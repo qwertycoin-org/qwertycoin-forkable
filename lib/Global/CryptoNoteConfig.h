@@ -192,7 +192,7 @@ const uint32_t P2P_IDLE_CONNECTION_KILL_INTERVAL             = (5 * 60);      //
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "07190a04cf6b457c09e39c9c90b1f8da9d263d1101318884a194b47ca6590e43";
 
 const char        LATEST_VERSION_URL[]                       = "https://releases.qwertycoin.org";
-const std::string LICENSE_URL                                = "https://github.com/qwertycoin-org/qwertycoin/blob/master/LICENSE.txt";
+const std::string LICENSE_URL                                = "https://github.com/qwertycoin-org/qwertycoin-forkable/blob/master/LICENSE.txt";
 
 /* Modules */
 

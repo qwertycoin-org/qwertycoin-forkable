@@ -1,6 +1,6 @@
 ![image](https://cdn.qwertycoin.org/images/press/other/qwc-github-3.png)
 #### Master Build Status
-[![Build Status](https://github.com/qwertycoin-org/qwertycoin/workflows/Build/badge.svg?branch=master)](https://github.com/qwertycoin-org/qwertycoin/actions)
+[![Build Status](https://github.com/qwertycoin-org/qwertycoin-forkable/workflows/Build/badge.svg?branch=master)](https://github.com/qwertycoin-org/qwertycoin-forkable/actions)
 
 # Table of contents
 1. [Project Specs](#coinspecs)
@@ -62,7 +62,7 @@ sudo apt-get install build-essential cmake git
 
 - After installing dependencies run simple script:
 ```
-git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin
+git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-forkable
 cd ./qwertycoin
 mkdir ./build
 cd ./build
@@ -84,7 +84,7 @@ cmake --build . --config Release
 - From the start menu, open "x64 Native Tools Command Prompt for vs2017";
 - And the run the following commands:
 ```
-git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin
+git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-forkable
 cd qwertycoin
 md build
 cd build
@@ -106,7 +106,7 @@ cmake --build . --config Release
 
 - After installing dependencies run simple script:
 ```
-git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin
+git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-forkable
 cd ./qwertycoin
 mkdir ./build
 cd ./build
@@ -136,7 +136,7 @@ export ANDROID_NDK_r18b="$HOME/.android/android-ndk-r18b"
 
 - After installing dependencies run simple script:
 ```
-git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin
+git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-forkable
 cd ./qwertycoin
 mkdir ./build
 cd ./build
@@ -159,7 +159,7 @@ sudo pkg install cmake git
 
 - After installing dependencies run simple script:
 ```
-git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin
+git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-forkable
 cd ./qwertycoin
 mkdir ./build
 cd ./build
@@ -198,7 +198,7 @@ ETN: etnkJXJFqiH9FCt6Gq2HWHPeY92YFsmvKX7qaysvnV11M796Xmovo2nSu6EUCMnniqRqAhKX9AQ
 <tr><td>Node Map</td><td>https://nodes.qwertycoin.org</td></tr>
 <tr><td>Wallets</td><td>https://releases.qwertycoin.org</td></tr>
 <tr><td>Web Wallet</td><td>https://myqwertycoin.com</td></tr>
-<tr><td>Masternode Setup</td><td>https://github.com/qwertycoin-org/qwertycoin/wiki</td></tr>
+<tr><td>Masternode Setup</td><td>https://github.com/qwertycoin-org/qwertycoin-forkable/wiki</td></tr>
 <tr><td>Blockfolio</td><td>https://blockfolio.com/#get-app</td></tr>
 <tr><td>CoinGecko</td><td>https://www.coingecko.com/en/coins/qwertycoin</td></tr>
 <tr><td>Delta</td><td>https://delta.app</td></tr>
@@ -212,7 +212,7 @@ Karbo Developers, Qwertycoin Community
 
 ### Copypasta for license when editing files  <a name="copypasta"></a>
 
-Hi Qwertycoin contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [src/config/CryptoNoteConfig.h](https://github.com/qwertycoin-org/qwertycoin/blob/master/src/config/CryptoNoteConfig.h) for an example.
+Hi Qwertycoin contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [src/config/CryptoNoteConfig.h](https://github.com/qwertycoin-org/qwertycoin-forkable/blob/master/src/config/CryptoNoteConfig.h) for an example.
 
 ```
 // Copyright (c) 2018-2021, The Qwertycoin Group.
