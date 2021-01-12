@@ -213,19 +213,10 @@ public:
 
     typedef std::function<difficulty_type(IMinerHandler::stat_period, uint64_t)> lazy_stat_callback_type;
 
-    difficulty_type nextDifficulty(uint32_t height,
-        uint8_t blockMajorVersion,
-        std::vector<uint64_t> timestamps,
-        std::vector<difficulty_type> Difficulties,
-        uint64_t nextBlockTime,
-        lazy_stat_callback_type &lazy_stat_cb) const;
-    difficulty_type nextDifficultyV1V2(
-        std::vector<uint64_t> timestamps,
-        std::vector<difficulty_type> Difficulties) const;
-    difficulty_type nextDifficultyV3EPoW(uint8_t blockMajorVersion,
-        std::vector<uint64_t> timestamps,
-        std::vector<difficulty_type> Difficulties,
-        uint32_t height) const;
+    difficulty_type nextDifficulty(uint8_t blockMajorVersion,
+                                   std::vector<uint64_t> timestamps,
+                                   std::vector<difficulty_type> Difficulties,
+                                   uint32_t height) const;
 
     difficulty_type getClifDifficulty(uint32_t height,
         uint8_t blockMajorVersion,

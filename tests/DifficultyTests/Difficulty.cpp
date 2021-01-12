@@ -166,9 +166,9 @@ bool test_difficulty_V6()
         std::vector<uint64_t> diff_window(diff_start, diff_end);
         std::cerr << "****** Calc diff for block: " << idx << std::endl;
         CryptoNote::difficulty_type next_diff =
-                currency.nextDifficultyV3EPoW(0, timestamp_window,
+                currency.nextDifficulty(0, timestamp_window,
                                           diff_window,
-                                          CryptoNote::parameters::UPGRADE_HEIGHT_V3 + idx);
+                                          CryptoNote::parameters::UPGRADE_HEIGHT_V1 + idx);
         if ((next_diff > precalc_diffs_V6[idx + 1]) ||
             (next_diff < precalc_diffs_V6[idx + 1])) {
             std::cerr << "Wrong difficulty for block " << idx << std::endl
@@ -218,7 +218,8 @@ int main(int argc, char *argv[])
             begin = end - currency.difficultyWindow();
         }
 
-        uint64_t res = currency.nextDifficultyV1V2(
+        uint64_t res = currency.nextDifficulty(
+            0,
             std::vector<uint64_t>{
                 std::next(std::begin(timestamps), begin),
                 std::next(std::begin(timestamps), begin + end)
@@ -226,7 +227,8 @@ int main(int argc, char *argv[])
             std::vector<uint64_t>{
                 std::next(std::begin(cumulativeDifficulties), begin),
                 std::next(std::begin(cumulativeDifficulties), begin + end)
-            }
+            },
+            n
         );
         if (res != difficulty) {
             std::cerr << "Wrong difficulty for block " << n << std::endl
