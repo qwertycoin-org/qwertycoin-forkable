@@ -123,11 +123,11 @@ uint32_t Currency::upgradeHeight(uint8_t majorVersion) const
     else if (majorVersion == BLOCK_MAJOR_VERSION_4) {
         return m_upgradeHeightV4;
     }
-    else if (majorVersion == BLOCK_MAJOR_VERSION_2) {
-        return m_upgradeHeightV2;
-    }
     else if (majorVersion == BLOCK_MAJOR_VERSION_3) {
         return m_upgradeHeightV3;
+    }
+    else if (majorVersion == BLOCK_MAJOR_VERSION_2) {
+        return m_upgradeHeightV2;
     }
     else {
         return static_cast<uint32_t>(-1);
@@ -151,7 +151,7 @@ bool Currency::getBlockReward(
     // Consistency
     double consistency = 1.0;
     double exponent = 0.25; 
-    if (height >= CryptoNote::parameters::UPGRADE_HEIGHT_V3 && difficultyTarget() != 0) {
+    if (height >= CryptoNote::parameters::UPGRADE_HEIGHT_V1 && difficultyTarget() != 0) {
         // blockTarget is (Timestamp of New Block - Timestamp of Previous Block)
         consistency = (double) blockTarget / (double) difficultyTarget();
 
@@ -188,10 +188,7 @@ bool Currency::getBlockReward(
     }
 
     uint64_t penalizedBaseReward = getPenalizedAmount(baseReward, medianSize, currentBlockSize);
-    uint64_t penalizedFee = fee;
-    if (blockMajorVersion >= BLOCK_MAJOR_VERSION_2 || cryptonoteCoinVersion() == 1) {
-        penalizedFee = getPenalizedAmount(fee, medianSize, currentBlockSize);
-    }
+    uint64_t penalizedFee = getPenalizedAmount(fee, medianSize, currentBlockSize);
 
     emissionChange = penalizedBaseReward - (fee - penalizedFee);
     reward = penalizedBaseReward + penalizedFee;
@@ -674,101 +671,8 @@ uint64_t Currency::roundUpMinFee(uint64_t minimalFee, int digits) const
     return ret;
 }
 
-difficulty_type Currency::nextDifficulty(uint32_t height,
+difficulty_type Currency::nextDifficulty(
     uint8_t blockMajorVersion,
-    std::vector<uint64_t> timestamps,
-    std::vector<difficulty_type> cumulativeDifficulties,
-    uint64_t nextBlockTime, lazy_stat_callback_type &lazy_stat_cb) const
-{
-    // check if we use special scenario with some fixed diff
-    if (CryptoNote::parameters::FIXED_DIFFICULTY > 0)
-    {
-        logger (WARNING) << "Fixed difficulty is used: " <<
-                            CryptoNote::parameters::FIXED_DIFFICULTY;
-        return CryptoNote::parameters::FIXED_DIFFICULTY;
-    }
-    if (m_fixedDifficulty > 0)
-    {
-        logger (WARNING) << "Fixed difficulty is used: " <<
-                            m_fixedDifficulty;
-        return m_fixedDifficulty;
-    }
-
-    uint64_t last_timestamp = 0;
-    if (!timestamps.empty()) {
-        last_timestamp = timestamps.back();
-    }
-    if ((blockMajorVersion >= BLOCK_MAJOR_VERSION_3) &&
-            (nextBlockTime > last_timestamp + CryptoNote::parameters::CRYPTONOTE_CLIF_THRESHOLD)) {
-        size_t array_size = cumulativeDifficulties.size();
-        difficulty_type last_difficulty = 1;
-        if (array_size >= 2) {
-            last_difficulty = cumulativeDifficulties[array_size - 1] - cumulativeDifficulties[array_size - 2];
-        }
-        uint64_t currentSolveTime = nextBlockTime - last_timestamp;
-        return getClifDifficulty(height, blockMajorVersion,
-                               last_difficulty, last_timestamp,
-                               currentSolveTime, lazy_stat_cb);
-    }
-
-    if (blockMajorVersion >= BLOCK_MAJOR_VERSION_3) {
-        return nextDifficultyV3EPoW(blockMajorVersion, timestamps, cumulativeDifficulties, height);
-    }
-    else {
-        return nextDifficultyV1V2(timestamps, cumulativeDifficulties);
-    }
-}
-
-// Retro Difficulty Algorithm
-difficulty_type Currency::nextDifficultyV1V2(
-    std::vector<uint64_t> timestamps,
-    std::vector<difficulty_type> cumulativeDifficulties) const
-{
-    assert(m_difficultyWindow >= 2);
-
-    if (timestamps.size() > m_difficultyWindow) {
-        timestamps.resize(m_difficultyWindow);
-        cumulativeDifficulties.resize(m_difficultyWindow);
-    }
-
-    size_t length = timestamps.size();
-    assert(length == cumulativeDifficulties.size());
-    assert(length <= m_difficultyWindow);
-    if (length <= 1) {
-        return 1;
-    }
-
-    sort(timestamps.begin(), timestamps.end());
-
-    size_t cutBegin, cutEnd;
-    assert(2 * m_difficultyCut <= m_difficultyWindow - 2);
-    if (length <= m_difficultyWindow - 2 * m_difficultyCut) {
-        cutBegin = 0;
-        cutEnd = length;
-    } else {
-        cutBegin = (length - (m_difficultyWindow - 2 * m_difficultyCut) + 1) / 2;
-        cutEnd = cutBegin + (m_difficultyWindow - 2 * m_difficultyCut);
-    }
-    assert(/*cut_begin >= 0 &&*/ cutBegin + 2 <= cutEnd && cutEnd <= length);
-    uint64_t timeSpan = timestamps[cutEnd - 1] - timestamps[cutBegin];
-    if (timeSpan == 0) {
-        timeSpan = 1;
-    }
-
-    difficulty_type totalWork = cumulativeDifficulties[cutEnd - 1]-cumulativeDifficulties[cutBegin];
-    assert(totalWork > 0);
-
-    uint64_t low, high;
-    low = mul128(totalWork, m_difficultyTarget, &high);
-    if (high != 0 || low + timeSpan - 1 < low) {
-        return 0;
-    }
-
-    return (low + timeSpan - 1) / timeSpan;
-}
-
-// Difficulty for Block Version 3.0 Qwertycoin´s Egalitarian Proof of Work (EPoW)
-difficulty_type Currency::nextDifficultyV3EPoW(uint8_t blockMajorVersion,
     std::vector<uint64_t> timestamps,
     std::vector<difficulty_type> cumulativeDifficulties,
     uint32_t height) const
@@ -793,7 +697,7 @@ difficulty_type Currency::nextDifficultyV3EPoW(uint8_t blockMajorVersion,
     // Consider this as a service or trial period.
     // With EPoW reward algo in place, we don't really need to worry about attackers
     // or large miners taking advanatage of our system.
-    if (height < CryptoNote::parameters::UPGRADE_HEIGHT_V3 + diffWindow) {
+    if (height < CryptoNote::parameters::UPGRADE_HEIGHT_V1 + diffWindow) {
         return nextDiffV6;
     }
 
@@ -839,16 +743,16 @@ difficulty_type Currency::nextDifficultyV3EPoW(uint8_t blockMajorVersion,
     uint64_t invalid_solvetime_sum = 0;
     std::for_each(solveTimes.begin(), solveTimes.end(),
                   [solvetime_lowborder, solvetime_highborder,
-                   &valid_solvetime_number, &valid_solvetime_sum,
-                   &invalid_solvetime_number, &invalid_solvetime_sum] (uint64_t st) {
-        if ((st >= solvetime_lowborder) && (st <= solvetime_highborder)) {
-            valid_solvetime_number++;
-            valid_solvetime_sum += st;
-        } else {
-            invalid_solvetime_number++;
-            invalid_solvetime_sum += st;
-        }
-    });
+                          &valid_solvetime_number, &valid_solvetime_sum,
+                          &invalid_solvetime_number, &invalid_solvetime_sum] (uint64_t st) {
+                      if ((st >= solvetime_lowborder) && (st <= solvetime_highborder)) {
+                          valid_solvetime_number++;
+                          valid_solvetime_sum += st;
+                      } else {
+                          invalid_solvetime_number++;
+                          invalid_solvetime_sum += st;
+                      }
+                  });
 
     // if there is no "invalid" solvetimes we can use previous difficulty value
     if (invalid_solvetime_number == 0) {

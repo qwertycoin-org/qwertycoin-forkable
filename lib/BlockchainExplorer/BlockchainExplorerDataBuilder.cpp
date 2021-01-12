@@ -99,7 +99,7 @@ bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block, BlockDe
         }
     }
 
-    if (blockDetails.height >= CryptoNote::parameters::UPGRADE_HEIGHT_V3) {
+    if (blockDetails.height >= CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
         m_core.getBlockHeight(block.previousBlockHash, previousBlockHeight);
         blockTarget = block.timestamp - m_core.getBlockTimestamp(previousBlockHeight);
     }
