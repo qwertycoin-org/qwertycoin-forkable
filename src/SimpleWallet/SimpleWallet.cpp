@@ -921,8 +921,8 @@ bool processServerAliasResponse(const std::string &s, std::string &address)
 {
     try {
         // Courtesy of Monero Project
-        // make sure the txt record has "oa1:qwc" and find it
-        auto pos = s.find("oa1:qwc");
+        // make sure the txt record has "oa1:tickername" and find it
+        auto pos = s.find("oa1:"+WalletConfig::ticker);
         if (pos == std::string::npos) {
             return false;
         }
@@ -1366,7 +1366,7 @@ bool simple_wallet::get_reserve_proof(const std::vector<std::string> &args)
     try {
         const std::string sig_str = m_wallet->getReserveProof(reserve,args.size()==2?args[1] : "");
 
-        const std::string filename = "reserve_proof_" + args[0] + "QWC.txt";
+        const std::string filename = "reserve_proof_" + args[0] + WalletConfig::ticker+".txt";
         boost::system::error_code ec;
         if (boost::filesystem::exists(filename, ec)) {
             boost::filesystem::remove(filename, ec);
