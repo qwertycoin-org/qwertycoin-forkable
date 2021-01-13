@@ -132,8 +132,8 @@ jobs:
       - name: Build
         id: build
         run: |
-          sudo apt-get purge '*boost*'
-          sudo apt install -y libboost1.62-all-dev
+          sudo apt update
+          sudo apt install -y libboost-all-dev libssl-dev
           build_folder="build/release"
           qwc_ver=${GITHUB_SHA::7}
           release_name=qwertycoin-cli-ubuntu18.04-"$qwc_ver"
@@ -171,8 +171,8 @@ jobs:
           CXX: clang++-6.0
 
         run: |
-          sudo apt-get purge '*boost*'
-          sudo apt install -y libboost1.62-all-dev
+          sudo apt update
+          sudo apt install -y libboost-all-dev libssl-dev
           build_folder="build/release"
           qwc_ver=${GITHUB_SHA::7}
           release_name=qwertcoin-cli-ubuntu18.04-clang-6-"$qwc_ver"
