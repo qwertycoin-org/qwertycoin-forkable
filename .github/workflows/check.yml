@@ -103,8 +103,8 @@ jobs:
           release_name=qwertycoin-cli-ubuntu20.04-"$qwc_ver"
           mkdir -p "$build_folder"
           cd "$build_folder"
-          cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
-          make
+          cmake -DBUILD_ALL:BOOL=TRUE ..
+          cmake --build . --config Release
           mkdir -p "$release_name"
           exeFiles=()
           for f in src/*; do [[ -x $f && -f $f ]] && exeFiles+=( "$f" ); done
@@ -135,8 +135,8 @@ jobs:
           release_name=qwertycoin-cli-ubuntu18.04-"$qwc_ver"
           mkdir -p "$build_folder"
           cd "$build_folder"
-          cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
-          make
+          cmake -DBUILD_ALL:BOOL=TRUE ..
+          cmake --build . --config Release
           mkdir -p "$release_name"
           exeFiles=()
           ls -al src/
@@ -173,8 +173,8 @@ jobs:
           release_name=qwertcoin-cli-ubuntu18.04-clang-6-"$qwc_ver"
           mkdir -p "$build_folder"
           cd "$build_folder"
-          cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
-          make
+          cmake -DBUILD_ALL:BOOL=TRUE ..
+          cmake --build . --config Release
           mkdir -p "$release_name"
           exeFiles=()
           for f in src/*; do [[ -x $f && -f $f ]] && exeFiles+=( "$f" ); done
