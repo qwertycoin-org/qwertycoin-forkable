@@ -28,7 +28,7 @@ jobs:
           $release_name = "qwertycoin-cli-win64-$qwc_ver"
           mkdir "$build_folder"
           cd "$build_folder"
-          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_WITH_TOOLS:BOOL=TRUE ..
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_WITH_TOOLS:BOOL=TRUE -DBUILD_WITH_TESTS:BOOL=FALSE ..
           cmake --build . --config Release
           cd src/Release
           Compress-Archive -Path *.exe -DestinationPath "$release_name.zip"
