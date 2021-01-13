@@ -59,7 +59,7 @@ jobs:
       - name: Build
         id: build
         run: |
-          build_folder="build/"
+          build_folder="build"
           qwc_ver=${GITHUB_SHA::7}
           release_name="qwertycoin-cli-macOS-$qwc_ver"
           brew install --force gcc
@@ -98,7 +98,7 @@ jobs:
       - name: Build
         id: build
         run: |
-          build_folder="build/release"
+          build_folder="build"
           qwc_ver=${GITHUB_SHA::7}
           release_name=qwertycoin-cli-ubuntu20.04-"$qwc_ver"
           mkdir -p "$build_folder"
@@ -130,7 +130,7 @@ jobs:
       - name: Build
         id: build
         run: |
-          build_folder="build/release"
+          build_folder="build"
           qwc_ver=${GITHUB_SHA::7}
           release_name=qwertycoin-cli-ubuntu18.04-"$qwc_ver"
           mkdir -p "$build_folder"
@@ -168,7 +168,7 @@ jobs:
           CXX: clang++-6.0
 
         run: |
-          build_folder="build/release"
+          build_folder="build"
           qwc_ver=${GITHUB_SHA::7}
           release_name=qwertcoin-cli-ubuntu18.04-clang-6-"$qwc_ver"
           mkdir -p "$build_folder"
