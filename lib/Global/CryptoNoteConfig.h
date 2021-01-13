@@ -137,9 +137,9 @@ const uint32_t GOVERNANCE_HEIGHT_END                         = 10000000;
 
 } // namespace parameters
 
-const char     CRYPTONOTE_NAME[]                             = "QwertyNote";
+const char     CRYPTONOTE_NAME[]                             = "QwertyFork";
 const char     GENESIS_COINBASE_TX_HEX[]                     = "013c01ff0001ffffffffffff07029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101aa15fd091aecfced736b3fcb0063d7bd74063c0183dbbd2cf376c46e2c969205";
-const char     DNS_CHECKPOINTS_HOST[]                        = "checkpoints-qwertynote.qwertycoin.org";
+const char     DNS_CHECKPOINTS_HOST[]                        = "checkpoints-qwertyfork.qwertycoin.org";
 
 const uint8_t  TRANSACTION_VERSION_1                         =  1;
 const uint8_t  TRANSACTION_VERSION_2                         =  2;
