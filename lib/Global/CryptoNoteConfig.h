@@ -137,9 +137,9 @@ const uint32_t GOVERNANCE_HEIGHT_END                         = 10000000;
 
 } // namespace parameters
 
-const char     CRYPTONOTE_NAME[]                             = "QwertyNote";
+const char     CRYPTONOTE_NAME[]                             = "QwertyFork";
 const char     GENESIS_COINBASE_TX_HEX[]                     = "013c01ff0001ffffffffffff07029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101aa15fd091aecfced736b3fcb0063d7bd74063c0183dbbd2cf376c46e2c969205";
-const char     DNS_CHECKPOINTS_HOST[]                        = "checkpoints-qwertynote.qwertycoin.org";
+const char     DNS_CHECKPOINTS_HOST[]                        = "checkpoints-qwertyfork.qwertycoin.org";
 
 const uint8_t  TRANSACTION_VERSION_1                         =  1;
 const uint8_t  TRANSACTION_VERSION_2                         =  2;
@@ -201,8 +201,8 @@ const bool     P2P_MESSAGES                                  =  true;
 const uint16_t P2P_MESSAGES_CHAR_COUNT                       =  160;
 
 /* Governance Fee Wallets // The Qwertycoin Foundation */
-const std::string GOVERNANCE_WALLET_ADDRESS                  = "";
-const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "";
+const std::string GOVERNANCE_WALLET_ADDRESS                  = "QWFiLPfqNroPMmpr9rw5dyVkqhSFTwskGGRqbX59qjNS77b4iaisnYtNC8ccKCKqTuhzkW9BN4Sa2Q59YxVgdEbe2d1mncRG3y";
+const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "36928ecdb244f03c1cbdc14a6a54713724cf9a52b528678a84434cf762c5340a";
 
 const char *const SEED_NODES[] = {
 	"n00-fork.qwertycoin.org:5196"
