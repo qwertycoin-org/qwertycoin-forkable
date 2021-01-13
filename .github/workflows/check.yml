@@ -143,6 +143,7 @@ jobs:
           make
           mkdir -p "$release_name"
           exeFiles=()
+          ls -al src/
           for f in src/*; do [[ -x $f && -f $f ]] && exeFiles+=( "$f" ); done
           strip "${exeFiles[@]}"
           cp "${exeFiles[@]}" "$release_name/"
