@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/qwertycoin-org/qwertycoin-forkable/workflows/Build/badge.svg?branch=master)](https://github.com/qwertycoin-org/qwertycoin-forkable/actions)
 
 # What's this for? 
-This is and lightweight version of Qwertycoin´s Sourcecode. Perfect for create your own Project using QwertyNote v1.0.
+This is and lightweight version of Qwertycoin´s Sourcecode. Perfect for create your own Project using QwertyFork v1.0.
 
 ## Table of contents
 1. [Project Specs](#coinspecs)
@@ -21,7 +21,7 @@ This is and lightweight version of Qwertycoin´s Sourcecode. Perfect for create 
 <table>
 <tr><td>Ticker Symbol</td><td>QWCfork</td></tr>
 <tr><td>Algorithm</td><td>Cryptonight</td></tr>
-<tr><td>Type</td><td>Egalitrian Proof of Work (EPoW)</td></tr>
+<tr><td>Type</td><td>Egalitarian Proof of Work (EPoW)</td></tr>
 <tr><td>Block Time</td><td>120 Seconds</td></tr>
 <tr><td>Premine</td><td>0.0 %</td></tr>
 <tr><td>Decimals</td><td>8 Digits</td></tr>

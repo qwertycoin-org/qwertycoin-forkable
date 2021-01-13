@@ -73,7 +73,7 @@ if(GIT_FOUND)
     endif()
 endif()
 
-set(PROJECT_DISPLAY_NAME "QwertyNote")
+set(PROJECT_DISPLAY_NAME "QwertyFork")
 set(PROJECT_SHORT_NAME "qwfc")
 set(PROJECT_NAME "qwertycoin")
 set(PROJECT_DESCRIPTION "Safe. Simple. Easy. Fork.")
