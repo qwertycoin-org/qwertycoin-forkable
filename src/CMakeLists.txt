@@ -47,7 +47,7 @@ add_executable(QwertycoinTools_Daemon ${QwertycoinTools_Daemon_SOURCES})
 add_executable(QwertycoinTools::Daemon ALIAS QwertycoinTools_Daemon)
 target_include_directories(QwertycoinTools_Daemon PRIVATE ${QwertycoinTools_INCLUDE_DIRS})
 target_link_libraries(QwertycoinTools_Daemon PRIVATE ${QwertycoinTools_Daemon_LIBS})
-set_target_properties(QwertycoinTools_Daemon PROPERTIES OUTPUT_NAME "qwertycoind")
+set_target_properties(QwertycoinTools_Daemon PROPERTIES OUTPUT_NAME "qwertyforkd")
 
 # QwertycoinTools::PaymentGateService
 
