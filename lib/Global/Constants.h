@@ -69,7 +69,8 @@ const std::vector <uint64_t> PRETTY_AMOUNTS {
 
 const std::string windowsAsciiArt =
         "\n                                                              \n"
-        "                         _                   _                  \n"
+        " Fork                                                           \n"
+        "     of                  _                   _                  \n"
         "                        | |                 (_)                 \n"
         "  __ ___      _____ _ __| |_ _   _  ___ ___  _ _ __             \n"
         " / _` \\ \\ /\\ / / _ \\ '__| __| | | |/ __/ _ \\| | '_  \\     \n"
@@ -81,6 +82,7 @@ const std::string windowsAsciiArt =
 
 const std::string nonWindowsAsciiArt =
         "\n                                                                                 \n"
+        " Fork of                                                                           \n"
         " ██████╗ ██╗    ██╗███████╗██████╗ ████████╗██╗   ██╗ ██████╗ ██████╗ ██╗███╗   ██╗\n"
         "██╔═══██╗██║    ██║██╔════╝██╔══██╗╚══██╔══╝╚██╗ ██╔╝██╔════╝██╔═══██╗██║████╗  ██║\n"
         "██║   ██║██║ █╗ ██║█████╗  ██████╔╝   ██║    ╚████╔╝ ██║     ██║   ██║██║██╔██╗ ██║\n"
@@ -115,12 +117,12 @@ const uint64_t addressPrefix = CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS
 /*!
     Your coins 'Ticker', e.g. Qwertycoin = QWC, Bitcoin = BTC
 */
-const std::string ticker = "QWC";
+const std::string ticker = "QWF";
 
 /*!
     The name of your deamon
 */
-const std::string daemonName = "qwertycoind";
+const std::string daemonName = "qwertyforkd";
 
 /*!
     The name to call this wallet

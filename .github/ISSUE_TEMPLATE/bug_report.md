@@ -35,7 +35,7 @@ Please insert your default verbosity CMake output here
 
 ### Issue Report
 
-**Binary Reported:** <!-- does this issue affect simplewallet, qwertycoind, walletd, miner? -->
+**Binary Reported:** <!-- does this issue affect simplewallet, qwertyforkd, walletd? -->
 
 #### Expected Behavior
 

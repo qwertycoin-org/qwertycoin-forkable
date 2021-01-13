@@ -86,7 +86,7 @@ jobs:
         run: |
             if [[ "${TAG:5:4}" == "tags" ]]; then export TAG=${TAG:10}; else export TAG=${COMMIT_SHA::8}; fi
             cd build/src
-            TARGETS="qwertycoind simplewallet walletd"
+            TARGETS="qwertyforkd simplewallet walletd"
             if [[ "${LABEL}" != "aarch64" ]]; then strip ${TARGETS}; fi
             rm -rf qwertycoin-${TAG}
             mkdir qwertycoin-${TAG}
@@ -161,7 +161,7 @@ jobs:
         run: |
             if [[ "${TAG:5:4}" == "tags" ]]; then export TAG=${TAG:10}; else export TAG=${COMMIT_SHA::8}; fi
             cd build/src
-            TARGETS="qwertycoind simplewallet walletd"
+            TARGETS="qwertyforkd simplewallet walletd"
             strip ${TARGETS}
             rm -rf qwertycoin-${TAG}
             mkdir qwertycoin-${TAG}

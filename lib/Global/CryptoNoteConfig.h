@@ -36,7 +36,7 @@ const uint64_t DIFFICULTY_TARGET                              = 120; // seconds
 const uint64_t CRYPTONOTE_MAX_BLOCK_NUMBER                    = 500000000;
 const size_t   CRYPTONOTE_MAX_BLOCK_BLOB_SIZE                 = 500000000;
 const size_t   CRYPTONOTE_MAX_TX_SIZE                         = 1000000000;
-const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX        = 0x14820c; // Addresses starts with "QWC"
+const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX        = 0x430c; // Addresses starts with "QWF"
 const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW           = 60;
 const size_t   CRYPTONOTE_TX_SPENDABLE_AGE                    = 10;
 const size_t   CRYPTONOTE_SAFE_TX_SPENDABLE_AGE               = 1;
@@ -137,9 +137,9 @@ const uint32_t GOVERNANCE_HEIGHT_END                         = 10000000;
 
 } // namespace parameters
 
-const char     CRYPTONOTE_NAME[]                             = "Qwertycoin";
-const char     GENESIS_COINBASE_TX_HEX[]                     = "";
-const char     DNS_CHECKPOINTS_HOST[]                        = "checkpoints.qwertycoin.org";
+const char     CRYPTONOTE_NAME[]                             = "QwertyNote";
+const char     GENESIS_COINBASE_TX_HEX[]                     = "013c01ff0001ffffffffffff07029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101aa15fd091aecfced736b3fcb0063d7bd74063c0183dbbd2cf376c46e2c969205";
+const char     DNS_CHECKPOINTS_HOST[]                        = "checkpoints-qwertynote.qwertycoin.org";
 
 const uint8_t  TRANSACTION_VERSION_1                         =  1;
 const uint8_t  TRANSACTION_VERSION_2                         =  2;
@@ -159,9 +159,9 @@ const size_t   BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT        =  10000; // by def
 const size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT            =  128; // by default, blocks count in blocks downloading
 const size_t   COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT         =  1000;
 
-const int      P2P_DEFAULT_PORT                              =  8196;
-const int      RPC_DEFAULT_PORT                              =  8197;
-const int      SERVICE_DEFAULT_PORT                          =  8198;
+const int      P2P_DEFAULT_PORT                              =  5196;
+const int      RPC_DEFAULT_PORT                              =  5197;
+const int      SERVICE_DEFAULT_PORT                          =  5198;
 
 const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  1000;
 const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
@@ -205,7 +205,7 @@ const std::string GOVERNANCE_WALLET_ADDRESS                  = "";
 const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "";
 
 const char *const SEED_NODES[] = {
-	"127.0.0.1:8197"
+	"n00-fork.qwertycoin.org:5196"
 	/*
 		Add your lovely nodes!
 		Recommended: At best 8, at least: 2
