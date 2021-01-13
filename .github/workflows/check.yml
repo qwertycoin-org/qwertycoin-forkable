@@ -28,8 +28,8 @@ jobs:
           $release_name = "qwertycoin-cli-win64-$qwc_ver"
           mkdir "$build_folder"
           cd "$build_folder"
-          cmake -G "Visual Studio 16 2019" -A x64 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" ..
-          msbuild Qwertycoin.sln /p:Configuration=Release /m
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_ALL:BOOL=TRUE ..
+          cmake --build . --config Release
           cd src\Release
           Compress-Archive -Path *.exe -DestinationPath "$release_name.zip"
           $sha256 = (Get-FileHash "$release_name.zip").Hash
