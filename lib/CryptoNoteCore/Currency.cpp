@@ -677,13 +677,10 @@ difficulty_type Currency::nextDifficulty(
     std::vector<difficulty_type> cumulativeDifficulties,
     uint32_t height) const
 {
-    if(isTestnet()){
+    if(isTestnet() || timestamps.empty()){
         return CryptoNote::parameters::DEFAULT_DIFFICULTY;
     }
 
-    if (timestamps.empty()) {
-        return CryptoNote::parameters::DEFAULT_DIFFICULTY;
-    }
     // Dynamic difficulty calculation window
     uint32_t diffWindow = timestamps.size() - 1;
 
@@ -998,9 +995,7 @@ CurrencyBuilder::CurrencyBuilder(Logging::ILogger &log)
     expectedNumberOfBlocksPerDay(parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY);
 
     timestampCheckWindow(parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW);
-    timestampCheckWindow_v1(parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2);
     blockFutureTimeLimit(parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT);
-    blockFutureTimeLimit_v1(parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2);
 
     moneySupply(parameters::MONEY_SUPPLY);
     emissionSpeedFactor(parameters::EMISSION_SPEED_FACTOR);

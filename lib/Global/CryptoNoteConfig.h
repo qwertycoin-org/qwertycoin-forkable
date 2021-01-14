@@ -42,10 +42,7 @@ const size_t   CRYPTONOTE_TX_SPENDABLE_AGE                    = 10;
 const size_t   CRYPTONOTE_SAFE_TX_SPENDABLE_AGE               = 1;
 
 const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT             = DIFFICULTY_TARGET * 60;
-const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2          = DIFFICULTY_TARGET * 6;
-
-const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW              = 60;
-const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2           = 11;
+const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW              = DIFFICULTY_TARGET / 2;
 
 
 const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT               = 8;
@@ -85,7 +82,7 @@ const size_t   DIFFICULTY_WINDOW_V2                           = EXPECTED_NUMBER_
 const size_t   DIFFICULTY_CUT                                 = 60;  // timestamps to cut after sorting
 const size_t   DIFFICULTY_LAG                                 = 15;  // !!!
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
-const size_t DEFAULT_DIFFICULTY                               = 1;
+const size_t DEFAULT_DIFFICULTY                               = 10000;
 const size_t FIXED_DIFFICULTY                                 = 0;
 
 static constexpr uint64_t POISSON_CHECK_TRIGGER               = 10;   // Reorg size that triggers poisson timestamp check

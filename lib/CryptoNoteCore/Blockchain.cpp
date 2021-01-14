@@ -1089,7 +1089,7 @@ bool Blockchain::switch_to_alternative_blockchain(
             }
         }
 
-        uint64_t block_ftl = CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2;
+        uint64_t block_ftl = CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT;
         // This would fail later anyway
         if (high_timestamp > get_adjusted_time() + block_ftl) {
             logger(ERROR, BRIGHT_RED)
@@ -1543,12 +1543,12 @@ bool Blockchain::complete_timestamps_vector(
     uint64_t start_top_height,
     std::vector<uint64_t> &timestamps)
 {
-    if (timestamps.size() >= m_currency.timestampCheckWindow(blockMajorVersion)) {
+    if (timestamps.size() >= m_currency.timestampCheckWindow()) {
         return true;
     }
 
     std::lock_guard<decltype(m_blockchain_lock)> lk(m_blockchain_lock);
-    size_t need_elements = m_currency.timestampCheckWindow(blockMajorVersion) - timestamps.size();
+    size_t need_elements = m_currency.timestampCheckWindow() - timestamps.size();
     if (start_top_height >= m_blocks.size()) {
         logger(ERROR, BRIGHT_RED)
             << "internal error: passed start_height = " << start_top_height
@@ -2500,7 +2500,7 @@ uint64_t Blockchain::get_adjusted_time()
 
 bool Blockchain::check_block_timestamp_main(const Block &b)
 {
-    if (b.timestamp > get_adjusted_time() + m_currency.blockFutureTimeLimit(b.majorVersion)) {
+    if (b.timestamp > get_adjusted_time() + m_currency.blockFutureTimeLimit()) {
         logger(INFO, BRIGHT_WHITE)
             << "Timestamp of block with id: " << get_block_hash(b) << ", "
             << b.timestamp << ", bigger than adjusted time + 28 min.";
@@ -2508,8 +2508,8 @@ bool Blockchain::check_block_timestamp_main(const Block &b)
     }
 
     std::vector<uint64_t> timestamps;
-    auto delta = m_blocks.size() - m_currency.timestampCheckWindow(b.majorVersion);
-    size_t offset = m_blocks.size() <= m_currency.timestampCheckWindow(b.majorVersion) ? 0 : delta;
+    auto delta = m_blocks.size() - m_currency.timestampCheckWindow();
+    size_t offset = m_blocks.size() <= m_currency.timestampCheckWindow() ? 0 : delta;
     for (; offset != m_blocks.size(); ++offset) {
         timestamps.push_back(m_blocks[offset].bl.timestamp);
     }
@@ -2527,7 +2527,7 @@ bool Blockchain::check_block_timestamp_main(const Block &b)
 */
 bool Blockchain::check_block_timestamp(std::vector<uint64_t> timestamps, const Block &b)
 {
-    if (timestamps.size() < m_currency.timestampCheckWindow(b.majorVersion)) {
+    if (timestamps.size() < m_currency.timestampCheckWindow()) {
         return true;
     }
 
@@ -2537,7 +2537,7 @@ bool Blockchain::check_block_timestamp(std::vector<uint64_t> timestamps, const B
         logger(INFO, BRIGHT_WHITE)
             << "Timestamp of block with id: " << get_block_hash(b) << ", "
             << b.timestamp
-            << ", less than median of last " << m_currency.timestampCheckWindow(b.majorVersion)
+            << ", less than median of last " << m_currency.timestampCheckWindow()
             << " blocks, " << median_ts;
         return false;
     }

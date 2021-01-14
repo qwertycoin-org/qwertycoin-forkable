@@ -692,9 +692,9 @@ bool core::get_block_template(
         // Fix by Jagerman
         // https://github.com/graft-project/GraftNetwork/pull/118/commits
 
-        if(height >= m_currency.timestampCheckWindow(b.majorVersion)) {
+        if(height >= m_currency.timestampCheckWindow()) {
             std::vector<uint64_t> timestamps;
-            for(size_t offset = height - m_currency.timestampCheckWindow(b.majorVersion);
+            for(size_t offset = height - m_currency.timestampCheckWindow();
                 offset < height;
                 ++offset) {
                 timestamps.push_back(m_blockchain.getBlockTimestamp(offset));
