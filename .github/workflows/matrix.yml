@@ -88,14 +88,14 @@ jobs:
             cd build/src
             TARGETS="qwertyforkd simplewallet walletd"
             if [[ "${LABEL}" != "aarch64" ]]; then strip ${TARGETS}; fi
-            rm -rf qwertycoin-${TAG}
-            mkdir qwertycoin-${TAG}
-            cp ${TARGETS} qwertycoin-${TAG}/
-            cp ../../LICENSE.txt qwertycoin-${TAG}/
-            tar cvfz qwertycoin-${LABEL}-${TAG}.tar.gz qwertycoin-${TAG}/
-            echo ::set-output name=binary_path::qwertycoin-${TAG}
-            echo ::set-output name=artifact_name::qwertycoin-${LABEL}-${TAG}
-            echo ::set-output name=file_name::qwertycoin-${LABEL}-${TAG}.tar.gz
+            rm -rf qwertyfork-${TAG}
+            mkdir qwertyfork-${TAG}
+            cp ${TARGETS} qwertyfork-${TAG}/
+            cp ../../LICENSE.txt qwertyfork-${TAG}/
+            tar cvfz qwertyfork-${LABEL}-${TAG}.tar.gz qwertyfork-${TAG}/
+            echo ::set-output name=binary_path::qwertyfork-${TAG}
+            echo ::set-output name=artifact_name::qwertyfork-${LABEL}-${TAG}
+            echo ::set-output name=file_name::qwertyfork-${LABEL}-${TAG}.tar.gz
 
       # Upload to GH Release
       - name: Upload to GH Release
@@ -163,14 +163,14 @@ jobs:
             cd build/src
             TARGETS="qwertyforkd simplewallet walletd"
             strip ${TARGETS}
-            rm -rf qwertycoin-${TAG}
-            mkdir qwertycoin-${TAG}
-            cp ${TARGETS} qwertycoin-${TAG}/
-            cp ../../LICENSE.txt qwertycoin-${TAG}/
-            tar cvfz qwertycoin-${LABEL}-${TAG}.tar.gz qwertycoin-${TAG}/
-            echo ::set-output name=binary_path::qwertycoin-${TAG}
-            echo ::set-output name=artifact_name::qwertycoin-${LABEL}-${TAG}
-            echo ::set-output name=file_name::qwertycoin-${LABEL}-${TAG}.tar.gz
+            rm -rf qwertyfork-${TAG}
+            mkdir qwertyfork-${TAG}
+            cp ${TARGETS} qwertyfork-${TAG}/
+            cp ../../LICENSE.txt qwertyfork-${TAG}/
+            tar cvfz qwertyfork-${LABEL}-${TAG}.tar.gz qwertyfork-${TAG}/
+            echo ::set-output name=binary_path::qwertyfork-${TAG}
+            echo ::set-output name=artifact_name::qwertyfork-${LABEL}-${TAG}
+            echo ::set-output name=file_name::qwertyfork-${LABEL}-${TAG}.tar.gz
 
 
       # Upload to GH Release
@@ -216,7 +216,7 @@ jobs:
         run: |
             mkdir build
             cd build
-            cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_ALL:BOOL=TRUE -DARCH=default ..
+            cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_WITH_TOOLS:BOOL=TRUE -DBUILD_WITH_TESTS:BOOL=FALSE ..
 
       # Build for Windows
       - name: Build
@@ -235,14 +235,14 @@ jobs:
         run: |
             if [[ "${TAG:5:4}" == "tags" ]]; then export TAG=${TAG:10}; else export TAG=${COMMIT_SHA::8}; fi
             cd build/src/Release
-            rm -rf qwertycoin-${TAG}
-            mkdir qwertycoin-${TAG}
-            cp *.exe qwertycoin-${TAG}/
-            cp ../../../LICENSE.txt qwertycoin-${TAG}/
-            7z a qwertycoin-${LABEL}-${TAG}.zip qwertycoin-${TAG}/
-            echo ::set-output name=binary_path::qwertycoin-${TAG}
-            echo ::set-output name=artifact_name::qwertycoin-${LABEL}-${TAG}
-            echo ::set-output name=file_name::qwertycoin-${LABEL}-${TAG}.zip
+            rm -rf qwertyfork-${TAG}
+            mkdir qwertyfork-${TAG}
+            cp *.exe qwertyfork-${TAG}/
+            cp ../../../LICENSE.txt qwertyfork-${TAG}/
+            7z a qwertyfork-${LABEL}-${TAG}.zip qwertyfork-${TAG}/
+            echo ::set-output name=binary_path::qwertyfork-${TAG}
+            echo ::set-output name=artifact_name::qwertyfork-${LABEL}-${TAG}
+            echo ::set-output name=file_name::qwertyfork-${LABEL}-${TAG}.zip
 
 
       # Upload to GH Release
