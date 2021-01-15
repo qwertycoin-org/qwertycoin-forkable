@@ -195,12 +195,14 @@ jobs:
   # Windows Builds on Windows Server 2019
   windows_build:
     name: Windows
-    runs-on: windows-2019
+    runs-on: windows-latest
     env:
-      MSBUILD_PATH: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin"
       LABEL: windows
     steps:
       - uses: actions/checkout@v1
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
 
       - name: Setup clcache
         run: pip install clcache
