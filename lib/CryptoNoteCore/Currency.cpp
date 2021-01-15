@@ -684,7 +684,7 @@ difficulty_type Currency::nextDifficulty(
     // Dynamic difficulty calculation window
     uint32_t diffWindow = timestamps.size() - 1;
 
-    difficulty_type nextDiffV6 = CryptoNote::parameters::DEFAULT_DIFFICULTY;
+    difficulty_type nextEPoWDiff = CryptoNote::parameters::DEFAULT_DIFFICULTY;
     difficulty_type min_difficulty = CryptoNote::parameters::DEFAULT_DIFFICULTY;
     // Condition #1 When starting a chain or a working testnet requiring
     // block sample gathering until enough blocks are available (Kick-off Scenario)
@@ -695,17 +695,17 @@ difficulty_type Currency::nextDifficulty(
     // With EPoW reward algo in place, we don't really need to worry about attackers
     // or large miners taking advanatage of our system.
     if (height < CryptoNote::parameters::UPGRADE_HEIGHT_V1 + diffWindow) {
-        return nextDiffV6;
+        return nextEPoWDiff;
     }
 
     // check all values in input vectors greater than previous value to calc adjacent differences later
     if (std::adjacent_find(timestamps.begin(), timestamps.end(), std::greater<uint64_t>()) != timestamps.end()) {
         logger (ERROR) << "Invalid timestamps for difficulty calculation";
-        return nextDiffV6;
+        return nextEPoWDiff;
     }
     if (std::adjacent_find(cumulativeDifficulties.begin(), cumulativeDifficulties.end(), std::greater_equal<difficulty_type>()) != cumulativeDifficulties.end()) {
         logger (ERROR) << "Invalid cumulativeDifficulties for difficulty calculation";
-        return nextDiffV6;
+        return nextEPoWDiff;
     }
 
     uint64_t difficulty_target = CryptoNote::parameters::DIFFICULTY_TARGET;
@@ -765,25 +765,25 @@ difficulty_type Currency::nextDifficulty(
         if (valid_solvetime_mean >= invalid_solvetime_mean) {
             double coef = double(difficulty_target) / double(valid_solvetime_mean);
             if (valid_solvetime_mean < difficulty_target) {
-                nextDiffV6 = prev_difficulty * std::min(1.01, coef) + 0.5;
+                nextEPoWDiff = prev_difficulty * std::min(1.01, coef) + 0.5;
             } else {
-                nextDiffV6 = prev_difficulty * std::max(0.99, coef) + 0.5;
+                nextEPoWDiff = prev_difficulty * std::max(0.99, coef) + 0.5;
             }
         } else {
             double coef = double(difficulty_target) / double(invalid_solvetime_mean);
             if (invalid_solvetime_mean < difficulty_target) {
-                nextDiffV6 = prev_difficulty * std::min(1.01, coef) + 0.5;
+                nextEPoWDiff = prev_difficulty * std::min(1.01, coef) + 0.5;
             } else {
-                nextDiffV6 = prev_difficulty * std::max(0.99, coef) + 0.5;
+                nextEPoWDiff = prev_difficulty * std::max(0.99, coef) + 0.5;
             }
         }
     } else if (window_time < window_target * 0.97) {
-        nextDiffV6 = prev_difficulty * 1.02 + 0.5;
+        nextEPoWDiff = prev_difficulty * 1.02 + 0.5;
     } else {
-        nextDiffV6 = prev_difficulty * 0.98 + 0.5;
+        nextEPoWDiff = prev_difficulty * 0.98 + 0.5;
     }
 
-    return std::max(nextDiffV6, min_difficulty);
+    return std::max(nextEPoWDiff, min_difficulty);
 }
 
 difficulty_type Currency::getClifDifficulty(uint32_t height,
