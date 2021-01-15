@@ -129,7 +129,7 @@ const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json"
 
 /* Governance Fee and range // The QWC Foundation */
 const uint16_t GOVERNANCE_PERCENT_FEE                        = 10; // 10 percent of base block reward
-const uint32_t GOVERNANCE_HEIGHT_START                       = UPGRADE_HEIGHT_V1;
+const uint32_t GOVERNANCE_HEIGHT_START                       = UPGRADE_HEIGHT_V2;
 const uint32_t GOVERNANCE_HEIGHT_END                         = 10000000;
 
 } // namespace parameters
