@@ -202,7 +202,8 @@ const std::string GOVERNANCE_WALLET_ADDRESS                  = "QWFiLPfqNroPMmpr
 const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "36928ecdb244f03c1cbdc14a6a54713724cf9a52b528678a84434cf762c5340a";
 
 const char *const SEED_NODES[] = {
-	"n00-fork.qwertycoin.org:5196"
+	"n00-fork.qwertycoin.org:5196",
+	"n01-fork.qwertycoin.org:5196"
 	/*
 		Add your lovely nodes!
 		Recommended: At best 8, at least: 2

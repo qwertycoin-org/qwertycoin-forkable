@@ -218,7 +218,7 @@ jobs:
         run: |
             mkdir build
             cd build
-            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION="10.0.18362.0" -DBUILD_WITH_TOOLS:BOOL=TRUE -DBUILD_WITH_TESTS:BOOL=FALSE ..
+            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION="10.0.18362.0" -DBUILD_ALL:BOOL=TRUE ..
 
       # Build for Windows
       - name: Build
