@@ -2058,7 +2058,7 @@ namespace CryptoNote {
 			}
 		}
 
-		if (res.block.height >= CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
+		if (res.block.height > CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
 			m_core.getBlockHeight(blk.previousBlockHash, previousBlockHeight);
 			blockTarget = blk.timestamp - m_core.getBlockTimestamp(previousBlockHeight);
 		}

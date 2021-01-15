@@ -437,7 +437,7 @@ bool core::check_tx_unmixable(const Transaction &tx, uint32_t height)
 {
     for (const auto &out : tx.outputs) {
         if (!is_valid_decomposed_amount(out.amount)
-            && height >= CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
+            && height > CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
             logger(ERROR)
                 << "Invalid decomposed output amount "
                 << out.amount
@@ -732,7 +732,7 @@ bool core::get_block_template(
     uint32_t previousBlockHeight = 0;
     uint64_t blockTarget = CryptoNote::parameters::DIFFICULTY_TARGET;
 
-    if (height >= CryptoNote::parameters::UPGRADE_HEIGHT_V1 + 1) {
+    if (height > CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
         getBlockHeight(b.previousBlockHash, previousBlockHeight);
         uint64_t prev_timestamp = getBlockTimestamp(previousBlockHeight);
         if(prev_timestamp >= b.timestamp) {
@@ -1841,7 +1841,7 @@ bool core::fillBlockDetails(const Block &block, BlockDetails2 &blockDetails)
         }
     }
 
-    if (blockDetails.height >= CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
+    if (blockDetails.height > CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
         getBlockHeight(block.previousBlockHash, previousBlockHeight);
         blockTarget = block.timestamp - getBlockTimestamp(previousBlockHeight);
     }
