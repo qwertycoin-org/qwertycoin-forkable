@@ -86,12 +86,6 @@ bool parseTransactionExtra(
                 transactionExtraFields.push_back(extraNonce);
                 break;
             }
-            case TX_EXTRA_MERGE_MINING_TAG: {
-                TransactionExtraMergeMiningTag mmTag;
-                ar(mmTag, "mm_tag");
-                transactionExtraFields.push_back(mmTag);
-                break;
-            }
             case TX_EXTRA_MESSAGE_TAG: {
                 tx_extra_message message;
                 ar(message.data, "message");
@@ -146,11 +140,6 @@ struct ExtraSerializerVisitor : public boost::static_visitor<bool>
     bool operator()(const TransactionExtraNonce &t)
     {
         return addExtraNonceToTransactionExtra(extra, t.nonce);
-    }
-
-    bool operator()(const TransactionExtraMergeMiningTag &t)
-    {
-        return appendMergeMiningTagToExtra(extra, t);
     }
 
     bool operator()(const tx_extra_message &t)
@@ -228,36 +217,6 @@ bool addExtraNonceToTransactionExtra(std::vector<uint8_t> &tx_extra, const Binar
     memcpy(&tx_extra[start_pos], extra_nonce.data(), extra_nonce.size());
 
     return true;
-}
-
-bool appendMergeMiningTagToExtra(
-    std::vector<uint8_t> &tx_extra,
-    const TransactionExtraMergeMiningTag &mm_tag)
-{
-    BinaryArray blob;
-    if (!toBinaryArray(mm_tag, blob)) {
-        return false;
-    }
-
-    tx_extra.push_back(TX_EXTRA_MERGE_MINING_TAG);
-
-    std::copy(
-        reinterpret_cast<const uint8_t *>(blob.data()),
-        reinterpret_cast<const uint8_t *>(blob.data() + blob.size()),
-        std::back_inserter(tx_extra)
-    );
-
-    return true;
-}
-
-bool getMergeMiningTagFromExtra(
-    const std::vector<uint8_t> &tx_extra,
-    TransactionExtraMergeMiningTag &mm_tag)
-{
-    std::vector<TransactionExtraField> tx_extra_fields;
-    parseTransactionExtra(tx_extra, tx_extra_fields);
-
-    return findTransactionExtraFieldByType(tx_extra_fields, mm_tag);
 }
 
 bool appendMessageToExtra(std::vector<uint8_t> &tx_extra, const tx_extra_message &message)

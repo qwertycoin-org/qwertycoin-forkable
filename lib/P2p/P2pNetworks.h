@@ -30,7 +30,7 @@ namespace {
 
 boost::uuids::uuid name;
 boost::uuids::name_generator gen(name);
-boost::uuids::uuid u = gen(GENESIS_COINBASE_TX_HEX);
+boost::uuids::uuid u = gen("013c01ff0001ffffffffffff07029b2e4c");
 
 } // namespace
 

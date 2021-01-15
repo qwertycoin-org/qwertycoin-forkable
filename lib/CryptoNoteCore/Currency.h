@@ -85,15 +85,9 @@ public:
     size_t difficultyCut() const { return m_difficultyCut; }
     size_t difficultyBlocksCountByBlockVersion(uint8_t blockMajorVersion) const
     {
-        if (blockMajorVersion >= BLOCK_MAJOR_VERSION_3) {
-            return difficultyBlocksCount2();
-        }
-        else {
-            return difficultyBlocksCount();
-        }
+        return difficultyBlocksCount();
     };
     size_t difficultyBlocksCount() const { return m_difficultyWindow + m_difficultyLag; }
-    size_t difficultyBlocksCount2() const { return CryptoNote::parameters::DIFFICULTY_WINDOW_V2; }
 
     size_t maxBlockSizeInitial() const { return m_maxBlockSizeInitial; }
     uint64_t maxBlockSizeGrowthSpeedNumerator() const { return m_maxBlockSizeGrowthSpeedNumerator; }

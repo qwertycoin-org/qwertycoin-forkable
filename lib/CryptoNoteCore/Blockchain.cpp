@@ -1604,11 +1604,6 @@ bool Blockchain::handle_alternative_block(
         return false;
     }
 
-    if (!checkParentBlockSize(b, id)) {
-        bvc.m_verification_failed = true;
-        return false;
-    }
-
     size_t cumulativeSize;
     if (!getBlockCumulativeSize(b, cumulativeSize)) {
         logger(TRACE)
@@ -1692,14 +1687,6 @@ bool Blockchain::handle_alternative_block(
         if (!m_checkpoints.check_block(bei.height, id, is_a_checkpoint)) {
             logger(ERROR, BRIGHT_RED) << "CHECKPOINT VALIDATION FAILED";
             bvc.m_verification_failed = true;
-            return false;
-        }
-
-        // Disable merged mining
-        TransactionExtraMergeMiningTag mmTag;
-        if (getMergeMiningTagFromExtra(bei.bl.baseTransaction.extra, mmTag)
-            && bei.bl.majorVersion >= CryptoNote::BLOCK_MAJOR_VERSION_3) {
-            logger(ERROR, BRIGHT_RED) << "Merge mining tag was found in extra of miner transaction";
             return false;
         }
 
@@ -2558,40 +2545,6 @@ bool Blockchain::checkBlockVersion(const Block& b, const Crypto::Hash& blockHash
         return false;
     }
 
-    if (b.majorVersion==BLOCK_MAJOR_VERSION_2 && b.parentBlock.majorVersion>BLOCK_MAJOR_VERSION_1) {
-        logger(ERROR, BRIGHT_RED)
-            << "Parent block of block " << blockHash
-            << " has wrong major version: " << static_cast<int>(b.parentBlock.majorVersion)
-            << ", at height " << height
-            << " expected version is " << static_cast<int>(BLOCK_MAJOR_VERSION_1);
-        return false;
-    }
-
-    return true;
-}
-
-bool Blockchain::checkParentBlockSize(const Block &b, const Crypto::Hash &blockHash)
-{
-    if (b.majorVersion == BLOCK_MAJOR_VERSION_2) {
-        auto serializer = makeParentBlockSerializer(b, false, false);
-        size_t parentBlockSize;
-        if (!getObjectBinarySize(serializer, parentBlockSize)) {
-            logger(ERROR, BRIGHT_RED)
-                << "Block "
-                << blockHash
-                << ": failed to determine parent block size";
-            return false;
-        }
-
-        if (parentBlockSize > 2 * 1024) {
-            logger(INFO, BRIGHT_WHITE)
-                << "Block " << blockHash
-                << " contains too big parent block: " << parentBlockSize
-                << " bytes, expected no more than " << 2 * 1024 << " bytes";
-            return false;
-        }
-    }
-
     return true;
 }
 
@@ -2735,19 +2688,6 @@ bool Blockchain::pushBlock(
 
     if (!checkBlockVersion(blockData, blockHash)) {
         bvc.m_verification_failed = true;
-        return false;
-    }
-
-    if (!checkParentBlockSize(blockData, blockHash)) {
-        bvc.m_verification_failed = true;
-        return false;
-    }
-
-    // Disable merged mining
-    TransactionExtraMergeMiningTag mmTag;
-    if (getMergeMiningTagFromExtra(blockData.baseTransaction.extra, mmTag)
-        && blockData.majorVersion >= CryptoNote::BLOCK_MAJOR_VERSION_3) {
-        logger(ERROR, BRIGHT_RED) << "Merge mining tag was found in extra of miner transaction";
         return false;
     }
 
