@@ -908,7 +908,7 @@ CurrencyBuilder::CurrencyBuilder(Logging::ILogger &log)
     maxBlockBlobSize(parameters::CRYPTONOTE_MAX_BLOCK_BLOB_SIZE);
     maxTxSize(parameters::CRYPTONOTE_MAX_TX_SIZE);
     publicAddressBase58Prefix(parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX);
-    minedMoneyUnlockWindow(parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW);
+    minedMoneyUnlockWindow(parameters::CRYPTONOTE_TX_SPENDABLE_AGE);
     transactionSpendableAge(parameters::CRYPTONOTE_TX_SPENDABLE_AGE);
     safeTransactionSpendableAge(parameters::CRYPTONOTE_SAFE_TX_SPENDABLE_AGE);
     expectedNumberOfBlocksPerDay(parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY);

@@ -381,7 +381,6 @@ private:
         uint64_t start_height,
         std::vector<uint64_t> &timestamps);
     bool checkBlockVersion(const Block &b, const Crypto::Hash &blockHash);
-    bool checkParentBlockSize(const Block &b, const Crypto::Hash &blockHash);
     bool checkCumulativeBlockSize(
         const Crypto::Hash &blockId,
         size_t cumulativeBlockSize,

@@ -641,24 +641,15 @@ bool core::get_block_template(
 
         if (b.majorVersion == BLOCK_MAJOR_VERSION_1) {
             b.minorVersion =
-                m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_2) == UpgradeDetectorBase::UNDEF_HEIGHT
+                m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_1) == UpgradeDetectorBase::UNDEF_HEIGHT
                 ? BLOCK_MINOR_VERSION_1
                 : BLOCK_MINOR_VERSION_0;
         }
         else if (b.majorVersion==BLOCK_MAJOR_VERSION_2) {
-            b.minorVersion = BLOCK_MINOR_VERSION_0;
-
-            b.parentBlock.majorVersion = BLOCK_MAJOR_VERSION_1;
-            b.parentBlock.majorVersion = BLOCK_MINOR_VERSION_0;
-            b.parentBlock.transactionCount = 1;
-            TransactionExtraMergeMiningTag mm_tag = boost::value_initialized<decltype(mm_tag)>();
-
-            if (!appendMergeMiningTagToExtra(b.parentBlock.baseTransaction.extra, mm_tag)) {
-                logger(ERROR, BRIGHT_RED)
-                    << "Failed to append merge mining tag "
-                    << "to extra of the parent block miner transaction";
-                return false;
-            }
+            b.minorVersion =
+                    m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_2) == UpgradeDetectorBase::UNDEF_HEIGHT
+                    ? BLOCK_MINOR_VERSION_1
+                    : BLOCK_MINOR_VERSION_0;
         }
         else if (b.majorVersion == BLOCK_MAJOR_VERSION_3) {
             b.minorVersion =
