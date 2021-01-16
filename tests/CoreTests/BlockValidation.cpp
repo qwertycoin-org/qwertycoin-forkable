@@ -61,60 +61,6 @@ namespace {
     return true;
   }
 
-  bool getParentBlockSize(const CryptoNote::Block& block, size_t& size) {
-    auto serializer = CryptoNote::makeParentBlockSerializer(block, false, false);
-    if (!CryptoNote::getObjectBinarySize(serializer, size)) {
-      LOG_ERROR("Failed to get size of parent block");
-      return false;
-    }
-    return true;
-  }
-
-  bool adjustParentBlockSize(CryptoNote::Block& block, size_t targetSize) {
-    size_t parentBlockSize;
-    if (!getParentBlockSize(block, parentBlockSize)) {
-      return false;
-    }
-
-    if (parentBlockSize > targetSize) {
-      LOG_ERROR("Parent block size is " << parentBlockSize << " bytes that is already greater than target size " << targetSize << " bytes");
-      return false;
-    }
-
-    block.parentBlock.baseTransaction.extra.resize(block.parentBlock.baseTransaction.extra.size() + (targetSize - parentBlockSize));
-
-    if (!getParentBlockSize(block, parentBlockSize)) {
-      return false;
-    }
-
-    if (parentBlockSize > targetSize) {
-      if (block.parentBlock.baseTransaction.extra.size() < parentBlockSize - targetSize) {
-        LOG_ERROR("Failed to adjust parent block size to " << targetSize);
-        return false;
-      }
-
-      block.parentBlock.baseTransaction.extra.resize(block.parentBlock.baseTransaction.extra.size() - (parentBlockSize - targetSize));
-
-      if (!getParentBlockSize(block, parentBlockSize)) {
-        return false;
-      }
-
-      if (parentBlockSize + 1 == targetSize) {
-        block.timestamp = std::max(block.timestamp, UINT64_C(1)) << 7;
-        if (!getParentBlockSize(block, parentBlockSize)) {
-          return false;
-        }
-      }
-    }
-
-    if (parentBlockSize != targetSize) {
-      LOG_ERROR("Failed to adjust parent block size to " << targetSize);
-      return false;
-    }
-
-    return true;
-  }
-
   void clearTransaction(CryptoNote::Transaction& tx) {
     tx.version = 0;
     tx.unlockTime = 0;
@@ -763,9 +709,6 @@ bool TestMaxSizeOfParentBlock::generate(std::vector<test_event_entry>& events) c
 
   CryptoNote::Block blk_1;
   generator.constructBlockManually(blk_1, blk_0, miner_account, test_generator::bf_major_ver, BLOCK_MAJOR_VERSION_2);
-  if (!adjustParentBlockSize(blk_1, 2 * 1024)) {
-    return false;
-  }
   events.push_back(blk_1);
 
   DO_CALLBACK(events, "check_block_accepted");
@@ -778,9 +721,6 @@ bool TestBigParentBlock::generate(std::vector<test_event_entry>& events) const {
 
   CryptoNote::Block blk_1;
   generator.constructBlockManually(blk_1, blk_0, miner_account, test_generator::bf_major_ver, BLOCK_MAJOR_VERSION_2);
-  if (!adjustParentBlockSize(blk_1, 2 * 1024 + 1)) {
-    return false;
-  }
   events.push_back(blk_1);
 
   DO_CALLBACK(events, "check_block_purged");

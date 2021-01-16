@@ -139,25 +139,6 @@ bool test_generator::constructBlock(CryptoNote::Block& blk, uint32_t height, con
     }
   }
 
-  if (blk.majorVersion >= BLOCK_MAJOR_VERSION_2) {
-    blk.parentBlock.majorVersion = BLOCK_MAJOR_VERSION_1;
-    blk.parentBlock.minorVersion = BLOCK_MINOR_VERSION_0;
-    blk.parentBlock.transactionCount = 1;
-    blk.parentBlock.baseTransaction.version = 0;
-    blk.parentBlock.baseTransaction.unlockTime = 0;
-
-    CryptoNote::TransactionExtraMergeMiningTag mmTag;
-    mmTag.depth = 0;
-    if (!CryptoNote::get_aux_block_header_hash(blk, mmTag.merkleRoot)) {
-      return false;
-    }
-
-    blk.parentBlock.baseTransaction.extra.clear();
-    if (!CryptoNote::appendMergeMiningTagToExtra(blk.parentBlock.baseTransaction.extra, mmTag)) {
-      return false;
-    }
-  }
-
   // Nonce search...
   blk.nonce = 0;
   Crypto::cn_context context;
@@ -218,23 +199,6 @@ bool test_generator::constructBlockManually(Block& blk, const Block& prevBlock, 
     // TODO: This will work, until size of constructed block is less then m_currency.blockGrantedFullRewardZone()
     if (!m_currency.constructMinerTx(blk.majorVersion, height, Common::medianValue(blockSizes), alreadyGeneratedCoins, currentBlockSize, 0,
         minerAcc.getAccountKeys().address, blk.baseTransaction, BinaryArray(), 1)) {
-      return false;
-    }
-  }
-
-  if (blk.majorVersion >= BLOCK_MAJOR_VERSION_2) {
-    blk.parentBlock.majorVersion = BLOCK_MAJOR_VERSION_1;
-    blk.parentBlock.minorVersion = BLOCK_MINOR_VERSION_0;
-    blk.parentBlock.transactionCount = 1;
-
-    CryptoNote::TransactionExtraMergeMiningTag mmTag;
-    mmTag.depth = 0;
-    if (!CryptoNote::get_aux_block_header_hash(blk, mmTag.merkleRoot)) {
-      return false;
-    }
-
-    blk.parentBlock.baseTransaction.extra.clear();
-    if (!CryptoNote::appendMergeMiningTagToExtra(blk.parentBlock.baseTransaction.extra, mmTag)) {
       return false;
     }
   }
