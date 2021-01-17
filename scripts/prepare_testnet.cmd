@@ -1,7 +1,7 @@
 :: Commands used for creating private testnet nodes and wallets
 
 SET TESTNET_PATH=%USERPROFILE%\Desktop\QwertyFork\Testnet
-SET BIN_PATH=%USERPROFILE%\Documents\GitHub\qwertycoin-forkable\cmake-build-debug\src\Release
+SET BIN_PATH=%USERPROFILE%\Documents\GitHub\qwertycoin-forkable\cmake-build-release\src\Release
 
 IF not exist %TESTNET_PATH% (
     mkdir %TESTNET_PATH%
