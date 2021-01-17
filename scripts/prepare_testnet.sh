@@ -18,7 +18,6 @@ mkdir $TESTNET_PATH/node_01
 
 # copy binaries to testnet directory
 cp -fv $BIN_PATH/src/qwertyforkd  $TESTNET_PATH
-cp -fv $BIN_PATH/src/miner $TESTNET_PATH
 cp -fv $BIN_PATH/src/simplewallet $TESTNET_PATH
 cp -fv $BIN_PATH/src/walletd $TESTNET_PATH
 
