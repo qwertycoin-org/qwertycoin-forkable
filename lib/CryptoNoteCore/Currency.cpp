@@ -753,7 +753,11 @@ difficulty_type Currency::nextDifficulty(
 
     // if there is no "invalid" solvetimes we can use previous difficulty value
     if (invalid_solvetime_number == 0) {
-        return std::max(prev_difficulty, min_difficulty);
+        if (difficulties.size() > 0) {
+            return std::max(prev_difficulty, min_difficulty);
+        } else {
+            return std::max(nextEPoWDiff, min_difficulty);
+        }
     }
 
     // process data with "invalid" solvetimes

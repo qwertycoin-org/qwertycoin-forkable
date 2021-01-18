@@ -842,10 +842,12 @@ difficulty_type Blockchain::getDifficultyForNextBlock(uint64_t nextBlockTime)
     if (offset == 0) {
         ++offset;
     }
+
     for (; offset < m_blocks.size(); offset++) {
         timestamps.push_back(m_blocks[offset].bl.timestamp);
         cumulative_difficulties.push_back(m_blocks[offset].cumulative_difficulty);
     }
+
     CryptoNote::Currency::lazy_stat_callback_type cb([&](IMinerHandler::stat_period p, uint64_t next_time)
     {
         uint32_t min_height = CryptoNote::parameters::UPGRADE_HEIGHT_V1 +
@@ -884,6 +886,7 @@ difficulty_type Blockchain::getDifficultyForNextBlock(uint64_t nextBlockTime)
         }
         return static_cast<difficulty_type>(Common::meanValue(diffs));
     });
+
     return m_currency.nextDifficulty(
         BlockMajorVersion,
         timestamps,
