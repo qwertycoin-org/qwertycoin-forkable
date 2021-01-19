@@ -129,6 +129,9 @@ uint32_t Currency::upgradeHeight(uint8_t majorVersion) const
     else if (majorVersion == BLOCK_MAJOR_VERSION_2) {
         return m_upgradeHeightV2;
     }
+    else if (majorVersion == BLOCK_MAJOR_VERSION_1) {
+        return BLOCK_MAJOR_VERSION_1;
+    }
     else {
         return static_cast<uint32_t>(-1);
     }
@@ -755,8 +758,6 @@ difficulty_type Currency::nextDifficulty(
     if (invalid_solvetime_number == 0) {
         if (difficulties.size() > 0) {
             return std::max(prev_difficulty, min_difficulty);
-        } else {
-            return std::max(nextEPoWDiff, min_difficulty);
         }
     }
 

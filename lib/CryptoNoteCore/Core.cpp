@@ -645,7 +645,7 @@ bool core::get_block_template(
                 ? BLOCK_MINOR_VERSION_1
                 : BLOCK_MINOR_VERSION_0;
         }
-        else if (b.majorVersion==BLOCK_MAJOR_VERSION_2) {
+        else if (b.majorVersion == BLOCK_MAJOR_VERSION_2) {
             b.minorVersion =
                     m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_2) == UpgradeDetectorBase::UNDEF_HEIGHT
                     ? BLOCK_MINOR_VERSION_1
