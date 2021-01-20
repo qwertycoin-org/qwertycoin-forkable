@@ -199,8 +199,8 @@ const bool     P2P_MESSAGES                                  =  true;
 const uint16_t P2P_MESSAGES_CHAR_COUNT                       =  160;
 
 /* Governance Fee Wallets // The Qwertycoin Foundation */
-const std::string GOVERNANCE_WALLET_ADDRESS                  = "QWFiLPfqNroPMmpr9rw5dyVkqhSFTwskGGRqbX59qjNS77b4iaisnYtNC8ccKCKqTuhzkW9BN4Sa2Q59YxVgdEbe2d1mncRG3y";
-const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "36928ecdb244f03c1cbdc14a6a54713724cf9a52b528678a84434cf762c5340a";
+const std::string GOVERNANCE_WALLET_ADDRESS                  = "QWFiAbhkBoWdF1g9tufMfubsz5e6yyx3h8WESitYYUmugihGS6a5YPfS4xKq1W6VWucreYfGXdqUReY1kQy2pUdg6uag8Yw1KG";
+const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "8e70e25148875bc7850a068c57bd91c8bff65eb2009c70eeeba2c87fd0f9ca0c";
 
 const char *const SEED_NODES[] = {
 	"n00-fork.qwertycoin.org:5196",
