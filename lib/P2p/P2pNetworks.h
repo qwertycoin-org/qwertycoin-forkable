@@ -29,8 +29,11 @@ namespace CryptoNote {
 namespace {
 
 boost::uuids::uuid name;
+std::string network_1 = GENESIS_COINBASE_TX_HEX;
+std::string network_2 = NETWORK_ID_BASE;
+
 boost::uuids::name_generator gen(name);
-boost::uuids::uuid u = gen(GENESIS_COINBASE_TX_HEX);
+boost::uuids::uuid u = gen(network_1 + network_2);
 
 } // namespace
 

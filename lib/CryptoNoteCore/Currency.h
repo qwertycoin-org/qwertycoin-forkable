@@ -206,16 +206,6 @@ public:
         uint64_t currentSolveTime,
         lazy_stat_callback_type& lazy_stat_cb) const;
 
-    bool checkProofOfWorkV1(
-        Crypto::cn_context &context,
-        const Block &block,
-        difficulty_type currentDiffic,
-        Crypto::Hash &proofOfWork) const;
-    bool checkProofOfWorkV2(
-        Crypto::cn_context &context,
-        const Block &block,
-        difficulty_type currentDiffic,
-        Crypto::Hash &proofOfWork) const;
     bool checkProofOfWork(
         Crypto::cn_context &context,
         const Block &block,

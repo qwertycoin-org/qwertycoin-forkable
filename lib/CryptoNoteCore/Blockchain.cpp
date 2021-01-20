@@ -842,10 +842,12 @@ difficulty_type Blockchain::getDifficultyForNextBlock(uint64_t nextBlockTime)
     if (offset == 0) {
         ++offset;
     }
+
     for (; offset < m_blocks.size(); offset++) {
         timestamps.push_back(m_blocks[offset].bl.timestamp);
         cumulative_difficulties.push_back(m_blocks[offset].cumulative_difficulty);
     }
+
     CryptoNote::Currency::lazy_stat_callback_type cb([&](IMinerHandler::stat_period p, uint64_t next_time)
     {
         uint32_t min_height = CryptoNote::parameters::UPGRADE_HEIGHT_V1 +
@@ -884,6 +886,7 @@ difficulty_type Blockchain::getDifficultyForNextBlock(uint64_t nextBlockTime)
         }
         return static_cast<difficulty_type>(Common::meanValue(diffs));
     });
+
     return m_currency.nextDifficulty(
         BlockMajorVersion,
         timestamps,
@@ -1600,11 +1603,6 @@ bool Blockchain::handle_alternative_block(
     }
 
     if (!checkBlockVersion(b, id)) {
-        bvc.m_verification_failed = true;
-        return false;
-    }
-
-    if (!checkParentBlockSize(b, id)) {
         bvc.m_verification_failed = true;
         return false;
     }
@@ -2558,40 +2556,6 @@ bool Blockchain::checkBlockVersion(const Block& b, const Crypto::Hash& blockHash
         return false;
     }
 
-    if (b.majorVersion==BLOCK_MAJOR_VERSION_2 && b.parentBlock.majorVersion>BLOCK_MAJOR_VERSION_1) {
-        logger(ERROR, BRIGHT_RED)
-            << "Parent block of block " << blockHash
-            << " has wrong major version: " << static_cast<int>(b.parentBlock.majorVersion)
-            << ", at height " << height
-            << " expected version is " << static_cast<int>(BLOCK_MAJOR_VERSION_1);
-        return false;
-    }
-
-    return true;
-}
-
-bool Blockchain::checkParentBlockSize(const Block &b, const Crypto::Hash &blockHash)
-{
-    if (b.majorVersion == BLOCK_MAJOR_VERSION_2) {
-        auto serializer = makeParentBlockSerializer(b, false, false);
-        size_t parentBlockSize;
-        if (!getObjectBinarySize(serializer, parentBlockSize)) {
-            logger(ERROR, BRIGHT_RED)
-                << "Block "
-                << blockHash
-                << ": failed to determine parent block size";
-            return false;
-        }
-
-        if (parentBlockSize > 2 * 1024) {
-            logger(INFO, BRIGHT_WHITE)
-                << "Block " << blockHash
-                << " contains too big parent block: " << parentBlockSize
-                << " bytes, expected no more than " << 2 * 1024 << " bytes";
-            return false;
-        }
-    }
-
     return true;
 }
 
@@ -2734,11 +2698,6 @@ bool Blockchain::pushBlock(
     }
 
     if (!checkBlockVersion(blockData, blockHash)) {
-        bvc.m_verification_failed = true;
-        return false;
-    }
-
-    if (!checkParentBlockSize(blockData, blockHash)) {
         bvc.m_verification_failed = true;
         return false;
     }
