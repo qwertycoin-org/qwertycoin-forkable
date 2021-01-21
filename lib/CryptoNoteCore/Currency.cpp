@@ -250,8 +250,16 @@ bool Currency::validateGovernmentFee(const Transaction &baseTx) const
 
 bool Currency::getGovernanceAddressAndKey(AccountKeys &governanceKeys) const
 {
-    std::string address = parameters::GOVERNANCE_WALLET_ADDRESS;
-    std::string viewSecretKey = parameters::GOVERNANCE_VIEW_SECRET_KEY;
+    std::string address;
+    std::string viewSecretKey;
+
+    if (isTestnet()) {
+        address = parameters::GOVERNANCE_WALLET_ADDRESS;
+        viewSecretKey = parameters::GOVERNANCE_VIEW_SECRET_KEY;
+    } else {
+        address = parameters::TESTNET_GOVERNANCE_WALLET_ADDRESS;
+        viewSecretKey = parameters::TESTNET_GOVERNANCE_VIEW_SECRET_KEY;
+    }
 
     AccountPublicAddress governanceAddress = boost::value_initialized<AccountPublicAddress>();
     if (!parseAccountAddressString(address, governanceAddress)) {

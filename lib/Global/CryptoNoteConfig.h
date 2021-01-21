@@ -148,6 +148,9 @@ const uint32_t TESTNET_GOVERNANCE_HEIGHT_END                 = 10000000;
 const std::string GOVERNANCE_WALLET_ADDRESS                  = "QWFiAbhkBoWdF1g9tufMfubsz5e6yyx3h8WESitYYUmugihGS6a5YPfS4xKq1W6VWucreYfGXdqUReY1kQy2pUdg6uag8Yw1KG";
 const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "8e70e25148875bc7850a068c57bd91c8bff65eb2009c70eeeba2c87fd0f9ca0c";
 
+const std::string TESTNET_GOVERNANCE_WALLET_ADDRESS          = "QWFi5QHxmajhg2SxRS1FhjcyoM2FTYxmSjmvaBr7uXzz1b8Ms4M2h8PiKTL2YswTz1dFrV8ry5UQmBBLrb27tecs7MuNbLGuy5";
+const std::string TESTNET_GOVERNANCE_VIEW_SECRET_KEY         = "f747f4a4838027c9af80e6364a941b60c538e67e9ea198b6ec452b74c276de06";
+
 } // namespace parameters
 
 const char     CRYPTONOTE_NAME[]                             = "QwertyFork";
