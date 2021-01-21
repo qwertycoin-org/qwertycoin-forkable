@@ -107,7 +107,7 @@ bool Currency::generateGenesisBlock()
     return true;
 }
 
-size_t Currency::blockGrantedFullRewardZoneByBlockVersion(uint8_t blockMajorVersion)
+size_t Currency::blockGrantedFullRewardZoneByBlockVersion(uint8_t blockMajorVersion) const
 {
     return CryptoNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
 }
@@ -495,7 +495,7 @@ bool Currency::isAmountApplicableInFusionTransactionInput(uint64_t amount, uint6
 
 bool Currency::isAmountApplicableInFusionTransactionInput(uint64_t amount, uint64_t threshold,
                                                           uint8_t &amountPowerOfTen,
-                                                          uint32_t height)
+                                                          uint32_t height) const
 {
     if (amount >= threshold) {
         return false;
