@@ -21,7 +21,7 @@
 #pragma once
 
 #include <unordered_set>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <Logging/LoggerRef.h>
 #include <Transfers/IBlockchainSynchronizer.h>
 #include <Transfers/IObservableImpl.h>

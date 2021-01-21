@@ -19,7 +19,7 @@
 #pragma once
 
 #include <Common/StringTools.h>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <crypto/hash.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 

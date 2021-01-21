@@ -26,7 +26,7 @@
 #include "CryptoNoteCore/Currency.h"
 #include "CryptoNoteCore/TransactionExtra.h"
 
-#include "crypto/crypto.h"
+#include "crypto/Crypto.h"
 
 #include "Logging/ConsoleLogger.h"
 

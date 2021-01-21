@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
@@ -45,8 +45,8 @@ namespace {
   inline AccountKeys generateAccountKeys() {
     KeyPair p1;
     KeyPair p2;
-    Crypto::generate_keys(p2.publicKey, p2.secretKey);
-    Crypto::generate_keys(p1.publicKey, p1.secretKey);
+    Crypto::generateKeys(p2.publicKey, p2.secretKey);
+    Crypto::generateKeys(p1.publicKey, p1.secretKey);
     return accountKeysFromKeypairs(p1, p2);
   }
 
@@ -150,10 +150,13 @@ private:
 
   void derivePublicKey(const AccountKeys& reciever, const Crypto::PublicKey& srcTxKey, size_t outputIndex, PublicKey& ephemeralKey) {
     Crypto::KeyDerivation derivation;
-    Crypto::generate_key_derivation(srcTxKey, reinterpret_cast<const Crypto::SecretKey&>(reciever.viewSecretKey), derivation);
-    Crypto::derive_public_key(derivation, outputIndex,
-      reinterpret_cast<const Crypto::PublicKey&>(reciever.address.spendPublicKey),
-      reinterpret_cast<Crypto::PublicKey&>(ephemeralKey));
+    Crypto::generateKeyDerivation(
+            srcTxKey, reinterpret_cast<const Crypto::SecretKey &>(reciever.viewSecretKey),
+            derivation);
+    Crypto::derivePublicKey(
+            derivation, outputIndex,
+            reinterpret_cast<const Crypto::PublicKey &>(reciever.address.spendPublicKey),
+            reinterpret_cast<Crypto::PublicKey &>(ephemeralKey));
   }
 
   struct MsigInfo {

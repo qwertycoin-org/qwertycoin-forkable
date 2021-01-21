@@ -23,7 +23,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <boost/functional/hash.hpp>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <WalletLegacy/IWalletLegacy.h>
 #include <ITransfersContainer.h>

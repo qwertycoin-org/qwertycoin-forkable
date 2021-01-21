@@ -37,7 +37,7 @@
 #include <time.h>
 #include <tuple>
 #include <utility>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <Common/Base58.h>
 #include <Common/ShuffleGenerator.h>
 #include <Common/StringTools.h>
@@ -583,7 +583,7 @@ std::string WalletLegacy::sign_message(const std::string &message)
     Crypto::cn_fast_hash(message.data(), message.size(), hash);
     const CryptoNote::AccountKeys &keys = m_account.getAccountKeys();
     Crypto::Signature signature;
-    Crypto::generate_signature(hash, keys.address.spendPublicKey, keys.spendSecretKey, signature);
+    Crypto::generateSignature(hash, keys.address.spendPublicKey, keys.spendSecretKey, signature);
 
     return std::string("SigV1") + Tools::Base58::encode(
         std::string((const char *)&signature,
@@ -618,7 +618,7 @@ bool WalletLegacy::verify_message(
 
     memcpy(&s, decoded.data(), sizeof(s));
 
-    return Crypto::check_signature(hash, address.spendPublicKey, s);
+    return Crypto::checkSignature(hash, address.spendPublicKey, s);
 }
 
 std::vector<Payments> WalletLegacy::getTransactionsByPaymentIds(
@@ -838,7 +838,7 @@ std::list<TransactionOutputInformation> WalletLegacy::selectFusionTransfersToSen
         return selectedOutputs;
     }
 
-    ShuffleGenerator<size_t, Crypto::random_engine<size_t>> generator(selectedOuts.size());
+    ShuffleGenerator<size_t, Crypto::RandomEngine<size_t>> generator(selectedOuts.size());
     std::vector<TransactionOutputInformation> trimmedSelectedOuts;
     trimmedSelectedOuts.reserve(maxInputCount);
     for (size_t i = 0; i < maxInputCount; ++i) {
@@ -1265,13 +1265,13 @@ bool WalletLegacy::getTxProof(
 {
     Crypto::KeyImage p = *reinterpret_cast<Crypto::KeyImage *>(&address.viewPublicKey);
     Crypto::KeyImage k = *reinterpret_cast<Crypto::KeyImage *>(&tx_key);
-    Crypto::KeyImage pk = Crypto::scalarmultKey(p, k);
+    Crypto::KeyImage pk = Crypto::scalarMultKey(p, k);
     Crypto::PublicKey R;
     Crypto::PublicKey rA = reinterpret_cast<const PublicKey&>(pk);
-    Crypto::secret_key_to_public_key(tx_key, R);
+    Crypto::secretKeyToPublicKey(tx_key, R);
     Crypto::Signature sig;
     try {
-        Crypto::generate_tx_proof(txid, R, address.viewPublicKey, rA, tx_key, sig);
+        Crypto::generateTxProof(txid, R, address.viewPublicKey, rA, tx_key, sig);
     } catch (const std::runtime_error &e) {
         m_loggerGroup(
             "WalletLegacy",
@@ -1379,20 +1379,20 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
         auto txPubKey = td.transactionPublicKey;
 
         for (int j = 0; j < 2; ++i)	{
-            Crypto::KeyImage sk = Crypto::scalarmultKey(
-                *reinterpret_cast<const Crypto::KeyImage *>(&txPubKey),
-                *reinterpret_cast<const Crypto::KeyImage *>(&viewSecretKey)
-            );
+            Crypto::KeyImage sk = Crypto::scalarMultKey(
+                    *reinterpret_cast<const Crypto::KeyImage *>(&txPubKey),
+                    *reinterpret_cast<const Crypto::KeyImage *>(&viewSecretKey));
             proof.shared_secret = *reinterpret_cast<const Crypto::PublicKey *>(&sk);
 
             Crypto::KeyDerivation derivation;
-            if (!Crypto::generate_key_derivation(proof.shared_secret, viewSecretKey, derivation)) {
+            if (!Crypto::generateKeyDerivation(proof.shared_secret, viewSecretKey, derivation)) {
                 throw std::runtime_error("Failed to generate key derivation");
             }
         }
 
         // generate signature for shared secret
-        Crypto::generate_tx_proof(prefix_hash, keys.address.viewPublicKey, txPubKey, proof.shared_secret, viewSecretKey, proof.shared_secret_sig);
+        Crypto::generateTxProof(prefix_hash, keys.address.viewPublicKey, txPubKey,
+                                proof.shared_secret, viewSecretKey, proof.shared_secret_sig);
 
         // derive ephemeral secret key
         Crypto::KeyImage ki;
@@ -1416,25 +1416,14 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
         // generate signature for key image
         const std::vector<const Crypto::PublicKey *>& pubs = { &ephemeral.publicKey };
 
-        Crypto::generate_ring_signature(
-            prefix_hash,
-            proof.key_image,
-            &pubs[0],
-            1,
-            ephemeral.secretKey,
-            0,
-            &proof.key_image_sig
-        );
+        Crypto::generateRingSignature(prefix_hash, proof.key_image, &pubs[0], 1,
+                                      ephemeral.secretKey, 0, &proof.key_image_sig);
     }
 
     // generate signature for the spend key that received those outputs
     Crypto::Signature signature;
-    Crypto::generate_signature(
-        prefix_hash,
-        keys.address.spendPublicKey,
-        keys.spendSecretKey,
-        signature
-    );
+    Crypto::generateSignature(prefix_hash, keys.address.spendPublicKey, keys.spendSecretKey,
+                              signature);
 
     // serialize & encode
     RESERVE_PROOF p;

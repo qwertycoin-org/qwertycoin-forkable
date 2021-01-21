@@ -993,7 +993,50 @@ uint64_t Blockchain::getBlockTimestamp(uint32_t height)
 
 uint64_t Blockchain::getMinimalFee(uint32_t height)
 {
-    return CryptoNote::parameters::MINIMUM_FEE;
+    std::lock_guard<decltype(m_blockchain_lock)> lk(m_blockchain_lock);
+    if (height == 0 || m_blocks.size() <= 1) {
+        return 0;
+    }
+    if (height > static_cast<uint32_t>(m_blocks.size()) - 1) {
+        height = static_cast<uint32_t>(m_blocks.size()) - 1;
+    }
+    if (height < 3) {
+        height = 3;
+    }
+    uint32_t window = std::min(height,
+                               std::min<uint32_t>(
+                                       static_cast<uint32_t>(m_blocks.size()),
+                                       static_cast<uint32_t>(m_currency.expectedNumberOfBlocksPerDay())));
+    if (window == 0) {
+        ++window;
+    }
+    size_t offset = height - window;
+    if (offset == 0) {
+        ++offset;
+    }
+
+    /* Perhaps, in case of POW change, difficulties for calculations here
+     * should be reset and used starting from the fork height.
+     */
+
+    // calculate average difficulty for ~last month
+    uint64_t avgCurrentDifficulty = getAvgDifficultyForHeight(height, window * 7 * 4);
+    // reference trailing average difficulty
+    uint64_t avgReferenceDifficulty = m_blocks[height].cumulative_difficulty / height;
+    // calculate current base reward
+    uint64_t currentBaseReward = ((m_currency.moneySupply() -
+                                   m_blocks[height].already_generated_coins) >>
+                                  m_currency.emissionSpeedFactor());
+    // reference trailing average reward
+    uint64_t avgReferenceReward = m_blocks[height].already_generated_coins / height;
+
+    return m_currency.getMinimalFee(avgCurrentDifficulty,
+                                    currentBaseReward,
+                                    avgReferenceDifficulty,
+                                    avgReferenceReward,
+                                    height);
+
+    // return CryptoNote::parameters::MINIMUM_FEE;
 }
 
 uint64_t Blockchain::getCoinsInCirculation()
@@ -1464,7 +1507,7 @@ bool Blockchain::validate_miner_transaction(
     }
 
     if (m_currency.isGovernanceEnabled(height)) {
-        if (!m_currency.validate_government_fee(b.baseTransaction)) {
+        if (!m_currency.validateGovernmentFee(b.baseTransaction)) {
             logger(INFO, BRIGHT_WHITE)
                 << "Invalid government fee";
             return false;
@@ -2442,7 +2485,7 @@ bool Blockchain::check_tx_input(
         0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x10
     } };
-    if (!(scalarmultKey(txin.keyImage, L) == I)) {
+    if (!(scalarMultKey(txin.keyImage, L) == I)) {
         logger(ERROR) << "Transaction uses key image not in the valid domain";
         return false;
     }
@@ -2477,7 +2520,7 @@ bool Blockchain::check_tx_input(
         return true;
     }
 
-    bool check_tx_ring_signature = Crypto::check_ring_signature(
+    bool check_tx_ring_signature = Crypto::checkRingSignature(
         tx_prefix_hash,
         txin.keyImage,
         output_keys,
@@ -3164,11 +3207,8 @@ bool Blockchain::validateInput(
             return false;
         }
 
-        bool b = Crypto::check_signature(
-            transactionPrefixHash,
-            output.keys[outputKeyIndex],
-            transactionSignatures[inputSignatureIndex]
-        );
+        bool b = Crypto::checkSignature(transactionPrefixHash, output.keys[outputKeyIndex],
+                                        transactionSignatures[inputSignatureIndex]);
         if (b) {
             ++inputSignatureIndex;
         }

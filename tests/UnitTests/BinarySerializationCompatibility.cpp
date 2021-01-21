@@ -113,24 +113,24 @@
 //  }
 //}
 //
-//void fillPublicKey(Crypto::PublicKey& key, char startByte = 120) {
-//  fillData(reinterpret_cast<char *>(&key), sizeof(Crypto::PublicKey), startByte);
+//void fillPublicKey(crypto::PublicKey& key, char startByte = 120) {
+//  fillData(reinterpret_cast<char *>(&key), sizeof(crypto::PublicKey), startByte);
 //}
 //
-//void fillHash(Crypto::Hash& hash, char startByte = 120) {
-//  fillData(reinterpret_cast<char *>(&hash), sizeof(Crypto::Hash), startByte);
+//void fillHash(crypto::Hash& hash, char startByte = 120) {
+//  fillData(reinterpret_cast<char *>(&hash), sizeof(crypto::Hash), startByte);
 //}
 //
-//void fillKeyImage(Crypto::KeyImage& image, char startByte = 120) {
-//  fillData(reinterpret_cast<char *>(&image), sizeof(Crypto::KeyImage), startByte);
+//void fillKeyImage(crypto::KeyImage& image, char startByte = 120) {
+//  fillData(reinterpret_cast<char *>(&image), sizeof(crypto::KeyImage), startByte);
 //}
 //
-//void fillSignature(Crypto::Signature& sig, char startByte = 120) {
-//  fillData(reinterpret_cast<char *>(&sig), sizeof(Crypto::Signature), startByte);
+//void fillSignature(crypto::Signature& sig, char startByte = 120) {
+//  fillData(reinterpret_cast<char *>(&sig), sizeof(crypto::Signature), startByte);
 //}
 //
 //void fillTransactionOutputMultisignature(CryptoNote::TransactionOutputMultisignature& s) {
-//  Crypto::PublicKey key;
+//  crypto::PublicKey key;
 //  fillPublicKey(key, 0);
 //  s.keys.push_back(key);
 //
@@ -186,13 +186,13 @@
 //  tx.signatures.resize(3);
 //
 //  for (size_t i = 0; i < boost::get<CryptoNote::TransactionInputToKey>(tx.vin[1]).keyOffsets.size(); ++i) {
-//    Crypto::Signature sig;
+//    crypto::Signature sig;
 //    fillSignature(sig, static_cast<char>(i));
 //    tx.signatures[1].push_back(sig);
 //  }
 //
 //  for (size_t i = 0; i < boost::get<CryptoNote::TransactionInputMultisignature>(tx.vin[2]).signatures; ++i) {
-//    Crypto::Signature sig;
+//    crypto::Signature sig;
 //    fillSignature(sig, static_cast<char>(i + 120));
 //    tx.signatures[2].push_back(sig);
 //  }
@@ -205,9 +205,9 @@
 //  fillHash(pb.prevId, 120);
 //
 //  pb.numberOfTransactions = 3;
-//  size_t branchSize = Crypto::tree_depth(pb.numberOfTransactions);
+//  size_t branchSize = crypto::tree_depth(pb.numberOfTransactions);
 //  for (size_t i = 0; i < branchSize; ++i) {
-//    Crypto::Hash hash;
+//    crypto::Hash hash;
 //    fillHash(hash, static_cast<char>(i));
 //    pb.minerTxBranch.push_back(hash);
 //  }
@@ -224,7 +224,7 @@
 //  std::copy(pb.minerTx.extra.begin(), pb.minerTx.extra.end(), std::back_inserter(my));
 //
 //  for (size_t i = 0; i < mmTag.depth; ++i) {
-//    Crypto::Hash hash;
+//    crypto::Hash hash;
 //    fillHash(hash, static_cast<char>(i));
 //    pb.blockchainBranch.push_back(hash);
 //  }
@@ -320,12 +320,12 @@
 //
 //  std::string blob;
 //  serialization::dump_binary(tx, blob);
-//  Crypto::Hash h2;
+//  crypto::Hash h2;
 //  CryptoNote::get_blob_hash(blob, h2);
 //
 //
-//  auto s1 = std::hash<Crypto::Hash>()(h1);
-//  auto s2 = boost::hash<Crypto::Hash>()(h1);
+//  auto s1 = std::hash<crypto::Hash>()(h1);
+//  auto s2 = boost::hash<crypto::Hash>()(h1);
 //
 //  ASSERT_EQ(h1, h2);
 //}
@@ -504,7 +504,7 @@
 //  fillTransaction(block.minerTx);
 //
 //  for (size_t i = 0; i < 7; ++i) {
-//    Crypto::Hash hash;
+//    crypto::Hash hash;
 //    fillHash(hash, static_cast<char>(0x7F + i));
 //    block.txHashes.push_back(hash);
 //  }
@@ -519,7 +519,7 @@
 //  fillTransaction(block.minerTx);
 //
 //  for (size_t i = 0; i < 7; ++i) {
-//    Crypto::Hash hash;
+//    crypto::Hash hash;
 //    fillHash(hash, static_cast<char>(0x7F + i));
 //    block.txHashes.push_back(hash);
 //  }

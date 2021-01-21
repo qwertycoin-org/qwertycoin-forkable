@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <boost/filesystem/operations.hpp>
 #include <Common/Util.h>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/TransactionExtra.h>
@@ -374,7 +374,7 @@ void generateNewWallet(const CryptoNote::Currency &currency,
             Crypto::SecretKey private_view_key;
             CryptoNote::KeyPair spendKey;
 
-            Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+            Crypto::generateKeys(spendKey.publicKey, spendKey.secretKey);
             CryptoNote::AccountBase::generateViewFromSpend(spendKey.secretKey, private_view_key);
 
             wallet->initializeWithViewKey(conf.walletFile, conf.walletPassword, private_view_key);
@@ -615,7 +615,7 @@ std::error_code WalletService::replaceWithNewWallet(const std::string &viewSecre
         }
 
         Crypto::PublicKey viewPublicKey;
-        if (!Crypto::secret_key_to_public_key(viewSecretKey, viewPublicKey)) {
+        if (!Crypto::secretKeyToPublicKey(viewSecretKey, viewPublicKey)) {
             logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
                 << "Cannot derive view public key, wrong secret key: "
                 << viewSecretKeyText;

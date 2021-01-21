@@ -2043,11 +2043,11 @@ bool simple_wallet::new_wallet(
         AccountKeys wallet_keys;
         wallet_keys.spendSecretKey = secret_key;
         wallet_keys.viewSecretKey = view_key;
-        Crypto::secret_key_to_public_key(
+        Crypto::secretKeyToPublicKey(
             wallet_keys.spendSecretKey,
             wallet_keys.address.spendPublicKey
         );
-        Crypto::secret_key_to_public_key(
+        Crypto::secretKeyToPublicKey(
             wallet_keys.viewSecretKey,
             wallet_keys.address.viewPublicKey
         );

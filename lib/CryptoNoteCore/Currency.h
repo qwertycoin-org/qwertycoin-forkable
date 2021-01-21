@@ -77,6 +77,8 @@ public:
         uint64_t avgHistoricalDifficulty,
         uint64_t medianHistoricalReward,
         uint32_t height) const;
+    uint64_t getFeePerByte(const uint64_t txExtraSize, const uint64_t minFee) const;
+
     uint64_t defaultDustThreshold() const { return m_defaultDustThreshold; }
 
     uint64_t difficultyTarget() const { return m_difficultyTarget; }
@@ -220,7 +222,7 @@ public:
     bool isGovernanceEnabled(uint32_t height) const;
     bool getGovernanceAddressAndKey(AccountKeys& m_account_keys) const;
     uint64_t getGovernanceReward(uint64_t base_reward) const;
-    bool validate_government_fee(const Transaction& baseTx) const;
+    bool validateGovernmentFee(const Transaction& baseTx) const;
 
     static const std::vector<uint64_t> PRETTY_AMOUNTS;
 

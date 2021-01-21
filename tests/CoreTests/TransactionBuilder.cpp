@@ -124,8 +124,9 @@ void TransactionBuilder::fillOutputs(Transaction& tx) const {
   for(const auto& dst_entr : m_destinations) {
     Crypto::KeyDerivation derivation;
     Crypto::PublicKey out_eph_public_key;
-    Crypto::generate_key_derivation(dst_entr.addr.viewPublicKey, m_txKey.secretKey, derivation);
-    Crypto::derive_public_key(derivation, output_index, dst_entr.addr.spendPublicKey, out_eph_public_key);
+    Crypto::generateKeyDerivation(dst_entr.addr.viewPublicKey, m_txKey.secretKey, derivation);
+    Crypto::derivePublicKey(derivation, output_index, dst_entr.addr.spendPublicKey,
+                            out_eph_public_key);
 
     TransactionOutput out;
     out.amount = dst_entr.amount;
@@ -145,8 +146,9 @@ void TransactionBuilder::fillOutputs(Transaction& tx) const {
     for (const auto& key : mdst.keys) {
       Crypto::KeyDerivation derivation;
       Crypto::PublicKey ephemeralPublicKey;
-      Crypto::generate_key_derivation(key.address.viewPublicKey, m_txKey.secretKey, derivation);
-      Crypto::derive_public_key(derivation, output_index, key.address.spendPublicKey, ephemeralPublicKey);
+      Crypto::generateKeyDerivation(key.address.viewPublicKey, m_txKey.secretKey, derivation);
+      Crypto::derivePublicKey(derivation, output_index, key.address.spendPublicKey,
+                              ephemeralPublicKey);
       target.keys.push_back(ephemeralPublicKey);
     }
     out.amount = mdst.amount;
@@ -174,7 +176,8 @@ void TransactionBuilder::signSources(const Crypto::Hash& prefixHash, const std::
     tx.signatures.push_back(std::vector<Crypto::Signature>());
     std::vector<Crypto::Signature>& sigs = tx.signatures.back();
     sigs.resize(src_entr.outputs.size());
-    generate_ring_signature(prefixHash, boost::get<KeyInput>(tx.inputs[i]).keyImage, keys_ptrs, contexts[i].secretKey, src_entr.realOutput, sigs.data());
+    generateRingSignature(prefixHash, boost::get<KeyInput>(tx.inputs[i]).keyImage, keys_ptrs,
+                          contexts[i].secretKey, src_entr.realOutput, sigs.data());
     i++;
   }
 
@@ -188,12 +191,14 @@ void TransactionBuilder::signSources(const Crypto::Hash& prefixHash, const std::
       Crypto::PublicKey ephemeralPublicKey;
       Crypto::SecretKey ephemeralSecretKey;
 
-      Crypto::generate_key_derivation(msrc.srcTxPubKey, key.viewSecretKey, derivation);
-      Crypto::derive_public_key(derivation, msrc.srcOutputIndex, key.address.spendPublicKey, ephemeralPublicKey);
-      Crypto::derive_secret_key(derivation, msrc.srcOutputIndex, key.spendSecretKey, ephemeralSecretKey);
+      Crypto::generateKeyDerivation(msrc.srcTxPubKey, key.viewSecretKey, derivation);
+      Crypto::derivePublicKey(derivation, msrc.srcOutputIndex, key.address.spendPublicKey,
+                              ephemeralPublicKey);
+      Crypto::deriveSecretKey(derivation, msrc.srcOutputIndex, key.spendSecretKey,
+                              ephemeralSecretKey);
 
       Crypto::Signature sig;
-      Crypto::generate_signature(prefixHash, ephemeralPublicKey, ephemeralSecretKey, sig);
+      Crypto::generateSignature(prefixHash, ephemeralPublicKey, ephemeralSecretKey, sig);
       outsigs.push_back(sig);
     }
   }

@@ -172,7 +172,7 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
             account.getAccountKeys().address.spendPublicKey
         );
     } else {
-        if (!Crypto::check_key(account.getAccountKeys().address.spendPublicKey)) {
+        if (!Crypto::checkKey(account.getAccountKeys().address.spendPublicKey)) {
             throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
         }
     }

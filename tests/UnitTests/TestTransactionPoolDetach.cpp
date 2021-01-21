@@ -315,7 +315,7 @@ namespace {
 //  ASSERT_EQ(0, tc2.balance(ITransfersContainer::IncludeAllUnlocked));
 //  ASSERT_EQ(1, tc2.transactionsCount());
 //
-//  std::vector<Crypto::Hash> unconfirmed;
+//  std::vector<crypto::Hash> unconfirmed;
 //  tc2.getUnconfirmedTransactions(unconfirmed);
 //  ASSERT_EQ(0, unconfirmed.size());
 //

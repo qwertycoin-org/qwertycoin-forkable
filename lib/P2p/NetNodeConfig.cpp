@@ -20,7 +20,7 @@
 #include <Common/Util.h>
 #include <Common/CommandLine.h>
 #include <Common/StringTools.h>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <Global/CryptoNoteConfig.h>
 #include <P2p/NetNodeConfig.h>
 

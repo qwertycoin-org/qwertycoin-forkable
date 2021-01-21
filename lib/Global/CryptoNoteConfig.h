@@ -61,6 +61,8 @@ const size_t   CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE         = 600;
 
 /* This section defines our minimum fee count required for transactions */
 const uint64_t MINIMUM_FEE                                    = UINT64_C(10000);
+const uint64_t MAXIMUM_FEE                                    = UINT64_C(250000);
+const uint64_t BASE_FEE                                       = UINT64_C(25000);
 
 /* This section defines the fees are remote node will receive from the sender */
 const double   REMOTE_NODE_FEE_FACTOR                         = 0.25; // percent
@@ -113,6 +115,13 @@ const uint32_t UPGRADE_HEIGHT_V4                              = 50; // Reserved 
 const uint32_t UPGRADE_HEIGHT_V5                              = 60; // future
 const uint32_t UPGRADE_HEIGHT_V6                              = 100; // use :)
 
+const uint32_t TESTNET_UPGRADE_HEIGHT_V1                      = 1;
+const uint32_t TESTNET_UPGRADE_HEIGHT_V2                      = 20;
+const uint32_t TESTNET_UPGRADE_HEIGHT_V3                      = 300;
+const uint32_t TESTNET_UPGRADE_HEIGHT_V4                      = 4000;
+const uint32_t TESTNET_UPGRADE_HEIGHT_V5                      = 50000;
+const uint32_t TESTNET_UPGRADE_HEIGHT_V6                      = 600000;
+
 const unsigned UPGRADE_VOTING_THRESHOLD                      = 90; // percent
 const uint32_t UPGRADE_VOTING_WINDOW                         = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;  // blocks
 const uint32_t UPGRADE_WINDOW                                = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;  // blocks
@@ -131,6 +140,16 @@ const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json"
 const uint16_t GOVERNANCE_PERCENT_FEE                        = 10; // 10 percent of base block reward
 const uint32_t GOVERNANCE_HEIGHT_START                       = UPGRADE_HEIGHT_V2;
 const uint32_t GOVERNANCE_HEIGHT_END                         = 10000000;
+const uint16_t TESTNET_GOVERNANCE_PERCENT_FEE                = 10; // 10 percent of base block reward
+const uint32_t TESTNET_GOVERNANCE_HEIGHT_START               = TESTNET_UPGRADE_HEIGHT_V2;
+const uint32_t TESTNET_GOVERNANCE_HEIGHT_END                 = 10000000;
+
+/* Governance Fee Wallets // The QWC Foundation */
+const std::string GOVERNANCE_WALLET_ADDRESS                  = "QWFiAbhkBoWdF1g9tufMfubsz5e6yyx3h8WESitYYUmugihGS6a5YPfS4xKq1W6VWucreYfGXdqUReY1kQy2pUdg6uag8Yw1KG";
+const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "8e70e25148875bc7850a068c57bd91c8bff65eb2009c70eeeba2c87fd0f9ca0c";
+
+const std::string TESTNET_GOVERNANCE_WALLET_ADDRESS          = "QWFi5QHxmajhg2SxRS1FhjcyoM2FTYxmSjmvaBr7uXzz1b8Ms4M2h8PiKTL2YswTz1dFrV8ry5UQmBBLrb27tecs7MuNbLGuy5";
+const std::string TESTNET_GOVERNANCE_VIEW_SECRET_KEY         = "f747f4a4838027c9af80e6364a941b60c538e67e9ea198b6ec452b74c276de06";
 
 } // namespace parameters
 
@@ -197,10 +216,6 @@ const std::string LICENSE_URL                                = "https://github.c
 // P2P encrypted blockchain messenger settings:
 const bool     P2P_MESSAGES                                  =  true;
 const uint16_t P2P_MESSAGES_CHAR_COUNT                       =  160;
-
-/* Governance Fee Wallets // The Qwertycoin Foundation */
-const std::string GOVERNANCE_WALLET_ADDRESS                  = "QWFiAbhkBoWdF1g9tufMfubsz5e6yyx3h8WESitYYUmugihGS6a5YPfS4xKq1W6VWucreYfGXdqUReY1kQy2pUdg6uag8Yw1KG";
-const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "8e70e25148875bc7850a068c57bd91c8bff65eb2009c70eeeba2c87fd0f9ca0c";
 
 const char *const SEED_NODES[] = {
 	"n00-fork.qwertycoin.org:5196",

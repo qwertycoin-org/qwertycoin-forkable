@@ -28,7 +28,7 @@
 #include <boost/utility/value_init.hpp>
 #include <Common/CommandLine.h>
 #include <Common/StringTools.h>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/Miner.h>
 #include <CryptoNoteCore/TransactionExtra.h>

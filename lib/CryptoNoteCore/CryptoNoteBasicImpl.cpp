@@ -101,8 +101,8 @@ bool parseAccountAddressString(uint64_t& prefix, AccountPublicAddress& adr, cons
 
     return Tools::Base58::decode_addr(str, prefix, data)
            && fromBinaryArray(adr, asBinaryArray(data))
-           && check_key(adr.spendPublicKey)
-           && check_key(adr.viewPublicKey);
+           && checkKey(adr.spendPublicKey)
+           && checkKey(adr.viewPublicKey);
 }
 
 bool operator ==(const CryptoNote::Transaction &a, const CryptoNote::Transaction &b)

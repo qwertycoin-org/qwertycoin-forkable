@@ -65,29 +65,25 @@ bool generate_key_image_helper(
     KeyImage &ki)
 {
     KeyDerivation recv_derivation;
-    bool r = generate_key_derivation(tx_public_key, ack.viewSecretKey, recv_derivation);
+    bool r = generateKeyDerivation(tx_public_key, ack.viewSecretKey, recv_derivation);
 
-    assert(r && "key image helper: failed to generate_key_derivation");
-
-    if (!r) {
-        return false;
-    }
-
-    r = derive_public_key(
-        recv_derivation,
-        real_output_index,
-        ack.address.spendPublicKey,
-        in_ephemeral.publicKey
-    );
-
-    assert(r && "key image helper: failed to derive_public_key");
+    assert(r && "key image helper: failed to generateKeyDerivation");
 
     if (!r) {
         return false;
     }
 
-    derive_secret_key(recv_derivation,real_output_index,ack.spendSecretKey,in_ephemeral.secretKey);
-    generate_key_image(in_ephemeral.publicKey, in_ephemeral.secretKey, ki);
+    r = derivePublicKey(recv_derivation, real_output_index, ack.address.spendPublicKey,
+                        in_ephemeral.publicKey);
+
+    assert(r && "key image helper: failed to derivePublicKey");
+
+    if (!r) {
+        return false;
+    }
+
+    deriveSecretKey(recv_derivation, real_output_index, ack.spendSecretKey, in_ephemeral.secretKey);
+    generateKeyImage(in_ephemeral.publicKey, in_ephemeral.secretKey, ki);
 
     return true;
 }
@@ -243,11 +239,11 @@ bool constructTransaction(
         }
         KeyDerivation derivation;
         PublicKey out_eph_public_key;
-        bool r = generate_key_derivation(dst_entr.addr.viewPublicKey, txkey.secretKey, derivation);
+        bool r = generateKeyDerivation(dst_entr.addr.viewPublicKey, txkey.secretKey, derivation);
 
         if (!(r)) {
             logger(ERROR, BRIGHT_RED)
-                << "at creation outs: failed to generate_key_derivation("
+                << "at creation outs: failed to generateKeyDerivation("
                 << dst_entr.addr.viewPublicKey
                 << ", "
                 << txkey.secretKey
@@ -255,12 +251,11 @@ bool constructTransaction(
             return false;
         }
 
-        r = derive_public_key(derivation, output_index,
-        dst_entr.addr.spendPublicKey,
-        out_eph_public_key);
+        r = derivePublicKey(derivation, output_index, dst_entr.addr.spendPublicKey,
+                            out_eph_public_key);
         if (!(r)) {
             logger(ERROR, BRIGHT_RED)
-                << "at creation outs: failed to derive_public_key("
+                << "at creation outs: failed to derivePublicKey("
                 << derivation
                 << ", "
                 << output_index
@@ -333,14 +328,9 @@ bool constructTransaction(
         tx.signatures.push_back(std::vector<Signature>());
         std::vector<Signature> &sigs = tx.signatures.back();
         sigs.resize(src_entr.outputs.size());
-        generate_ring_signature(
-            tx_prefix_hash,
-            boost::get<KeyInput>(tx.inputs[i]).keyImage,
-            keys_ptrs,
-            in_contexts[i].in_ephemeral.secretKey,
-            src_entr.realOutput,
-            sigs.data()
-        );
+        generateRingSignature(tx_prefix_hash, boost::get<KeyInput>(tx.inputs[i]).keyImage,
+                              keys_ptrs, in_contexts[i].in_ephemeral.secretKey, src_entr.realOutput,
+                              sigs.data());
         i++;
     }
 
@@ -400,7 +390,7 @@ bool check_outs_valid(const TransactionPrefix &tx, std::string *error)
                 return false;
             }
 
-            if (!check_key(boost::get<KeyOutput>(out.target).key)) {
+            if (!checkKey(boost::get<KeyOutput>(out.target).key)) {
                 if (error) {
                     *error = "Output with invalid key";
                 }
@@ -424,7 +414,7 @@ bool check_outs_valid(const TransactionPrefix &tx, std::string *error)
                 return false;
             }
             for (const PublicKey &key : multisignatureOutput.keys) {
-                if (!check_key(key)) {
+                if (!checkKey(key)) {
                     if (error) {
                         *error = "Multisignature output with invalid public key";
                     }
@@ -531,7 +521,7 @@ bool is_out_to_acc(
     size_t keyIndex)
 {
     PublicKey pk;
-    derive_public_key(derivation, keyIndex, acc.address.spendPublicKey, pk);
+    derivePublicKey(derivation, keyIndex, acc.address.spendPublicKey, pk);
     return pk == out_key.key;
 }
 
@@ -542,7 +532,7 @@ bool is_out_to_acc(
     size_t keyIndex)
 {
     KeyDerivation derivation;
-    generate_key_derivation(tx_pub_key, acc.viewSecretKey, derivation);
+    generateKeyDerivation(tx_pub_key, acc.viewSecretKey, derivation);
     return is_out_to_acc(acc, out_key, derivation, keyIndex);
 }
 
@@ -571,7 +561,7 @@ bool lookup_acc_outs(
     size_t outputIndex = 0;
 
     KeyDerivation derivation;
-    generate_key_derivation(tx_pub_key, acc.viewSecretKey, derivation);
+    generateKeyDerivation(tx_pub_key, acc.viewSecretKey, derivation);
 
     for (const TransactionOutput &o : tx.outputs) {
         assert(o.target.type() == typeid(KeyOutput)

@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <Wallet/WalletErrors.h>
 #include <Wallet/WalletUtils.h>
 #include <CryptoNote.h>
@@ -28,7 +28,7 @@ void throwIfKeysMissmatch(const Crypto::SecretKey &secretKey,
                           const std::string &message)
 {
     Crypto::PublicKey pub;
-    bool r = Crypto::secret_key_to_public_key(secretKey, pub);
+    bool r = Crypto::secretKeyToPublicKey(secretKey, pub);
     if (!r || expectedPublicKey != pub) {
         throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD), message);
     }

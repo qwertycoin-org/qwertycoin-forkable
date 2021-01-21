@@ -21,14 +21,14 @@
 #include "gtest/gtest.h"
 
 #include <unordered_set>
-#include "crypto/crypto.h"
+#include "crypto/Crypto.h"
 #include "Common/ShuffleGenerator.h"
 
 class ShuffleTest : public ::testing::Test {
 public:
 
   typedef ShuffleGenerator<size_t, std::default_random_engine> DefaultShuffleGenerator;
-  typedef ShuffleGenerator<size_t, Crypto::random_engine<size_t>> CryptoShuffleGenerator;
+  typedef ShuffleGenerator<size_t, Crypto::RandomEngine<size_t>> CryptoShuffleGenerator;
 
   template <typename Gen>
   void checkUniqueness(Gen& gen, size_t count) {
