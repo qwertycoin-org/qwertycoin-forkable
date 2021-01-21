@@ -2674,7 +2674,7 @@ namespace CryptoNote {
 
 		// obtain key derivation
 		Crypto::KeyDerivation derivation;
-		if (!Crypto::generate_key_derivation(address.viewPublicKey, tx_key, derivation)) {
+		if (!Crypto::generateKeyDerivation(address.viewPublicKey, tx_key, derivation)) {
 			throw JsonRpc::JsonRpcError{
 					CORE_RPC_ERROR_CODE_WRONG_PARAM,
 					"Failed to generate key derivation from supplied parameters"
@@ -2690,7 +2690,8 @@ namespace CryptoNote {
 				if (o.target.type() == typeid(KeyOutput)) {
 					const KeyOutput out_key = boost::get<KeyOutput>(o.target);
 					Crypto::PublicKey pubkey;
-					derive_public_key(derivation, keyIndex, address.spendPublicKey, pubkey);
+                                        derivePublicKey(derivation, keyIndex,
+                                                        address.spendPublicKey, pubkey);
 					if (pubkey == out_key.key) {
 						received += o.amount;
 						outputs.push_back(o);
@@ -2758,7 +2759,7 @@ namespace CryptoNote {
 
 		// obtain key derivation
 		Crypto::KeyDerivation derivation;
-		if (!Crypto::generate_key_derivation(txPubKey, viewKey, derivation)) {
+		if (!Crypto::generateKeyDerivation(txPubKey, viewKey, derivation)) {
 			throw JsonRpc::JsonRpcError{
 					CORE_RPC_ERROR_CODE_WRONG_PARAM,
 					"Failed to generate key derivation from supplied parameters"
@@ -2774,7 +2775,8 @@ namespace CryptoNote {
 				if (o.target.type() == typeid(KeyOutput)) {
 					const KeyOutput out_key = boost::get<KeyOutput>(o.target);
 					Crypto::PublicKey pubkey;
-					derive_public_key(derivation, keyIndex, address.spendPublicKey, pubkey);
+                                        derivePublicKey(derivation, keyIndex,
+                                                        address.spendPublicKey, pubkey);
 					if (pubkey == out_key.key) {
 						received += o.amount;
 						outputs.push_back(o);
@@ -2869,13 +2871,13 @@ namespace CryptoNote {
 		}
 
 		// check signature
-		bool r = Crypto::check_tx_proof(txid, R, address.viewPublicKey, rA, sig);
+		bool r = Crypto::checkTxProof(txid, R, address.viewPublicKey, rA, sig);
 		res.signature_valid = r;
 
 		if (r) {
 			// obtain key derivation by multiplying scalar 1 to the pubkey r*A included in the signature
 			Crypto::KeyDerivation derivation;
-			if (!Crypto::generate_key_derivation(rA, I, derivation)) {
+			if (!Crypto::generateKeyDerivation(rA, I, derivation)) {
 				throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
 											"Failed to generate key derivation"};
 			}
@@ -2889,7 +2891,8 @@ namespace CryptoNote {
 					if (o.target.type() == typeid(KeyOutput)) {
 						const KeyOutput out_key = boost::get<KeyOutput>(o.target);
 						Crypto::PublicKey pubkey;
-						derive_public_key(derivation, keyIndex, address.spendPublicKey, pubkey);
+                                                derivePublicKey(derivation, keyIndex,
+                                                                address.spendPublicKey, pubkey);
 						if (pubkey == out_key.key) {
 							received += o.amount;
 							outputs.push_back(o);
@@ -2995,8 +2998,8 @@ namespace CryptoNote {
 			Crypto::PublicKey txPubKey = getTransactionPublicKeyFromExtra(tx.extra);
 
 			// check singature for shared secret
-			if (!Crypto::check_tx_proof(prefix_hash, address.viewPublicKey, txPubKey,
-										proof.shared_secret, proof.shared_secret_sig)) {
+			if (!Crypto::checkTxProof(prefix_hash, address.viewPublicKey, txPubKey,
+                                                  proof.shared_secret, proof.shared_secret_sig)) {
 				// throw JsonRpc::JsonRpcError{
 				//    CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
 				//    "Failed to check singature for shared secret"
@@ -3007,8 +3010,8 @@ namespace CryptoNote {
 
 			// check signature for key image
 			const std::vector<const Crypto::PublicKey *> &pubs = {&out_key.key};
-			if (!Crypto::check_ring_signature(prefix_hash, proof.key_image, &pubs[0], 1,
-											  &proof.key_image_sig)) {
+			if (!Crypto::checkRingSignature(prefix_hash, proof.key_image, &pubs[0], 1,
+                                                        &proof.key_image_sig)) {
 				// throw JsonRpc::JsonRpcError{
 				//    CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
 				//    "Failed to check signature for key image"
@@ -3019,14 +3022,15 @@ namespace CryptoNote {
 
 			// check if the address really received the fund
 			Crypto::KeyDerivation derivation;
-			if (!Crypto::generate_key_derivation(proof.shared_secret, I, derivation)) {
+			if (!Crypto::generateKeyDerivation(proof.shared_secret, I, derivation)) {
 				throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
 											"Failed to generate key derivation"};
 			}
 
 			try {
 				Crypto::PublicKey pubkey;
-				derive_public_key(derivation, proof.index_in_tx, address.spendPublicKey, pubkey);
+                                derivePublicKey(derivation, proof.index_in_tx,
+                                                address.spendPublicKey, pubkey);
 				if (pubkey == out_key.key) {
 					uint64_t amount = tx.outputs[proof.index_in_tx].amount;
 					res.total += amount;
@@ -3042,7 +3046,7 @@ namespace CryptoNote {
 
 		// check signature for address spend keys
 		Crypto::Signature sig = proof_decoded.signature;
-		if (!Crypto::check_signature(prefix_hash, address.spendPublicKey, sig)) {
+		if (!Crypto::checkSignature(prefix_hash, address.spendPublicKey, sig)) {
 			res.good = false;
 			return true;
 		}
@@ -3094,7 +3098,7 @@ namespace CryptoNote {
 
 		memcpy(&s, decoded.data(), sizeof(s));
 
-		res.sig_valid = Crypto::check_signature(hash, acc.spendPublicKey, s);
+		res.sig_valid = Crypto::checkSignature(hash, acc.spendPublicKey, s);
 		res.status = CORE_RPC_STATUS_OK;
 
 		return true;

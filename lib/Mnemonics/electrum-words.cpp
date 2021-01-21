@@ -50,7 +50,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/crc.hpp>
 #include <boost/filesystem.hpp>
-#include <crypto/crypto.h> // for declaration of Crypto::SecretKey
+#include <crypto/Crypto.h> // for declaration of crypto::SecretKey
 #include <Common/Lazy.h>
 #include <Mnemonics/electrum-words.h>
 
@@ -238,8 +238,8 @@ bool checksum_test(std::vector<std::string> seed, uint32_t unique_prefix_length)
 } // namespace
 
 /*!
-    \namespace Crypto
-    \brief Crypto namespace.
+    \namespace crypto
+    \brief crypto namespace.
 */
 namespace Crypto {
 
@@ -402,4 +402,4 @@ bool get_is_old_style_seed(std::string seed)
 
 } // namespace ElectrumWords
 
-} // namespace Crypto
+} // namespace crypto

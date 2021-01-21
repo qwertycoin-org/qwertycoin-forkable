@@ -19,7 +19,7 @@
 #pragma once
 
 #include <crypto/chacha8.h>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <Serialization/ISerializer.h>
 
@@ -36,7 +36,7 @@ bool serialize(Signature &sig, Common::StringView name, CN::ISerializer &seriali
 bool serialize(EllipticCurveScalar &ecScalar, Common::StringView name, CN::ISerializer &serializer);
 bool serialize(EllipticCurvePoint &ecPoint, Common::StringView name, CN::ISerializer &serializer);
 
-} // namespace Crypto
+} // namespace crypto
 
 namespace CryptoNote {
 

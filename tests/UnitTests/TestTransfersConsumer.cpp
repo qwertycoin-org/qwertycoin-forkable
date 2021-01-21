@@ -46,7 +46,7 @@ AccountKeys getAccountKeysWithViewKey(const PublicKey& publicViewKey, const Secr
   viewKp.publicKey = publicViewKey;
   viewKp.secretKey = secretViewKey;
   KeyPair p1;
-  Crypto::generate_keys(p1.publicKey, p1.secretKey);
+  Crypto::generateKeys(p1.publicKey, p1.secretKey);
   AccountKeys accountKeys = accountKeysFromKeypairs(viewKp, p1);
 
   return accountKeys;

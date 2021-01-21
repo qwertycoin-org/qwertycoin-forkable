@@ -41,8 +41,8 @@ void derivePublicKey(
     PublicKey &ephemeralKey)
 {
     KeyDerivation derivation;
-    generate_key_derivation(to.viewPublicKey, txKey, derivation);
-    derive_public_key(derivation, outputIndex, to.spendPublicKey, ephemeralKey);
+    generateKeyDerivation(to.viewPublicKey, txKey, derivation);
+    derivePublicKey(derivation, outputIndex, to.spendPublicKey, ephemeralKey);
 }
 
 } // namespace
@@ -265,7 +265,7 @@ void TransactionImpl::setTransactionSecretKey(const SecretKey &key)
     PublicKey pk;
     PublicKey txPubKey;
 
-    secret_key_to_public_key(sk, pk);
+    secretKeyToPublicKey(sk, pk);
     extra.getPublicKey(txPubKey);
 
     if (txPubKey != pk) {
@@ -394,14 +394,10 @@ void TransactionImpl::signInputKey(
 
     signatures.resize(keysPtrs.size());
 
-    generate_ring_signature(
-        reinterpret_cast<const Hash &>(prefixHash),
-        reinterpret_cast<const KeyImage &>(input.keyImage),
-        keysPtrs,
-        reinterpret_cast<const SecretKey &>(ephKeys.secretKey),
-        info.realOutput.transactionIndex,
-        signatures.data()
-    );
+    generateRingSignature(reinterpret_cast<const Hash &>(prefixHash),
+                          reinterpret_cast<const KeyImage &>(input.keyImage), keysPtrs,
+                          reinterpret_cast<const SecretKey &>(ephKeys.secretKey),
+                          info.realOutput.transactionIndex, signatures.data());
 
     getSignatures(index) = signatures;
     invalidateHash();
@@ -417,34 +413,22 @@ void TransactionImpl::signInputMultisignature(
     PublicKey ephemeralPublicKey;
     SecretKey ephemeralSecretKey;
 
-    generate_key_derivation(
-        reinterpret_cast<const PublicKey &>(sourceTransactionKey),
-        reinterpret_cast<const SecretKey &>(accountKeys.viewSecretKey),
-        derivation
-    );
+    generateKeyDerivation(reinterpret_cast<const PublicKey &>(sourceTransactionKey),
+                          reinterpret_cast<const SecretKey &>(accountKeys.viewSecretKey),
+                          derivation);
 
-    derive_public_key(
-        derivation,
-        outputIndex,
-        reinterpret_cast<const PublicKey &>(accountKeys.address.spendPublicKey),
-        ephemeralPublicKey
-    );
-    derive_secret_key(
-        derivation,
-        outputIndex,
-        reinterpret_cast<const SecretKey &>(accountKeys.spendSecretKey),
-        ephemeralSecretKey
-    );
+    derivePublicKey(derivation, outputIndex,
+                    reinterpret_cast<const PublicKey &>(accountKeys.address.spendPublicKey),
+                    ephemeralPublicKey);
+    deriveSecretKey(derivation, outputIndex,
+                    reinterpret_cast<const SecretKey &>(accountKeys.spendSecretKey),
+                    ephemeralSecretKey);
 
     Signature signature;
     auto txPrefixHash = getTransactionPrefixHash();
 
-    generate_signature(
-        reinterpret_cast<const Hash &>(txPrefixHash),
-        ephemeralPublicKey,
-        ephemeralSecretKey,
-        signature
-    );
+    generateSignature(reinterpret_cast<const Hash &>(txPrefixHash), ephemeralPublicKey,
+                      ephemeralSecretKey, signature);
 
     getSignatures(index).push_back(signature);
     invalidateHash();
@@ -455,7 +439,7 @@ void TransactionImpl::signInputMultisignature(size_t index, const KeyPair &ephem
     Signature signature;
     auto txPrefixHash = getTransactionPrefixHash();
 
-    generate_signature(txPrefixHash, ephemeralKeys.publicKey, ephemeralKeys.secretKey, signature);
+    generateSignature(txPrefixHash, ephemeralKeys.publicKey, ephemeralKeys.secretKey, signature);
 
     getSignatures(index).push_back(signature);
     invalidateHash();

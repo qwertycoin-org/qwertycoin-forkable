@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "crypto/crypto.h"
+#include "crypto/Crypto.h"
 #include "CryptoNoteCore/CryptoNoteBasic.h"
 
 #include "SingleTransactionTestBase.h"
@@ -38,10 +38,11 @@ public:
     AccountKeys bob_keys = m_bob.getAccountKeys();
 
     Crypto::KeyDerivation recv_derivation;
-    Crypto::generate_key_derivation(m_tx_pub_key, bob_keys.viewSecretKey, recv_derivation);
+    Crypto::generateKeyDerivation(m_tx_pub_key, bob_keys.viewSecretKey, recv_derivation);
 
-    Crypto::derive_public_key(recv_derivation, 0, bob_keys.address.spendPublicKey, m_in_ephemeral.publicKey);
-    Crypto::derive_secret_key(recv_derivation, 0, bob_keys.spendSecretKey, m_in_ephemeral.secretKey);
+    Crypto::derivePublicKey(recv_derivation, 0, bob_keys.address.spendPublicKey,
+                            m_in_ephemeral.publicKey);
+    Crypto::deriveSecretKey(recv_derivation, 0, bob_keys.spendSecretKey, m_in_ephemeral.secretKey);
 
     return true;
   }
@@ -49,7 +50,7 @@ public:
   bool test()
   {
     Crypto::KeyImage ki;
-    Crypto::generate_key_image(m_in_ephemeral.publicKey, m_in_ephemeral.secretKey, ki);
+    Crypto::generateKeyImage(m_in_ephemeral.publicKey, m_in_ephemeral.secretKey, ki);
     return true;
   }
 

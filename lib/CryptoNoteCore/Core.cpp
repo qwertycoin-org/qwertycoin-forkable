@@ -25,7 +25,7 @@
 #include <Common/Math.h>
 #include <Common/StringTools.h>
 #include <Common/Util.h>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <CryptoNoteCore/Core.h>
 #include <CryptoNoteCore/CoreConfig.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
@@ -574,7 +574,7 @@ bool core::check_tx_inputs_keyimages_diff(const Transaction &tx)
 
             // Additional key_image check.
             // Fix discovered by Monero Lab and suggested by "fluffypony" (bitcointalk.org)
-            if (!(scalarmultKey(in.keyImage, L) == I)) {
+            if (!(scalarMultKey(in.keyImage, L) == I)) {
                 logger(ERROR) << "Transaction uses key image not in the valid domain";
                 return false;
             }

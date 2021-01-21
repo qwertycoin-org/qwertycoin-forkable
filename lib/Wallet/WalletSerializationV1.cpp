@@ -18,7 +18,7 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/optional.hpp>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <Common/MemoryInputStream.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
@@ -524,7 +524,7 @@ void WalletSerializerV1::loadWallets(Common::IInputStream &source, CryptoContext
                                  dto.spendPublicKey,
                                  "Restored spend public key doesn't correspond to secret key");
         } else {
-            if (!Crypto::check_key(dto.spendPublicKey)) {
+            if (!Crypto::checkKey(dto.spendPublicKey)) {
                 throw std::system_error(
                     make_error_code(error::WRONG_PASSWORD),
                     "Public spend key is incorrect"

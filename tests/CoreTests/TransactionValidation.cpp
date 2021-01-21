@@ -69,8 +69,9 @@ namespace
       {
         Crypto::KeyDerivation derivation;
         Crypto::PublicKey out_eph_public_key;
-        Crypto::generate_key_derivation(dst_entr.addr.viewPublicKey, m_tx_key.secretKey, derivation);
-        Crypto::derive_public_key(derivation, output_index, dst_entr.addr.spendPublicKey, out_eph_public_key);
+        Crypto::generateKeyDerivation(dst_entr.addr.viewPublicKey, m_tx_key.secretKey, derivation);
+        Crypto::derivePublicKey(derivation, output_index, dst_entr.addr.spendPublicKey,
+                                out_eph_public_key);
 
         TransactionOutput out;
         out.amount = dst_entr.amount;
@@ -103,8 +104,9 @@ namespace
         m_tx.signatures.push_back(std::vector<Crypto::Signature>());
         std::vector<Crypto::Signature>& sigs = m_tx.signatures.back();
         sigs.resize(src_entr.outputs.size());
-        generate_ring_signature(m_tx_prefix_hash, boost::get<KeyInput>(m_tx.inputs[i]).keyImage,
-          keys_ptrs, m_in_contexts[i].secretKey, src_entr.realOutput, sigs.data());
+        generateRingSignature(m_tx_prefix_hash, boost::get<KeyInput>(m_tx.inputs[i]).keyImage,
+                              keys_ptrs, m_in_contexts[i].secretKey, src_entr.realOutput,
+                              sigs.data());
         i++;
       }
     }
@@ -138,7 +140,7 @@ namespace
     {
       Crypto::PublicKey key;
       memset(&key, i, sizeof(Crypto::PublicKey));
-      if (!Crypto::check_key(key))
+      if (!Crypto::checkKey(key))
       {
         return key;
       }
@@ -456,7 +458,7 @@ bool gen_tx_key_image_not_derive_from_tx_key::generate(std::vector<test_event_en
   KeyInput& in_to_key = boost::get<KeyInput>(builder.m_tx.inputs.front());
   KeyPair kp = generateKeyPair();
   Crypto::KeyImage another_ki;
-  Crypto::generate_key_image(kp.publicKey, kp.secretKey, another_ki);
+  Crypto::generateKeyImage(kp.publicKey, kp.secretKey, another_ki);
   in_to_key.keyImage = another_ki;
 
   builder.step3_fill_outputs(destinations);
@@ -787,7 +789,7 @@ bool MultiSigTx_InvalidOutputSignature::generate(std::vector<test_event_entry>& 
 
   Crypto::PublicKey pk;
   Crypto::SecretKey sk;
-  Crypto::generate_keys(pk, sk);
+  Crypto::generateKeys(pk, sk);
 
   // fill with 1 valid key
   target.keys.push_back(pk);
@@ -858,7 +860,7 @@ bool MultiSigTx_Input::generate(std::vector<test_event_entry>& events) const {
     const auto& sk = m_outputAccounts[i].getAccountKeys().spendSecretKey;
 
     Crypto::Signature sig;
-    Crypto::generate_signature(builder.m_tx_prefix_hash, pk, sk, sig);
+    Crypto::generateSignature(builder.m_tx_prefix_hash, pk, sk, sig);
     outsigs.push_back(sig);
   }
 
@@ -899,7 +901,7 @@ bool MultiSigTx_BadInputSignature::generate(std::vector<test_event_entry>& event
 
   // sign the hash
   Crypto::Signature sig;
-  Crypto::generate_signature(badHash, pk, sk, sig);
+  Crypto::generateSignature(badHash, pk, sk, sig);
   outsigs.push_back(sig);
 
   // transaction with bad signature should be rejected

@@ -24,7 +24,7 @@
 #include "CryptoNoteCore/TransactionApi.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h" // TODO: delete
 #include "CryptoNoteCore/Account.h"
-#include "crypto/crypto.h"
+#include "crypto/Crypto.h"
 #include "TransactionApiHelpers.h"
 
 using namespace CryptoNote;
@@ -47,10 +47,13 @@ namespace {
 
   void derivePublicKey(const AccountKeys& reciever, const Crypto::PublicKey& srcTxKey, size_t outputIndex, PublicKey& ephemeralKey) {
     Crypto::KeyDerivation derivation;
-    Crypto::generate_key_derivation(srcTxKey, reinterpret_cast<const Crypto::SecretKey&>(reciever.viewSecretKey), derivation);
-    Crypto::derive_public_key(derivation, outputIndex,
-      reinterpret_cast<const Crypto::PublicKey&>(reciever.address.spendPublicKey),
-      reinterpret_cast<Crypto::PublicKey&>(ephemeralKey));
+    Crypto::generateKeyDerivation(
+            srcTxKey, reinterpret_cast<const Crypto::SecretKey &>(reciever.viewSecretKey),
+            derivation);
+    Crypto::derivePublicKey(
+            derivation, outputIndex,
+            reinterpret_cast<const Crypto::PublicKey &>(reciever.address.spendPublicKey),
+            reinterpret_cast<Crypto::PublicKey &>(ephemeralKey));
   }
 
 
@@ -168,7 +171,7 @@ TEST_F(TransactionApi, addAndSignInputMsig) {
   ASSERT_EQ(3, tx->getRequiredSignaturesCount(index));
 
   KeyPair kp1;
-  Crypto::generate_keys(kp1.publicKey, kp1.secretKey );
+  Crypto::generateKeys(kp1.publicKey, kp1.secretKey );
 
   auto srcTxKey = kp1.publicKey;
   AccountKeys accounts[] = { generateAccountKeys(), generateAccountKeys(), generateAccountKeys() };
@@ -230,7 +233,7 @@ TEST_F(TransactionApi, secretKey) {
   ASSERT_TRUE(tx->getTransactionSecretKey(txSecretKey));
 
   KeyPair kp1;
-  Crypto::generate_keys(kp1.publicKey, kp1.secretKey);
+  Crypto::generateKeys(kp1.publicKey, kp1.secretKey);
   SecretKey sk = kp1.secretKey;
   ASSERT_ANY_THROW(tx2->setTransactionSecretKey(sk)); // unrelated secret key should not be accepted
 
@@ -355,7 +358,7 @@ TEST_F(TransactionApi, unableToModifySignedTransaction) {
   auto index = tx->addInput(inputMsig);
 
   KeyPair kp1;
-  Crypto::generate_keys(kp1.publicKey, kp1.secretKey);
+  Crypto::generateKeys(kp1.publicKey, kp1.secretKey);
 
   auto srcTxKey = kp1.publicKey;
 

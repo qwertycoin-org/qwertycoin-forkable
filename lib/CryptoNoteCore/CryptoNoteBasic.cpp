@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 
 namespace CryptoNote {
@@ -25,7 +25,7 @@ KeyPair generateKeyPair()
 {
     KeyPair k;
 
-    Crypto::generate_keys(k.publicKey, k.secretKey);
+    Crypto::generateKeys(k.publicKey, k.secretKey);
 
     return k;
 }

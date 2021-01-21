@@ -27,7 +27,7 @@
 #include <boost/serialization/is_bitwise_serializable.hpp>
 #include "CryptoNoteCore/CryptoNoteBasic.h"
 #include "UnorderedContainersBoostSerialization.h"
-#include "crypto/crypto.h"
+#include "crypto/Crypto.h"
 
 //namespace CryptoNote {
 namespace boost

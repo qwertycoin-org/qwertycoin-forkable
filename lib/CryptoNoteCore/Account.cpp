@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteSerialization.h>
 
@@ -38,18 +38,18 @@ void AccountBase::setNull()
 
 void AccountBase::generate()
 {
-    Crypto::generate_keys(m_keys.address.spendPublicKey, m_keys.spendSecretKey);
-    Crypto::generate_keys(m_keys.address.viewPublicKey, m_keys.viewSecretKey);
+    Crypto::generateKeys(m_keys.address.spendPublicKey, m_keys.spendSecretKey);
+    Crypto::generateKeys(m_keys.address.viewPublicKey, m_keys.viewSecretKey);
     m_creation_timestamp = time(nullptr);
 }
 
 void AccountBase::generateDeterministic()
 {
     Crypto::SecretKey second;
-    Crypto::generate_keys(m_keys.address.spendPublicKey, m_keys.spendSecretKey);
+    Crypto::generateKeys(m_keys.address.spendPublicKey, m_keys.spendSecretKey);
     auto ssk = (uint8_t *)&m_keys.spendSecretKey;
     keccak(ssk, sizeof(Crypto::SecretKey), (uint8_t *)&second, sizeof(Crypto::SecretKey));
-    Crypto::generate_deterministic_keys(m_keys.address.viewPublicKey, m_keys.viewSecretKey, second);
+    Crypto::generateDeterministicKeys(m_keys.address.viewPublicKey, m_keys.viewSecretKey, second);
     m_creation_timestamp = time(nullptr);
 }
 
@@ -58,7 +58,7 @@ Crypto::SecretKey AccountBase::generate_key(
     bool recover,
     bool two_random)
 {
-    Crypto::SecretKey first = generate_m_keys(
+    Crypto::SecretKey first = generateMKeys(
         m_keys.address.spendPublicKey,
         m_keys.spendSecretKey,
         recovery_key,
@@ -70,7 +70,7 @@ Crypto::SecretKey AccountBase::generate_key(
     Crypto::SecretKey second;
     keccak((uint8_t*)&first,sizeof(Crypto::SecretKey),(uint8_t*)&second,sizeof(Crypto::SecretKey));
 
-    generate_m_keys(m_keys.address.viewPublicKey, m_keys.viewSecretKey, second, !two_random);
+    generateMKeys(m_keys.address.viewPublicKey, m_keys.viewSecretKey, second, !two_random);
 
     struct tm timestamp;
     timestamp.tm_year = 2016 - 1900; // year 2016
@@ -96,7 +96,7 @@ void AccountBase::generateViewFromSpend(
 {
     Crypto::SecretKey viewKeySeed;
     keccak((uint8_t *)&spend, sizeof(spend), (uint8_t *)&viewKeySeed, sizeof(viewKeySeed));
-    Crypto::generate_deterministic_keys(viewPublic, viewSecret, viewKeySeed);
+    Crypto::generateDeterministicKeys(viewPublic, viewSecret, viewKeySeed);
 }
 
 void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret)

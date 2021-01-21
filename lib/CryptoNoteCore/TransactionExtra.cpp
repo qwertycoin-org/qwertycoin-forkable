@@ -459,7 +459,8 @@ bool tx_extra_message::encrypt(
     mlen += TX_EXTRA_MESSAGE_CHECKSUM_SIZE;
     if (recipient) {
         message_key_data key_data;
-        if(!generate_key_derivation(recipient->spendPublicKey,txkey.secretKey,key_data.derivation)){
+        if(!generateKeyDerivation(recipient->spendPublicKey, txkey.secretKey,
+                                   key_data.derivation)){
             return false;
         }
         key_data.magic1 = 0x80;
@@ -490,7 +491,7 @@ bool tx_extra_message::decrypt(
         ptr.reset(new char[mlen]);
         assert(ptr);
         message_key_data key_data;
-        if (!generate_key_derivation(txkey, *recepient_secret_key, key_data.derivation)) {
+        if (!generateKeyDerivation(txkey, *recepient_secret_key, key_data.derivation)) {
             return false;
         }
         key_data.magic1 = 0x80;
@@ -535,7 +536,8 @@ bool tx_extra_sender::encrypt(
     mlen += TX_EXTRA_SENDER_CHECKSUM_SIZE;
     if (recipient) {
         sender_key_data key_data;
-        if(!generate_key_derivation(recipient->spendPublicKey,txkey.secretKey,key_data.derivation)){
+        if(!generateKeyDerivation(recipient->spendPublicKey, txkey.secretKey,
+                                   key_data.derivation)){
             std::cout << "Encrypt returned false" << std::endl;
             return false;
         }
@@ -567,7 +569,7 @@ bool tx_extra_sender::decrypt(
         ptr.reset(new char[mlen]);
         assert(ptr);
         sender_key_data key_data;
-        if (!generate_key_derivation(txkey, *recepient_secret_key, key_data.derivation)) {
+        if (!generateKeyDerivation(txkey, *recepient_secret_key, key_data.derivation)) {
             return false;
         }
         key_data.magic1 = 0x80;

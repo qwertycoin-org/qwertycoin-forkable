@@ -30,7 +30,7 @@
 
 #include <system_error>
 
-#include "crypto/crypto.h"
+#include "crypto/Crypto.h"
 
 #include "BlockchainExplorer/BlockchainExplorerDataBuilder.h"
 
@@ -221,7 +221,7 @@ void INodeTrivialRefreshStub::doGetRandomOutsByAmounts(std::vector<uint64_t> amo
     {
       Crypto::PublicKey key;
       Crypto::SecretKey sk;
-      generate_keys(key, sk);
+      generateKeys(key, sk);
 
       COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::out_entry e;
       e.global_amount_index = i;

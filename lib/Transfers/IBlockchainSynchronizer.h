@@ -22,7 +22,7 @@
 #include <future>
 #include <system_error>
 #include <unordered_set>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <IObservable.h>
 #include <IStreamSerializable.h>

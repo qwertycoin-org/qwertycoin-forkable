@@ -31,7 +31,7 @@
 #include <Common/StdInputStream.h>
 #include <Common/StdOutputStream.h>
 #include <Common/Util.h>
-#include <crypto/crypto.h>
+#include <crypto/Crypto.h>
 #include <P2p/ConnectionContext.h>
 #include <P2p/LevinProtocol.h>
 #include <P2p/NetNode.h>
@@ -1307,7 +1307,7 @@ bool NodeServer::check_trust(const proof_of_trust &tr)
     Crypto::PublicKey pk;
     Common::podFromHex(CryptoNote::P2P_STAT_TRUSTED_PUB_KEY, pk);
     Crypto::Hash h = get_proof_of_trust_hash(tr);
-    if (!Crypto::check_signature(h, pk, tr.sign)) {
+    if (!Crypto::checkSignature(h, pk, tr.sign)) {
         logger(ERROR) << "check_trust failed: sign check failed";
         return false;
     }

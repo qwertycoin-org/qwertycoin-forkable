@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "crypto/crypto.h"
+#include "crypto/Crypto.h"
 #include "CryptoNoteCore/CryptoNoteBasic.h"
 
 #include "SingleTransactionTestBase.h"
@@ -31,7 +31,8 @@ public:
   bool test()
   {
     Crypto::KeyDerivation recv_derivation;
-    Crypto::generate_key_derivation(m_tx_pub_key, m_bob.getAccountKeys().viewSecretKey, recv_derivation);
+    Crypto::generateKeyDerivation(m_tx_pub_key, m_bob.getAccountKeys().viewSecretKey,
+                                  recv_derivation);
     return true;
   }
 };
