@@ -143,6 +143,7 @@ public:
     const Block &genesisBlock() const { return m_genesisBlock; }
     const Crypto::Hash &genesisBlockHash() const { return m_genesisBlockHash; }
 
+    uint64_t getBaseReward(uint64_t alreadyGeneratedCoins, uint32_t height) const;
     bool getBlockReward(
         uint8_t blockMajorVersion,
         size_t medianSize,

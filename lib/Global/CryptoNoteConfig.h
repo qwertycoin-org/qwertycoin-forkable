@@ -58,6 +58,7 @@ const size_t   CRYPTONOTE_REWARD_BLOCKS_WINDOW                = 100;
 const size_t   CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE      = 1000000;
 const size_t   CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE         = 600;
 
+const uint64_t COIN                                           = std::pow(10, CRYPTONOTE_DISPLAY_DECIMAL_POINT);
 
 /* This section defines our minimum fee count required for transactions */
 const uint64_t MINIMUM_FEE                                    = UINT64_C(10000);
@@ -150,6 +151,12 @@ const std::string GOVERNANCE_VIEW_SECRET_KEY                 = "8e70e25148875bc7
 
 const std::string TESTNET_GOVERNANCE_WALLET_ADDRESS          = "QWFi5QHxmajhg2SxRS1FhjcyoM2FTYxmSjmvaBr7uXzz1b8Ms4M2h8PiKTL2YswTz1dFrV8ry5UQmBBLrb27tecs7MuNbLGuy5";
 const std::string TESTNET_GOVERNANCE_VIEW_SECRET_KEY         = "f747f4a4838027c9af80e6364a941b60c538e67e9ea198b6ec452b74c276de06";
+
+// Fixed rewarding
+const bool FIXED_REWARDING                                   = true;
+const uint64_t START_BLOCK_REWARD                            = (UINT64_C(300000) * COIN);
+const uint64_t MIN_BLOCK_REWARD                              = (UINT64_C(100) * COIN);
+const uint64_t REWARD_HALVING_INTERVAL                       = UINT64_C(11000);
 
 } // namespace parameters
 

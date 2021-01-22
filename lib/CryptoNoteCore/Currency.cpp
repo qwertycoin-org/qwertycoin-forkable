@@ -131,6 +131,22 @@ uint32_t Currency::upgradeHeight(uint8_t majorVersion) const
     }
 }
 
+uint64_t Currency::getBaseReward(uint64_t alreadyGeneratedCoins, uint32_t height) const
+{
+    uint64_t baseReward;
+    if (parameters::FIXED_REWARDING) {
+        uint64_t shift = static_cast<uint64_t>(height) / parameters::REWARD_HALVING_INTERVAL;
+        baseReward = shift >= 64 ? 0 : parameters::START_BLOCK_REWARD >> shift;
+        baseReward = (std::max)(baseReward, parameters::MIN_BLOCK_REWARD);
+    } else {
+        return baseReward = ((m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactor);
+    }
+
+    baseReward = (std::min)(baseReward, m_moneySupply - alreadyGeneratedCoins);
+
+    return baseReward;
+}
+
 bool Currency::getBlockReward(uint8_t blockMajorVersion,
                               size_t medianSize,
                               size_t currentBlockSize,
@@ -163,8 +179,8 @@ bool Currency::getBlockReward(uint8_t blockMajorVersion,
 
     // Tail emission
 
-    uint64_t baseReward =
-            ((m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactor) * consistency;
+    uint64_t baseReward = getBaseReward(alreadyGeneratedCoins, height) * consistency;
+
     if (alreadyGeneratedCoins + CryptoNote::parameters::TAIL_EMISSION_REWARD >= m_moneySupply
         || baseReward < CryptoNote::parameters::TAIL_EMISSION_REWARD) {
         baseReward = CryptoNote::parameters::TAIL_EMISSION_REWARD;
