@@ -162,7 +162,7 @@ const uint64_t REWARD_HALVING_INTERVAL                       = UINT64_C(11000);
 } // namespace parameters
 
 const char     CRYPTONOTE_NAME[]                             = "QwertyFork";
-const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff0001ffffffffffff07029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101b40aae3db7f8816252ab958777255c1ce9ec88afb96656d76c66a68300836d5a";
+const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff000180c0dfda8ee906029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017f9b72c9323f424c3996c0a5ad6542f7c87e404d4b204ee265eecf97ae05ce41";
 const char     NETWORK_ID_BASE[]                             = "deadbeef";
 const char     DNS_CHECKPOINTS_HOST[]                        = "checkpoints-qwertyfork.qwertycoin.org";
 
