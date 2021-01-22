@@ -3320,9 +3320,14 @@ bool simple_wallet::consolidate(const std::vector<std::string> &args)
 
             WalletHelper::IWalletRemoveObserverGuard removeGuard(*m_wallet, sent);
 
+            uint64_t feePerByte = m_currency.getFeePerByte(to_send, getMinimalFee());
+
+            logger(DEBUGGING, BRIGHT_CYAN) << "Consolidate: feePerByte: " << feePerByte;
+
             CryptoNote::TransactionId tx = m_wallet->sendFusionTransaction(
                 transferInputs,
-                CryptoNote::parameters::MINIMUM_FEE,
+                // CryptoNote::parameters::MINIMUM_FEE,
+                feePerByte,
                 extraString,
                 mixIn,
                 0

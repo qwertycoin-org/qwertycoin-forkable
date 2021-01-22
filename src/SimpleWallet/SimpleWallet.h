@@ -67,11 +67,8 @@ class simple_wallet : public CryptoNote::INodeObserver,
                       public CryptoNote::INodeRpcProxyObserver
 {
 public:
-    simple_wallet(
-        System::Dispatcher &dispatcher,
-        const CryptoNote::Currency &currency,
-        Logging::LoggerManager &log
-    );
+    simple_wallet(System::Dispatcher &dispatcher, const CryptoNote::Currency &currency,
+                  Logging::LoggerManager &log);
 
     bool init(const boost::program_options::variables_map &vm);
     bool deinit();
@@ -82,10 +79,7 @@ public:
     std::string get_commands_str();
     std::string getFeeAddress();
 
-    const CryptoNote::Currency &currency() const
-    {
-        return m_currency;
-    }
+    const CryptoNote::Currency &currency() const { return m_currency; }
 
 private:
     Logging::LoggerMessage success_msg_writer(bool color = false)
@@ -103,29 +97,19 @@ private:
     void handle_command_line(const boost::program_options::variables_map &vm);
 
     bool new_wallet(const std::string &wallet_file, const std::string &password);
-	bool new_wallet(
-	    Crypto::SecretKey &secret_key,
-	    Crypto::SecretKey &view_key,
-	    const std::string &wallet_file,
-	    const std::string &password);
-	bool gen_wallet(
-	    const std::string &wallet_file,
-	    const std::string &password,
-	    const Crypto::SecretKey &recovery_key = Crypto::SecretKey(),
-	    bool recover = false,
-	    bool two_random = false);
-    bool new_wallet(
-        AccountKeys &private_key,
-        const std::string &wallet_file,
-        const std::string &password);
-    bool new_tracking_wallet(
-        AccountKeys &tracking_key,
-        const std::string &wallet_file,
-        const std::string &password);
+    bool new_wallet(Crypto::SecretKey &secret_key, Crypto::SecretKey &view_key,
+                    const std::string &wallet_file, const std::string &password);
+    bool gen_wallet(const std::string &wallet_file, const std::string &password,
+                    const Crypto::SecretKey &recovery_key = Crypto::SecretKey(),
+                    bool recover = false, bool two_random = false);
+    bool new_wallet(AccountKeys &private_key, const std::string &wallet_file,
+                    const std::string &password);
+    bool new_tracking_wallet(AccountKeys &tracking_key, const std::string &wallet_file,
+                             const std::string &password);
     bool close_wallet();
 
     bool help(const std::vector<std::string> &args = std::vector<std::string>());
-	bool seed(const std::vector<std::string> &args = std::vector<std::string>());
+    bool seed(const std::vector<std::string> &args = std::vector<std::string>());
     bool exit(const std::vector<std::string> &args);
     bool start_mining(const std::vector<std::string> &args);
     bool stop_mining(const std::vector<std::string> &args);
@@ -136,11 +120,11 @@ private:
     bool show_outgoing_transfers(const std::vector<std::string> &args);
     bool show_payments(const std::vector<std::string> &args);
     bool show_blockchain_height(const std::vector<std::string> &args);
-	bool show_unlocked_outputs_count(const std::vector<std::string> &args);
+    bool show_unlocked_outputs_count(const std::vector<std::string> &args);
     bool listTransfers(const std::vector<std::string> &args);
     bool listMessages(const std::vector<std::string> &args);
     bool transfer(const std::vector<std::string> &args);
-    bool sendMsg(const std::vector<std::string>& args);
+    bool sendMsg(const std::vector<std::string> &args);
     bool print_address(const std::vector<std::string> &args = std::vector<std::string>());
     bool save(const std::vector<std::string> &args);
     bool rescan(const std::vector<std::string> &args);
@@ -149,12 +133,12 @@ private:
     bool payment_id(const std::vector<std::string> &args);
     bool change_password(const std::vector<std::string> &args);
     bool sweep_dust(const std::vector<std::string> &args);
-	bool estimate_fusion(const std::vector<std::string> &args);
+    bool estimate_fusion(const std::vector<std::string> &args);
     bool optimize(const std::vector<std::string> &args);
     bool consolidate(const std::vector<std::string> &args);
     bool get_tx_key(const std::vector<std::string> &args);
-	bool get_tx_proof(const std::vector<std::string> &args);
-	bool get_reserve_proof(const std::vector<std::string> &args);
+    bool get_tx_proof(const std::vector<std::string> &args);
+    bool get_reserve_proof(const std::vector<std::string> &args);
     bool sign_message(const std::vector<std::string> &args);
     bool verify_message(const std::vector<std::string> &args);
 
@@ -163,7 +147,7 @@ private:
 #endif
 
     void printConnectionError() const;
-	uint64_t getMinimalFee();
+    uint64_t getMinimalFee();
 
     // IWalletLegacyObserver
     void initCompleted(std::error_code result) override;
@@ -181,9 +165,9 @@ private:
     public:
         explicit refresh_progress_reporter_t(CryptoNote::simple_wallet &simple_wallet)
             : m_simple_wallet(simple_wallet),
-            m_blockchain_height(0),
-            m_blockchain_height_update_time(),
-            m_print_time()
+              m_blockchain_height(0),
+              m_blockchain_height_update_time(),
+              m_print_time()
         {
         }
 
