@@ -254,11 +254,11 @@ bool Currency::getGovernanceAddressAndKey(AccountKeys &governanceKeys) const
     std::string viewSecretKey;
 
     if (isTestnet()) {
-        address = parameters::GOVERNANCE_WALLET_ADDRESS;
-        viewSecretKey = parameters::GOVERNANCE_VIEW_SECRET_KEY;
-    } else {
         address = parameters::TESTNET_GOVERNANCE_WALLET_ADDRESS;
         viewSecretKey = parameters::TESTNET_GOVERNANCE_VIEW_SECRET_KEY;
+    } else {
+        address = parameters::GOVERNANCE_WALLET_ADDRESS;
+        viewSecretKey = parameters::GOVERNANCE_VIEW_SECRET_KEY;
     }
 
     AccountPublicAddress governanceAddress = boost::value_initialized<AccountPublicAddress>();

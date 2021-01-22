@@ -726,7 +726,7 @@ bool core::get_block_template(
     if (height > CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
         getBlockHeight(b.previousBlockHash, previousBlockHeight);
         uint64_t prev_timestamp = getBlockTimestamp(previousBlockHeight);
-        if(prev_timestamp >= b.timestamp) {
+        if(prev_timestamp > b.timestamp) {
             logger(ERROR, BRIGHT_RED) << "incorrect timestamp, prev = "
                << prev_timestamp << ",  new = " << b.timestamp;
             return false;
