@@ -252,6 +252,13 @@ private:
 
     bool onGetMixin(const Transaction &transaction, uint64_t &mixin);
 
+    bool onGetStatsByHeights(const COMMAND_RPC_GET_STATS_BY_HEIGHTS::request &req,
+                             COMMAND_RPC_GET_STATS_BY_HEIGHTS::response &res);
+    bool onGetStatsByHeightsRange(const COMMAND_RPC_GET_STATS_BY_HEIGHTS_RANGE::request &req,
+                                  COMMAND_RPC_GET_STATS_BY_HEIGHTS_RANGE::response &res);
+    bool onResolveOpenAlias(const COMMAND_RPC_RESOLVE_OPEN_ALIAS::request &req,
+                            COMMAND_RPC_RESOLVE_OPEN_ALIAS::response &res);
+
 private:
     static std::unordered_map<std::string, RpcHandler<HandlerFunction>> s_handlers;
     Logging::LoggerRef logger;

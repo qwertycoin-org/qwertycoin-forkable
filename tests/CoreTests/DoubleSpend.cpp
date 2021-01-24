@@ -68,7 +68,7 @@ bool gen_double_spend_in_different_chains::check_double_spend(CryptoNote::core& 
   CHECK_EQ(expected_blockchain_height, blocks.size());
 
   CHECK_EQ(1, c.get_pool_transactions_count());
-  CHECK_EQ(1, c.get_alternative_blocks_count());
+  CHECK_EQ(1, c.getAlternativeBlocksCount());
 
   CryptoNote::AccountBase bob_account = boost::get<CryptoNote::AccountBase>(events[1]);
   CryptoNote::AccountBase alice_account = boost::get<CryptoNote::AccountBase>(events[2]);

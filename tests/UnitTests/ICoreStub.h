@@ -110,7 +110,7 @@ public:
   virtual uint64_t getMinimalFee() override;
   virtual uint64_t getBlockTimestamp(uint32_t height) override;
 
-  virtual uint32_t get_current_blockchain_height() override;
+  virtual uint32_t getCurrentBlockchainHeight() override;
   virtual uint8_t getBlockMajorVersionForHeight(uint32_t height) override;
   virtual uint8_t getCurrentBlockMajorVersion() override;
 

@@ -163,10 +163,10 @@ bool gen_simple_chain_split_1::check_split_not_switched(CryptoNote::core& c, siz
 {
   DEFINE_TESTS_ERROR_CONTEXT("gen_simple_chain_split_1::check_split_not_switched");
   //check height
-  CHECK_TEST_CONDITION(c.get_current_blockchain_height() == 9);
+  CHECK_TEST_CONDITION(c.getCurrentBlockchainHeight() == 9);
   CHECK_TEST_CONDITION(c.get_blockchain_total_transactions() == 9);
   CHECK_TEST_CONDITION(c.get_tail_id() == get_block_hash(boost::get<CryptoNote::Block>(events[8])));
-  CHECK_TEST_CONDITION(c.get_alternative_blocks_count() == 2);
+  CHECK_TEST_CONDITION(c.getAlternativeBlocksCount() == 2);
   return true;
 }
 //-----------------------------------------------------------------------------------------------------
@@ -174,10 +174,10 @@ bool gen_simple_chain_split_1::check_split_not_switched2(CryptoNote::core& c, si
 {
   DEFINE_TESTS_ERROR_CONTEXT("gen_simple_chain_split_1::check_split_not_switched2");
   //check height
-  CHECK_TEST_CONDITION(c.get_current_blockchain_height() == 9);
+  CHECK_TEST_CONDITION(c.getCurrentBlockchainHeight() == 9);
   CHECK_TEST_CONDITION(c.get_blockchain_total_transactions() == 9);
   CHECK_TEST_CONDITION(c.get_tail_id() == get_block_hash(boost::get<CryptoNote::Block>(events[8])));
-  CHECK_TEST_CONDITION(c.get_alternative_blocks_count() == 3);
+  CHECK_TEST_CONDITION(c.getAlternativeBlocksCount() == 3);
   return true;
 }
 //-----------------------------------------------------------------------------------------------------
@@ -186,10 +186,10 @@ bool gen_simple_chain_split_1::check_split_switched(CryptoNote::core& c, size_t 
   DEFINE_TESTS_ERROR_CONTEXT("gen_simple_chain_split_1::check_split_switched");
 
   //check height
-  CHECK_TEST_CONDITION(c.get_current_blockchain_height() == 10);
+  CHECK_TEST_CONDITION(c.getCurrentBlockchainHeight() == 10);
   CHECK_TEST_CONDITION(c.get_blockchain_total_transactions() == 10);
   CHECK_TEST_CONDITION(c.get_tail_id() == get_block_hash(boost::get<CryptoNote::Block>(events[14])));
-  CHECK_TEST_CONDITION(c.get_alternative_blocks_count() == 3);
+  CHECK_TEST_CONDITION(c.getAlternativeBlocksCount() == 3);
   return true;
 }
 //-----------------------------------------------------------------------------------------------------
@@ -197,10 +197,10 @@ bool gen_simple_chain_split_1::check_split_not_switched_back(CryptoNote::core& c
 {
   DEFINE_TESTS_ERROR_CONTEXT("gen_simple_chain_split_1::check_split_not_switched_back");
   //check height
-  CHECK_TEST_CONDITION(c.get_current_blockchain_height() == 14);
+  CHECK_TEST_CONDITION(c.getCurrentBlockchainHeight() == 14);
   CHECK_TEST_CONDITION(c.get_blockchain_total_transactions() == 14);
   CHECK_TEST_CONDITION(c.get_tail_id() == get_block_hash(boost::get<CryptoNote::Block>(events[19])));
-  CHECK_TEST_CONDITION(c.get_alternative_blocks_count() == 8);
+  CHECK_TEST_CONDITION(c.getAlternativeBlocksCount() == 8);
 
   return true;
 }
@@ -210,10 +210,10 @@ bool gen_simple_chain_split_1::check_split_switched_back_1(CryptoNote::core& c, 
   DEFINE_TESTS_ERROR_CONTEXT("gen_simple_chain_split_1::check_split_switched_back_1");
 
   //check height
-  CHECK_TEST_CONDITION(c.get_current_blockchain_height()== 15);
+  CHECK_TEST_CONDITION(c.getCurrentBlockchainHeight()== 15);
   CHECK_TEST_CONDITION(c.get_blockchain_total_transactions() == 15);
   CHECK_TEST_CONDITION(c.get_tail_id() == get_block_hash(boost::get<CryptoNote::Block>(events[26])));
-  CHECK_TEST_CONDITION(c.get_alternative_blocks_count() == 8);
+  CHECK_TEST_CONDITION(c.getAlternativeBlocksCount() == 8);
 
   return true;
 }//-----------------------------------------------------------------------------------------------------
@@ -222,10 +222,10 @@ bool gen_simple_chain_split_1::check_split_switched_back_2(CryptoNote::core& c, 
   DEFINE_TESTS_ERROR_CONTEXT("gen_simple_chain_split_1::check_split_switched_back_2");
 
   //check height
-  CHECK_TEST_CONDITION(c.get_current_blockchain_height() == 16);
+  CHECK_TEST_CONDITION(c.getCurrentBlockchainHeight() == 16);
   CHECK_TEST_CONDITION(c.get_blockchain_total_transactions() == 16);
   CHECK_TEST_CONDITION(c.get_tail_id() == get_block_hash(boost::get<CryptoNote::Block>(events[28])));
-  CHECK_TEST_CONDITION(c.get_alternative_blocks_count() == 8);
+  CHECK_TEST_CONDITION(c.getAlternativeBlocksCount() == 8);
   return true;
 }
 //-----------------------------------------------------------------------------------------------------
@@ -293,8 +293,8 @@ bool gen_simple_chain_split_1::check_orphaned_chain_41(CryptoNote::core& c, size
 {
   DEFINE_TESTS_ERROR_CONTEXT("gen_simple_chain_split_1::check_orphaned_chain_41");
   CHECK_TEST_CONDITION(c.get_orphaned_by_prev_blocks_count() == 0);
-  CHECK_TEST_CONDITION(c.get_alternative_blocks_count() == 19);
-  CHECK_TEST_CONDITION(c.get_current_blockchain_height()== 23);
+  CHECK_TEST_CONDITION(c.getAlternativeBlocksCount() == 19);
+  CHECK_TEST_CONDITION(c.getCurrentBlockchainHeight()== 23);
 
   return true;
 }*/

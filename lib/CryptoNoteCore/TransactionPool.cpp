@@ -165,7 +165,7 @@ bool tx_memory_pool::add_tx(
     const uint64_t fee = inputs_amount - outputs_amount;
     bool isFusionTransaction =
         fee == 0
-        && m_currency.isFusionTransaction(tx, blobSize, m_core.get_current_blockchain_height());
+        && m_currency.isFusionTransaction(tx, blobSize, m_core.getCurrentBlockchainHeight());
 
     if (ttl.ttl != 0 && !keptByBlock) {
         uint64_t now = static_cast<uint64_t>(time(nullptr));

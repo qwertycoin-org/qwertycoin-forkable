@@ -119,7 +119,7 @@ bool core::handle_command_line(const boost::program_options::variables_map &vm)
     return true;
 }
 
-uint32_t core::get_current_blockchain_height()
+uint32_t core::getCurrentBlockchainHeight()
 {
     return m_blockchain.getCurrentBlockchainHeight();
 }
@@ -177,9 +177,26 @@ bool core::get_alternative_blocks(std::list<Block> &blocks)
     return m_blockchain.getAlternativeBlocks(blocks);
 }
 
-size_t core::get_alternative_blocks_count()
+size_t core::getAlternativeBlocksCount()
 {
     return m_blockchain.getAlternativeBlocksCount();
+}
+
+bool core::getBlockEntry(uint32_t height,
+                         uint64_t &blockCumulativeSize,
+                         difficulty_type &difficulty,
+                         uint64_t &alreadyGeneratedCoins,
+                         uint64_t &reward,
+                         uint64_t &transactionsCount,
+                         uint64_t &timestamp)
+{
+    return m_blockchain.getBlockEntry(static_cast<size_t>(height),
+                                      blockCumulativeSize,
+                                      difficulty,
+                                      alreadyGeneratedCoins,
+                                      reward,
+                                      transactionsCount,
+                                      timestamp);
 }
 
 std::time_t core::getStartTime() const
@@ -323,7 +340,7 @@ bool core::handle_incoming_tx(
     uint32_t blockHeight;
     bool ok = getBlockContainingTx(tx_hash, blockId, blockHeight);
     if (!ok) {
-        blockHeight = this->get_current_blockchain_height();
+        blockHeight = this->getCurrentBlockchainHeight();
     }
     return handleIncomingTransaction(
         tx,
@@ -1676,7 +1693,7 @@ std::vector<Crypto::Hash> core::getTransactionHashesByPaymentId(const Crypto::Ha
 
 uint64_t core::getMinimalFee()
 {
-    return getMinimalFeeForHeight(get_current_blockchain_height() - 1);
+    return getMinimalFeeForHeight(getCurrentBlockchainHeight() - 1);
 }
 
 uint64_t core::getBlockTimestamp(uint32_t height)
@@ -2069,7 +2086,7 @@ bool core::handleIncomingTransaction(
     }
 
     // is in checkpoint zone
-    if (!m_blockchain.isInCheckpointZone(get_current_blockchain_height())) {
+    if (!m_blockchain.isInCheckpointZone(getCurrentBlockchainHeight())) {
         if (blobSize > m_currency.maxTransactionSizeLimit() && getCurrentBlockMajorVersion() >= BLOCK_MAJOR_VERSION_3) {
             logger(INFO)
                 << "Transaction verification failed: too big size "

@@ -53,7 +53,7 @@ template<class concrete_test>
 bool gen_double_spend_base<concrete_test>::mark_last_valid_block(CryptoNote::core& c, size_t /*ev_index*/, const std::vector<test_event_entry>& /*events*/)
 {
   std::list<CryptoNote::Block> block_list;
-  bool r = c.get_blocks(c.get_current_blockchain_height() - 1, 1, block_list);
+  bool r = c.get_blocks(c.getCurrentBlockchainHeight() - 1, 1, block_list);
   CHECK_AND_ASSERT_MES(r, false, "core::get_blocks failed");
   m_last_valid_block = block_list.back();
   return true;

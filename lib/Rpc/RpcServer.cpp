@@ -367,7 +367,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                     Block blk;
                     std::vector<Crypto::Hash> vh;
                     uint32_t upperBorder =
-                            std::min(tempInt, m_core.get_current_blockchain_height());
+                            std::min(tempInt, m_core.getCurrentBlockchainHeight());
                     Crypto::Hash blockHash = m_core.getBlockIdByHeight(upperBorder);
 
                     if (!m_core.getBlockByHash(blockHash, blk)) {
@@ -630,6 +630,8 @@ bool RpcServer::processJsonRpcRequest(const HttpRequest &request, HttpResponse &
                       { makeMemberMethod(&RpcServer::onGetBlocksDetailsByHashes), false } },
                     { "get_blocks_hashes_by_timestamps",
                       { makeMemberMethod(&RpcServer::onGetBlocksHashesByTimestamps), false } },
+                    { "getstatsbyheights", { makeMemberMethod(&RpcServer::onGetStatsByHeights), false } },
+                    { "getstatsinrange", { makeMemberMethod(&RpcServer::onGetStatsByHeightsRange), false } },
                     { "check_tx_key", { makeMemberMethod(&RpcServer::onCheckTxKey), false } },
                     { "check_tx_with_view_key",
                       { makeMemberMethod(&RpcServer::onCheckTxWithViewKey), false } },
@@ -732,7 +734,7 @@ bool RpcServer::masternodeCheckIncomingTx(const BinaryArray &tx_blob)
 
     const uint64_t fee = inputs_amount - outputs_amount;
     bool isFusionTransaction = m_core.currency().isFusionTransaction(
-            tx, tx_blob.size(), m_core.get_current_blockchain_height() - 1);
+            tx, tx_blob.size(), m_core.getCurrentBlockchainHeight() - 1);
     if (fee == 0 && isFusionTransaction) {
         logger(DEBUGGING) << "Masternode received fusion transaction, relaying with no fee check";
         return true;
@@ -949,12 +951,12 @@ bool RpcServer::onGetBlocksDetailsByHeights(
     try {
         std::vector<BlockDetails> blockDetails;
         for (const uint32_t &height : req.blockHeights) {
-            if (m_core.get_current_blockchain_height() <= height) {
+            if (m_core.getCurrentBlockchainHeight() <= height) {
                 throw JsonRpc::JsonRpcError {
                     CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
                     std::string("To big height: ") + std::to_string(height)
                             + ", current blockchain height = "
-                            + std::to_string(m_core.get_current_blockchain_height() - 1)
+                            + std::to_string(m_core.getCurrentBlockchainHeight() - 1)
                 };
             }
             Hash block_hash = m_core.getBlockIdByHeight(height);
@@ -1026,12 +1028,12 @@ bool RpcServer::onGetBlockDetailsByHeight(
 {
     try {
         BlockDetails blockDetails;
-        if (m_core.get_current_blockchain_height() <= req.blockHeight) {
+        if (m_core.getCurrentBlockchainHeight() <= req.blockHeight) {
             throw JsonRpc::JsonRpcError {
                 CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
                 std::string("To big height: ") + std::to_string(req.blockHeight)
                         + ", current blockchain height = "
-                        + std::to_string(m_core.get_current_blockchain_height() - 1)
+                        + std::to_string(m_core.getCurrentBlockchainHeight() - 1)
             };
         }
         Hash block_hash = m_core.getBlockIdByHeight(req.blockHeight);
@@ -1253,7 +1255,7 @@ bool RpcServer::onGetIndex(const COMMAND_HTTP::request &req, COMMAND_HTTP::respo
             + "d " + std::to_string((unsigned int)floor(fmod((uptime / 60.0 / 60.0), 24.0))) + "h "
             + std::to_string((unsigned int)floor(fmod((uptime / 60.0), 60.0))) + "m "
             + std::to_string((unsigned int)fmod(uptime, 60.0)) + "s";
-    uint32_t top_block_index = m_core.get_current_blockchain_height() - 1;
+    uint32_t top_block_index = m_core.getCurrentBlockchainHeight() - 1;
     uint32_t top_known_block_index =
             std::max(static_cast<uint32_t>(1), m_protocolQuery.getObservedHeight()) - 1;
     size_t outConn = m_p2p.get_outgoing_connections_count();
@@ -1261,7 +1263,7 @@ bool RpcServer::onGetIndex(const COMMAND_HTTP::request &req, COMMAND_HTTP::respo
     Crypto::Hash last_block_hash = m_core.getBlockIdByHeight(top_block_index);
     size_t white_peerlist_size = m_p2p.getPeerlistManager().get_white_peers_count();
     size_t grey_peerlist_size = m_p2p.getPeerlistManager().get_gray_peers_count();
-    size_t alt_blocks_count = m_core.get_alternative_blocks_count();
+    size_t alt_blocks_count = m_core.getAlternativeBlocksCount();
     size_t total_tx_count = m_core.get_blockchain_total_transactions() - top_block_index + 1;
 
     size_t tx_pool_count = m_core.get_pool_transactions_count();
@@ -1309,7 +1311,7 @@ bool RpcServer::onGetPaymentId(const COMMAND_HTTP::request &req, COMMAND_HTTP::r
 bool RpcServer::onGetInfo(const COMMAND_RPC_GET_INFO::request &req,
                           COMMAND_RPC_GET_INFO::response &res)
 {
-    res.height = m_core.get_current_blockchain_height();
+    res.height = m_core.getCurrentBlockchainHeight();
     res.last_known_block_index =
             std::max(static_cast<uint32_t>(1), m_protocolQuery.getObservedHeight()) - 1;
     if (res.height == res.last_known_block_index) {
@@ -1321,7 +1323,7 @@ bool RpcServer::onGetInfo(const COMMAND_RPC_GET_INFO::request &req,
     }
     res.tx_count = m_core.get_blockchain_total_transactions() - res.height; // without coinbase
     res.tx_pool_size = m_core.get_pool_transactions_count();
-    res.alt_blocks_count = m_core.get_alternative_blocks_count();
+    res.alt_blocks_count = m_core.getAlternativeBlocksCount();
     uint64_t total_conn = m_p2p.get_connections_count();
     res.outgoing_connections_count = m_p2p.get_outgoing_connections_count();
     res.incoming_connections_count = total_conn - res.outgoing_connections_count;
@@ -1329,7 +1331,7 @@ bool RpcServer::onGetInfo(const COMMAND_RPC_GET_INFO::request &req,
     res.white_peerlist_size = m_p2p.getPeerlistManager().get_white_peers_count();
     res.grey_peerlist_size = m_p2p.getPeerlistManager().get_gray_peers_count();
     Crypto::Hash last_block_hash =
-            m_core.getBlockIdByHeight(m_core.get_current_blockchain_height() - 1);
+            m_core.getBlockIdByHeight(m_core.getCurrentBlockchainHeight() - 1);
     res.top_block_hash = Common::podToHex(last_block_hash);
     res.version = PROJECT_VERSION_LONG;
     res.fee_address = m_fee_address.empty() ? std::string() : m_fee_address;
@@ -1424,7 +1426,7 @@ bool RpcServer::onGetHardwareInfo(const COMMAND_RPC_GET_HARDWARE_INFO::request &
 bool RpcServer::onGetHeight(const COMMAND_RPC_GET_HEIGHT::request &req,
                             COMMAND_RPC_GET_HEIGHT::response &res)
 {
-    res.height = m_core.get_current_blockchain_height();
+    res.height = m_core.getCurrentBlockchainHeight();
     res.status = CORE_RPC_STATUS_OK;
 
     return true;
@@ -1475,7 +1477,7 @@ bool RpcServer::onGetTransactionsByHeights(
                 return true;
             }
 
-            uint32_t upperBorder = std::min(req.heights[1], m_core.get_current_blockchain_height());
+            uint32_t upperBorder = std::min(req.heights[1], m_core.getCurrentBlockchainHeight());
 
             for (size_t i = 0; i < (upperBorder - req.heights[0]); i++) {
                 Block blk;
@@ -1604,7 +1606,7 @@ bool RpcServer::onGetRawTransactionsByHeights(
                 };
             }
 
-            uint32_t upperBound = std::min(req.heights[1], m_core.get_current_blockchain_height());
+            uint32_t upperBound = std::min(req.heights[1], m_core.getCurrentBlockchainHeight());
             for (size_t i = 0; i < (upperBound - req.heights[0]); i++) {
                 heights.push_back(req.heights[0] + i);
             }
@@ -1613,12 +1615,12 @@ bool RpcServer::onGetRawTransactionsByHeights(
         }
 
         for (const uint32_t &height : heights) {
-            if (m_core.get_current_blockchain_height() <= height) {
+            if (m_core.getCurrentBlockchainHeight() <= height) {
                 throw JsonRpc::JsonRpcError {
                     CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
                     std::string("To big height: ") + std::to_string(height)
                             + ", current blockchain height = "
-                            + std::to_string(m_core.get_current_blockchain_height() - 1)
+                            + std::to_string(m_core.getCurrentBlockchainHeight() - 1)
                 };
             }
 
@@ -1858,12 +1860,12 @@ bool RpcServer::onGetPeerList(const COMMAND_RPC_GET_PEER_LIST::request &req,
 bool RpcServer::onBlocksListJson(const COMMAND_RPC_GET_BLOCKS_LIST::request &req,
                                  COMMAND_RPC_GET_BLOCKS_LIST::response &res)
 {
-    if (m_core.get_current_blockchain_height() <= req.height) {
+    if (m_core.getCurrentBlockchainHeight() <= req.height) {
         throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
                                       std::string("To big height: ") + std::to_string(req.height)
                                               + ", current blockchain height = "
                                               + std::to_string(
-                                                      m_core.get_current_blockchain_height()) };
+                                                      m_core.getCurrentBlockchainHeight()) };
     }
 
     uint32_t print_blocks_count = 20;
@@ -2235,6 +2237,138 @@ bool RpcServer::onGetMixin(const Transaction &transaction, uint64_t &mixin)
     return true;
 }
 
+bool RpcServer::onGetStatsByHeights(const COMMAND_RPC_GET_STATS_BY_HEIGHTS::request &req,
+                                    COMMAND_RPC_GET_STATS_BY_HEIGHTS::response &res)
+{
+    if (m_restricted_rpc) {
+        throw JsonRpc::JsonRpcError{
+            CORE_RPC_ERROR_CODE_RESTRICTED,
+            "Method disabled"
+        };
+    }
+
+    std::chrono::steady_clock::time_point timePoint = std::chrono::steady_clock::now();
+    std::vector<BLOCK_STATS_ENTRY> stats;
+
+    for (const uint32_t &height : req.heights) {
+        if (m_core.getCurrentBlockchainHeight() <= height) {
+            throw JsonRpc::JsonRpcError{
+                CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
+                std::string("To big height: ") +
+                std::to_string(height) +
+                ", current blockchain height = " +
+                std::to_string(height)
+            };
+        }
+
+        BLOCK_STATS_ENTRY entry;
+        entry.height = height;
+        if (!m_core.getBlockEntry(height,
+                                  entry.blockSize,
+                                  entry.difficulty,
+                                  entry.alreadyGeneratedCoins,
+                                  entry.reward,
+                                  entry.transactionsCount,
+                                  entry.timestamp)) {
+            throw JsonRpc::JsonRpcError{
+                CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
+                "Internal error: can't get stats for height" + std::to_string(height)
+            };
+        }
+
+        entry.minFee = m_core.getMinimalFeeForHeight(height);
+        stats.push_back(entry);
+    }
+
+    res.stats = std::move(stats);
+    std::chrono::duration<double> duration = std::chrono::steady_clock::now() - timePoint;
+    res.duration = duration.count();
+    res.status = CORE_RPC_STATUS_OK;
+
+    return true;
+}
+
+bool RpcServer::onGetStatsByHeightsRange(const COMMAND_RPC_GET_STATS_BY_HEIGHTS_RANGE::request &req,
+                                         COMMAND_RPC_GET_STATS_BY_HEIGHTS_RANGE::response &res)
+{
+    std::chrono::steady_clock::time_point timePoint = std::chrono::steady_clock::now();
+
+    uint32_t min = std::max<uint32_t>(req.startHeight, 1);
+    uint32_t max = std::min<uint32_t>(req.endHeight, m_core.getCurrentBlockchainHeight() - 1);
+
+    if (min >= max) {
+        throw JsonRpc::JsonRpcError{
+            CORE_RPC_ERROR_CODE_WRONG_PARAM,
+            "Wrong start and end heights"
+        };
+    }
+
+    std::vector<BLOCK_STATS_ENTRY> stats;
+
+    if (m_restricted_rpc) {
+        uint32_t count = std::min<uint32_t>(
+                std::min<uint32_t>(
+                        MAX_NUMBER_OF_BLOCKS_PER_STATS_REQUEST,
+                        max - min),
+                m_core.getCurrentBlockchainHeight() - 1);
+        std::vector<uint32_t> selectedHeights(count);
+        double delta = (max - min) / static_cast<double>(count - 1);
+        std::vector<uint32_t>::iterator i;
+        double val;
+
+        for (i = selectedHeights.begin(), val = min; i != selectedHeights.end(); i++, val += delta) {
+            *i = static_cast<uint32_t>(val);
+        }
+
+        for (const uint32_t &height : selectedHeights) {
+            BLOCK_STATS_ENTRY entry;
+            entry.height = height;
+            if (!m_core.getBlockEntry(height,
+                                      entry.blockSize,
+                                      entry.difficulty,
+                                      entry.alreadyGeneratedCoins,
+                                      entry.reward,
+                                      entry.transactionsCount,
+                                      entry.timestamp)) {
+                throw JsonRpc::JsonRpcError{
+                    CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
+                    "Internal error: can't get stats for height" + std::to_string(height)
+                };
+            }
+
+            entry.minFee = m_core.getMinimalFeeForHeight(height);
+            stats.push_back(entry);
+        }
+    } else {
+        for (uint32_t height = min; height <= max; height++) {
+            BLOCK_STATS_ENTRY entry;
+            entry.height = height;
+            if (!m_core.getBlockEntry(height,
+                                      entry.blockSize,
+                                      entry.difficulty,
+                                      entry.alreadyGeneratedCoins,
+                                      entry.reward,
+                                      entry.transactionsCount,
+                                      entry.timestamp)) {
+                throw JsonRpc::JsonRpcError{
+                        CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
+                        "Internal error: can't get stats for height" + std::to_string(height)
+                };
+            }
+            entry.minFee = m_core.getMinimalFeeForHeight(height);
+            stats.push_back(entry);
+        }
+    }
+
+    res.stats = std::move(stats);
+
+    std::chrono::duration<double> duration = std::chrono::steady_clock::now() - timePoint;
+    res.duration = duration.count();
+    res.status = CORE_RPC_STATUS_OK;
+
+    return true;
+}
+
 bool RpcServer::onTransactionsByPaymentId(
         const COMMAND_RPC_GET_TRANSACTIONS_BY_PAYMENT_ID::request &req,
         COMMAND_RPC_GET_TRANSACTIONS_BY_PAYMENT_ID::response &res)
@@ -2302,7 +2436,7 @@ bool RpcServer::onTransactionsPoolJson(const COMMAND_RPC_GET_POOL::request &req,
 bool RpcServer::onGetBlockCount(const COMMAND_RPC_GET_BLOCK_COUNT::request &req,
                                 COMMAND_RPC_GET_BLOCK_COUNT::response &res)
 {
-    res.count = m_core.get_current_blockchain_height();
+    res.count = m_core.getCurrentBlockchainHeight();
     res.status = CORE_RPC_STATUS_OK;
 
     return true;
@@ -2322,7 +2456,7 @@ bool RpcServer::onGetBlockHash(const COMMAND_RPC_GET_BLOCK_HASH::request &req,
         throw JsonRpc::JsonRpcError {
             CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
             std::string("To big height: ") + std::to_string(h) + ", current blockchain height = "
-                    + std::to_string(m_core.get_current_blockchain_height())
+                    + std::to_string(m_core.getCurrentBlockchainHeight())
         };
     }
 
@@ -2481,7 +2615,7 @@ void RpcServer::fillBlockHeaderResponse(const Block &blk, bool orphan_status, ui
     responce.nonce = blk.nonce;
     responce.orphan_status = orphan_status;
     responce.height = height;
-    responce.depth = m_core.get_current_blockchain_height() - height - 1;
+    responce.depth = m_core.getCurrentBlockchainHeight() - height - 1;
     responce.hash = Common::podToHex(hash);
     m_core.getBlockDifficulty(static_cast<uint32_t>(height), responce.difficulty);
     responce.reward = getBlockReward(blk);
@@ -2547,12 +2681,12 @@ bool RpcServer::onGetBlockHeaderByHash(const COMMAND_RPC_GET_BLOCK_HEADER_BY_HAS
 bool RpcServer::onGetBlockHeaderByHeight(const COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::request &req,
                                          COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::response &res)
 {
-    if (m_core.get_current_blockchain_height() <= req.height) {
+    if (m_core.getCurrentBlockchainHeight() <= req.height) {
         throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
                                       std::string("To big height: ") + std::to_string(req.height)
                                               + ", current blockchain height = "
                                               + std::to_string(
-                                                      m_core.get_current_blockchain_height()) };
+                                                      m_core.getCurrentBlockchainHeight()) };
     }
 
     Hash block_hash = m_core.getBlockIdByHeight(static_cast<uint32_t>(req.height));

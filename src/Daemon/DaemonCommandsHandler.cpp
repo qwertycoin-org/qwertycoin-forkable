@@ -254,9 +254,9 @@ bool DaemonCommandsHandler::help(const std::vector<std::string> &args)
 
 bool DaemonCommandsHandler::status(const std::vector<std::string> &args)
 {
-    uint32_t height = m_core.get_current_blockchain_height() - 1;
+    uint32_t height = m_core.getCurrentBlockchainHeight() - 1;
     size_t tx_pool_size = m_core.get_pool_transactions_count();
-    size_t alt_blocks_count = m_core.get_alternative_blocks_count();
+    size_t alt_blocks_count = m_core.getAlternativeBlocksCount();
     uint32_t last_known_block_index = std::max(
         static_cast<uint32_t>(1),
         protocolQuery.getObservedHeight()
@@ -273,7 +273,7 @@ bool DaemonCommandsHandler::status(const std::vector<std::string> &args)
     bool synced = ((uint32_t)height == (uint32_t)last_known_block_index);
     uint64_t difficulty = m_core.getNextBlockDifficulty(synced ? time(nullptr) : 0);
     uint64_t hashrate = (uint32_t)round(difficulty / CryptoNote::parameters::DIFFICULTY_TARGET);
-    uint64_t alt_block_count = m_core.get_alternative_blocks_count();
+    uint64_t alt_block_count = m_core.getAlternativeBlocksCount();
 
     std::cout
         << std::endl
@@ -391,7 +391,7 @@ bool DaemonCommandsHandler::print_bc(const std::vector<std::string> &args)
 
     uint32_t start_index = 0;
     uint32_t end_index = 0;
-    uint32_t end_block_parametr = m_core.get_current_blockchain_height();
+    uint32_t end_block_parametr = m_core.getCurrentBlockchainHeight();
     if (!Common::fromString(args[0], start_index)) {
         std::cout << "wrong starter block index parameter" << ENDL;
         return false;
@@ -426,7 +426,7 @@ bool DaemonCommandsHandler::print_bc(const std::vector<std::string> &args)
 
 bool DaemonCommandsHandler::print_height(const std::vector<std::string> &args)
 {
-    logger(Logging::INFO) << "Height: " << m_core.get_current_blockchain_height() << std::endl;
+    logger(Logging::INFO) << "Height: " << m_core.getCurrentBlockchainHeight() << std::endl;
 
     return true;
 }

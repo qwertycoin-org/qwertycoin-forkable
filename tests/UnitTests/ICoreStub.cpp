@@ -499,7 +499,7 @@ uint64_t ICoreStub::getBlockTimestamp(uint32_t height)
 {
     return (uint64_t)4;
 }
-uint32_t ICoreStub::get_current_blockchain_height()
+uint32_t ICoreStub::getCurrentBlockchainHeight()
 {
     return (uint32_t)4;
 };
