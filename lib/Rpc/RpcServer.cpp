@@ -431,7 +431,7 @@ namespace CryptoNote {
 						logger(DEBUGGING) << "Found " << txs.size() << "/" << vh.size()
 										  << " transactions on the blockchain.";
 
-						TransactionDetails2 transactionsDetails;
+						TransactionDetails transactionsDetails;
 
 						bool r = m_core.fillTransactionDetails(txs.back(), transactionsDetails);
 						if (r) {
@@ -992,7 +992,7 @@ namespace CryptoNote {
 			COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HEIGHTS::response &rsp)
 	{
 		try {
-			std::vector<BlockDetails2> blockDetails;
+			std::vector<BlockDetails> blockDetails;
 			for (const uint32_t &height : req.blockHeights) {
 				if (m_core.get_current_blockchain_height() <= height) {
 					throw JsonRpc::JsonRpcError{
@@ -1009,7 +1009,7 @@ namespace CryptoNote {
 												"Internal error: can't get block by height "
 												+ std::to_string(height) + '.'};
 				}
-				BlockDetails2 detail;
+				BlockDetails detail;
 				if (!m_core.fillBlockDetails(blk, detail)) {
 					throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
 												"Internal error: can't fill block details."};
@@ -1035,7 +1035,7 @@ namespace CryptoNote {
 			COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HASHES::response &rsp)
 	{
 		try {
-			std::vector<BlockDetails2> blockDetails;
+			std::vector<BlockDetails> blockDetails;
 			for (const Crypto::Hash &hash : req.blockHashes) {
 				Block blk;
 				if (!m_core.getBlockByHash(hash, blk)) {
@@ -1044,7 +1044,7 @@ namespace CryptoNote {
 					//    "Internal error: can't get block by hash " + Common::PodToHex(hash) + '.'
 					//};
 				}
-				BlockDetails2 detail;
+				BlockDetails detail;
 				if (!m_core.fillBlockDetails(blk, detail)) {
 					throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
 												"Internal error: can't fill block details."};
@@ -1070,7 +1070,7 @@ namespace CryptoNote {
 			COMMAND_RPC_GET_BLOCK_DETAILS_BY_HEIGHT::response &rsp)
 	{
 		try {
-			BlockDetails2 blockDetails;
+			BlockDetails blockDetails;
 			if (m_core.get_current_blockchain_height() <= req.blockHeight) {
 				throw JsonRpc::JsonRpcError{
 						CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
@@ -1108,7 +1108,7 @@ namespace CryptoNote {
 											COMMAND_RPC_GET_BLOCK_DETAILS_BY_HASH::response &rsp)
 	{
 		try {
-			BlockDetails2 blockDetails;
+			BlockDetails blockDetails;
 			Crypto::Hash block_hash;
 
 			if (!parse_hash256(req.hash, block_hash)) {
@@ -1173,7 +1173,7 @@ namespace CryptoNote {
 			COMMAND_RPC_GET_TRANSACTIONS_DETAILS_BY_HASHES::response &rsp)
 	{
 		try {
-			std::vector<TransactionDetails2> transactionsDetails;
+			std::vector<TransactionDetails> transactionsDetails;
 			transactionsDetails.reserve(req.transactionHashes.size());
 
 			std::list<Crypto::Hash> missed_txs;
@@ -1182,7 +1182,7 @@ namespace CryptoNote {
 
 			if (!txs.empty()) {
 				for (const Transaction &tx : txs) {
-					TransactionDetails2 txDetails;
+					TransactionDetails txDetails;
 					if (!m_core.fillTransactionDetails(tx, txDetails)) {
 						throw JsonRpc::JsonRpcError{
 								CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
@@ -1239,7 +1239,7 @@ namespace CryptoNote {
 											"transaction wasn't found. Hash = " + hash_str + '.'};
 			}
 
-			TransactionDetails2 transactionsDetails;
+			TransactionDetails transactionsDetails;
 			if (!m_core.fillTransactionDetails(txs.back(), transactionsDetails)) {
 				throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
 											"Internal error: can't fill transaction details."};

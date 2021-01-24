@@ -33,9 +33,9 @@ void serialize(MultiSignatureInputDetails &inputMultisig, ISerializer &serialize
 void serialize(TransactionInputDetails &input, ISerializer &serializer);
 
 void serialize(TransactionExtraDetails &extra, ISerializer &serializer);
-void serialize(TransactionExtraDetails2 &extra, ISerializer &serializer);
-void serialize(TransactionDetails2 &transaction, ISerializer &serializer);
+// void serialize(TransactionExtraDetails2 &extra, ISerializer &serializer);
+void serialize(TransactionDetails &transaction, ISerializer &serializer);
 
-void serialize(BlockDetails2 &block, ISerializer &serializer);
+void serialize(BlockDetails &block, ISerializer &serializer);
 
 } // namespace CryptoNote

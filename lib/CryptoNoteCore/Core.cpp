@@ -1723,18 +1723,22 @@ bool core::getPaymentId(const Transaction &transaction, Crypto::Hash &paymentId)
     return getPaymentIdFromTransactionExtraNonce(extraNonce.nonce, paymentId);
 }
 
-bool core::fillTxExtra(const std::vector<uint8_t> &rawExtra, TransactionExtraDetails2 &extraDetails)
+bool core::fillTxExtra(const std::vector<uint8_t> &rawExtra, TransactionExtraDetails &extraDetails)
 {
     extraDetails.raw = rawExtra;
     std::vector<TransactionExtraField> txExtraFields;
     parseTransactionExtra(rawExtra, txExtraFields);
+
     for (const TransactionExtraField &field : txExtraFields) {
-        if (typeid(TransactionExtraPublicKey) == field.type()) {
-            extraDetails.publicKey = boost::get<TransactionExtraPublicKey>(field).publicKey;
+        if (typeid(TransactionExtraPadding) == field.type()) {
+            extraDetails.padding.push_back(std::move(boost::get<TransactionExtraPadding>(field).size));
+        } else if (typeid(TransactionExtraPublicKey) == field.type()) {
+            extraDetails.publicKey.push_back(std::move(boost::get<TransactionExtraPublicKey>(field).publicKey));
         } else if (typeid(TransactionExtraNonce) == field.type()) {
             extraDetails.nonce = boost::get<TransactionExtraNonce>(field).nonce;
         }
     }
+
     return true;
 }
 
@@ -1763,7 +1767,7 @@ size_t core::median(std::vector<size_t> &v)
     }
 }
 
-bool core::fillBlockDetails(const Block &block, BlockDetails2 &blockDetails)
+bool core::fillBlockDetails(const Block &block, BlockDetails &blockDetails)
 {
     Crypto::Hash hash = get_block_hash(block);
 
@@ -1880,7 +1884,7 @@ bool core::fillBlockDetails(const Block &block, BlockDetails2 &blockDetails)
     }
 
     blockDetails.transactions.reserve(block.transactionHashes.size() + 1);
-    TransactionDetails2 transactionDetails;
+    TransactionDetails transactionDetails;
     if (!fillTransactionDetails(block.baseTransaction, transactionDetails, block.timestamp)) {
         return false;
     }
@@ -1896,7 +1900,7 @@ bool core::fillBlockDetails(const Block &block, BlockDetails2 &blockDetails)
     blockDetails.totalFeeAmount = 0;
 
     for (const Transaction &tx : found) {
-        TransactionDetails2 transactionDetails;
+        TransactionDetails transactionDetails;
         if (!fillTransactionDetails(tx, transactionDetails, block.timestamp)) {
             return false;
         }
@@ -1909,12 +1913,12 @@ bool core::fillBlockDetails(const Block &block, BlockDetails2 &blockDetails)
 
 bool core::fillTransactionDetails(
     const Transaction &transaction,
-    TransactionDetails2 &transactionDetails,
+    TransactionDetails &transactionDetails,
     uint64_t timestamp)
 {
     Crypto::Hash hash = getObjectHash(transaction);
     transactionDetails.hash = hash;
-
+    transactionDetails.version = transaction.version;
     transactionDetails.timestamp = timestamp;
 
     Crypto::Hash blockHash;
