@@ -850,7 +850,7 @@ TEST_F(TransfersConsumerTest, onPoolUpdated_addTransactionMultisignature) {
   auto& o = outputs[0];
 
   uint64_t amount_;
-  MultisignatureOutput out;
+  MultiSignatureOutput out;
   tx->getOutput(0, out, amount_);
 
   ASSERT_EQ(TransactionTypes::OutputType::Multisignature, o.type);

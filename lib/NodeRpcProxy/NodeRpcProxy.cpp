@@ -548,7 +548,7 @@ void NodeRpcProxy::getPoolSymmetricDifference(
 
 void NodeRpcProxy::getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                                         uint32_t gindex,
-                                                        MultisignatureOutput &out,
+                                                        MultiSignatureOutput &out,
                                                         const Callback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);

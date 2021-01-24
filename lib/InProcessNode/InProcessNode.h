@@ -87,7 +87,7 @@ public:
                                     const Callback &callback) override;
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                               uint32_t gindex,
-                                              MultisignatureOutput &out,
+                                              MultiSignatureOutput &out,
                                               const Callback &callback) override;
 
     void getBlocks(const std::vector<uint32_t> &blockHeights,
@@ -173,8 +173,7 @@ private:
                                          const Callback &callback);
 
     void getOutByMSigGIndexAsync(uint64_t amount,
-                                 uint32_t gindex,
-                                 MultisignatureOutput &out,
+                                 uint32_t gindex, MultiSignatureOutput &out,
                                  const Callback &callback);
 
     void getBlocksAsync(const std::vector<uint32_t> &blockHeights,

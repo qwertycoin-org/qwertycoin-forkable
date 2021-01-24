@@ -72,14 +72,14 @@ public:
     uint64_t getInputTotalAmount() const override;
     TransactionTypes::InputType getInputType(size_t index) const override;
     void getInput(size_t index, KeyInput &input) const override;
-    void getInput(size_t index, MultisignatureInput &input) const override;
+    void getInput(size_t index, MultiSignatureInput &input) const override;
 
     // outputs
     size_t getOutputCount() const override;
     uint64_t getOutputTotalAmount() const override;
     TransactionTypes::OutputType getOutputType(size_t index) const override;
     void getOutput(size_t index, KeyOutput &output, uint64_t &amount) const override;
-    void getOutput(size_t index, MultisignatureOutput &output, uint64_t &amount) const override;
+    void getOutput(size_t index, MultiSignatureOutput &output, uint64_t &amount) const override;
 
     size_t getRequiredSignaturesCount(size_t index) const override;
     bool findOutputsToAccount(
@@ -104,7 +104,7 @@ public:
 
     // Inputs/Outputs
     size_t addInput(const KeyInput &input) override;
-    size_t addInput(const MultisignatureInput &input) override;
+    size_t addInput(const MultiSignatureInput &input) override;
     size_t addInput(
         const AccountKeys &senderKeys,
         const TransactionTypes::InputKeyInfo &info,
@@ -116,7 +116,7 @@ public:
         const std::vector<AccountPublicAddress> &to,
         uint32_t requiredSignatures) override;
     size_t addOutput(uint64_t amount, const KeyOutput &out) override;
-    size_t addOutput(uint64_t amount, const MultisignatureOutput &out) override;
+    size_t addOutput(uint64_t amount, const MultiSignatureOutput &out) override;
 
     void signInputKey(
         size_t input,
@@ -310,7 +310,7 @@ size_t TransactionImpl::addInput(
     return addInput(input);
 }
 
-size_t TransactionImpl::addInput(const MultisignatureInput &input)
+size_t TransactionImpl::addInput(const MultiSignatureInput &input)
 {
     checkIfSigning();
     transaction.inputs.push_back(input);
@@ -340,7 +340,7 @@ size_t TransactionImpl::addOutput(
 
     const auto &txKey = txSecretKey();
     size_t outputIndex = transaction.outputs.size();
-    MultisignatureOutput outMsig;
+    MultiSignatureOutput outMsig;
     outMsig.requiredSignatureCount = requiredSignatures;
     outMsig.keys.resize(to.size());
 
@@ -365,7 +365,7 @@ size_t TransactionImpl::addOutput(uint64_t amount, const KeyOutput &out)
     return outputIndex;
 }
 
-size_t TransactionImpl::addOutput(uint64_t amount, const MultisignatureOutput &out)
+size_t TransactionImpl::addOutput(uint64_t amount, const MultiSignatureOutput &out)
 {
     checkIfSigning();
     size_t outputIndex = transaction.outputs.size();
@@ -545,9 +545,9 @@ void TransactionImpl::getInput(size_t index, KeyInput &input) const
     );
 }
 
-void TransactionImpl::getInput(size_t index, MultisignatureInput &input) const
+void TransactionImpl::getInput(size_t index, MultiSignatureInput &input) const
 {
-    input = boost::get<MultisignatureInput>(
+    input = boost::get<MultiSignatureInput>(
         getInputChecked(transaction, index, TransactionTypes::InputType::Multisignature)
     );
 }
@@ -581,14 +581,14 @@ void TransactionImpl::getOutput(size_t index, KeyOutput &output, uint64_t &amoun
     amount = out.amount;
 }
 
-void TransactionImpl::getOutput(size_t index, MultisignatureOutput& output, uint64_t& amount) const
+void TransactionImpl::getOutput(size_t index, MultiSignatureOutput & output, uint64_t& amount) const
 {
     const auto &out = getOutputChecked(
         transaction,
         index,
         TransactionTypes::OutputType::Multisignature
     );
-    output = boost::get<MultisignatureOutput>(out.target);
+    output = boost::get<MultiSignatureOutput>(out.target);
     amount = out.amount;
 }
 

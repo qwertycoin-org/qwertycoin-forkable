@@ -38,8 +38,7 @@ struct TransactionOutputToKeyDetails
     Crypto::PublicKey txOutKey;
 };
 
-struct TransactionOutputMultisignatureDetails
-{
+struct TransactionOutputMultiSignatureDetails {
     std::vector<Crypto::PublicKey> keys;
     uint32_t requiredSignatures;
 };
@@ -70,8 +69,7 @@ struct TransactionInputToKeyDetails
     std::vector<uint32_t> outputIndexes;
 };
 
-struct TransactionInputMultisignatureDetails
-{
+struct TransactionInputMultiSignatureDetails {
     uint32_t signatures;
     TransactionOutputReferenceDetails output;
 };
@@ -89,19 +87,17 @@ struct KeyInputDetails
     std::vector<TransactionOutputReferenceDetails> outputs;
 };
 
-struct MultisignatureInputDetails
-{
-    MultisignatureInput input;
+struct MultiSignatureInputDetails {
+    MultiSignatureInput input;
     TransactionOutputReferenceDetails output;
 };
 
 typedef boost::variant<
     BaseInputDetails,
-    KeyInputDetails,
-    MultisignatureInputDetails> transaction_input_details;
+    KeyInputDetails, MultiSignatureInputDetails>
+        TransactionInputDetails;
 
-struct transaction_output_details
-{
+struct TransactionOutputDetails {
     TransactionOutput output;
     uint64_t globalIndex;
 };

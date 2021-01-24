@@ -41,7 +41,7 @@ public:
     uint32_t& totalBlockCount, uint32_t& startBlockIndex) override;
   virtual bool get_random_outs_for_amounts(const CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_request& req,
       CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_response& res) override;
-  virtual bool get_tx_outputs_gindexs(const Crypto::Hash& tx_id, std::vector<uint32_t>& indexs) override;
+  virtual bool getTxOutputsGlobalIndexes(const Crypto::Hash& tx_id, std::vector<uint32_t>& indexs) override;
   virtual CryptoNote::i_cryptonote_protocol* get_protocol() override;
   virtual bool handle_incoming_tx(const CryptoNote::BinaryArray& tx_blob, CryptoNote::tx_verification_context& tvc, bool keeped_by_block, bool loose_check) override;
   virtual std::vector<CryptoNote::Transaction> getPoolTransactions() override;
@@ -68,7 +68,7 @@ public:
   virtual bool handle_incoming_block_blob(const CryptoNote::BinaryArray& block_blob, CryptoNote::block_verification_context& bvc, bool control_miner, bool relay_block) override { return false; }
   virtual bool handle_get_objects(CryptoNote::NOTIFY_REQUEST_GET_OBJECTS::request& arg, CryptoNote::NOTIFY_RESPONSE_GET_OBJECTS::request& rsp) override { return false; }
   virtual void on_synchronized() override {}
-  virtual bool getOutByMSigGIndex(uint64_t amount, uint64_t gindex, CryptoNote::MultisignatureOutput& out) override { return true; }
+  virtual bool getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, CryptoNote::MultiSignatureOutput & out) override { return true; }
   virtual size_t addChain(const std::vector<const CryptoNote::IBlock*>& chain) override;
 
   virtual Crypto::Hash getBlockIdByHeight(uint32_t height) override;
@@ -91,7 +91,7 @@ public:
   virtual bool getBlockDifficulty(uint32_t height, CryptoNote::difficulty_type& difficulty) override;
   virtual bool getBlockCumulativeDifficulty(uint32_t height, CryptoNote::difficulty_type& difficulty) override;
   virtual bool getBlockContainingTx(const Crypto::Hash& txId, Crypto::Hash& blockId, uint32_t& blockHeight) override;
-  virtual bool getMultisigOutputReference(const CryptoNote::MultisignatureInput& txInMultisig, std::pair<Crypto::Hash, size_t>& outputReference) override;
+  virtual bool getMultisigOutputReference(const CryptoNote::MultiSignatureInput & txInMultisig, std::pair<Crypto::Hash, size_t>& outputReference) override;
 
   virtual bool getGeneratedTransactionsNumber(uint32_t height, uint64_t& generatedTransactions) override;
   virtual bool getOrphanBlocksByHeight(uint32_t height, std::vector<CryptoNote::Block>& blocks) override;

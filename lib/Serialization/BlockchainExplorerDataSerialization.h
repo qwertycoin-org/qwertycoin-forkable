@@ -24,13 +24,13 @@
 
 namespace CryptoNote {
 
-void serialize(transaction_output_details &output, ISerializer &serializer);
+void serialize(TransactionOutputDetails &output, ISerializer &serializer);
 void serialize(TransactionOutputReferenceDetails &outputReference, ISerializer &serializer);
 
 void serialize(BaseInputDetails &inputBase, ISerializer &serializer);
 void serialize(KeyInputDetails &inputToKey, ISerializer &serializer);
-void serialize(MultisignatureInputDetails &inputMultisig, ISerializer &serializer);
-void serialize(transaction_input_details &input, ISerializer &serializer);
+void serialize(MultiSignatureInputDetails &inputMultisig, ISerializer &serializer);
+void serialize(TransactionInputDetails &input, ISerializer &serializer);
 
 void serialize(TransactionExtraDetails &extra, ISerializer &serializer);
 void serialize(TransactionExtraDetails2 &extra, ISerializer &serializer);

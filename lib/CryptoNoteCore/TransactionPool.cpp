@@ -58,8 +58,8 @@ public:
                 auto r = m_keyImages.insert(boost::get<KeyInput>(in).keyImage);
                 (void)r; // just to make compiler to shut up
                 assert(r.second);
-            } else if (in.type() == typeid(MultisignatureInput)) {
-                const auto &msig = boost::get<MultisignatureInput>(in);
+            } else if (in.type() == typeid(MultiSignatureInput)) {
+                const auto &msig = boost::get<MultiSignatureInput>(in);
                 auto r = m_usedOutputs.insert(std::make_pair(msig.amount, msig.outputIndex));
                 (void)r; // just to make compiler to shut up
                 assert(r.second);
@@ -84,8 +84,8 @@ private:
                 if (m_keyImages.count(boost::get<KeyInput>(in).keyImage)) {
                     return false;
                 }
-            } else if (in.type() == typeid(MultisignatureInput)) {
-                const auto &msig = boost::get<MultisignatureInput>(in);
+            } else if (in.type() == typeid(MultiSignatureInput)) {
+                const auto &msig = boost::get<MultiSignatureInput>(in);
                 if (m_usedOutputs.count(std::make_pair(msig.amount, msig.outputIndex))) {
                     return false;
                 }
@@ -138,9 +138,9 @@ bool tx_memory_pool::add_tx(
     }
 
     uint64_t inputs_amount = 0;
-    uint64_t outputs_amount = get_outs_money_amount(tx);
+    uint64_t outputs_amount = getOutsMoneyAmount(tx);
 
-    if (!get_inputs_money_amount(tx, inputs_amount)) {
+    if (!getInputsMoneyAmount(tx, inputs_amount)) {
         tvc.m_verification_failed = true;
         return false;
     }
@@ -458,7 +458,7 @@ std::string tx_memory_pool::print_pool(bool short_format) const
             << "max_used_block_id: " << txd.maxUsedBlock.id << std::endl
             << "last_failed_height: " << txd.lastFailedBlock.height << std::endl
             << "last_failed_id: " << txd.lastFailedBlock.id << std::endl
-            << "amount_out: " << get_outs_money_amount(txd.tx) << std::endl
+            << "amount_out: " << getOutsMoneyAmount(txd.tx) << std::endl
             << "fee_atomic_units: " << txd.fee << std::endl
             << "received_timestamp: " << txd.receiveTime << std::endl
             << "received: " << std::ctime(&txd.receiveTime);
@@ -771,9 +771,9 @@ bool tx_memory_pool::removeTransactionInputs(
                 // it is now empty hash container for this key_image
                 m_spent_key_images.erase(it);
             }
-        } else if (in.type() == typeid(MultisignatureInput)) {
+        } else if (in.type() == typeid(MultiSignatureInput)) {
             if (!keptByBlock) {
-                const auto &msig = boost::get<MultisignatureInput>(in);
+                const auto &msig = boost::get<MultiSignatureInput>(in);
                 auto output = GlobalOutput(msig.amount, msig.outputIndex);
                 assert(m_spentOutputs.count(output));
                 m_spentOutputs.erase(output);
@@ -808,9 +808,9 @@ bool tx_memory_pool::addTransactionInputs(
                     << "internal error: try to insert duplicate iterator in key_image set";
                 return false;
             }
-        } else if (in.type() == typeid(MultisignatureInput)) {
+        } else if (in.type() == typeid(MultiSignatureInput)) {
             if (!keptByBlock) {
-                const auto &msig = boost::get<MultisignatureInput>(in);
+                const auto &msig = boost::get<MultiSignatureInput>(in);
                 auto r = m_spentOutputs.insert(GlobalOutput(msig.amount, msig.outputIndex));
                 (void)r;
                 assert(r.second);
@@ -829,8 +829,8 @@ bool tx_memory_pool::haveSpentInputs(const Transaction &tx) const
             if (m_spent_key_images.count(tokey_in.keyImage)) {
                 return true;
             }
-        } else if (in.type() == typeid(MultisignatureInput)) {
-            const auto &msig = boost::get<MultisignatureInput>(in);
+        } else if (in.type() == typeid(MultiSignatureInput)) {
+            const auto &msig = boost::get<MultiSignatureInput>(in);
             if (m_spentOutputs.count(GlobalOutput(msig.amount, msig.outputIndex))) {
                 return true;
             }

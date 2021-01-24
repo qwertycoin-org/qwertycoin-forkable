@@ -133,7 +133,7 @@ public:
 
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                               uint32_t gindex,
-                                              CryptoNote::MultisignatureOutput &out,
+                                              CryptoNote::MultiSignatureOutput &out,
                                               const Callback &callback) override { }
 
     void isSynchronized(bool &syncStatus, const Callback &callback) override { }

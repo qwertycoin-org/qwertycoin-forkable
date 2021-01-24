@@ -382,7 +382,7 @@ TEST_F(tx_pool, fillblock_same_size)
     auto iter = transactions.find(th);
     ASSERT_TRUE(iter != transactions.end());
 
-    if (get_tx_fee(*iter->second) > fee)
+    if (getTxFee(*iter->second) > fee)
       ++doubleFee;
   }
 

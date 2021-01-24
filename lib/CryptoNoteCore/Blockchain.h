@@ -127,7 +127,7 @@ public:
         COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_response &res);
     bool getBackwardBlocksSize(size_t from_height, std::vector<size_t> &sz, size_t count);
     bool getTransactionOutputGlobalIndexes(const Crypto::Hash &tx_id,std::vector<uint32_t> &indexs);
-    bool get_out_by_msig_gindex(uint64_t amount, uint64_t gindex, MultisignatureOutput &out);
+    bool getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, MultiSignatureOutput &out);
     bool checkTransactionInputs(
         const Transaction &tx,
         uint32_t &pmax_used_block_height,
@@ -143,7 +143,7 @@ public:
     bool getAlreadyGeneratedCoins(const Crypto::Hash &hash, uint64_t &generatedCoins);
     bool getBlockSize(const Crypto::Hash &hash, size_t &size);
     bool getMultisigOutputReference(
-        const MultisignatureInput &txInMultisig,
+        const MultiSignatureInput &txInMultisig,
         std::pair<Crypto::Hash, size_t> &outputReference);
     bool getGeneratedTransactionsNumber(uint32_t height, uint64_t &generatedTransactions);
     bool getOrphanBlockIdsByHeight(uint32_t height, std::vector<Crypto::Hash> &blockHashes);
@@ -413,7 +413,7 @@ private:
     void popTransaction(const Transaction &transaction, const Crypto::Hash &transactionHash);
     void popTransactions(const BlockEntry &block, const Crypto::Hash &minerTransactionHash);
     bool validateInput(
-        const MultisignatureInput &input,
+        const MultiSignatureInput &input,
         const Crypto::Hash &transactionHash,
         const Crypto::Hash &transactionPrefixHash,
         const std::vector<Crypto::Signature> &transactionSignatures);

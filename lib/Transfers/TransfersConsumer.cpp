@@ -88,7 +88,7 @@ void findMyOutputs(
             ++keyIndex;
         } else if (outType == TransactionTypes::OutputType::Multisignature) {
             uint64_t amount;
-            MultisignatureOutput out;
+            MultiSignatureOutput out;
             tx.getOutput(idx, out, amount);
 
             for (const auto &key : out.keys) {
@@ -516,7 +516,7 @@ std::error_code TransfersConsumer::createTransfers(
             info.outputKey = out.key;
         } else if (outType == TransactionTypes::OutputType::Multisignature) {
             uint64_t amount;
-            MultisignatureOutput out;
+            MultiSignatureOutput out;
             tx.getOutput(idx, out, amount);
 
             for (const auto &key : out.keys) {

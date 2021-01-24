@@ -381,12 +381,12 @@ bool core::check_tx_fee(
     bool loose_check)
 {
     uint64_t inputs_amount = 0;
-    if (!get_inputs_money_amount(tx, inputs_amount)) {
+    if (!getInputsMoneyAmount(tx, inputs_amount)) {
         tvc.m_verification_failed = true;
         return false;
     }
 
-    uint64_t outputs_amount = get_outs_money_amount(tx);
+    uint64_t outputs_amount = getOutsMoneyAmount(tx);
 
     if (outputs_amount > inputs_amount) {
         logger(DEBUGGING)
@@ -497,8 +497,8 @@ bool core::check_tx_semantic(const Transaction &tx, bool keeped_by_block)
     }
 
     uint64_t amount_in = 0;
-    get_inputs_money_amount(tx, amount_in);
-    uint64_t amount_out = get_outs_money_amount(tx);
+    getInputsMoneyAmount(tx, amount_in);
+    uint64_t amount_out = getOutsMoneyAmount(tx);
 
     if (amount_in < amount_out) {
         logger(ERROR)
@@ -887,14 +887,14 @@ bool core::get_random_outs_for_amounts(
     return m_blockchain.getRandomOutsByAmount(req, res);
 }
 
-bool core::get_tx_outputs_gindexs(const Crypto::Hash &tx_id, std::vector<uint32_t> &indexs)
+bool core::getTxOutputsGlobalIndexes(const Crypto::Hash &tx_id, std::vector<uint32_t> &indexs)
 {
     return m_blockchain.getTransactionOutputGlobalIndexes(tx_id, indexs);
 }
 
-bool core::getOutByMSigGIndex(uint64_t amount, uint64_t gindex, MultisignatureOutput &out)
+bool core::getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, MultiSignatureOutput &out)
 {
-    return m_blockchain.get_out_by_msig_gindex(amount, gindex, out);
+    return m_blockchain.getOutByMultiSigGlobalIndex(amount, gindex, out);
 }
 
 void core::pause_mining()
@@ -1532,7 +1532,7 @@ bool core::getBlockContainingTx(
 }
 
 bool core::getMultisigOutputReference(
-    const MultisignatureInput &txInMultisig,
+    const MultiSignatureInput &txInMultisig,
     std::pair<Crypto::Hash, size_t> &outputReference)
 {
     return m_blockchain.getMultisigOutputReference(txInMultisig, outputReference);
@@ -1937,10 +1937,10 @@ bool core::fillTransactionDetails(
     }
     transactionDetails.size = getObjectBinarySize(transaction);
     transactionDetails.unlockTime = transaction.unlockTime;
-    transactionDetails.totalOutputsAmount = get_outs_money_amount(transaction);
+    transactionDetails.totalOutputsAmount = getOutsMoneyAmount(transaction);
 
     uint64_t inputsAmount;
-    if (!get_inputs_money_amount(transaction, inputsAmount)) {
+    if (!getInputsMoneyAmount(transaction, inputsAmount)) {
         return false;
     }
     transactionDetails.totalInputsAmount = inputsAmount;
@@ -1951,12 +1951,12 @@ bool core::fillTransactionDetails(
         transactionDetails.mixin = 0;
     } else {
         uint64_t fee;
-        if (!get_tx_fee(transaction, fee)) {
+        if (!getTxFee(transaction, fee)) {
             return false;
         }
         transactionDetails.fee = fee;
         uint64_t mixin;
-        if (!f_getMixin(transaction, mixin)) {
+        if (!getMixin(transaction, mixin)) {
             return false;
         }
         transactionDetails.mixin = mixin;
@@ -1967,8 +1967,10 @@ bool core::fillTransactionDetails(
     } else {
         transactionDetails.paymentId = boost::value_initialized<Crypto::Hash>();
     }
+
     fillTxExtra(transaction.extra, transactionDetails.extra);
     transactionDetails.signatures.reserve(transaction.signatures.size());
+
     for (const std::vector<Crypto::Signature> &signatures : transaction.signatures) {
         std::vector<Crypto::Signature> signaturesDetails;
         signaturesDetails.reserve(signatures.size());
@@ -1980,9 +1982,9 @@ bool core::fillTransactionDetails(
 
     transactionDetails.inputs.reserve(transaction.inputs.size());
     for (const TransactionInput &txIn : transaction.inputs) {
-        transaction_input_details txInDetails;
+        TransactionInputDetails txInDetails;
         if (txIn.type() == typeid(BaseInput)) {
-            BaseInputDetails txInGenDetails;
+            BaseInputDetails txInGenDetails{};
             txInGenDetails.input.blockIndex = boost::get<BaseInput>(txIn).blockIndex;
             txInGenDetails.amount = 0;
             for (const TransactionOutput &out : transaction.outputs) {
@@ -1999,23 +2001,23 @@ bool core::fillTransactionDetails(
             }
             txInToKeyDetails.mixin = txInToKey.outputIndexes.size();
             for (const auto &r : outputReferences) {
-                TransactionOutputReferenceDetails d;
+                TransactionOutputReferenceDetails d{};
                 d.number = r.second;
                 d.transactionHash = r.first;
                 txInToKeyDetails.outputs.push_back(d);
             }
             txInDetails = txInToKeyDetails;
-        } else if (txIn.type() == typeid(MultisignatureInput)) {
-            MultisignatureInputDetails txInMultisigDetails;
-            const MultisignatureInput &txInMultisig = boost::get<MultisignatureInput>(txIn);
-            txInMultisigDetails.input = txInMultisig;
+        } else if (txIn.type() == typeid(MultiSignatureInput)) {
+            MultiSignatureInputDetails txInMultiSigDetails {};
+            const MultiSignatureInput &txInMultiSig = boost::get<MultiSignatureInput>(txIn);
+            txInMultiSigDetails.input = txInMultiSig;
             std::pair<Crypto::Hash, size_t> outputReference;
-            if (!getMultisigOutputReference(txInMultisig, outputReference)) {
+            if (!getMultisigOutputReference(txInMultiSig, outputReference)) {
                 return false;
             }
-            txInMultisigDetails.output.number = outputReference.second;
-            txInMultisigDetails.output.transactionHash = outputReference.first;
-            txInDetails = txInMultisigDetails;
+            txInMultiSigDetails.output.number = outputReference.second;
+            txInMultiSigDetails.output.transactionHash = outputReference.first;
+            txInDetails = txInMultiSigDetails;
         } else {
             return false;
         }
@@ -2025,7 +2027,7 @@ bool core::fillTransactionDetails(
     transactionDetails.outputs.reserve(transaction.outputs.size());
     std::vector<uint32_t> globalIndices;
     globalIndices.reserve(transaction.outputs.size());
-    if (!transactionDetails.inBlockchain || !get_tx_outputs_gindexs(hash, globalIndices)) {
+    if (!transactionDetails.inBlockchain || !getTxOutputsGlobalIndexes(hash, globalIndices)) {
         for (size_t i = 0; i < transaction.outputs.size(); ++i) {
             globalIndices.push_back(0);
         }
@@ -2034,7 +2036,7 @@ bool core::fillTransactionDetails(
     typedef boost::tuple<TransactionOutput, uint32_t> outputWithIndex;
     auto range = boost::combine(transaction.outputs, globalIndices);
     for (const auto &txOutput : range) {
-        transaction_output_details txOutDetails;
+        TransactionOutputDetails txOutDetails;
         txOutDetails.globalIndex = txOutput.get<1>();
         txOutDetails.output.amount = txOutput.get<0>().amount;
         txOutDetails.output.target = txOutput.get<0>().target;
@@ -2150,7 +2152,7 @@ std::unique_ptr<IBlock> core::getBlock(const Crypto::Hash &blockId)
     return std::move(blockPtr);
 }
 
-bool core::f_getMixin(const Transaction &transaction, uint64_t &mixin)
+bool core::getMixin(const Transaction &transaction, uint64_t &mixin)
 {
     mixin = 0;
     for (const TransactionInput& txin : transaction.inputs) {

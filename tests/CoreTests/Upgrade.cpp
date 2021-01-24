@@ -227,7 +227,7 @@ bool gen_upgrade::checkBlockRewardEqFee(CryptoNote::core& c, size_t evIndex, con
   DEFINE_TESTS_ERROR_CONTEXT("gen_upgrade::checkBlockRewardEqFee");
 
   Block blk = boost::get<Block>(events[evIndex - 1]);
-  uint64_t blockReward = get_outs_money_amount(blk.baseTransaction);
+  uint64_t blockReward = getOutsMoneyAmount(blk.baseTransaction);
   CHECK_EQ(blockReward, m_currency.minimumFee());
 
   CHECK_EQ(m_coinsInCirculationBeforeUpgrade, c.getTotalGeneratedAmount());
@@ -239,7 +239,7 @@ bool gen_upgrade::checkBlockRewardIsZero(CryptoNote::core& c, size_t evIndex, co
   DEFINE_TESTS_ERROR_CONTEXT("gen_upgrade::checkBlockRewardIsZero");
 
   Block blk = boost::get<Block>(events[evIndex - 1]);
-  uint64_t blockReward = get_outs_money_amount(blk.baseTransaction);
+  uint64_t blockReward = getOutsMoneyAmount(blk.baseTransaction);
   CHECK_EQ(blockReward, 0);
 
   CHECK_EQ(m_coinsInCirculationAfterUpgrade - m_currency.minimumFee(), c.getTotalGeneratedAmount());

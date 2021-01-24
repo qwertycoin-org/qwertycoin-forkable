@@ -24,7 +24,7 @@ namespace
 {
   void split_miner_tx_outs(Transaction& miner_tx, uint64_t amount_1)
   {
-    uint64_t total_amount = get_outs_money_amount(miner_tx);
+    uint64_t total_amount = getOutsMoneyAmount(miner_tx);
     uint64_t amount_2 = total_amount - amount_1;
     TransactionOutputTarget target = miner_tx.outputs[0].target;
 

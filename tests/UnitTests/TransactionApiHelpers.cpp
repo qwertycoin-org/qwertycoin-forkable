@@ -125,7 +125,7 @@ void TestTransactionBuilder::addInput(const AccountKeys& senderKeys, const Trans
 }
 
 void TestTransactionBuilder::addTestMultisignatureInput(uint64_t amount, const TransactionOutputInformation& t) {
-  MultisignatureInput input;
+    MultiSignatureInput input;
   input.amount = amount;
   input.outputIndex = t.globalOutputIndex;
   input.signatureCount = t.requiredSignatures;
@@ -135,7 +135,7 @@ void TestTransactionBuilder::addTestMultisignatureInput(uint64_t amount, const T
 }
 
 size_t TestTransactionBuilder::addFakeMultisignatureInput(uint64_t amount, uint32_t globalOutputIndex, size_t signatureCount) {
-  MultisignatureInput input;
+    MultiSignatureInput input;
   input.amount = amount;
   input.outputIndex = globalOutputIndex;
   input.signatureCount = static_cast<uint8_t>(signatureCount);
@@ -173,7 +173,7 @@ TransactionOutputInformationIn TestTransactionBuilder::addTestMultisignatureOutp
   uint32_t index = static_cast<uint32_t>(tx->addOutput(amount, addresses, static_cast<uint32_t>(addresses.size())));
 
   uint64_t _amount;
-  MultisignatureOutput output;
+  MultiSignatureOutput output;
   tx->getOutput(index, output, _amount);
 
   TransactionOutputInformationIn outputInfo;
@@ -205,7 +205,7 @@ size_t TestTransactionBuilder::addOutput(uint64_t amount, const KeyOutput& out) 
   return tx->addOutput(amount, out);
 }
 
-size_t TestTransactionBuilder::addOutput(uint64_t amount, const MultisignatureOutput& out) {
+size_t TestTransactionBuilder::addOutput(uint64_t amount, const MultiSignatureOutput & out) {
   return tx->addOutput(amount, out);
 }
 

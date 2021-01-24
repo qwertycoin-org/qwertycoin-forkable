@@ -475,7 +475,7 @@ bool TransfersContainer::addTransactionInputs(
 
             inputsAdded = true;
         } else if (inputType == TransactionTypes::InputType::Multisignature) {
-            MultisignatureInput input;
+            MultiSignatureInput input;
             tx.getInput(i, input);
 
             auto &outputDescriptorIndex = m_availableTransfers.get<SpentOutputDescriptorIndex>();

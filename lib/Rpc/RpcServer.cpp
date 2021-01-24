@@ -772,8 +772,8 @@ namespace CryptoNote {
 
 		// always relay fusion transactions
 		uint64_t inputs_amount = 0;
-		get_inputs_money_amount(tx, inputs_amount);
-		uint64_t outputs_amount = get_outs_money_amount(tx);
+                getInputsMoneyAmount(tx, inputs_amount);
+		uint64_t outputs_amount = getOutsMoneyAmount(tx);
 
 		const uint64_t fee = inputs_amount - outputs_amount;
 		bool isFusionTransaction = m_core.currency().isFusionTransaction(
@@ -913,7 +913,7 @@ namespace CryptoNote {
 								 COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::response &res)
 	{
 		std::vector<uint32_t> outputIndexes;
-		if (!m_core.get_tx_outputs_gindexs(req.txid, outputIndexes)) {
+		if (!m_core.getTxOutputsGlobalIndexes(req.txid, outputIndexes)) {
 			res.status = "Failed";
 			return true;
 		}
@@ -1583,13 +1583,14 @@ namespace CryptoNote {
 				Crypto::Hash blockHash;
 				uint32_t blockHeight;
 				uint64_t fee;
-				get_tx_fee(tx, fee);
+                                getTxFee(tx, fee);
 
 				Crypto::Hash txHash = *vHi++;
 				e.tx_hash = *txHi++;
 
 				bool r = m_core.getBlockContainingTx(txHash, blockHash, blockHeight);
-				bool oR = m_core.get_tx_outputs_gindexs(txHash, e.output_indices);
+				bool oR =
+                                        m_core.getTxOutputsGlobalIndexes(txHash, e.output_indices);
 
 				if (req.as_json) {
 					e.as_json = tx;
@@ -2096,7 +2097,7 @@ namespace CryptoNote {
 		TRANSACTION_SHORT_RESPONSE transaction_short;
 		transaction_short.hash = Common::podToHex(getObjectHash(blk.baseTransaction));
 		transaction_short.fee = 0;
-		transaction_short.amount_out = get_outs_money_amount(blk.baseTransaction);
+		transaction_short.amount_out = getOutsMoneyAmount(blk.baseTransaction);
 		transaction_short.size = getObjectBinarySize(blk.baseTransaction);
 		res.block.transactions.push_back(transaction_short);
 
@@ -2109,8 +2110,8 @@ namespace CryptoNote {
 		for (const Transaction &tx : txs) {
 			TRANSACTION_SHORT_RESPONSE tr_short;
 			uint64_t amount_in = 0;
-			get_inputs_money_amount(tx, amount_in);
-			uint64_t amount_out = get_outs_money_amount(tx);
+                        getInputsMoneyAmount(tx, amount_in);
+			uint64_t amount_out = getOutsMoneyAmount(tx);
 
 			tr_short.hash = Common::podToHex(getObjectHash(tx));
 			tr_short.fee = amount_in - amount_out;
@@ -2175,8 +2176,8 @@ namespace CryptoNote {
 		}
 
 		uint64_t amount_in = 0;
-		get_inputs_money_amount(res.tx, amount_in);
-		uint64_t amount_out = get_outs_money_amount(res.tx);
+                getInputsMoneyAmount(res.tx, amount_in);
+		uint64_t amount_out = getOutsMoneyAmount(res.tx);
 
 		res.txDetails.hash = Common::podToHex(getObjectHash(res.tx));
 		res.txDetails.fee = amount_in - amount_out;
@@ -2319,8 +2320,8 @@ namespace CryptoNote {
 		for (const Transaction &tx : transactions) {
 			TRANSACTION_SHORT_RESPONSE transaction_short;
 			uint64_t amount_in = 0;
-			get_inputs_money_amount(tx, amount_in);
-			uint64_t amount_out = get_outs_money_amount(tx);
+                        getInputsMoneyAmount(tx, amount_in);
+			uint64_t amount_out = getOutsMoneyAmount(tx);
 
 			transaction_short.hash = Common::podToHex(getObjectHash(tx));
 			transaction_short.fee = amount_in - amount_out;

@@ -45,7 +45,7 @@ struct BlockShortInfo;
 struct core_stat_info;
 struct i_cryptonote_protocol;
 struct Transaction;
-struct MultisignatureInput;
+struct MultiSignatureInput;
 struct KeyInput;
 struct TransactionPrefixInfo;
 struct tx_verification_context;
@@ -85,10 +85,11 @@ public:
     virtual bool get_random_outs_for_amounts(
         const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_request &req,
         COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_response &res) = 0;
-    virtual bool get_tx_outputs_gindexs(
+    virtual bool getTxOutputsGlobalIndexes(
         const Crypto::Hash &tx_id,
         std::vector<uint32_t> &indexs) = 0;
-    virtual bool getOutByMSigGIndex(uint64_t amount, uint64_t gindex, MultisignatureOutput &out) = 0;
+    virtual bool getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex,
+                                    MultiSignatureOutput &out) = 0;
     virtual i_cryptonote_protocol *get_protocol() = 0;
     virtual bool handle_incoming_tx( // TODO: Deprecated. Should be removed with CryptoNoteProtocolHandler.
         const BinaryArray &tx_blob,
@@ -174,7 +175,7 @@ public:
         Crypto::Hash &blockId,
         uint32_t &blockHeight) = 0;
     virtual bool getMultisigOutputReference(
-        const MultisignatureInput &txInMultisig,
+        const MultiSignatureInput &txInMultisig,
         std::pair<Crypto::Hash, size_t> &outputReference) = 0;
 
     virtual bool getGeneratedTransactionsNumber(
