@@ -109,7 +109,7 @@ public:
                                     const Callback &callback) override;
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                               uint32_t gindex,
-                                              MultisignatureOutput &out,
+                                              MultiSignatureOutput &out,
                                               const Callback &callback) override;
     void getBlocks(const std::vector<uint32_t> &blockHeights,
                    std::vector<std::vector<BlockDetails>> &blocks,

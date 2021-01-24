@@ -138,7 +138,7 @@ public:
   TransactionOutputInformationIn addTestMultisignatureOutput(uint64_t amount, std::vector<AccountPublicAddress>& addresses, uint32_t globalOutputIndex);
   size_t addOutput(uint64_t amount, const AccountPublicAddress& to);
   size_t addOutput(uint64_t amount, const KeyOutput& out);
-  size_t addOutput(uint64_t amount, const MultisignatureOutput& out);
+  size_t addOutput(uint64_t amount, const MultiSignatureOutput & out);
 
   // final step
   std::unique_ptr<ITransactionReader> build();

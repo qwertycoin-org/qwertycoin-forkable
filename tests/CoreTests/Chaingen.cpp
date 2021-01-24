@@ -130,8 +130,8 @@ bool init_output_indices(map_output_idx_t& outs, std::map<uint64_t, std::vector<
                 }
 
                 ++keyIndex;
-              } else if (out.target.type() == typeid(MultisignatureOutput)) {
-                keyIndex += boost::get<MultisignatureOutput>(out.target).keys.size();
+              } else if (out.target.type() == typeid(MultiSignatureOutput)) {
+                keyIndex += boost::get<MultiSignatureOutput>(out.target).keys.size();
               }
             }
         }

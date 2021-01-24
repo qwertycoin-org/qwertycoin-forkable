@@ -30,7 +30,7 @@ public:
   typedef std::vector<SignatureVector> SignatureMultivector;
 
   struct MultisignatureSource {
-    CryptoNote::MultisignatureInput input;
+    CryptoNote::MultiSignatureInput input;
     KeysVector keys;
     Crypto::PublicKey srcTxPubKey;
     size_t srcOutputIndex;

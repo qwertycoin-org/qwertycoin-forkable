@@ -131,7 +131,7 @@ bool gen_block_reward::generate(std::vector<test_event_entry>& events) const
     Transaction tx_1 = construct_tx_with_fee(m_logger, events, blk_5, miner_account, bob_account, MK_COINS(1), 11 * m_currency.minimumFee());
     Transaction tx_2 = construct_tx_with_fee(m_logger, events, blk_5, miner_account, bob_account, MK_COINS(1), 13 * m_currency.minimumFee());
     size_t txs_1_size = getObjectBinarySize(tx_1) + getObjectBinarySize(tx_2);
-    uint64_t txs_fee = get_tx_fee(tx_1) + get_tx_fee(tx_2);
+    uint64_t txs_fee = getTxFee(tx_1) + getTxFee(tx_2);
 
     std::vector<size_t> block_sizes;
     generator.getLastNBlockSizes(block_sizes, get_block_hash(blk_7), m_currency.rewardBlocksWindow());

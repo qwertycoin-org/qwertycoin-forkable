@@ -49,7 +49,7 @@ struct BinaryVariantTagGetter : boost::static_visitor<uint8_t>
         return static_cast<uint8_t>(SerializationTag::Key);
     }
 
-    uint8_t operator()(const CryptoNote::MultisignatureInputDetails)
+    uint8_t operator()(const CryptoNote::MultiSignatureInputDetails)
     {
         return static_cast<uint8_t>(SerializationTag::Multisignature);
     }
@@ -76,7 +76,7 @@ struct VariantSerializer : boost::static_visitor<>
 void getVariantValue(
     CryptoNote::ISerializer &serializer,
     uint8_t tag,
-    boost::variant<BaseInputDetails, KeyInputDetails, MultisignatureInputDetails> in)
+    boost::variant<BaseInputDetails, KeyInputDetails, MultiSignatureInputDetails> in)
 {
     switch (static_cast<SerializationTag>(tag)) {
     case SerializationTag::Base: {
@@ -92,7 +92,7 @@ void getVariantValue(
         break;
     }
     case SerializationTag::Multisignature: {
-        MultisignatureInputDetails v;
+        MultiSignatureInputDetails v;
         serializer(v, "data");
         in = v;
         break;
@@ -110,7 +110,7 @@ bool serializePod(T &v, Common::StringView name, CryptoNote::ISerializer &serial
 
 } // namespace
 
-void serialize(transaction_output_details &output, ISerializer &serializer)
+void serialize(TransactionOutputDetails &output, ISerializer &serializer)
 {
     serializer(output.output, "output");
     serializer(output.globalIndex, "globalIndex");
@@ -135,13 +135,13 @@ void serialize(KeyInputDetails &inputToKey, ISerializer &serializer)
     serializer(inputToKey.outputs, "outputs");
 }
 
-void serialize(MultisignatureInputDetails &inputMultisig, ISerializer &serializer)
+void serialize(MultiSignatureInputDetails &inputMultisig, ISerializer &serializer)
 {
     serializer(inputMultisig.input, "input");
     serializer(inputMultisig.output, "output");
 }
 
-void serialize(transaction_input_details &input, ISerializer &serializer)
+void serialize(TransactionInputDetails &input, ISerializer &serializer)
 {
     if (serializer.type() == ISerializer::OUTPUT) {
         BinaryVariantTagGetter tagGetter;
@@ -163,16 +163,10 @@ void serialize(TransactionExtraDetails &extra, ISerializer &serializer)
     serializePod(extra.publicKey, "publicKey", serializer);
     serializer(extra.nonce, "nonce");
     serializeAsBinary(extra.raw, "raw", serializer);
+    serializer(extra.size, "size");
 }
 
-void serialize(TransactionExtraDetails2 &extra, ISerializer &serializer)
-{
-    serializePod(extra.publicKey, "publicKey", serializer);
-    serializer(extra.nonce, "nonce");
-    serializeAsBinary(extra.raw, "raw", serializer);
-}
-
-void serialize(TransactionDetails2 &transaction, ISerializer &serializer)
+void serialize(TransactionDetails &transaction, ISerializer &serializer)
 {
     serializePod(transaction.hash, "hash", serializer);
     serializer(transaction.size, "size");
@@ -182,6 +176,7 @@ void serialize(TransactionDetails2 &transaction, ISerializer &serializer)
     serializer(transaction.mixin, "mixin");
     serializer(transaction.unlockTime, "unlockTime");
     serializer(transaction.timestamp, "timestamp");
+    serializer(transaction.version, "version");
     serializePod(transaction.paymentId, "paymentId", serializer);
     serializer(transaction.inBlockchain, "inBlockchain");
     serializePod(transaction.blockHash, "blockHash", serializer);
@@ -217,16 +212,20 @@ void serialize(TransactionDetails2 &transaction, ISerializer &serializer)
     }
 }
 
-void serialize(BlockDetails2 &block, ISerializer &serializer)
+void serialize(BlockDetails &block, ISerializer &serializer)
 {
     serializer(block.majorVersion, "majorVersion");
     serializer(block.minorVersion, "minorVersion");
     serializer(block.timestamp, "timestamp");
     serializePod(block.prevBlockHash, "prevBlockHash", serializer);
+    serializePod(block.proofOfWork, "proofOfWork", serializer);
     serializer(block.nonce, "nonce");
+    serializer(block.isOrphaned, "isOrphaned");
     serializer(block.height, "index");
+    serializer(block.depth, "depth");
     serializePod(block.hash, "hash", serializer);
     serializer(block.difficulty, "difficulty");
+    serializer(block.cumulativeDifficulty, "cumulativeDifficulty");
     serializer(block.reward, "reward");
     serializer(block.baseReward, "baseReward");
     serializer(block.blockSize, "blockSize");
@@ -234,6 +233,7 @@ void serialize(BlockDetails2 &block, ISerializer &serializer)
     serializer(block.alreadyGeneratedCoins, "alreadyGeneratedCoins");
     serializer(block.alreadyGeneratedTransactions, "alreadyGeneratedTransactions");
     serializer(block.sizeMedian, "sizeMedian");
+    serializer(block.effectiveSizeMedian, "effectiveSizeMedian");
     serializer(block.penalty, "penalty");
     serializer(block.totalFeeAmount, "totalFeeAmount");
     serializer(block.transactions, "transactions");

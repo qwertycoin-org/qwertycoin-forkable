@@ -45,7 +45,7 @@ size_t getSignaturesCount(const TransactionInput &input)
     {
         size_t operator()(const BaseInput &txin) const { return 0; }
         size_t operator()(const KeyInput &txin) const { return txin.outputIndexes.size(); }
-        size_t operator()(const MultisignatureInput &txin) const { return txin.signatureCount; }
+        size_t operator()(const MultiSignatureInput &txin) const { return txin.signatureCount; }
     };
 
     return boost::apply_visitor(txin_signature_size_visitor(), input);
@@ -55,9 +55,9 @@ struct BinaryVariantTagGetter : boost::static_visitor<uint8_t>
 {
     uint8_t operator()(const CryptoNote::BaseInput) { return  0xff; }
     uint8_t operator()(const CryptoNote::KeyInput) { return  0x2; }
-    uint8_t operator()(const CryptoNote::MultisignatureInput) { return  0x3; }
+    uint8_t operator()(const CryptoNote::MultiSignatureInput) { return  0x3; }
     uint8_t operator()(const CryptoNote::KeyOutput) { return  0x2; }
-    uint8_t operator()(const CryptoNote::MultisignatureOutput) { return  0x3; }
+    uint8_t operator()(const CryptoNote::MultiSignatureOutput) { return  0x3; }
     uint8_t operator()(const CryptoNote::Transaction) { return  0xcc; }
     uint8_t operator()(const CryptoNote::Block) { return  0xbb; }
 };
@@ -93,7 +93,7 @@ void getVariantValue(CryptoNote::ISerializer&serializer,uint8_t tag,CryptoNote::
         break;
     }
     case 0x3: {
-        CryptoNote::MultisignatureInput v;
+        CryptoNote::MultiSignatureInput v;
         serializer(v, "value");
         in = v;
         break;
@@ -116,7 +116,7 @@ void getVariantValue(
         break;
     }
     case 0x3: {
-        CryptoNote::MultisignatureOutput v;
+        CryptoNote::MultiSignatureOutput v;
         serializer(v, "data");
         out = v;
         break;
@@ -301,7 +301,7 @@ void serialize(KeyInput &key, ISerializer &serializer)
     serializer(key.keyImage, "k_image");
 }
 
-void serialize(MultisignatureInput &multisignature, ISerializer &serializer)
+void serialize(MultiSignatureInput &multisignature, ISerializer &serializer)
 {
     serializer(multisignature.amount, "amount");
     serializer(multisignature.signatureCount, "signatures");
@@ -336,7 +336,7 @@ void serialize(KeyOutput &key, ISerializer &serializer)
     serializer(key.key, "key");
 }
 
-void serialize(MultisignatureOutput &multisignature, ISerializer &serializer)
+void serialize(MultiSignatureOutput &multisignature, ISerializer &serializer)
 {
     serializer(multisignature.keys, "keys");
     serializer(multisignature.requiredSignatureCount, "required_signatures");

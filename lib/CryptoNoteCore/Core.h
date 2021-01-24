@@ -131,7 +131,7 @@ public:
         Crypto::Hash &blockId,
         uint32_t &blockHeight) override;
     bool getMultisigOutputReference(
-        const MultisignatureInput &txInMultisig,
+        const MultiSignatureInput &txInMultisig,
         std::pair<Crypto::Hash, size_t> &output_reference) override;
     bool getGeneratedTransactionsNumber(uint32_t height, uint64_t &generatedTransactions) override;
     bool getOrphanBlocksByHeight(uint32_t height, std::vector<Block> &blocks) override;
@@ -152,7 +152,7 @@ public:
         std::vector<Transaction> &transactions) override;
     std::vector<Crypto::Hash> getTransactionHashesByPaymentId(
         const Crypto::Hash &paymentId) override;
-    bool getOutByMSigGIndex(uint64_t amount, uint64_t gindex, MultisignatureOutput &out) override;
+    bool getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, MultiSignatureOutput &out) override;
     std::unique_ptr<IBlock> getBlock(const Crypto::Hash &blocksId) override;
     bool handleIncomingTransaction(
         const Transaction &tx,
@@ -176,10 +176,10 @@ public:
     uint8_t getCurrentBlockMajorVersion() override;
     uint8_t getBlockMajorVersionForHeight(uint32_t height) override;
 
-    bool fillBlockDetails(const CryptoNote::Block &block, BlockDetails2 &blockDetails);
+    bool fillBlockDetails(const CryptoNote::Block &block, BlockDetails &blockDetails);
     bool fillTransactionDetails(
         const Transaction &tx,
-        TransactionDetails2 &txRpcInfo,
+        TransactionDetails &txRpcInfo,
         uint64_t timestamp = 0);
 
     static bool getPaymentId(const Transaction &transaction, Crypto::Hash &paymentId);
@@ -258,7 +258,7 @@ public:
 
     bool get_stat_info(core_stat_info &st_inf) override;
 
-    bool get_tx_outputs_gindexs(const Crypto::Hash &tx_id, std::vector<uint32_t> &indexs) override;
+    bool getTxOutputsGlobalIndexes(const Crypto::Hash &tx_id, std::vector<uint32_t> &indexs) override;
     Crypto::Hash get_tail_id();
     bool get_random_outs_for_amounts(
         const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_request &req,
@@ -296,11 +296,11 @@ public:
     uint64_t getNextBlockDifficulty(uint64_t nextBlockTime);
     uint64_t getTotalGeneratedAmount();
     uint8_t getBlockMajorVersionForHeight(uint32_t height) const;
-    bool f_getMixin(const Transaction &transaction, uint64_t &mixin);
+    bool getMixin(const Transaction &transaction, uint64_t &mixin);
 
     bool is_key_image_spent(const Crypto::KeyImage &key_im);
 
-    bool fillTxExtra(const std::vector<uint8_t> &rawExtra, TransactionExtraDetails2 &extraDetails);
+    bool fillTxExtra(const std::vector<uint8_t> &rawExtra, TransactionExtraDetails &extraDetails);
 
     void setBlocksToFind(uint64_t blocksToFind);
 

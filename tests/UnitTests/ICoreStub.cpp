@@ -88,7 +88,7 @@ bool ICoreStub::get_random_outs_for_amounts(
     return randomOutsResult;
 }
 
-bool ICoreStub::get_tx_outputs_gindexs(const Crypto::Hash &tx_id, std::vector<uint32_t> &indexs)
+bool ICoreStub::getTxOutputsGlobalIndexes(const Crypto::Hash &tx_id, std::vector<uint32_t> &indexs)
 {
     std::copy(globalIndices.begin(), globalIndices.end(), std::back_inserter(indexs));
     return globalIndicesResult;
@@ -368,7 +368,7 @@ bool ICoreStub::getBlockContainingTx(const Crypto::Hash &txId, Crypto::Hash &blo
     return true;
 }
 
-bool ICoreStub::getMultisigOutputReference(const CryptoNote::MultisignatureInput &txInMultisig,
+bool ICoreStub::getMultisigOutputReference(const CryptoNote::MultiSignatureInput &txInMultisig,
                                            std::pair<Crypto::Hash, size_t> &outputReference)
 {
     return true;

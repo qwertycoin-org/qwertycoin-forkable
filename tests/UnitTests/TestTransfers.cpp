@@ -289,7 +289,7 @@ TEST_F(TransfersApi, moveMoney) {
   generator.generateEmptyBlocks(2 * m_currency.minedMoneyUnlockWindow());
 
   // sendAmount is an even number
-  uint64_t sendAmount = (get_outs_money_amount(generator.getBlockchain()[1].baseTransaction) / 4) * 2;
+  uint64_t sendAmount = (getOutsMoneyAmount(generator.getBlockchain()[1].baseTransaction) / 4) * 2;
   auto fee = m_currency.minimumFee();
 
   startSync();

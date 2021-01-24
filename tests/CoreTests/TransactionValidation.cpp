@@ -742,7 +742,7 @@ bool MultiSigTx_OutputSignatures::generate(TestGenerator& generator) const {
   builder.step1_init();
   builder.step2_fill_inputs(generator.minerAccount.getAccountKeys(), sources);
 
-  MultisignatureOutput target;
+  MultiSignatureOutput target;
 
   for (const auto& acc : m_outputAccounts) {
     target.keys.push_back(acc.getAccountKeys().address.spendPublicKey);
@@ -785,7 +785,7 @@ bool MultiSigTx_InvalidOutputSignature::generate(std::vector<test_event_entry>& 
   builder.step1_init();
   builder.step2_fill_inputs(miner_account.getAccountKeys(), sources);
 
-  MultisignatureOutput target;
+  MultiSignatureOutput target;
 
   Crypto::PublicKey pk;
   Crypto::SecretKey sk;
@@ -817,7 +817,7 @@ namespace
     builder.step1_init();
 
     // create input
-    MultisignatureInput input;
+    MultiSignatureInput input;
     input.amount = inputAmount;
     input.signatureCount = givenSignatures;
     input.outputIndex = 0;

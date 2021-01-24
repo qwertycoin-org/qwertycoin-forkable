@@ -98,7 +98,7 @@ bool test_generator::constructBlock(CryptoNote::Block& blk, uint32_t height, con
   size_t txsSize = 0;
   for (auto& tx : txList) {
     uint64_t fee = 0;
-    bool r = get_tx_fee(tx, fee);
+    bool r = getTxFee(tx, fee);
     CHECK_AND_ASSERT_MES(r, false, "wrong transaction passed to construct_block");
     totalFee += fee;
     txsSize += getObjectBinarySize(tx);
@@ -237,7 +237,7 @@ bool test_generator::constructMaxSizeBlock(CryptoNote::Block& blk, const CryptoN
   std::vector<Crypto::Hash> transactionHashes;
   for (auto& tx : txList) {
     uint64_t fee = 0;
-    bool r = get_tx_fee(tx, fee);
+    bool r = getTxFee(tx, fee);
     CHECK_AND_ASSERT_MES(r, false, "wrong transaction passed to construct_max_size_block");
     totalFee += fee;
     txsSize += getObjectBinarySize(tx);

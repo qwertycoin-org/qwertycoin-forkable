@@ -156,7 +156,7 @@ TEST_F(TransactionApi, addAndSignInput) {
 
 TEST_F(TransactionApi, addAndSignInputMsig) {
 
-  MultisignatureInput inputMsig;
+    MultiSignatureInput inputMsig;
 
   inputMsig.amount = 1000;
   inputMsig.outputIndex = 0;
@@ -339,7 +339,7 @@ TEST_F(TransactionApi, doubleSpendInTransactionKey) {
 }
 
 TEST_F(TransactionApi, doubleSpendInTransactionMultisignature) {
-  MultisignatureInput inputMsig = { 1000, 0, 2 };
+    MultiSignatureInput inputMsig = { 1000, 0, 2 };
 
   tx->addInput(inputMsig);
   ASSERT_TRUE(tx->validateInputs());
@@ -350,7 +350,7 @@ TEST_F(TransactionApi, doubleSpendInTransactionMultisignature) {
 
 TEST_F(TransactionApi, unableToModifySignedTransaction) {
 
-  MultisignatureInput inputMsig;
+    MultiSignatureInput inputMsig;
 
   inputMsig.amount = 1000;
   inputMsig.outputIndex = 0;

@@ -135,8 +135,8 @@ bool lookup_acc_outs(
     std::vector<size_t> &outs,
     uint64_t &money_transfered);
 
-bool get_tx_fee(const Transaction &tx, uint64_t &fee);
-uint64_t get_tx_fee(const Transaction &tx);
+bool getTxFee(const Transaction &tx, uint64_t &fee);
+uint64_t getTxFee(const Transaction &tx);
 bool generate_key_image_helper(
     const AccountKeys &ack,
     const Crypto::PublicKey &tx_public_key,
@@ -149,8 +149,8 @@ bool get_block_hashing_blob(const Block &b, BinaryArray &blob);
 bool get_block_hash(const Block &b, Crypto::Hash &res);
 Crypto::Hash get_block_hash(const Block &b);
 bool get_block_longhash(Crypto::cn_context &context, const Block &b, Crypto::Hash &res);
-bool get_inputs_money_amount(const Transaction &tx, uint64_t &money);
-uint64_t get_outs_money_amount(const Transaction &tx);
+bool getInputsMoneyAmount(const Transaction &tx, uint64_t &money);
+uint64_t getOutsMoneyAmount(const Transaction &tx);
 bool check_inputs_types_supported(const TransactionPrefix &tx);
 bool check_outs_valid(const TransactionPrefix &tx, std::string *error = nullptr);
 bool checkMultisignatureInputsDiff(const TransactionPrefix &tx);

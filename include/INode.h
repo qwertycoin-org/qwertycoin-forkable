@@ -36,41 +36,36 @@ class INodeObserver
 public:
     virtual ~INodeObserver() = default;
 
-    virtual void peerCountUpdated(size_t count) {}
-    virtual void localBlockchainUpdated(uint32_t height) {}
-    virtual void lastKnownBlockHeightUpdated(uint32_t height) {}
-    virtual void poolChanged() {}
-    virtual void blockchainSynchronized(uint32_t topHeight) {}
+    virtual void peerCountUpdated(size_t count) { }
+    virtual void localBlockchainUpdated(uint32_t height) { }
+    virtual void lastKnownBlockHeightUpdated(uint32_t height) { }
+    virtual void poolChanged() { }
+    virtual void blockchainSynchronized(uint32_t topHeight) { }
 };
 
-struct OutEntry
-{
+struct OutEntry {
     uint32_t outGlobalIndex;
     Crypto::PublicKey outKey;
 };
 
-struct OutsForAmount
-{
+struct OutsForAmount {
     uint64_t amount;
     std::vector<OutEntry> outs;
 };
 
-struct TransactionShortInfo
-{
+struct TransactionShortInfo {
     Crypto::Hash txId;
     TransactionPrefix txPrefix;
 };
 
-struct BlockShortEntry
-{
+struct BlockShortEntry {
     Crypto::Hash blockHash;
     bool hasBlock;
     CryptoNote::Block block;
     std::vector<TransactionShortInfo> txsShortInfo;
 };
 
-struct BlockHeaderInfo
-{
+struct BlockHeaderInfo {
     uint32_t index;
     uint8_t majorVersion;
     uint8_t minorVersion;
@@ -110,68 +105,46 @@ public:
 
     virtual void relayTransaction(const Transaction &transaction, const Callback &callback) = 0;
     virtual void getRandomOutsByAmounts(
-        std::vector<uint64_t> &&amounts,
-        uint64_t outsCount,
-        std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>&result,
-        const Callback &callback) = 0;
-    virtual void getNewBlocks(
-        std::vector<Crypto::Hash> &&knownBlockIds,
-        std::vector<CryptoNote::block_complete_entry> &newBlocks,
-        uint32_t &startHeight,
-        const Callback &callback) = 0;
-    virtual void getTransactionOutsGlobalIndices(
-        const Crypto::Hash &transactionHash,
-        std::vector<uint32_t> &outsGlobalIndices,
-        const Callback &callback) = 0;
-    virtual void queryBlocks(
-        std::vector<Crypto::Hash> &&knownBlockIds,
-        uint64_t timestamp,
-        std::vector<BlockShortEntry> &newBlocks,
-        uint32_t &startHeight,
-        const Callback &callback) = 0;
+            std::vector<uint64_t> &&amounts, uint64_t outsCount,
+            std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>
+                    &result,
+            const Callback &callback) = 0;
+    virtual void getNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
+                              std::vector<CryptoNote::block_complete_entry> &newBlocks,
+                              uint32_t &startHeight, const Callback &callback) = 0;
+    virtual void getTransactionOutsGlobalIndices(const Crypto::Hash &transactionHash,
+                                                 std::vector<uint32_t> &outsGlobalIndices,
+                                                 const Callback &callback) = 0;
+    virtual void queryBlocks(std::vector<Crypto::Hash> &&knownBlockIds, uint64_t timestamp,
+                             std::vector<BlockShortEntry> &newBlocks, uint32_t &startHeight,
+                             const Callback &callback) = 0;
     virtual void getPoolSymmetricDifference(
-        std::vector<Crypto::Hash> &&knownPoolTxIds,
-        Crypto::Hash knownBlockId,
-        bool &isBcActual,
-        std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
-        std::vector<Crypto::Hash> &deletedTxIds,
-        const Callback &callback) = 0;
-    virtual void getMultisignatureOutputByGlobalIndex(
-        uint64_t amount,
-        uint32_t gindex,
-        MultisignatureOutput &out,
-        const Callback &callback) = 0;
+            std::vector<Crypto::Hash> &&knownPoolTxIds, Crypto::Hash knownBlockId, bool &isBcActual,
+            std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
+            std::vector<Crypto::Hash> &deletedTxIds, const Callback &callback) = 0;
+    virtual void getMultisignatureOutputByGlobalIndex(uint64_t amount, uint32_t gindex,
+                                                      MultiSignatureOutput &out,
+                                                      const Callback &callback) = 0;
 
-    virtual void getBlocks(
-        const std::vector<uint32_t> &blockHeights,
-        std::vector<std::vector<BlockDetails>> &blocks,
-        const Callback &callback) = 0;
-    virtual void getBlocks(
-        const std::vector<Crypto::Hash> &blockHashes,
-        std::vector<BlockDetails> &blocks,
-        const Callback &callback) = 0;
-    virtual void getBlocks(
-        uint64_t timestampBegin,
-        uint64_t timestampEnd,
-        uint32_t blocksNumberLimit,
-        std::vector<BlockDetails> &blocks,
-        uint32_t &blocksNumberWithinTimestamps,
-        const Callback &callback) = 0;
-    virtual void getTransactions(
-        const std::vector<Crypto::Hash> &transactionHashes,
-        std::vector<TransactionDetails> &transactions,
-        const Callback &callback) = 0;
-    virtual void getTransactionsByPaymentId(
-        const Crypto::Hash &paymentId,
-        std::vector<TransactionDetails> &transactions,
-        const Callback &callback) = 0;
-    virtual void getPoolTransactions(
-        uint64_t timestampBegin,
-        uint64_t timestampEnd,
-        uint32_t transactionsNumberLimit,
-        std::vector<TransactionDetails> &transactions,
-        uint64_t &transactionsNumberWithinTimestamps,
-        const Callback &callback) = 0;
+    virtual void getBlocks(const std::vector<uint32_t> &blockHeights,
+                           std::vector<std::vector<BlockDetails>> &blocks,
+                           const Callback &callback) = 0;
+    virtual void getBlocks(const std::vector<Crypto::Hash> &blockHashes,
+                           std::vector<BlockDetails> &blocks, const Callback &callback) = 0;
+    virtual void getBlocks(uint64_t timestampBegin, uint64_t timestampEnd,
+                           uint32_t blocksNumberLimit, std::vector<BlockDetails> &blocks,
+                           uint32_t &blocksNumberWithinTimestamps, const Callback &callback) = 0;
+    virtual void getTransactions(const std::vector<Crypto::Hash> &transactionHashes,
+                                 std::vector<TransactionDetails> &transactions,
+                                 const Callback &callback) = 0;
+    virtual void getTransactionsByPaymentId(const Crypto::Hash &paymentId,
+                                            std::vector<TransactionDetails> &transactions,
+                                            const Callback &callback) = 0;
+    virtual void getPoolTransactions(uint64_t timestampBegin, uint64_t timestampEnd,
+                                     uint32_t transactionsNumberLimit,
+                                     std::vector<TransactionDetails> &transactions,
+                                     uint64_t &transactionsNumberWithinTimestamps,
+                                     const Callback &callback) = 0;
     virtual void isSynchronized(bool &syncStatus, const Callback &callback) = 0;
 };
 

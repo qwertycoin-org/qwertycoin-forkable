@@ -262,7 +262,7 @@ std::error_code InProcessNode::doGetTransactionOutsGlobalIndices(
     }
 
     try {
-        bool r = core.get_tx_outputs_gindexs(transactionHash, outsGlobalIndices);
+        bool r = core.getTxOutputsGlobalIndexes(transactionHash, outsGlobalIndices);
         if(!r) {
             return make_error_code(CryptoNote::error::REQUEST_ERROR);
         }
@@ -710,7 +710,7 @@ void InProcessNode::getPoolSymmetricDifferenceAsync(
 
 void InProcessNode::getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                                          uint32_t gindex,
-                                                         MultisignatureOutput &out,
+                                                         MultiSignatureOutput &out,
                                                          const Callback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
@@ -728,11 +728,11 @@ void InProcessNode::getMultisignatureOutputByGlobalIndex(uint64_t amount,
 
 void InProcessNode::getOutByMSigGIndexAsync(uint64_t amount,
                                             uint32_t gindex,
-                                            MultisignatureOutput &out,
+                                            MultiSignatureOutput &out,
                                             const Callback &callback)
 {
     std::error_code ec = std::error_code();
-    bool result = core.getOutByMSigGIndex(amount, gindex, out);
+    bool result = core.getOutByMultiSigGlobalIndex(amount, gindex, out);
     if (!result) {
         ec = make_error_code(std::errc::invalid_argument);
         callback(ec);
