@@ -891,7 +891,9 @@ difficulty_type Blockchain::getDifficultyForNextBlock(uint64_t nextBlockTime)
         BlockMajorVersion,
         timestamps,
         cumulative_difficulties,
-        static_cast<uint32_t>(m_blocks.size()));
+        static_cast<uint32_t>(m_blocks.size()),
+        nextBlockTime,
+        cb);
 }
 
 bool Blockchain::getDifficultyStat(uint32_t height,
@@ -1432,7 +1434,12 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(
         }
         return static_cast<difficulty_type>(Common::meanValue(diffs));
     });
-    return m_currency.nextDifficulty(BlockMajorVersion, timestamps, cumulative_difficulties, static_cast<uint32_t>(m_blocks.size()));
+    return m_currency.nextDifficulty(BlockMajorVersion,
+                                     timestamps,
+                                     cumulative_difficulties,
+                                     static_cast<uint32_t>(m_blocks.size()),
+                                     nextBlockTime,
+                                     cb);
 }
 
 bool Blockchain::prevalidate_miner_transaction(const Block &b, uint32_t height)

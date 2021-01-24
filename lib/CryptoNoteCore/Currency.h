@@ -201,7 +201,9 @@ public:
     difficulty_type nextDifficulty(uint8_t blockMajorVersion,
                                    std::vector<uint64_t> timestamps,
                                    std::vector<difficulty_type> Difficulties,
-                                   uint32_t height) const;
+                                   uint32_t height,
+                                   uint64_t nextBlockTime,
+                                   lazy_stat_callback_type &lazyStatCallbackType) const;
 
     difficulty_type getClifDifficulty(uint32_t height,
         uint8_t blockMajorVersion,

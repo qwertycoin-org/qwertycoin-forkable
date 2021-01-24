@@ -688,10 +688,49 @@ uint64_t Currency::roundUpMinFee(uint64_t minimalFee, int digits) const
 difficulty_type Currency::nextDifficulty(uint8_t blockMajorVersion,
                                          std::vector<uint64_t> timestamps,
                                          std::vector<difficulty_type> cumulativeDifficulties,
-                                         uint32_t height) const
+                                         uint32_t height,
+                                         uint64_t nextBlockTime,
+                                         lazy_stat_callback_type &lazyStatCallbackType) const
 {
     if (isTestnet() || timestamps.empty()) {
         return CryptoNote::parameters::DEFAULT_DIFFICULTY;
+    }
+
+    // check if we use special scenario with some fixed diff
+    if (CryptoNote::parameters::FIXED_DIFFICULTY > 0) {
+        logger (WARNING) << "Fixed difficulty is used: " <<
+                         CryptoNote::parameters::FIXED_DIFFICULTY;
+        return CryptoNote::parameters::FIXED_DIFFICULTY;
+    }
+
+    if (m_fixedDifficulty > 0) {
+        logger (WARNING) << "Fixed difficulty is used: " <<
+                         m_fixedDifficulty;
+        return m_fixedDifficulty;
+    }
+
+    uint64_t lastTimestamp = 0;
+
+    if (!timestamps.empty()) {
+        lastTimestamp = timestamps.back();
+    }
+
+    if (nextBlockTime > lastTimestamp + CryptoNote::parameters::CRYPTONOTE_CLIF_THRESHOLD) {
+        size_t arraySize = cumulativeDifficulties.size();
+        difficulty_type lastDifficulty = 1;
+
+        if (arraySize >= 2) {
+            lastDifficulty = cumulativeDifficulties[arraySize - 1] - cumulativeDifficulties[arraySize - 2];
+        }
+
+        uint64_t currentSolveTime = nextBlockTime - lastTimestamp;
+
+        return getClifDifficulty(height,
+                                 blockMajorVersion,
+                                 lastDifficulty,
+                                 lastTimestamp,
+                                 currentSolveTime,
+                                 lazyStatCallbackType);
     }
 
     // Dynamic difficulty calculation window
@@ -743,7 +782,11 @@ difficulty_type Currency::nextDifficulty(uint8_t blockMajorVersion,
     std::adjacent_difference(cumulativeDifficulties.begin(), cumulativeDifficulties.end(),
                              difficulties.begin()); // we check it before and all diffs are positive
     difficulties.erase(difficulties.begin());
-    difficulty_type prev_difficulty = difficulties.back();
+    difficulty_type prev_difficulty = 1;
+
+    if (!difficulties.empty()) {
+        prev_difficulty = difficulties.back();
+    }
 
     // calc stat values to detect outliers
     double avg_solvetime = Common::meanValue(solveTimes);
@@ -756,6 +799,7 @@ difficulty_type Currency::nextDifficulty(uint8_t blockMajorVersion,
     uint64_t valid_solvetime_sum = 0;
     size_t invalid_solvetime_number = 0;
     uint64_t invalid_solvetime_sum = 0;
+
     std::for_each(solveTimes.begin(), solveTimes.end(),
                   [solvetime_lowborder, solvetime_highborder, &valid_solvetime_number,
                    &valid_solvetime_sum, &invalid_solvetime_number,
@@ -771,7 +815,7 @@ difficulty_type Currency::nextDifficulty(uint8_t blockMajorVersion,
 
     // if there is no "invalid" solvetimes we can use previous difficulty value
     if (invalid_solvetime_number == 0) {
-        if (difficulties.size() > 0) {
+        if (!difficulties.empty()) {
             return std::max(prev_difficulty, min_difficulty);
         }
     }
@@ -779,30 +823,33 @@ difficulty_type Currency::nextDifficulty(uint8_t blockMajorVersion,
     // process data with "invalid" solvetimes
     double valid_solvetime_mean = double(valid_solvetime_sum) / valid_solvetime_number;
     double invalid_solvetime_mean = double(invalid_solvetime_sum) / invalid_solvetime_number;
+    double addParam = 1.0;
 
     if ((window_time >= window_target * 0.97) && (window_time <= window_target * 1.03)) {
         if (valid_solvetime_mean >= invalid_solvetime_mean) {
             double coef = double(difficulty_target) / double(valid_solvetime_mean);
             if (valid_solvetime_mean < difficulty_target) {
-                nextEPoWDiff = prev_difficulty * std::min(1.01, coef) + 0.5;
+                nextEPoWDiff = prev_difficulty * std::min(1.01, coef) + addParam;
             } else {
-                nextEPoWDiff = prev_difficulty * std::max(0.99, coef) + 0.5;
+                nextEPoWDiff = prev_difficulty * std::max(0.99, coef) + addParam;
             }
         } else {
             double coef = double(difficulty_target) / double(invalid_solvetime_mean);
             if (invalid_solvetime_mean < difficulty_target) {
-                nextEPoWDiff = prev_difficulty * std::min(1.01, coef) + 0.5;
+                nextEPoWDiff = prev_difficulty * std::min(1.01, coef) + addParam;
             } else {
-                nextEPoWDiff = prev_difficulty * std::max(0.99, coef) + 0.5;
+                nextEPoWDiff = prev_difficulty * std::max(0.99, coef) + addParam;
             }
         }
     } else if (window_time < window_target * 0.97) {
-        nextEPoWDiff = prev_difficulty * 1.02 + 0.5;
+        nextEPoWDiff = prev_difficulty * 1.02 + addParam;
     } else {
-        nextEPoWDiff = prev_difficulty * 0.98 + 0.5;
+        nextEPoWDiff = prev_difficulty * 0.98 + addParam;
     }
 
-    return std::max(nextEPoWDiff, min_difficulty);
+    uint64_t diffRet = std::max(nextEPoWDiff, min_difficulty);
+
+    return diffRet;
 }
 
 difficulty_type Currency::getClifDifficulty(uint32_t height, uint8_t blockMajorVersion,

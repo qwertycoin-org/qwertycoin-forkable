@@ -16,6 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <Common/Math.h>
 #include "BlockValidation.h"
 #include "TestGenerator.h"
 #include "CryptoNoteCore/CryptoNoteTools.h"
@@ -38,8 +39,46 @@ namespace {
     CryptoNote::difficulty_type commulative_diffic = cummulative_difficulties.empty() ? 0 : cummulative_difficulties.back();
     CryptoNote::Block blk_prev = blk_last;
     for (size_t i = 0; i < new_block_count; ++i) {
+        CryptoNote::Currency::lazy_stat_callback_type cb(
+                [&](CryptoNote::IMinerHandler::stat_period p, uint64_t next_time) {
+                    uint32_t min_height = CryptoNote::parameters::UPGRADE_HEIGHT_V1
+                                          + CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY / 24;
+                    uint64_t time_window = 0;
+                    switch (p) {
+                    case (CryptoNote::IMinerHandler::stat_period::hour):
+                        time_window = 3600;
+                        break;
+                    case (CryptoNote::IMinerHandler::stat_period::day):
+                        time_window = 3600 * 24;
+                        break;
+                    case (CryptoNote::IMinerHandler::stat_period::week):
+                        time_window = 3600 * 24 * 7;
+                        break;
+                    case (CryptoNote::IMinerHandler::stat_period::month):
+                        time_window = 3600 * 24 * 30;
+                        break;
+                    case (CryptoNote::IMinerHandler::stat_period::halfyear):
+                        time_window = 3600 * 12 * 365;
+                        break;
+                    case (CryptoNote::IMinerHandler::stat_period::year):
+                        time_window = 3600 * 24 * 365;
+                        break;
+                    }
+                    assert(next_time > time_window);
+                    uint64_t stop_time = next_time - time_window;
+                    if (currency.timestampCheckWindow() >= stop_time)
+                        return CryptoNote::difficulty_type(0);
+                    uint32_t height = get_block_height(blk_last);
+                    std::vector<CryptoNote::difficulty_type> diffs;
+                    while (height > min_height && blk_prev.timestamp >= stop_time) {
+                        diffs.push_back(blk_last.timestamp
+                                        - blk_prev.timestamp);
+                        height--;
+                    }
+                    return static_cast<CryptoNote::difficulty_type>(Common::meanValue(diffs));
+                });
       CryptoNote::Block blk_next;
-	  CryptoNote::difficulty_type diffic = currency.nextDifficulty(block_major_version, timestamps, cummulative_difficulties, get_block_height(blk_last));
+	  CryptoNote::difficulty_type diffic = currency.nextDifficulty(block_major_version, timestamps, cummulative_difficulties, get_block_height(blk_last), 0, cb);
       if (!generator.constructBlockManually(blk_next, blk_prev, miner_account,
         test_generator::bf_major_ver | test_generator::bf_timestamp | test_generator::bf_diffic,
         block_major_version, 0, blk_prev.timestamp, Crypto::Hash(), diffic)) {
@@ -205,8 +244,39 @@ bool gen_block_invalid_nonce::generate(std::vector<test_event_entry>& events) co
     return false;
   }
 
+    CryptoNote::Currency::lazy_stat_callback_type cb(
+            [&](CryptoNote::IMinerHandler::stat_period p, uint64_t next_time) {
+                uint32_t min_height = CryptoNote::parameters::UPGRADE_HEIGHT_V1
+                                      + CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY / 24;
+                uint64_t time_window = 0;
+                switch (p) {
+                case (CryptoNote::IMinerHandler::stat_period::hour):
+                    time_window = 3600;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::day):
+                    time_window = 3600 * 24;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::week):
+                    time_window = 3600 * 24 * 7;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::month):
+                    time_window = 3600 * 24 * 30;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::halfyear):
+                    time_window = 3600 * 12 * 365;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::year):
+                    time_window = 3600 * 24 * 365;
+                    break;
+                }
+                assert(next_time > time_window);
+                uint64_t stop_time = next_time - time_window;
+
+                return CryptoNote::difficulty_type(0);
+            });
+
   // Create invalid nonce
-  difficulty_type diffic = m_currency.nextDifficulty(0, timestamps, cummulative_difficulties, get_block_height(blk_0));
+  difficulty_type diffic = m_currency.nextDifficulty(0, timestamps, cummulative_difficulties, get_block_height(blk_0), 0, cb);
   assert(1 < diffic);
   const Block& blk_last = boost::get<Block>(events.back());
   uint64_t timestamp = blk_last.timestamp;
@@ -636,7 +706,39 @@ bool gen_block_invalid_binary_format::generate(std::vector<test_event_entry>& ev
   do
   {
     blk_last = boost::get<Block>(events.back());
-	diffic = m_currency.nextDifficulty(0, timestamps, cummulative_difficulties, get_block_height(blk_0));
+
+      CryptoNote::Currency::lazy_stat_callback_type cb(
+              [&](CryptoNote::IMinerHandler::stat_period p, uint64_t next_time) {
+                  uint32_t min_height = CryptoNote::parameters::UPGRADE_HEIGHT_V1
+                                        + CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY / 24;
+                  uint64_t time_window = 0;
+                  switch (p) {
+                  case (CryptoNote::IMinerHandler::stat_period::hour):
+                      time_window = 3600;
+                      break;
+                  case (CryptoNote::IMinerHandler::stat_period::day):
+                      time_window = 3600 * 24;
+                      break;
+                  case (CryptoNote::IMinerHandler::stat_period::week):
+                      time_window = 3600 * 24 * 7;
+                      break;
+                  case (CryptoNote::IMinerHandler::stat_period::month):
+                      time_window = 3600 * 24 * 30;
+                      break;
+                  case (CryptoNote::IMinerHandler::stat_period::halfyear):
+                      time_window = 3600 * 12 * 365;
+                      break;
+                  case (CryptoNote::IMinerHandler::stat_period::year):
+                      time_window = 3600 * 24 * 365;
+                      break;
+                  }
+                  assert(next_time > time_window);
+                  uint64_t stop_time = next_time - time_window;
+
+                  return CryptoNote::difficulty_type(0);
+              });
+
+	diffic = m_currency.nextDifficulty(0, timestamps, cummulative_difficulties, get_block_height(blk_0), 0, cb);
     if (!lift_up_difficulty(m_currency, events, timestamps, cummulative_difficulties, generator, 1, blk_last,
       miner_account, m_blockMajorVersion)) {
       return false;
@@ -649,11 +751,42 @@ bool gen_block_invalid_binary_format::generate(std::vector<test_event_entry>& ev
   MAKE_TX(events, tx_0, miner_account, miner_account, MK_COINS(120), boost::get<Block>(events[1]));
   DO_CALLBACK(events, "corrupt_blocks_boundary");
 
+    CryptoNote::Currency::lazy_stat_callback_type cb(
+            [&](CryptoNote::IMinerHandler::stat_period p, uint64_t next_time) {
+                uint32_t min_height = CryptoNote::parameters::UPGRADE_HEIGHT_V1
+                                      + CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY / 24;
+                uint64_t time_window = 0;
+                switch (p) {
+                case (CryptoNote::IMinerHandler::stat_period::hour):
+                    time_window = 3600;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::day):
+                    time_window = 3600 * 24;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::week):
+                    time_window = 3600 * 24 * 7;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::month):
+                    time_window = 3600 * 24 * 30;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::halfyear):
+                    time_window = 3600 * 12 * 365;
+                    break;
+                case (CryptoNote::IMinerHandler::stat_period::year):
+                    time_window = 3600 * 24 * 365;
+                    break;
+                }
+                assert(next_time > time_window);
+                uint64_t stop_time = next_time - time_window;
+
+                return CryptoNote::difficulty_type(0);
+            });
+
   Block blk_test;
   std::vector<Crypto::Hash> tx_hashes;
   tx_hashes.push_back(getObjectHash(tx_0));
   size_t txs_size = getObjectBinarySize(tx_0);
-  diffic = m_currency.nextDifficulty(0, timestamps, cummulative_difficulties, get_block_height(blk_0));
+  diffic = m_currency.nextDifficulty(0, timestamps, cummulative_difficulties, get_block_height(blk_0), 0, cb);
   if (!generator.constructBlockManually(blk_test, blk_last, miner_account,
     test_generator::bf_major_ver | test_generator::bf_diffic | test_generator::bf_timestamp | test_generator::bf_tx_hashes,
     m_blockMajorVersion, 0, blk_last.timestamp, Crypto::Hash(), diffic, Transaction(), tx_hashes, txs_size))
