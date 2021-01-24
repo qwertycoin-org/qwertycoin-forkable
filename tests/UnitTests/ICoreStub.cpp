@@ -300,10 +300,17 @@ void ICoreStub::getTransactions(const std::vector<Crypto::Hash> &txs_ids,
     }
 }
 
-bool ICoreStub::getTransactionsWithOutputGlobalIndexes(const std::vector<Crypto::Hash> &txsIds,
-                                                       std::list<Crypto::Hash> &missedTxs,
-                                                       std::vector<std::pair<CryptoNote::Transaction,
-                                                                             std::vector<uint32_t>>> &txs)
+bool ICoreStub::getTransactionsWithOutputGlobalIndexes(
+        const std::vector<Crypto::Hash> &txsIds, std::list<Crypto::Hash> &missedTxs,
+        std::vector<std::pair<CryptoNote::Transaction, std::vector<uint32_t>>> &txs)
+{
+    return true;
+}
+
+bool ICoreStub::getBlockEntry(uint32_t height, uint64_t &blockCumulativeSize,
+                              CryptoNote::difficulty_type &difficulty,
+                              uint64_t &alreadyGeneratedCoins, uint64_t &reward,
+                              uint64_t &transactionsCount, uint64_t &timestamp)
 {
     return true;
 }
