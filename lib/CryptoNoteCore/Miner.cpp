@@ -314,7 +314,7 @@ bool miner::find_nonce_for_given_block(
                 for (uint32_t nonce = startNonce + i; !found; nonce += nthreads) {
                     lb.nonce = nonce;
 
-                    if (!get_block_longhash(localctx, lb, h)) {
+                    if (!getBlockLongHash(localctx, lb, h)) {
                         return;
                     }
 
@@ -339,7 +339,7 @@ bool miner::find_nonce_for_given_block(
     } else {
         for (; bl.nonce != std::numeric_limits<uint32_t>::max(); bl.nonce++) {
             Crypto::Hash h;
-            if (!get_block_longhash(context, bl, h)) {
+            if (!getBlockLongHash(context, bl, h)) {
                 return false;
             }
 
@@ -414,7 +414,7 @@ bool miner::worker_thread(uint32_t th_local_index)
 
         b.nonce = nonce;
         Crypto::Hash h;
-        if (!m_stop && !get_block_longhash(context, b, h)) {
+        if (!m_stop && !getBlockLongHash(context, b, h)) {
             logger(ERROR) << "Failed to get block long hash";
             m_stop = true;
         }

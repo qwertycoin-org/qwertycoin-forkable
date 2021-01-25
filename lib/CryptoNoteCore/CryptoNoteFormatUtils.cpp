@@ -614,7 +614,7 @@ Hash getBlockHash(const Block &b)
     return p;
 }
 
-bool get_block_longhash(cn_context &context, const Block &b, Hash &res)
+bool getBlockLongHash(cn_context &context, const Block &b, Hash &res)
 {
     BinaryArray bd;
     if (!get_block_hashing_blob(b, bd)) {

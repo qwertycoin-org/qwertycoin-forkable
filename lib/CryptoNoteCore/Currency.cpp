@@ -920,7 +920,7 @@ difficulty_type Currency::getClifDifficulty(uint32_t height, uint8_t blockMajorV
 bool Currency::checkProofOfWork(Crypto::cn_context &context, const Block &block,
                                 difficulty_type currentDiffic, Crypto::Hash &proofOfWork) const
 {
-    if (!get_block_longhash(context, block, proofOfWork)) {
+    if (!getBlockLongHash(context, block, proofOfWork)) {
         return false;
     }
 
