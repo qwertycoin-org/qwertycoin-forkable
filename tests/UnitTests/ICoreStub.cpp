@@ -385,7 +385,7 @@ void ICoreStub::addBlock(const CryptoNote::Block &block)
 {
     uint32_t height =
             boost::get<CryptoNote::BaseInput>(block.baseTransaction.inputs.front()).blockIndex;
-    Crypto::Hash hash = CryptoNote::get_block_hash(block);
+    Crypto::Hash hash = CryptoNote::getBlockHash(block);
     if (height > topHeight || blocks.empty()) {
         topHeight = height;
         topId = hash;

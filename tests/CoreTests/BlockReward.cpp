@@ -134,7 +134,7 @@ bool gen_block_reward::generate(std::vector<test_event_entry>& events) const
     uint64_t txs_fee = getTxFee(tx_1) + getTxFee(tx_2);
 
     std::vector<size_t> block_sizes;
-    generator.getLastNBlockSizes(block_sizes, get_block_hash(blk_7), m_currency.rewardBlocksWindow());
+    generator.getLastNBlockSizes(block_sizes, getBlockHash(blk_7), m_currency.rewardBlocksWindow());
     size_t median = Common::medianValue(block_sizes);
 
     Transaction miner_tx;

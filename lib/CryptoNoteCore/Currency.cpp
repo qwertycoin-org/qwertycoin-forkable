@@ -53,7 +53,7 @@ bool Currency::init()
         return false;
     }
 
-    if (!get_block_hash(m_genesisBlock, m_genesisBlockHash)) {
+    if (!getBlockHash(m_genesisBlock, m_genesisBlockHash)) {
         logger(ERROR, BRIGHT_RED) << "Failed to get genesis block hash";
         return false;
     }

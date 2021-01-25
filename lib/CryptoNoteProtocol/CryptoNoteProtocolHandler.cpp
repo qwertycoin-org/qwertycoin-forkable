@@ -489,7 +489,7 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(
         // to avoid concurrency in core between connections,
         // suspend connections which delivered block later then first one
         if (count == 2) {
-            if (m_core.have_block(get_block_hash(b))) {
+            if (m_core.have_block(getBlockHash(b))) {
                 context.m_state = CryptoNoteConnectionContext::state_idle;
                 context.m_needed_objects.clear();
                 context.m_requested_objects.clear();
@@ -498,7 +498,7 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(
             }
         }
 
-        auto blockHash = get_block_hash(b);
+        auto blockHash = getBlockHash(b);
         auto req_it = context.m_requested_objects.find(blockHash);
         if (req_it == context.m_requested_objects.end()) {
             logger(Logging::ERROR)

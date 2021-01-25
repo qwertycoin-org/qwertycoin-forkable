@@ -112,7 +112,7 @@ bool operator ==(const CryptoNote::Transaction &a, const CryptoNote::Transaction
 
 bool operator ==(const CryptoNote::Block &a, const CryptoNote::Block &b)
 {
-    return CryptoNote::get_block_hash(a) == CryptoNote::get_block_hash(b);
+    return CryptoNote::getBlockHash(a) == CryptoNote::getBlockHash(b);
 }
 
 } // namespace CryptoNote

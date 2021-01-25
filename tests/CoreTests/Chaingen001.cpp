@@ -49,7 +49,7 @@ bool one_block::verify_1(CryptoNote::core& c, size_t ev_index, const std::vector
     // check balances
     //std::vector<const CryptoNote::Block*> chain;
     //map_hash2tx_t mtx;
-    //CHECK_TEST_CONDITION(find_block_chain(events, chain, mtx, get_block_hash(boost::get<CryptoNote::Block>(events[1]))));
+    //CHECK_TEST_CONDITION(find_block_chain(events, chain, mtx, getBlockHash(boost::get<CryptoNote::Block>(events[1]))));
     //CHECK_TEST_CONDITION(get_block_reward(0) == get_balance(alice, events, chain, mtx));
 
     // check height
@@ -91,7 +91,8 @@ bool gen_simple_chain_001::generate(std::vector<test_event_entry> &events)
 
     std::vector<CryptoNote::Block> chain;
     map_hash2tx_t mtx;
-    /*bool r = */find_block_chain(events, chain, mtx, get_block_hash(boost::get<CryptoNote::Block>(events[3])));
+    /*bool r = */find_block_chain(events, chain, mtx,
+                                   getBlockHash(boost::get<CryptoNote::Block>(events[3])));
     std::cout << "BALANCE = " << get_balance(miner, chain, mtx) << std::endl;
 
     REWIND_BLOCKS(events, blk_2r, blk_2, miner);
@@ -111,13 +112,13 @@ bool gen_simple_chain_001::generate(std::vector<test_event_entry> &events)
 
     DO_CALLBACK(events, "verify_callback_1");
     //e.t.c.
-    //MAKE_BLOCK_TX1(events, blk_3, 3, get_block_hash(blk_0), get_test_target(), first_miner_account, ts_start + 10, tx_0);
-    //MAKE_BLOCK_TX1(events, blk_3, 3, get_block_hash(blk_0), get_test_target(), first_miner_account, ts_start + 10, tx_0);
+    //MAKE_BLOCK_TX1(events, blk_3, 3, getBlockHash(blk_0), get_test_target(), first_miner_account, ts_start + 10, tx_0);
+    //MAKE_BLOCK_TX1(events, blk_3, 3, getBlockHash(blk_0), get_test_target(), first_miner_account, ts_start + 10, tx_0);
     //DO_CALLBACK(events, "verify_callback_2");
 
 /*    std::vector<const CryptoNote::Block*> chain;
     map_hash2tx_t mtx;
-    if (!find_block_chain(events, chain, mtx, get_block_hash(blk_6)))
+    if (!find_block_chain(events, chain, mtx, getBlockHash(blk_6)))
         throw;
     cout << "miner = " << get_balance(first_miner_account, events, chain, mtx) << endl;
     cout << "alice = " << get_balance(alice, events, chain, mtx) << endl;*/

@@ -172,7 +172,7 @@ bool core::getTransactionsWithOutputGlobalIndexes(const std::vector<Crypto::Hash
 	return m_blockchain.getTransactionsWithOutputGlobalIndexes(txsIds, missedTxs, txs);
 }
 
-bool core::get_alternative_blocks(std::list<Block> &blocks)
+bool core::getAlternativeBlocks(std::list<Block> &blocks)
 {
     return m_blockchain.getAlternativeBlocks(blocks);
 }
@@ -294,7 +294,7 @@ size_t core::addChain(const std::vector<const IBlock *> &chain)
         if (bvc.m_marked_as_orphaned || bvc.m_verification_failed) {
             logger(ERROR, BRIGHT_RED)
                 << "core::addChain() failed to handle incoming block "
-                << get_block_hash(block->getBlock())
+                << getBlockHash(block->getBlock())
                 << ", "
                 << blocksCounter
                 << "/"
@@ -1034,14 +1034,14 @@ bool core::handle_incoming_block(
         std::list<Crypto::Hash> missed_txs;
         std::list<Transaction> txs;
         m_blockchain.getTransactions(b.transactionHashes, txs, missed_txs);
-        if (!missed_txs.empty() && getBlockIdByHeight(get_block_height(b)) != get_block_hash(b)) {
+        if (!missed_txs.empty() && getBlockIdByHeight(get_block_height(b)) != getBlockHash(b)) {
             logger(INFO)
                 << "Block added, but it seems that reorganize just happened after that, "
                 << "do not relay this block";
         } else {
             if (!(txs.size() == b.transactionHashes.size() && missed_txs.empty())) {
                 logger(ERROR, BRIGHT_RED)
-                    << "can't find some transactions in found block:" << get_block_hash(b)
+                    << "can't find some transactions in found block:" << getBlockHash(b)
                     << " txs.size()=" << txs.size()
                     << ", b.transactionHashes.size()=" << b.transactionHashes.size()
                     << ", missed_txs.size()" << missed_txs.size();
@@ -1263,7 +1263,7 @@ bool core::queryBlocks(
     for (auto &b : blocks) {
         BlockFullInfo item;
 
-        item.block_id = get_block_hash(b);
+        item.block_id = getBlockHash(b);
 
         if (b.timestamp >= timestamp) {
             // query transactions
@@ -1374,7 +1374,7 @@ bool core::queryBlocksLite(
     for (auto &b : blocks) {
         BlockShortInfo item;
 
-        item.blockId = get_block_hash(b);
+        item.blockId = getBlockHash(b);
 
         if (b.timestamp >= timestamp) {
             std::list<Transaction> txs;
@@ -1439,7 +1439,7 @@ bool core::queryBlocksDetailed(
     for (auto &b : blocks) {
         BlockFullInfo item;
 
-        item.block_id = get_block_hash(b);
+        item.block_id = getBlockHash(b);
 
         if (b.timestamp >= timestamp) {
             // query transactions
@@ -1786,7 +1786,7 @@ size_t core::median(std::vector<size_t> &v)
 
 bool core::fillBlockDetails(const Block &block, BlockDetails &blockDetails)
 {
-    Crypto::Hash hash = get_block_hash(block);
+    Crypto::Hash hash = getBlockHash(block);
 
     blockDetails.majorVersion = block.majorVersion;
     blockDetails.minorVersion = block.minorVersion;

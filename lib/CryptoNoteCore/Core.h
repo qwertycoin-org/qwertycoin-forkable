@@ -240,7 +240,7 @@ public:
     bool getBlockByHash(const Crypto::Hash &h, Block &blk) override;
     bool getBlockHeight(const Crypto::Hash &blockId, uint32_t &blockHeight) override;
 
-    bool get_alternative_blocks(std::list<Block> &blocks);
+    bool getAlternativeBlocks(std::list<Block> &blocks);
     size_t getAlternativeBlocksCount();
 
     virtual bool getBlockEntry(uint32_t height,

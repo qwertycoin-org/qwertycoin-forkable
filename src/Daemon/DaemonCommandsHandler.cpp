@@ -469,7 +469,7 @@ bool DaemonCommandsHandler::print_block_by_height(uint32_t height)
     m_core.get_blocks(height, 1, blocks);
 
     if (1 == blocks.size()) {
-        std::cout << "block_id: " << get_block_hash(blocks.front()) << ENDL;
+        std::cout << "block_id: " << getBlockHash(blocks.front()) << ENDL;
         print_as_json(blocks.front());
     } else {
         uint32_t current_height;

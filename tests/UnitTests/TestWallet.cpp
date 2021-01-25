@@ -3554,7 +3554,7 @@ TEST_F(WalletApi, getTransactionsReturnsBlockWithCorrectHash) {
   node.updateObservers();
   waitForWalletEvent(alice, CryptoNote::WalletEventType::SYNC_COMPLETED, std::chrono::seconds(3));
 
-  Crypto::Hash lastBlockHash = get_block_hash(generator.getBlockchain().back());
+  Crypto::Hash lastBlockHash = getBlockHash(generator.getBlockchain().back());
   auto transactions = alice.getTransactions(lastBlockHash, 1);
 
   ASSERT_EQ(1, transactions.size());
@@ -3571,7 +3571,7 @@ TEST_F(WalletApi, getTransactionsReturnsCorrectTransactionByBlockHash) {
   node.updateObservers();
   waitForWalletEvent(alice, CryptoNote::WalletEventType::SYNC_COMPLETED, std::chrono::seconds(3));
 
-  Crypto::Hash lastBlockHash = get_block_hash(generator.getBlockchain().back());
+  Crypto::Hash lastBlockHash = getBlockHash(generator.getBlockchain().back());
   auto transactions = alice.getTransactions(lastBlockHash, 1);
 
   ASSERT_TRUE(transactionWithTransfersFound(alice, transactions, transactionId));
@@ -3685,13 +3685,13 @@ TEST_F(WalletApi, getTransactionsDoesntReturnDeletedTransactions) {
 
 TEST_F(WalletApi, getTransactionsByBlockHashThrowsIfNotInitialized) {
   CryptoNote::WalletGreen bob(dispatcher, currency, node, logger, TRANSACTION_SOFTLOCK_TIME);
-  auto hash = get_block_hash(generator.getBlockchain().back());
+  auto hash = getBlockHash(generator.getBlockchain().back());
   ASSERT_ANY_THROW(bob.getTransactions(hash, 1));
 }
 
 TEST_F(WalletApi, getTransactionsByBlockHashThrowsIfStopped) {
   alice.stop();
-  auto hash = get_block_hash(generator.getBlockchain().back());
+  auto hash = getBlockHash(generator.getBlockchain().back());
   ASSERT_ANY_THROW(alice.getTransactions(hash, 1));
   alice.start();
 }
@@ -3720,7 +3720,7 @@ TEST_F(WalletApi, getBlockHashesReturnsNewBlocks) {
 
   waitForPredicate(alice, [this] { return alice.getBlockCount() == 3; }, std::chrono::seconds(5));
 
-  auto hash = get_block_hash(generator.getBlockchain().back());
+  auto hash = getBlockHash(generator.getBlockchain().back());
   auto hashes = alice.getBlockHashes(0, generator.getBlockchain().size());
 
   ASSERT_EQ(generator.getBlockchain().size(), hashes.size());
@@ -3738,7 +3738,7 @@ TEST_F(WalletApi, getBlockHashesReturnsCorrectBlockHashesAfterDetach) {
 
   waitForWalletEvent(alice, CryptoNote::WalletEventType::SYNC_COMPLETED, std::chrono::seconds(3));
 
-  auto hash = get_block_hash(generator.getBlockchain()[1]);
+  auto hash = getBlockHash(generator.getBlockchain()[1]);
   auto hashes = alice.getBlockHashes(0, 2);
 
   ASSERT_EQ(2, hashes.size());

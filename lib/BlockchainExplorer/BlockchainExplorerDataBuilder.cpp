@@ -35,7 +35,7 @@ BlockchainExplorerDataBuilder::BlockchainExplorerDataBuilder(ICore &core,
 
 bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block, BlockDetails& blockDetails)
 {
-    Crypto::Hash hash = get_block_hash(block);
+    Crypto::Hash hash = getBlockHash(block);
 
     blockDetails.majorVersion = block.majorVersion;
     blockDetails.minorVersion = block.minorVersion;
