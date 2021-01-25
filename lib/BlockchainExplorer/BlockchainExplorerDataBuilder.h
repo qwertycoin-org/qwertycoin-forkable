@@ -31,7 +31,9 @@ public:
     BlockchainExplorerDataBuilder(const BlockchainExplorerDataBuilder &) = delete;
     BlockchainExplorerDataBuilder(BlockchainExplorerDataBuilder &&) = delete;
 
-    bool fillBlockDetails(const Block &block, BlockDetails &blockDetails);
+    bool fillBlockDetails(const Block &block,
+                          BlockDetails &blockDetails,
+                          bool calculatePoW = false);
     bool fillTransactionDetails(const Transaction &tx,
                                 TransactionDetails &txRpcInfo,
                                 uint64_t timestamp = 0);

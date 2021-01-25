@@ -274,13 +274,14 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
                 true } }
         };
 
-RpcServer::RpcServer(System::Dispatcher &dispatcher, Logging::ILogger &log, core &c,
-                     NodeServer &p2p, const ICryptoNoteProtocolQuery &protocolQuery)
+RpcServer::RpcServer(System::Dispatcher &dispatcher, Logging::ILogger &log, core &core,
+                     NodeServer &p2p, ICryptoNoteProtocolQuery &protocolQuery)
     : HttpServer(dispatcher, log),
       logger(log, "RpcServer"),
-      m_core(c),
+      m_core(core),
       m_p2p(p2p),
-      m_protocolQuery(protocolQuery)
+      m_protocolQuery(protocolQuery),
+      blockchainExplorerDataBuilder(core, protocolQuery)
 {
 }
 
@@ -401,7 +402,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
 
                     TransactionDetails transactionsDetails;
 
-                    bool r = m_core.fillTransactionDetails(txs.back(), transactionsDetails);
+                    bool r = blockchainExplorerDataBuilder.fillTransactionDetails(txs.back(), transactionsDetails);
                     if (r) {
                         response.addHeader("Content-Type", "application/json");
                         response.setStatus(HttpResponse::HTTP_STATUS::STATUS_200);
@@ -971,7 +972,7 @@ bool RpcServer::onGetBlocksDetailsByHeights(
                                                       + std::to_string(height) + '.' };
             }
             BlockDetails detail;
-            if (!m_core.fillBlockDetails(blk, detail)) {
+            if (!blockchainExplorerDataBuilder.fillBlockDetails(blk, detail, false)) {
                 throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                                               "Internal error: can't fill block details." };
             }
@@ -1006,7 +1007,7 @@ bool RpcServer::onGetBlocksDetailsByHashes(
                 //};
             }
             BlockDetails detail;
-            if (!m_core.fillBlockDetails(blk, detail)) {
+            if (!blockchainExplorerDataBuilder.fillBlockDetails(blk, detail, false)) {
                 throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                                               "Internal error: can't fill block details." };
             }
@@ -1047,7 +1048,7 @@ bool RpcServer::onGetBlockDetailsByHeight(
                                           "Internal error: can't get block by height "
                                                   + std::to_string(req.blockHeight) + '.' };
         }
-        if (!m_core.fillBlockDetails(blk, blockDetails)) {
+        if (!blockchainExplorerDataBuilder.fillBlockDetails(blk, blockDetails, true)) {
             throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                                           "Internal error: can't fill block details." };
         }
@@ -1083,7 +1084,7 @@ bool RpcServer::onGetBlockDetailsByHash(const COMMAND_RPC_GET_BLOCK_DETAILS_BY_H
                                           "Internal error: can't get block by hash. Hash = "
                                                   + req.hash + '.' };
         }
-        if (!m_core.fillBlockDetails(blk, blockDetails)) {
+        if (!blockchainExplorerDataBuilder.fillBlockDetails(blk, blockDetails, true)) {
             throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                                           "Internal error: can't fill block details." };
         }
@@ -1144,7 +1145,7 @@ bool RpcServer::onGetTransactionsDetailsByHashes(
         if (!txs.empty()) {
             for (const Transaction &tx : txs) {
                 TransactionDetails txDetails;
-                if (!m_core.fillTransactionDetails(tx, txDetails)) {
+                if (!blockchainExplorerDataBuilder.fillTransactionDetails(tx, txDetails)) {
                     throw JsonRpc::JsonRpcError {
                         CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                         "Internal error: can't fill transaction details."
@@ -1201,7 +1202,7 @@ bool RpcServer::onGetTransactionDetailsByHash(
         }
 
         TransactionDetails transactionsDetails;
-        if (!m_core.fillTransactionDetails(txs.back(), transactionsDetails)) {
+        if (!blockchainExplorerDataBuilder.fillTransactionDetails(txs.back(), transactionsDetails)) {
             throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                                           "Internal error: can't fill transaction details." };
         }

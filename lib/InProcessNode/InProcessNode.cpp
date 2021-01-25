@@ -800,7 +800,9 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<uint32_t> &blockHei
                 return make_error_code(CryptoNote::error::INTERNAL_NODE_ERROR);
             }
             BlockDetails blockDetails;
-            if (!blockchainExplorerDataBuilder.fillBlockDetails(block, blockDetails)) {
+            if (!blockchainExplorerDataBuilder.fillBlockDetails(block,
+                                                                blockDetails,
+                                                                false)) {
                 return make_error_code(CryptoNote::error::INTERNAL_NODE_ERROR);
             }
             std::vector<BlockDetails> blocksOnSameHeight;
@@ -812,7 +814,8 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<uint32_t> &blockHei
             for (const Block &orphanBlock : orphanBlocks) {
                 BlockDetails orphanBlockDetails;
                 if (!blockchainExplorerDataBuilder.fillBlockDetails(orphanBlock,
-                                                                    orphanBlockDetails)) {
+                                                                    orphanBlockDetails,
+                                                                    false)) {
                     return make_error_code(CryptoNote::error::INTERNAL_NODE_ERROR);
                 }
                 blocksOnSameHeight.push_back(std::move(orphanBlockDetails));
@@ -877,7 +880,9 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<Crypto::Hash> &bloc
                 return make_error_code(CryptoNote::error::REQUEST_ERROR);
             }
             BlockDetails blockDetails;
-            if (!blockchainExplorerDataBuilder.fillBlockDetails(block, blockDetails)) {
+            if (!blockchainExplorerDataBuilder.fillBlockDetails(block,
+                                                                blockDetails,
+                                                                false)) {
                 return make_error_code(CryptoNote::error::INTERNAL_NODE_ERROR);
             }
             blocks.push_back(std::move(blockDetails));
@@ -965,7 +970,9 @@ std::error_code InProcessNode::doGetBlocks(uint64_t timestampBegin,
         }
         for (const Block &rawBlock : rawBlocks) {
             BlockDetails block;
-            if (!blockchainExplorerDataBuilder.fillBlockDetails(rawBlock, block)) {
+            if (!blockchainExplorerDataBuilder.fillBlockDetails(rawBlock,
+                                                                block,
+                                                                false)) {
                 return make_error_code(CryptoNote::error::INTERNAL_NODE_ERROR);
             }
             blocks.push_back(std::move(block));

@@ -176,12 +176,6 @@ public:
     uint8_t getCurrentBlockMajorVersion() override;
     uint8_t getBlockMajorVersionForHeight(uint32_t height) override;
 
-    bool fillBlockDetails(const CryptoNote::Block &block, BlockDetails &blockDetails);
-    bool fillTransactionDetails(
-        const Transaction &tx,
-        TransactionDetails &txRpcInfo,
-        uint64_t timestamp = 0);
-
     static bool getPaymentId(const Transaction &transaction, Crypto::Hash &paymentId);
 
     bool have_block(const Crypto::Hash &id) override;
@@ -308,8 +302,6 @@ public:
 
     bool is_key_image_spent(const Crypto::KeyImage &key_im);
 
-    bool fillTxExtra(const std::vector<uint8_t> &rawExtra, TransactionExtraDetails &extraDetails);
-
     void setBlocksToFind(uint64_t blocksToFind);
 
 private:
@@ -360,8 +352,6 @@ private:
         uint32_t &startFullOffset);
 
     std::vector<Crypto::Hash> findIdsForShortBlocks(uint32_t startOffset, uint32_t startFullOffset);
-
-    size_t median(std::vector<size_t> &v);
 
     const Currency &m_currency;
     Logging::LoggerRef logger;

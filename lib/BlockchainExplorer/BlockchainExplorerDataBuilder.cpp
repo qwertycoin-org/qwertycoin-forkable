@@ -28,12 +28,12 @@ namespace CryptoNote {
 
 BlockchainExplorerDataBuilder::BlockchainExplorerDataBuilder(ICore &core,
                                                              ICryptoNoteProtocolQuery &protocol)
-    : m_core(core),
-      m_protocol(protocol)
+    : m_core(core), m_protocol(protocol)
 {
 }
 
-bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block, BlockDetails& blockDetails)
+bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block, BlockDetails &blockDetails,
+                                                     bool calculatePoW)
 {
     Crypto::Hash hash = getBlockHash(block);
 
@@ -58,17 +58,29 @@ bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block, BlockDe
     Crypto::Hash tmpHash = m_core.getBlockIdByHeight(blockDetails.height);
     blockDetails.isOrphaned = hash != tmpHash;
 
+    blockDetails.proofOfWork = boost::value_initialized<Crypto::Hash>();
+    if (calculatePoW) {
+        Crypto::cn_context context;
+        if (!getBlockLongHash(context, block, blockDetails.proofOfWork)) {
+            return false;
+        }
+    }
+
     if (!m_core.getBlockDifficulty(blockDetails.height, blockDetails.difficulty)) {
         return false;
     }
 
     std::vector<size_t> blocksSizes;
-    if (!m_core.getBackwardBlocksSizes(blockDetails.height,
-                                       blocksSizes,
+    if (!m_core.getBackwardBlocksSizes(blockDetails.height, blocksSizes,
                                        parameters::CRYPTONOTE_REWARD_BLOCKS_WINDOW)) {
         return false;
     }
     blockDetails.sizeMedian = median(blocksSizes);
+
+    size_t blockGrantedFullRewardZone =
+            CryptoNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
+    blockDetails.effectiveSizeMedian =
+            std::max(blockDetails.sizeMedian, (uint64_t)blockGrantedFullRewardZone);
 
     size_t blockSize = 0;
     if (!m_core.getBlockSize(hash, blockSize)) {
@@ -76,9 +88,10 @@ bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block, BlockDe
     }
     blockDetails.transactionsCumulativeSize = blockSize;
 
-    size_t blokBlobSize = getObjectBinarySize(block);
+    size_t blockBlobSize = getObjectBinarySize(block);
     size_t minerTxBlobSize = getObjectBinarySize(block.baseTransaction);
-    blockDetails.blockSize = blokBlobSize+blockDetails.transactionsCumulativeSize-minerTxBlobSize;
+    blockDetails.blockSize =
+            blockBlobSize + blockDetails.transactionsCumulativeSize - minerTxBlobSize;
 
     if (!m_core.getAlreadyGeneratedCoins(hash, blockDetails.alreadyGeneratedCoins)) {
         return false;
@@ -107,27 +120,15 @@ bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block, BlockDe
     uint64_t maxReward = 0;
     uint64_t currentReward = 0;
     int64_t emissionChange = 0;
-    if (!m_core.getBlockReward(block.majorVersion,
-                               blockDetails.sizeMedian,
-                               0,
-                               prevBlockGeneratedCoins,
-                               0,
-                               maxReward,
-                               emissionChange,
-                               blockDetails.height,
-                               blockTarget)) {
+    if (!m_core.getBlockReward(block.majorVersion, blockDetails.sizeMedian, 0,
+                               prevBlockGeneratedCoins, 0, maxReward, emissionChange,
+                               blockDetails.height, blockTarget)) {
         return false;
     }
 
-    if (!m_core.getBlockReward(block.majorVersion,
-                               blockDetails.sizeMedian,
-                               blockDetails.transactionsCumulativeSize,
-                               prevBlockGeneratedCoins,
-                               0,
-                               currentReward,
-                               emissionChange,
-                               blockDetails.height,
-                               blockTarget)) {
+    if (!m_core.getBlockReward(block.majorVersion, blockDetails.sizeMedian,
+                               blockDetails.transactionsCumulativeSize, prevBlockGeneratedCoins, 0,
+                               currentReward, emissionChange, blockDetails.height, blockTarget)) {
         return false;
     }
 
@@ -158,13 +159,13 @@ bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block, BlockDe
 
     blockDetails.totalFeeAmount = 0;
 
-    for (const Transaction& tx : found) {
-        TransactionDetails td;
-        if (!fillTransactionDetails(tx, td, block.timestamp)) {
+    for (const Transaction &tx : found) {
+        TransactionDetails txDetails;
+        if (!fillTransactionDetails(tx, txDetails, block.timestamp)) {
             return false;
         }
-        blockDetails.transactions.push_back(std::move(td));
-        blockDetails.totalFeeAmount += td.fee;
+        blockDetails.totalFeeAmount += txDetails.fee;
+        blockDetails.transactions.push_back(std::move(txDetails));
     }
 
     return true;
@@ -209,7 +210,7 @@ bool BlockchainExplorerDataBuilder::fillTransactionDetails(const Transaction &tr
     }
     transactionDetails.totalInputsAmount = inputsAmount;
 
-    if (transaction.inputs.size() > 0 && transaction.inputs.front().type() == typeid(BaseInput)) {
+    if (!transaction.inputs.empty() && transaction.inputs.front().type() == typeid(BaseInput)) {
         // it's gen transaction
         transactionDetails.fee = 0;
         transactionDetails.mixin = 0;
@@ -226,7 +227,7 @@ bool BlockchainExplorerDataBuilder::fillTransactionDetails(const Transaction &tr
         transactionDetails.mixin = mixin;
     }
 
-    Crypto::Hash paymentId;
+    Crypto::Hash paymentId {};
     if (getPaymentId(transaction, paymentId)) {
         transactionDetails.paymentId = paymentId;
     } else {
@@ -251,37 +252,45 @@ bool BlockchainExplorerDataBuilder::fillTransactionDetails(const Transaction &tr
         TransactionInputDetails txInDetails;
 
         if (txIn.type() == typeid(BaseInput)) {
-            BaseInputDetails txInGenDetails;
+            BaseInputDetails txInGenDetails {};
             txInGenDetails.input.blockIndex = boost::get<BaseInput>(txIn).blockIndex;
             txInGenDetails.amount = 0;
-            for (const TransactionOutput& out : transaction.outputs) {
+
+            for (const TransactionOutput &out : transaction.outputs) {
                 txInGenDetails.amount += out.amount;
             }
+
             txInDetails = txInGenDetails;
         } else if (txIn.type() == typeid(KeyInput)) {
             KeyInputDetails txInToKeyDetails;
-            const KeyInput& txInToKey = boost::get<KeyInput>(txIn);
+            const KeyInput &txInToKey = boost::get<KeyInput>(txIn);
             txInToKeyDetails.input = txInToKey;
             std::list<std::pair<Crypto::Hash, size_t>> outputReferences;
+
             if (!m_core.scanOutputkeysForIndices(txInToKey, outputReferences)) {
                 return false;
             }
+
             txInToKeyDetails.mixin = txInToKey.outputIndexes.size();
+
             for (const auto &r : outputReferences) {
-                TransactionOutputReferenceDetails d;
+                TransactionOutputReferenceDetails d {};
                 d.number = r.second;
                 d.transactionHash = r.first;
                 txInToKeyDetails.outputs.push_back(d);
             }
             txInDetails = txInToKeyDetails;
+
         } else if (txIn.type() == typeid(MultiSignatureInput)) {
-            MultiSignatureInputDetails txInMultiSigDetails;
+            MultiSignatureInputDetails txInMultiSigDetails {};
             const MultiSignatureInput &txInMultiSig = boost::get<MultiSignatureInput>(txIn);
             txInMultiSigDetails.input = txInMultiSig;
             std::pair<Crypto::Hash, size_t> outputReference;
+
             if (!m_core.getMultisigOutputReference(txInMultiSig, outputReference)) {
                 return false;
             }
+
             txInMultiSigDetails.output.number = outputReference.second;
             txInMultiSigDetails.output.transactionHash = outputReference.first;
             txInDetails = txInMultiSigDetails;
@@ -294,7 +303,8 @@ bool BlockchainExplorerDataBuilder::fillTransactionDetails(const Transaction &tr
     transactionDetails.outputs.reserve(transaction.outputs.size());
     std::vector<uint32_t> globalIndices;
     globalIndices.reserve(transaction.outputs.size());
-    if (!transactionDetails.inBlockchain || !m_core.getTxOutputsGlobalIndexes(hash, globalIndices)) {
+    if (!transactionDetails.inBlockchain
+        || !m_core.getTxOutputsGlobalIndexes(hash, globalIndices)) {
         for (size_t i = 0; i < transaction.outputs.size(); ++i) {
             globalIndices.push_back(0);
         }
@@ -356,9 +366,11 @@ bool BlockchainExplorerDataBuilder::fillTxExtra(const std::vector<uint8_t> &rawE
 
     for (const TransactionExtraField &field : txExtraFields) {
         if (typeid(TransactionExtraPadding) == field.type()) {
-            extraDetails.padding.push_back(std::move(boost::get<TransactionExtraPadding>(field).size));
+            extraDetails.padding.push_back(
+                    std::move(boost::get<TransactionExtraPadding>(field).size));
         } else if (typeid(TransactionExtraPublicKey) == field.type()) {
-            extraDetails.publicKey.push_back(std::move(boost::get<TransactionExtraPublicKey>(field).publicKey));
+            extraDetails.publicKey.push_back(
+                    std::move(boost::get<TransactionExtraPublicKey>(field).publicKey));
         } else if (typeid(TransactionExtraNonce) == field.type()) {
             extraDetails.nonce = boost::get<TransactionExtraNonce>(field).nonce;
         }
@@ -379,7 +391,7 @@ size_t BlockchainExplorerDataBuilder::median(std::vector<size_t> &v)
 
     size_t n = (v.size()) / 2;
     std::sort(v.begin(), v.end());
-    //nth_element(v.begin(), v.begin()+n-1, v.end());
+    // nth_element(v.begin(), v.begin()+n-1, v.end());
     if (v.size() % 2) { // 1, 3, 5...
         return v[n];
     } else { // 2, 4, 6...

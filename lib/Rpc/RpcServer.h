@@ -22,10 +22,16 @@
 
 #include <functional>
 #include <unordered_map>
+
+#include <BlockchainExplorer/BlockchainExplorerDataBuilder.h>
+
 #include <Common/Math.h>
+
 #include <CryptoNoteCore/ITransaction.h>
+
 #include <Global/Constants.h>
 #include <Logging/LoggerRef.h>
+
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
 #include <Rpc/HttpServer.h>
 
@@ -53,8 +59,11 @@ public:
     typedef std::function<bool(RpcServer *, const HttpRequest &request, HttpResponse &response)>
             HandlerFunction;
 
-    RpcServer(System::Dispatcher &dispatcher, Logging::ILogger &log, core &c, NodeServer &p2p,
-              const ICryptoNoteProtocolQuery &protocolQuery);
+    RpcServer(System::Dispatcher &dispatcher,
+              Logging::ILogger &log,
+              core &core,
+              NodeServer &p2p,
+              ICryptoNoteProtocolQuery &protocolQuery);
 
     bool restrictRPC(const bool is_resctricted);
 
@@ -264,6 +273,7 @@ private:
 
 private:
     static std::unordered_map<std::string, RpcHandler<HandlerFunction>> s_handlers;
+    CryptoNote::BlockchainExplorerDataBuilder blockchainExplorerDataBuilder;
     Logging::LoggerRef logger;
     core &m_core;
     NodeServer &m_p2p;
