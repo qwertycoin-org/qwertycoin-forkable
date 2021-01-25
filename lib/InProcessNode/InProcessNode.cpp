@@ -133,7 +133,7 @@ void InProcessNode::workerFunc()
 }
 
 void InProcessNode::getNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
-                                 std::vector<CryptoNote::block_complete_entry> &newBlocks,
+                                 std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                                  uint32_t &startHeight,
                                  const Callback &callback)
 {
@@ -156,7 +156,7 @@ void InProcessNode::getNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
 }
 
 void InProcessNode::getNewBlocksAsync(std::vector<Crypto::Hash> &knownBlockIds,
-                                      std::vector<CryptoNote::block_complete_entry> &newBlocks,
+                                      std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                                       uint32_t &startHeight, const Callback &callback)
 {
     std::error_code ec = doGetNewBlocks(std::move(knownBlockIds), newBlocks, startHeight);
@@ -166,7 +166,7 @@ void InProcessNode::getNewBlocksAsync(std::vector<Crypto::Hash> &knownBlockIds,
 // it's always protected with mutex
 std::error_code InProcessNode::doGetNewBlocks(
     std::vector<Crypto::Hash> &&knownBlockIds,
-    std::vector<CryptoNote::block_complete_entry> &newBlocks,
+    std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
     uint32_t &startHeight)
 {
     {
@@ -201,7 +201,7 @@ std::error_code InProcessNode::doGetNewBlocks(
 
             assert(completeBlock != nullptr);
 
-            CryptoNote::block_complete_entry be;
+            CryptoNote::BlockCompleteEntry be;
             be.block = asString(toBinaryArray(completeBlock->getBlock()));
 
             be.txs.reserve(completeBlock->getTransactionCount());

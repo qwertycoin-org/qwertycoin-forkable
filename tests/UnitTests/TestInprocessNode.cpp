@@ -226,7 +226,7 @@ TEST_F(InProcessNodeTests, getLastKnownBlockHeightUninitialized) {
 TEST_F(InProcessNodeTests, getNewBlocksUninitialized) {
   CryptoNote::InProcessNode newNode(coreStub, protocolQueryStub);
   std::vector<Crypto::Hash> knownBlockIds;
-  std::vector<CryptoNote::block_complete_entry> newBlocks;
+  std::vector<CryptoNote::BlockCompleteEntry> newBlocks;
   uint32_t startHeight;
 
   CallbackStatus status;

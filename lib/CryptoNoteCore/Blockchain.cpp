@@ -1909,8 +1909,8 @@ bool Blockchain::handleGetObjects(
                 << "for block id = " << get_block_hash(bl);
             return false;
         }
-        rsp.blocks.push_back(block_complete_entry());
-        block_complete_entry& e = rsp.blocks.back();
+        rsp.blocks.push_back(BlockCompleteEntry());
+        BlockCompleteEntry & e = rsp.blocks.back();
         //pack block
         e.block = asString(toBinaryArray(bl));
         //pack transactions

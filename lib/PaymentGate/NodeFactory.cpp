@@ -65,7 +65,7 @@ public:
 
     void getNewBlocks(
         std::vector<Crypto::Hash> &&knownBlockIds,
-        std::vector<CryptoNote::block_complete_entry> &newBlocks,
+        std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
         uint32_t &startHeight,
         const Callback &callback) override
     {

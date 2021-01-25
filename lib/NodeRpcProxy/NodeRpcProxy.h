@@ -90,7 +90,7 @@ public:
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result,
         const Callback &callback) override;
     void getNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
-                      std::vector<CryptoNote::block_complete_entry> &newBlocks,
+                      std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                       uint32_t &startHeight,
                       const Callback &callback) override;
     void getTransactionOutsGlobalIndices(const Crypto::Hash &transactionHash,
@@ -162,7 +162,7 @@ private:
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result);
     std::error_code doGetNewBlocks(std::vector<Crypto::Hash> &knownBlockIds,
-                                   std::vector<CryptoNote::block_complete_entry> &newBlocks,
+                                   std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                                    uint32_t &startHeight);
     std::error_code doGetTransactionOutsGlobalIndices(const Crypto::Hash &transactionHash,
                                                       std::vector<uint32_t> &outsGlobalIndices);

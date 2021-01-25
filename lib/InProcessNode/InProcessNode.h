@@ -61,7 +61,7 @@ public:
     uint32_t getGRBHeight() const override;
 
     void getNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
-                      std::vector<CryptoNote::block_complete_entry> &newBlocks,
+                      std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                       uint32_t &startHeight,
                       const Callback &callback) override;
     void getTransactionOutsGlobalIndices(const Crypto::Hash &transactionHash,
@@ -129,11 +129,11 @@ private:
     void updateLastLocalBlockHeaderInfo();
     void resetLastLocalBlockHeaderInfo();
     void getNewBlocksAsync(std::vector<Crypto::Hash> &knownBlockIds,
-                           std::vector<CryptoNote::block_complete_entry> &newBlocks,
+                           std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                            uint32_t &startHeight,
                            const Callback &callback);
     std::error_code doGetNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
-                                   std::vector<CryptoNote::block_complete_entry> &newBlocks,
+                                   std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                                    uint32_t &startHeight);
 
     void getTransactionOutsGlobalIndicesAsync(const Crypto::Hash &transactionHash,

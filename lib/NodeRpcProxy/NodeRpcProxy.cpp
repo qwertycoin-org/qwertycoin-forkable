@@ -452,7 +452,7 @@ void NodeRpcProxy::getRandomOutsByAmounts(
 }
 
 void NodeRpcProxy::getNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
-                                std::vector<CryptoNote::block_complete_entry> &newBlocks,
+                                std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                                 uint32_t &startHeight,
                                 const Callback &callback)
 {
@@ -695,7 +695,7 @@ std::error_code NodeRpcProxy::doGetRandomOutsByAmounts(
 
 std::error_code NodeRpcProxy::doGetNewBlocks(
     std::vector<Crypto::Hash> &knownBlockIds,
-    std::vector<CryptoNote::block_complete_entry> &newBlocks,
+    std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
     uint32_t &startHeight)
 {
     CryptoNote::COMMAND_RPC_GET_BLOCKS_FAST::request req = AUTO_VAL_INIT(req);

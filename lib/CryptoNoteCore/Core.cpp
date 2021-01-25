@@ -1272,7 +1272,7 @@ bool core::queryBlocks(
             lbs->getTransactions(b.transactionHashes, txs, missedTxs);
 
             // fill data
-            block_complete_entry& completeEntry = item;
+            BlockCompleteEntry & completeEntry = item;
             completeEntry.block = asString(toBinaryArray(b));
             for (auto &tx : txs) {
                 completeEntry.txs.push_back(asString(toBinaryArray(tx)));
@@ -1448,7 +1448,7 @@ bool core::queryBlocksDetailed(
             lbs->getTransactions(b.transactionHashes, txs, missedTxs);
 
             // fill data
-            block_complete_entry &completeEntry = item;
+            BlockCompleteEntry &completeEntry = item;
             completeEntry.block = asString(toBinaryArray(b));
             for (auto &tx : txs) {
                 completeEntry.txs.push_back(asString(toBinaryArray(tx)));

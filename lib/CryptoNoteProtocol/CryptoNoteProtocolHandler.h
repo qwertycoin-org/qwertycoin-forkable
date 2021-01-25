@@ -114,7 +114,7 @@ private:
     void updateObservedHeight(uint32_t peerHeight, const CryptoNoteConnectionContext &context);
     void recalculateMaxObservedHeight(const CryptoNoteConnectionContext &context);
     int processObjects(CryptoNoteConnectionContext &context,
-                       const std::vector<block_complete_entry> &blocks);
+                       const std::vector<BlockCompleteEntry> &blocks);
 
     Logging::LoggerRef logger;
 
