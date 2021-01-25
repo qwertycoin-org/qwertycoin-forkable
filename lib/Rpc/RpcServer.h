@@ -212,6 +212,9 @@ private:
     bool onBlocksListJson(const COMMAND_RPC_GET_BLOCKS_LIST::request &req,
                           COMMAND_RPC_GET_BLOCKS_LIST::response &res);
 
+    bool onAltBlocksListJson(const COMMAND_RPC_GET_ALT_BLOCKS_LIST::request &req,
+                             COMMAND_RPC_GET_ALT_BLOCKS_LIST::response &res);
+
     bool onBlockJson(const COMMAND_RPC_GET_BLOCK_DETAILS::request &req,
                      COMMAND_RPC_GET_BLOCK_DETAILS::response &res);
 
