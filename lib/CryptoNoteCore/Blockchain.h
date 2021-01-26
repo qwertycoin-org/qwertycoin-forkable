@@ -136,6 +136,13 @@ public:
     uint64_t getCurrentCumulativeBlocksizeLimit();
     uint64_t blockDifficulty(size_t i);
     uint64_t blockCumulativeDifficulty(size_t i);
+    bool getBlockEntry(size_t i,
+                       uint64_t &blockCumulativeSize,
+                       difficulty_type &difficulty,
+                       uint64_t &alreadyGeneratedCoins,
+                       uint64_t &reward,
+                       uint64_t &transactionsCount,
+                       uint64_t &timestamp);
     bool getBlockContainingTransaction(
         const Crypto::Hash &txId,
         Crypto::Hash &blockId,

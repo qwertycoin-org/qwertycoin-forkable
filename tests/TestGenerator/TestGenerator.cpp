@@ -66,7 +66,7 @@ uint64_t test_generator::getAlreadyGeneratedCoins(const Crypto::Hash& blockId) c
 
 uint64_t test_generator::getAlreadyGeneratedCoins(const CryptoNote::Block& blk) const {
   Crypto::Hash blkHash;
-  get_block_hash(blk, blkHash);
+  getBlockHash(blk, blkHash);
   return getAlreadyGeneratedCoins(blkHash);
 }
 
@@ -76,7 +76,7 @@ void test_generator::addBlock(const CryptoNote::Block& blk, size_t tsxSize, uint
   int64_t emissionChange;
   uint64_t blockReward;
   m_currency.getBlockReward(blk.majorVersion, Common::medianValue(blockSizes), blockSize, alreadyGeneratedCoins, fee, blockReward, emissionChange, 0);
-  m_blocksInfo[get_block_hash(blk)] = BlockInfo(blk.previousBlockHash, alreadyGeneratedCoins + emissionChange, blockSize);
+  m_blocksInfo[getBlockHash(blk)] = BlockInfo(blk.previousBlockHash, alreadyGeneratedCoins + emissionChange, blockSize);
 }
 
 bool test_generator::constructBlock(CryptoNote::Block& blk, uint32_t height, const Crypto::Hash& previousBlockHash,
@@ -161,7 +161,7 @@ bool test_generator::constructBlock(CryptoNote::Block& blk, const CryptoNote::Bl
                                     const CryptoNote::AccountBase& minerAcc,
                                     const std::list<CryptoNote::Transaction>& txList/* = std::list<CryptoNote::Transaction>()*/) {
   uint32_t height = boost::get<BaseInput>(blkPrev.baseTransaction.inputs.front()).blockIndex + 1;
-  Crypto::Hash previousBlockHash = get_block_hash(blkPrev);
+  Crypto::Hash previousBlockHash = getBlockHash(blkPrev);
   // Keep difficulty unchanged
   uint64_t timestamp = blkPrev.timestamp + m_currency.difficultyTarget();
   uint64_t alreadyGeneratedCoins = getAlreadyGeneratedCoins(previousBlockHash);
@@ -181,7 +181,7 @@ bool test_generator::constructBlockManually(Block& blk, const Block& prevBlock, 
   blk.majorVersion = actualParams & bf_major_ver ? majorVer  : defaultMajorVersion;
   blk.minorVersion = actualParams & bf_minor_ver ? minorVer  : defaultMinorVersion;
   blk.timestamp    = actualParams & bf_timestamp ? timestamp : prevBlock.timestamp + m_currency.difficultyTarget(); // Keep difficulty unchanged
-  blk.previousBlockHash       = actualParams & bf_prev_id   ? previousBlockHash    : get_block_hash(prevBlock);
+  blk.previousBlockHash       = actualParams & bf_prev_id   ? previousBlockHash    : getBlockHash(prevBlock);
   blk.transactionHashes     = actualParams & bf_tx_hashes ? transactionHashes  : std::vector<Crypto::Hash>();
 
   blk.parentBlock.baseTransaction.version = 0;
@@ -190,7 +190,7 @@ bool test_generator::constructBlockManually(Block& blk, const Block& prevBlock, 
   uint32_t height = get_block_height(prevBlock) + 1;
   uint64_t alreadyGeneratedCoins = getAlreadyGeneratedCoins(prevBlock);
   std::vector<size_t> blockSizes;
-  getLastNBlockSizes(blockSizes, get_block_hash(prevBlock), m_currency.rewardBlocksWindow());
+  getLastNBlockSizes(blockSizes, getBlockHash(prevBlock), m_currency.rewardBlocksWindow());
   if (actualParams & bf_miner_tx) {
     blk.baseTransaction = baseTransaction;
   } else {
@@ -226,7 +226,7 @@ bool test_generator::constructMaxSizeBlock(CryptoNote::Block& blk, const CryptoN
                                            const std::list<CryptoNote::Transaction>& txList/* = std::list<CryptoNote::Transaction>()*/) {
   std::vector<size_t> blockSizes;
   medianBlockCount = medianBlockCount == 0 ? m_currency.rewardBlocksWindow() : medianBlockCount;
-  getLastNBlockSizes(blockSizes, get_block_hash(blkPrev), medianBlockCount);
+  getLastNBlockSizes(blockSizes, getBlockHash(blkPrev), medianBlockCount);
 
   size_t median = Common::medianValue(blockSizes);
   size_t blockGrantedFullRewardZone = m_currency.blockGrantedFullRewardZoneByBlockVersion(defaultMajorVersion);

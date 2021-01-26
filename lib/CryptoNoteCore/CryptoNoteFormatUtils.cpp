@@ -597,7 +597,7 @@ bool get_block_hashing_blob(const Block &b, BinaryArray &ba)
     return true;
 }
 
-bool get_block_hash(const Block &b, Hash &res)
+bool getBlockHash(const Block &b, Hash &res)
 {
     BinaryArray ba;
     if (!get_block_hashing_blob(b, ba)) {
@@ -607,14 +607,14 @@ bool get_block_hash(const Block &b, Hash &res)
     return getObjectHash(ba, res);
 }
 
-Hash get_block_hash(const Block &b)
+Hash getBlockHash(const Block &b)
 {
     Hash p = NULL_HASH;
-    get_block_hash(b, p);
+    getBlockHash(b, p);
     return p;
 }
 
-bool get_block_longhash(cn_context &context, const Block &b, Hash &res)
+bool getBlockLongHash(cn_context &context, const Block &b, Hash &res)
 {
     BinaryArray bd;
     if (!get_block_hashing_blob(b, bd)) {

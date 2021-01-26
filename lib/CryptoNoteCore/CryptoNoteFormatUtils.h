@@ -146,9 +146,9 @@ bool generate_key_image_helper(
 std::string short_hash_str(const Crypto::Hash &h);
 
 bool get_block_hashing_blob(const Block &b, BinaryArray &blob);
-bool get_block_hash(const Block &b, Crypto::Hash &res);
-Crypto::Hash get_block_hash(const Block &b);
-bool get_block_longhash(Crypto::cn_context &context, const Block &b, Crypto::Hash &res);
+bool getBlockHash(const Block &b, Crypto::Hash &res);
+Crypto::Hash getBlockHash(const Block &b);
+bool getBlockLongHash(Crypto::cn_context &context, const Block &b, Crypto::Hash &res);
 bool getInputsMoneyAmount(const Transaction &tx, uint64_t &money);
 uint64_t getOutsMoneyAmount(const Transaction &tx);
 bool check_inputs_types_supported(const TransactionPrefix &tx);

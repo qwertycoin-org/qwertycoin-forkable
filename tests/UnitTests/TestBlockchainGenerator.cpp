@@ -118,7 +118,8 @@ void TestBlockchainGenerator::addGenesisBlock() {
   m_blockchain.push_back(m_currency.genesisBlock());
   addTx(m_currency.genesisBlock().baseTransaction);
 
-  m_timestampIndex.add(m_currency.genesisBlock().timestamp, CryptoNote::get_block_hash(m_currency.genesisBlock()));
+  m_timestampIndex.add(m_currency.genesisBlock().timestamp,
+                       CryptoNote::getBlockHash(m_currency.genesisBlock()));
   m_generatedTransactionsIndex.add(m_currency.genesisBlock());
 }
 
@@ -128,7 +129,7 @@ void TestBlockchainGenerator::addMiningBlock() {
   uint64_t timestamp = time(NULL);
   CryptoNote::Block& prev_block = m_blockchain.back();
   uint32_t height = boost::get<BaseInput>(prev_block.baseTransaction.inputs.front()).blockIndex + 1;
-  Crypto::Hash prev_id = get_block_hash(prev_block);
+  Crypto::Hash prev_id = getBlockHash(prev_block);
 
   std::vector<size_t> block_sizes;
   std::list<CryptoNote::Transaction> tx_list;
@@ -137,7 +138,7 @@ void TestBlockchainGenerator::addMiningBlock() {
   m_blockchain.push_back(block);
   addTx(block.baseTransaction);
 
-  m_timestampIndex.add(block.timestamp, CryptoNote::get_block_hash(block));
+  m_timestampIndex.add(block.timestamp, CryptoNote::getBlockHash(block));
   m_generatedTransactionsIndex.add(block);
 }
 
@@ -153,7 +154,7 @@ void TestBlockchainGenerator::generateEmptyBlocks(size_t count)
     m_blockchain.push_back(block);
     addTx(block.baseTransaction);
 
-    m_timestampIndex.add(block.timestamp, CryptoNote::get_block_hash(block));
+    m_timestampIndex.add(block.timestamp, CryptoNote::getBlockHash(block));
     m_generatedTransactionsIndex.add(block);
   }
 }
@@ -237,7 +238,7 @@ void TestBlockchainGenerator::addToBlockchain(const std::vector<CryptoNote::Tran
   m_blockchain.push_back(block);
   addTx(block.baseTransaction);
 
-  m_timestampIndex.add(block.timestamp, CryptoNote::get_block_hash(block));
+  m_timestampIndex.add(block.timestamp, CryptoNote::getBlockHash(block));
   m_generatedTransactionsIndex.add(block);
 }
 
@@ -246,7 +247,7 @@ void TestBlockchainGenerator::getPoolSymmetricDifference(std::vector<Crypto::Has
 {
   std::unique_lock<std::mutex> lock(m_mutex);
 
-  if (known_block_id != CryptoNote::get_block_hash(m_blockchain.back())) {
+  if (known_block_id != CryptoNote::getBlockHash(m_blockchain.back())) {
     is_bc_actual = false;
     return;
   }

@@ -53,7 +53,7 @@ template<class concrete_test>
 bool gen_double_spend_base<concrete_test>::mark_last_valid_block(CryptoNote::core& c, size_t /*ev_index*/, const std::vector<test_event_entry>& /*events*/)
 {
   std::list<CryptoNote::Block> block_list;
-  bool r = c.get_blocks(c.get_current_blockchain_height() - 1, 1, block_list);
+  bool r = c.get_blocks(c.getCurrentBlockchainHeight() - 1, 1, block_list);
   CHECK_AND_ASSERT_MES(r, false, "core::get_blocks failed");
   m_last_valid_block = block_list.back();
   return true;
@@ -97,7 +97,7 @@ bool gen_double_spend_base<concrete_test>::check_double_spend(CryptoNote::core& 
   std::vector<CryptoNote::Block> chain;
   map_hash2tx_t mtx;
   std::vector<CryptoNote::Block> blocks(block_list.begin(), block_list.end());
-  r = find_block_chain(events, chain, mtx, get_block_hash(blocks.back()));
+  r = find_block_chain(events, chain, mtx, getBlockHash(blocks.back()));
   CHECK_TEST_CONDITION(r);
   CHECK_EQ(concrete_test::expected_bob_balance, get_balance(bob_account, blocks, mtx));
   CHECK_EQ(concrete_test::expected_alice_balance, get_balance(alice_account, blocks, mtx));

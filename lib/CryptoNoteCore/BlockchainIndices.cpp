@@ -383,7 +383,7 @@ bool OrphanBlocksIndex::add(const Block &block)
         return false;
     }
 
-    Crypto::Hash blockHash = get_block_hash(block);
+    Crypto::Hash blockHash = getBlockHash(block);
     uint32_t blockHeight = boost::get<BaseInput>(block.baseTransaction.inputs.front()).blockIndex;
     index.emplace(blockHeight, blockHash);
 
@@ -396,7 +396,7 @@ bool OrphanBlocksIndex::remove(const Block &block)
         return false;
     }
 
-    Crypto::Hash blockHash = get_block_hash(block);
+    Crypto::Hash blockHash = getBlockHash(block);
     uint32_t blockHeight = boost::get<BaseInput>(block.baseTransaction.inputs.front()).blockIndex;
     auto range = index.equal_range(blockHeight);
     for (auto iter = range.first; iter != range.second; ++iter) {

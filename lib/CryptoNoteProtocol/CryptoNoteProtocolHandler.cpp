@@ -473,7 +473,7 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(
     context.m_remote_blockchain_height = arg.current_blockchain_height;
 
     size_t count = 0;
-    for (const block_complete_entry& block_entry : arg.blocks) {
+    for (const BlockCompleteEntry & block_entry : arg.blocks) {
         ++count;
         Block b;
         if (!fromBinaryArray(b, asBinaryArray(block_entry.block))) {
@@ -489,7 +489,7 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(
         // to avoid concurrency in core between connections,
         // suspend connections which delivered block later then first one
         if (count == 2) {
-            if (m_core.have_block(get_block_hash(b))) {
+            if (m_core.have_block(getBlockHash(b))) {
                 context.m_state = CryptoNoteConnectionContext::state_idle;
                 context.m_needed_objects.clear();
                 context.m_requested_objects.clear();
@@ -498,7 +498,7 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(
             }
         }
 
-        auto blockHash = get_block_hash(b);
+        auto blockHash = getBlockHash(b);
         auto req_it = context.m_requested_objects.find(blockHash);
         if (req_it == context.m_requested_objects.end()) {
             logger(Logging::ERROR)
@@ -515,7 +515,7 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(
                 << "sent wrong NOTIFY_RESPONSE_GET_OBJECTS: block with id="
                 << Common::podToHex(blockHash)
                 << ", transactionHashes.size()=" << b.transactionHashes.size()
-                << " mismatch with block_complete_entry.m_txs.size()=" << block_entry.txs.size()
+                << " mismatch with BlockCompleteEntry.m_txs.size()=" << block_entry.txs.size()
                 << ", dropping connection";
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
             return 1;
@@ -559,9 +559,9 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(
 }
 
 int CryptoNoteProtocolHandler::processObjects(CryptoNoteConnectionContext &context,
-                                              const std::vector<block_complete_entry> &blocks)
+                                              const std::vector<BlockCompleteEntry> &blocks)
 {
-    for (const block_complete_entry &block_entry : blocks) {
+    for (const BlockCompleteEntry &block_entry : blocks) {
         if (m_stop) {
             break;
         }

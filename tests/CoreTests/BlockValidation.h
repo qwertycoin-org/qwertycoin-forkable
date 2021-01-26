@@ -50,7 +50,7 @@ public:
 
     CHECK_TEST_CONDITION(m_invalidBlockIdx < eventIdx);
     CHECK_EQ(0, c.get_pool_transactions_count());
-    CHECK_EQ(m_invalidBlockIdx, c.get_current_blockchain_height());
+    CHECK_EQ(m_invalidBlockIdx, c.getCurrentBlockchainHeight());
 
     return true;
   }
@@ -83,7 +83,7 @@ struct CheckBlockAccepted : public test_chain_unit_base {
     DEFINE_TESTS_ERROR_CONTEXT("CheckBlockAccepted::check_block_accepted");
 
     CHECK_EQ(0, c.get_pool_transactions_count());
-    CHECK_EQ(m_expectedBlockchainHeight, c.get_current_blockchain_height());
+    CHECK_EQ(m_expectedBlockchainHeight, c.getCurrentBlockchainHeight());
 
     return true;
   }

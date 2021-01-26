@@ -226,7 +226,7 @@ TEST_F(InProcessNodeTests, getLastKnownBlockHeightUninitialized) {
 TEST_F(InProcessNodeTests, getNewBlocksUninitialized) {
   CryptoNote::InProcessNode newNode(coreStub, protocolQueryStub);
   std::vector<Crypto::Hash> knownBlockIds;
-  std::vector<CryptoNote::block_complete_entry> newBlocks;
+  std::vector<CryptoNote::BlockCompleteEntry> newBlocks;
   uint32_t startHeight;
 
   CallbackStatus status;
@@ -310,7 +310,7 @@ TEST_F(InProcessNodeTests, getBlocksByHeightMany) {
     EXPECT_EQ(sameHeight.get<1>().size(), 1);
     for (const CryptoNote::BlockDetails& block : sameHeight.get<1>()) {
       EXPECT_EQ(block.height, sameHeight.get<0>().get<0>());
-      Crypto::Hash expectedCryptoHash = CryptoNote::get_block_hash(sameHeight.get<0>().get<1>());
+      Crypto::Hash expectedCryptoHash = CryptoNote::getBlockHash(sameHeight.get<0>().get<1>());
       Hash expectedHash = reinterpret_cast<const Hash&>(expectedCryptoHash);
       EXPECT_EQ(block.hash, expectedHash);
       EXPECT_FALSE(block.isOrphaned);
@@ -382,7 +382,7 @@ TEST_F(InProcessNodeTests, getBlocksByHashMany) {
 
   for (auto iter = generator.getBlockchain().begin() + 1; iter != generator.getBlockchain().end(); iter++) {
     expectedBlocks.push_back(*iter);
-    blockHashes.push_back(CryptoNote::get_block_hash(*iter));
+    blockHashes.push_back(CryptoNote::getBlockHash(*iter));
     coreStub.addBlock(*iter);
   }
 
@@ -400,7 +400,7 @@ TEST_F(InProcessNodeTests, getBlocksByHashMany) {
   auto range1 = boost::combine(blockHashes, expectedBlocks);
   auto range = boost::combine(range1, actualBlocks);
   for (const boost::tuple<boost::tuple<Crypto::Hash, CryptoNote::Block>, CryptoNote::BlockDetails>& sameHeight : range) {
-    Crypto::Hash expectedCryptoHash = CryptoNote::get_block_hash(sameHeight.get<0>().get<1>());
+    Crypto::Hash expectedCryptoHash = CryptoNote::getBlockHash(sameHeight.get<0>().get<1>());
     EXPECT_EQ(expectedCryptoHash, sameHeight.get<0>().get<0>());
     Hash expectedHash = reinterpret_cast<const Hash&>(expectedCryptoHash);
     EXPECT_EQ(sameHeight.get<1>().hash, expectedHash);
@@ -478,7 +478,7 @@ TEST_F(InProcessNodeTests, getTxMany) {
     prevBlockchainSize = generator.getBlockchain().size();
     coreStub.addBlock(generator.getBlockchain().back());
     coreStub.addTransaction(tx);
-    expectedTransactions.push_back(std::make_tuple(tx, CryptoNote::get_block_hash(generator.getBlockchain().back()), boost::get<CryptoNote::BaseInput>(generator.getBlockchain().back().baseTransaction.inputs.front()).blockIndex));
+    expectedTransactions.push_back(std::make_tuple(tx, CryptoNote::getBlockHash(generator.getBlockchain().back()), boost::get<CryptoNote::BaseInput>(generator.getBlockchain().back().baseTransaction.inputs.front()).blockIndex));
   }
 
   ASSERT_EQ(transactionHashes.size(), BLOCKCHAIN_TX_NUMBER);
@@ -542,7 +542,7 @@ TEST_F(InProcessNodeTests, getTxFail) {
     prevBlockchainSize = generator.getBlockchain().size();
     coreStub.addBlock(generator.getBlockchain().back());
     coreStub.addTransaction(tx);
-    expectedTransactions.push_back(std::make_tuple(tx, CryptoNote::get_block_hash(generator.getBlockchain().back()), boost::get<CryptoNote::BaseInput>(generator.getBlockchain().back().baseTransaction.inputs.front()).blockIndex));
+    expectedTransactions.push_back(std::make_tuple(tx, CryptoNote::getBlockHash(generator.getBlockchain().back()), boost::get<CryptoNote::BaseInput>(generator.getBlockchain().back().baseTransaction.inputs.front()).blockIndex));
   }
 
   ASSERT_EQ(transactionHashes.size(), BLOCKCHAIN_TX_NUMBER);

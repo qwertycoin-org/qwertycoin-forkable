@@ -300,10 +300,17 @@ void ICoreStub::getTransactions(const std::vector<Crypto::Hash> &txs_ids,
     }
 }
 
-bool ICoreStub::getTransactionsWithOutputGlobalIndexes(const std::vector<Crypto::Hash> &txsIds,
-                                                       std::list<Crypto::Hash> &missedTxs,
-                                                       std::vector<std::pair<CryptoNote::Transaction,
-                                                                             std::vector<uint32_t>>> &txs)
+bool ICoreStub::getTransactionsWithOutputGlobalIndexes(
+        const std::vector<Crypto::Hash> &txsIds, std::list<Crypto::Hash> &missedTxs,
+        std::vector<std::pair<CryptoNote::Transaction, std::vector<uint32_t>>> &txs)
+{
+    return true;
+}
+
+bool ICoreStub::getBlockEntry(uint32_t height, uint64_t &blockCumulativeSize,
+                              CryptoNote::difficulty_type &difficulty,
+                              uint64_t &alreadyGeneratedCoins, uint64_t &reward,
+                              uint64_t &transactionsCount, uint64_t &timestamp)
 {
     return true;
 }
@@ -378,7 +385,7 @@ void ICoreStub::addBlock(const CryptoNote::Block &block)
 {
     uint32_t height =
             boost::get<CryptoNote::BaseInput>(block.baseTransaction.inputs.front()).blockIndex;
-    Crypto::Hash hash = CryptoNote::get_block_hash(block);
+    Crypto::Hash hash = CryptoNote::getBlockHash(block);
     if (height > topHeight || blocks.empty()) {
         topHeight = height;
         topId = hash;
@@ -499,7 +506,7 @@ uint64_t ICoreStub::getBlockTimestamp(uint32_t height)
 {
     return (uint64_t)4;
 }
-uint32_t ICoreStub::get_current_blockchain_height()
+uint32_t ICoreStub::getCurrentBlockchainHeight()
 {
     return (uint32_t)4;
 };

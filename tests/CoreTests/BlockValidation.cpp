@@ -211,7 +211,7 @@ bool gen_block_invalid_prev_id::generate(std::vector<test_event_entry>& events) 
   BLOCK_VALIDATION_INIT_GENERATE();
 
   Block blk_1;
-  Crypto::Hash prev_id = get_block_hash(blk_0);
+  Crypto::Hash prev_id = getBlockHash(blk_0);
   reinterpret_cast<char &>(prev_id) ^= 1;
   generator.constructBlockManually(blk_1, blk_0, miner_account,
     test_generator::bf_major_ver | test_generator::bf_prev_id, m_blockMajorVersion, 0, 0, prev_id);
@@ -834,7 +834,7 @@ bool gen_block_invalid_binary_format::check_all_blocks_purged(CryptoNote::core& 
   DEFINE_TESTS_ERROR_CONTEXT("gen_block_invalid_binary_format::check_all_blocks_purged");
 
   CHECK_EQ(1, c.get_pool_transactions_count());
-  CHECK_EQ(m_corrupt_blocks_begin_idx - 2, c.get_current_blockchain_height());
+  CHECK_EQ(m_corrupt_blocks_begin_idx - 2, c.getCurrentBlockchainHeight());
 
   return true;
 }

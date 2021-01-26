@@ -186,7 +186,7 @@ public:
                         << ")! Current last block index "
                         << (m_blockchain.size() - 1)
                         << ", hash "
-                        << get_block_hash(m_blockchain.back().bl);
+                        << getBlockHash(m_blockchain.back().bl);
                 }
             } else if (m_blockchain.size() == upgradeHeight() + 1) {
                 assert(m_blockchain.back().bl.majorVersion == m_targetVersion - 1);

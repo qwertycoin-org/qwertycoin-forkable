@@ -203,10 +203,17 @@ public:
     virtual uint64_t getMinimalFee() = 0;
     virtual uint64_t getBlockTimestamp(uint32_t height) = 0;
 
-    virtual uint32_t get_current_blockchain_height() = 0;
+    virtual uint32_t getCurrentBlockchainHeight() = 0;
     virtual uint8_t getBlockMajorVersionForHeight(uint32_t height) = 0;
     virtual uint8_t getCurrentBlockMajorVersion() = 0;
 
+    virtual bool getBlockEntry(uint32_t height,
+                               uint64_t &blockCumulativeSize,
+                               difficulty_type &difficulty,
+                               uint64_t &alreadyGeneratedCoins,
+                               uint64_t &reward,
+                               uint64_t &transactionsCount,
+                               uint64_t &timestamp) = 0;
     virtual std::unique_ptr<IBlock> getBlock(const Crypto::Hash &blocksId) = 0;
     virtual bool handleIncomingTransaction(
         const Transaction &tx,
