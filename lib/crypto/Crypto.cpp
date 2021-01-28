@@ -27,25 +27,14 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
-#include <mutex>
 
 #include "Common/Varint.h"
 #include "Crypto.h"
+#include "CryptoOps.h"
 #include "hash.h"
+#include "random.h"
 
 namespace Crypto {
-
-using std::abort;
-using std::int32_t;
-using std::lock_guard;
-using std::mutex;
-
-extern "C" {
-#include "crypto-ops.h"
-#include "random.h"
-}
-
-mutex random_lock;
 
 static inline unsigned char *operator&(EllipticCurvePoint &point)
 {
@@ -70,29 +59,27 @@ static inline const unsigned char *operator&(const EllipticCurveScalar &scalar)
 static inline void randomScalar(EllipticCurveScalar &res)
 {
     unsigned char tmp[64];
-    generate_random_bytes(64, tmp);
+    Random::randomBytes(64, tmp);
     sc_reduce(tmp);
     memcpy(&res, tmp, 32);
 }
 
-static inline void hashToScalar(const void *data, size_t length, EllipticCurveScalar &res)
+void hashToScalar(const void *data, size_t length, EllipticCurveScalar &res)
 {
     cn_fast_hash(data, length, reinterpret_cast<Hash &>(res));
     sc_reduce32(reinterpret_cast<unsigned char *>(&res));
 }
 
-void crypto_ops::generateKeys(PublicKey &pub, SecretKey &sec)
+void CryptoOps::generateKeys(PublicKey &pub, SecretKey &sec)
 {
-    lock_guard<mutex> lock(random_lock);
     ge_p3 point;
     randomScalar(reinterpret_cast<EllipticCurveScalar &>(sec));
     ge_scalarmult_base(&point, reinterpret_cast<unsigned char *>(&sec));
     ge_p3_tobytes(reinterpret_cast<unsigned char *>(&pub), &point);
 }
 
-void crypto_ops::generateDeterministicKeys(PublicKey &pub, SecretKey &sec, SecretKey &second)
+void CryptoOps::generateDeterministicKeys(PublicKey &pub, SecretKey &sec, SecretKey &second)
 {
-    lock_guard<mutex> lock(random_lock);
     ge_p3 point;
     sec = second;
     sc_reduce32(reinterpret_cast<unsigned char *>(
@@ -101,10 +88,9 @@ void crypto_ops::generateDeterministicKeys(PublicKey &pub, SecretKey &sec, Secre
     ge_p3_tobytes(reinterpret_cast<unsigned char *>(&pub), &point);
 }
 
-SecretKey crypto_ops::generateMKeys(PublicKey &pub, SecretKey &sec, const SecretKey &recovery_key,
+SecretKey CryptoOps::generateMKeys(PublicKey &pub, SecretKey &sec, const SecretKey &recovery_key,
                                     bool recover)
 {
-    lock_guard<mutex> lock(random_lock);
     ge_p3 point;
     SecretKey rng;
     if (recover) {
@@ -121,13 +107,13 @@ SecretKey crypto_ops::generateMKeys(PublicKey &pub, SecretKey &sec, const Secret
     return rng;
 }
 
-bool crypto_ops::checkKey(const PublicKey &key)
+bool CryptoOps::checkKey(const PublicKey &key)
 {
     ge_p3 point;
     return ge_frombytes_vartime(&point, reinterpret_cast<const unsigned char *>(&key)) == 0;
 }
 
-bool crypto_ops::secretKeyToPublicKey(const SecretKey &sec, PublicKey &pub)
+bool CryptoOps::secretKeyToPublicKey(const SecretKey &sec, PublicKey &pub)
 {
     ge_p3 point;
     if (sc_check(reinterpret_cast<const unsigned char *>(&sec)) != 0) {
@@ -138,7 +124,22 @@ bool crypto_ops::secretKeyToPublicKey(const SecretKey &sec, PublicKey &pub)
     return true;
 }
 
-bool crypto_ops::generateKeyDerivation(const PublicKey &key1, const SecretKey &key2,
+bool CryptoOps::secretKeyMultPublicKey(const SecretKey &sec, const PublicKey &pub, PublicKey &res)
+{
+    if (sc_check(&sec) != 0) {
+        return false;
+    }
+    ge_p3 point;
+    if (ge_frombytes_vartime(&point, &pub) != 0) {
+        return false;
+    }
+    ge_p2 point2;
+    ge_scalarmult(&point2, &sec, &point);
+    ge_tobytes(reinterpret_cast<unsigned char *>(&res), &point2);
+    return true;
+}
+
+bool CryptoOps::generateKeyDerivation(const PublicKey &key1, const SecretKey &key2,
                                        KeyDerivation &derivation)
 {
     ge_p3 point;
@@ -186,7 +187,7 @@ static void derivationToScalar(const KeyDerivation &derivation, size_t output_in
     hashToScalar(&buf, bufSize + suffixLength, res);
 }
 
-bool crypto_ops::derivePublicKey(const KeyDerivation &derivation, size_t outputIndex,
+bool CryptoOps::derivePublicKey(const KeyDerivation &derivation, size_t outputIndex,
                                  const PublicKey &base, PublicKey &derivedKey)
 {
     EllipticCurveScalar scalar;
@@ -207,7 +208,7 @@ bool crypto_ops::derivePublicKey(const KeyDerivation &derivation, size_t outputI
     return true;
 }
 
-bool crypto_ops::derivePublicKey(const KeyDerivation &derivation, size_t outputIndex,
+bool CryptoOps::derivePublicKey(const KeyDerivation &derivation, size_t outputIndex,
                                  const PublicKey &base, const uint8_t *suffix, size_t suffixLength,
                                  PublicKey &derivedKey)
 {
@@ -229,7 +230,7 @@ bool crypto_ops::derivePublicKey(const KeyDerivation &derivation, size_t outputI
     return true;
 }
 
-bool crypto_ops::underivePublicKeyAndGetScalar(const KeyDerivation &derivation, size_t outputIndex,
+bool CryptoOps::underivePublicKeyAndGetScalar(const KeyDerivation &derivation, size_t outputIndex,
                                                const PublicKey &derivedKey, PublicKey &base,
                                                EllipticCurveScalar &hashedDerivation)
 {
@@ -250,7 +251,7 @@ bool crypto_ops::underivePublicKeyAndGetScalar(const KeyDerivation &derivation, 
     return true;
 }
 
-void crypto_ops::deriveSecretKey(const KeyDerivation &derivation, size_t outputIndex,
+void CryptoOps::deriveSecretKey(const KeyDerivation &derivation, size_t outputIndex,
                                  const SecretKey &base, SecretKey &derivedKey)
 {
     EllipticCurveScalar scalar;
@@ -261,7 +262,8 @@ void crypto_ops::deriveSecretKey(const KeyDerivation &derivation, size_t outputI
            reinterpret_cast<unsigned char *>(&scalar));
 }
 
-void crypto_ops::deriveSecretKey(const KeyDerivation &keyDerivation, size_t outputIndex, const SecretKey &baseKey, const uint8_t *suffix,
+void CryptoOps::deriveSecretKey(const KeyDerivation &keyDerivation, size_t outputIndex,
+                                 const SecretKey &baseKey, const uint8_t *suffix,
                                  size_t suffixLength, SecretKey &derivedKey)
 {
     EllipticCurveScalar scalar;
@@ -272,7 +274,7 @@ void crypto_ops::deriveSecretKey(const KeyDerivation &keyDerivation, size_t outp
            reinterpret_cast<unsigned char *>(&scalar));
 }
 
-bool crypto_ops::underivePublicKey(const KeyDerivation &keyDerivation, size_t outputIndex,
+bool CryptoOps::underivePublicKey(const KeyDerivation &keyDerivation, size_t outputIndex,
                                    const PublicKey &derivedKey, PublicKey &baseKey)
 {
     EllipticCurveScalar scalar;
@@ -293,7 +295,7 @@ bool crypto_ops::underivePublicKey(const KeyDerivation &keyDerivation, size_t ou
     return true;
 }
 
-bool crypto_ops::underivePublicKey(const KeyDerivation &keyDerivation, size_t outputIndex,
+bool CryptoOps::underivePublicKey(const KeyDerivation &keyDerivation, size_t outputIndex,
                                    const PublicKey &derivedKey, const uint8_t *suffix,
                                    size_t suffixLength, PublicKey &baseKey)
 {
@@ -329,10 +331,9 @@ struct sComm2 {
     EllipticCurvePoint Y;
 };
 
-void crypto_ops::generateSignature(const Hash &prefixHash, const PublicKey &publicKey,
+void CryptoOps::generateSignature(const Hash &prefixHash, const PublicKey &publicKey,
                                    const SecretKey &secretKey, Signature &signature)
 {
-    lock_guard<mutex> lock(random_lock);
     ge_p3 tmp3;
     EllipticCurveScalar k;
     sComm buf;
@@ -366,7 +367,7 @@ try_again:
         goto try_again;
 }
 
-bool crypto_ops::checkSignature(const Hash &prefixHash, const PublicKey &publicKey,
+bool CryptoOps::checkSignature(const Hash &prefixHash, const PublicKey &publicKey,
                                 const Signature &signature)
 {
     ge_p2 tmp2;
@@ -400,7 +401,7 @@ bool crypto_ops::checkSignature(const Hash &prefixHash, const PublicKey &publicK
     return sc_isnonzero(reinterpret_cast<unsigned char *>(&c)) == 0;
 }
 
-void crypto_ops::generateTxProof(const Hash &prefixHash, const PublicKey &R, const PublicKey &A,
+void CryptoOps::generateTxProof(const Hash &prefixHash, const PublicKey &R, const PublicKey &A,
                                  const PublicKey &D, const SecretKey &r, Signature &signature)
 {
     // sanity check
@@ -454,7 +455,7 @@ void crypto_ops::generateTxProof(const Hash &prefixHash, const PublicKey &R, con
               reinterpret_cast<const unsigned char *>(&r), reinterpret_cast<unsigned char *>(&k));
 }
 
-bool crypto_ops::checkTxProof(const Hash &prefixHash, const PublicKey &R, const PublicKey &A,
+bool CryptoOps::checkTxProof(const Hash &prefixHash, const PublicKey &R, const PublicKey &A,
                               const PublicKey &D, const Signature &signature)
 {
     // sanity check
@@ -544,7 +545,7 @@ static void hashToEC(const PublicKey &key, ge_p3 &res)
     ge_p1p1_to_p3(&res, &point2);
 }
 
-KeyImage crypto_ops::scalarMultKey(const KeyImage &P, const KeyImage &a)
+KeyImage CryptoOps::scalarMultKey(const KeyImage &P, const KeyImage &a)
 {
     ge_p3 A;
     ge_p2 R;
@@ -556,7 +557,7 @@ KeyImage crypto_ops::scalarMultKey(const KeyImage &P, const KeyImage &a)
     return aP;
 }
 
-void crypto_ops::hashDataToEC(const uint8_t *data, std::size_t length, PublicKey &publicKey)
+void CryptoOps::hashDataToEC(const uint8_t *data, std::size_t length, PublicKey &publicKey)
 {
     Hash h;
     ge_p2 point;
@@ -568,7 +569,7 @@ void crypto_ops::hashDataToEC(const uint8_t *data, std::size_t length, PublicKey
     ge_tobytes(reinterpret_cast<unsigned char *>(&publicKey), &point);
 }
 
-void crypto_ops::generateKeyImage(const PublicKey &publicKey, const SecretKey &secretKey,
+void CryptoOps::generateKeyImage(const PublicKey &publicKey, const SecretKey &secretKey,
                                   KeyImage &keyImage)
 {
     ge_p3 point;
@@ -579,7 +580,7 @@ void crypto_ops::generateKeyImage(const PublicKey &publicKey, const SecretKey &s
     ge_tobytes(reinterpret_cast<unsigned char *>(&keyImage), &point2);
 }
 
-void crypto_ops::generateIncompleteKeyImage(const PublicKey &publicKey,
+void CryptoOps::generateIncompleteKeyImage(const PublicKey &publicKey,
                                             EllipticCurvePoint &incompleteKeyImage)
 {
     ge_p3 point;
@@ -603,12 +604,11 @@ static inline size_t rsCommSize(size_t pubsCount)
     return sizeof(rsComm) + pubsCount * sizeof(((rsComm *)0)->ab[0]);
 }
 
-void crypto_ops::generateRingSignature(const Hash &prefixHash, const KeyImage &keyImage,
+void CryptoOps::generateRingSignature(const Hash &prefixHash, const KeyImage &keyImage,
                                        const PublicKey *const *pPublicKey, size_t pubsCount,
                                        const SecretKey &secretKey, size_t secIndex,
                                        Signature *signature)
 {
-    lock_guard<mutex> lock(random_lock);
     size_t i;
     ge_p3 image_unp;
     ge_dsmp image_pre;
@@ -678,7 +678,7 @@ void crypto_ops::generateRingSignature(const Hash &prefixHash, const KeyImage &k
               reinterpret_cast<unsigned char *>(&k));
 }
 
-bool crypto_ops::checkRingSignature(const Hash &prefixHash, const KeyImage &keyImage,
+bool CryptoOps::checkRingSignature(const Hash &prefixHash, const KeyImage &keyImage,
                                     const PublicKey *const *pPublicKey, size_t pubsCount,
                                     const Signature *signature)
 {

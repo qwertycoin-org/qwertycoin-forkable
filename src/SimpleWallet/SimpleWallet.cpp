@@ -1252,7 +1252,10 @@ bool simple_wallet::set_log(const std::vector<std::string> &args)
 
 bool simple_wallet::payment_id(const std::vector<std::string> &args)
 {
-    success_msg_writer() << "Payment ID: " << Crypto::rand<Crypto::Hash>();
+    Crypto::Hash result;
+    Random::randomBytes(32, result.data);
+    std::string pid_str = Common::podToHex(result);
+    success_msg_writer() << "Payment ID: " << pid_str;
     return true;
 }
 

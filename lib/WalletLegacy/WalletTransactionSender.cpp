@@ -17,8 +17,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <random>
-#include <crypto/Crypto.h> // for rand()
+#include <crypto/Crypto.h>
+#include <crypto/random.h>
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
@@ -647,21 +647,19 @@ uint64_t WalletTransactionSender::selectTransfersToSend(
         }
     }
 
-    std::default_random_engine randomGenerator(
-        Crypto::rand<std::default_random_engine::result_type>()
-    );
     bool selectOneUnmixable = addDust && !unusedUnmixable.empty();
     uint64_t foundMoney = 0;
 
     while (foundMoney < neededMoney
            && (!unusedTransfers.empty() || !unusedDust.empty() || !unusedUnmixable.empty())) {
         size_t idx;
+        std::mt19937 uRNG = Random::generator();
         if (selectOneUnmixable) {
-            idx = popRandomValue(randomGenerator, unusedUnmixable);
+            idx = popRandomValue(uRNG, unusedUnmixable);
             selectOneUnmixable = false;
         } else {
-            idx = !unusedTransfers.empty() ? popRandomValue(randomGenerator, unusedTransfers)
-                                           : popRandomValue(randomGenerator, unusedDust);
+            idx = !unusedTransfers.empty() ? popRandomValue(uRNG, unusedTransfers)
+                                           : popRandomValue(uRNG, unusedDust);
         }
         selectedTransfers.push_back(outputs[idx]);
         foundMoney += outputs[idx].amount;
@@ -699,16 +697,14 @@ uint64_t WalletTransactionSender::selectDustTransfersToSend(
         }
     }
 
-    std::default_random_engine randomGenerator(
-        Crypto::rand<std::default_random_engine::result_type>()
-    );
     uint64_t foundMoney = 0;
 
     // Sweep unmixable
     if (!unusedUnmixable.empty()) {
         while (foundMoney < neededUnmixable && !unusedUnmixable.empty()) {
             size_t idx;
-            idx = popRandomValue(randomGenerator, unusedUnmixable);
+            std::mt19937 uRNG = Random::generator();
+            idx = popRandomValue(uRNG, unusedUnmixable);
             foundMoney += outputs[idx].amount;
             selectedTransfers.push_back(outputs[idx]);
         }
@@ -718,7 +714,8 @@ uint64_t WalletTransactionSender::selectDustTransfersToSend(
     if (foundMoney < neededMoney) {
         while (foundMoney < neededMoney && !unusedDust.empty()) {
             size_t idx;
-            idx = popRandomValue(randomGenerator, unusedDust);
+            std::mt19937 uRNG = Random::generator();
+            idx = popRandomValue(uRNG, unusedDust);
             selectedTransfers.push_back(outputs[idx]);
             foundMoney += outputs[idx].amount;
         }
@@ -728,7 +725,8 @@ uint64_t WalletTransactionSender::selectDustTransfersToSend(
     if (foundMoney < neededMoney) {
         while (foundMoney < neededMoney && !unusedTransfers.empty()) {
             size_t idx;
-            idx = popRandomValue(randomGenerator, unusedTransfers);
+            std::mt19937 uRNG = Random::generator();
+            idx = popRandomValue(uRNG, unusedTransfers);
             selectedTransfers.push_back(outputs[idx]);
             foundMoney += outputs[idx].amount;
         }

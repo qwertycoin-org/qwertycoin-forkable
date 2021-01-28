@@ -22,6 +22,7 @@
 #include <ios>
 #include <string>
 
+#include "crypto/Crypto.h"
 #include "crypto/hash.h"
 #include "../Common/Io.h"
 

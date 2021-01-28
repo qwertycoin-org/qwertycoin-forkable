@@ -51,11 +51,6 @@ using namespace Crypto;
 using namespace Common;
 using namespace Logging;
 
-static const Crypto::SecretKey I = { { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
-
 namespace CryptoNote {
 
 namespace {
@@ -1305,7 +1300,10 @@ bool RpcServer::onGetSupply(const COMMAND_HTTP::request &req, COMMAND_HTTP::resp
 
 bool RpcServer::onGetPaymentId(const COMMAND_HTTP::request &req, COMMAND_HTTP::response &res)
 {
-    res = Common::podToHex(Crypto::rand<Crypto::Hash>());
+    Crypto::Hash result {};
+    Random::randomBytes(32, result.data);
+    res = Common::podToHex(result);
+
     return true;
 }
 
@@ -2986,7 +2984,7 @@ bool RpcServer::onCheckTxProof(const COMMAND_RPC_CHECK_TX_PROOF::request &req,
     if (r) {
         // obtain key derivation by multiplying scalar 1 to the pubkey r*A included in the signature
         Crypto::KeyDerivation derivation;
-        if (!Crypto::generateKeyDerivation(rA, I, derivation)) {
+        if (!Crypto::generateKeyDerivation(rA, Crypto::EllipticCurveScalar2SecretKey(Crypto::I), derivation)) {
             throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                                           "Failed to generate key derivation" };
         }
@@ -3129,7 +3127,7 @@ bool RpcServer::onCheckReserveProof(const COMMAND_RPC_CHECK_RESERVE_PROOF::reque
 
         // check if the address really received the fund
         Crypto::KeyDerivation derivation;
-        if (!Crypto::generateKeyDerivation(proof.shared_secret, I, derivation)) {
+        if (!Crypto::generateKeyDerivation(proof.shared_secret, Crypto::EllipticCurveScalar2SecretKey(Crypto::I), derivation)) {
             throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                                           "Failed to generate key derivation" };
         }

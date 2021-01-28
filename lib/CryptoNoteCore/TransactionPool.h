@@ -26,6 +26,9 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
+
+#include <CryptoTypes.h>
+
 #include <Common/int-util.h>
 #include <Common/ObserverManager.h>
 #include <Common/Util.h>

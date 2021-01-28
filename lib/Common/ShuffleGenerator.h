@@ -18,24 +18,17 @@
 
 #pragma once
 
-#include <random>
 #include <unordered_map>
 
-template <typename T, typename Gen>
+#include <crypto/random.h>
+
+template<typename T>
 class ShuffleGenerator
 {
 public:
-    explicit ShuffleGenerator(T n, const Gen &gen = Gen())
-        : count(n),
-          N(n),
-          generator(gen)
-    {
-    }
+    explicit ShuffleGenerator(T n) : count(n), N(n) { }
 
-    bool empty() const
-    {
-        return count == 0;
-    }
+    bool empty() const { return count == 0; }
 
     void reset()
     {
@@ -49,23 +42,18 @@ public:
             throw std::runtime_error("shuffle sequence ended");
         }
 
-        typedef typename std::uniform_int_distribution<T> distr_t;
-        typedef typename distr_t::param_type param_t;
+        T value = Random::randomValue<T>(0, --count);
 
-        distr_t distr;
+        auto rValIt = selected.find(count);
+        auto rVal = rValIt != selected.end() ? rValIt->second : count;
 
-        T value = distr(generator, param_t(0, --count));
+        auto lValIt = selected.find(value);
 
-        auto rvalIt = selected.find(count);
-        auto rval = rvalIt != selected.end() ? rvalIt->second : count;
-
-        auto lvalIt = selected.find(value);
-
-        if (lvalIt != selected.end()) {
-            value = lvalIt->second;
-            lvalIt->second = rval;
+        if (lValIt != selected.end()) {
+            value = lValIt->second;
+            lValIt->second = rVal;
         } else {
-            selected[value] = rval;
+            selected[value] = rVal;
         }
 
         return value;
@@ -75,5 +63,4 @@ private:
     std::unordered_map<T, T> selected;
     T count;
     const T N;
-    Gen generator;
 };

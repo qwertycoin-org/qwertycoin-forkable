@@ -28,31 +28,20 @@
 
 #include <CryptoTypes.h>
 
+#include "CryptoOps.h"
+#include "crypto-util.h"
 #include "generic-ops.h"
 #include "hash.h"
+#include "random.h"
 
 namespace Crypto {
 
-extern "C" {
-#include "random.h"
-}
-
-extern std::mutex random_lock;
-
-struct EllipticCurvePoint {
-    uint8_t data[32];
-};
-
-struct EllipticCurveScalar {
-    uint8_t data[32];
-};
-
-class crypto_ops
+class CryptoOps
 {
-    crypto_ops();
-    crypto_ops(const crypto_ops &);
-    void operator=(const crypto_ops &);
-    ~crypto_ops();
+    CryptoOps();
+    CryptoOps(const CryptoOps &);
+    void operator=(const CryptoOps &);
+    ~CryptoOps();
 
     static void generateKeys(PublicKey &, SecretKey &);
     friend void generateKeys(PublicKey &, SecretKey &);
@@ -67,6 +56,8 @@ class crypto_ops
     friend bool checkKey(const PublicKey &);
     static bool secretKeyToPublicKey(const SecretKey &, PublicKey &);
     friend bool secretKeyToPublicKey(const SecretKey &, PublicKey &);
+    static bool secretKeyMultPublicKey(const SecretKey &, const PublicKey &, PublicKey &);
+    friend bool secretKeyMultPublicKey(const SecretKey &, const PublicKey &, PublicKey &);
     static bool generateKeyDerivation(const PublicKey &key1, const SecretKey &key2,
                                       KeyDerivation &derivation);
     friend bool generateKeyDerivation(const PublicKey &, const SecretKey &, KeyDerivation &);
@@ -124,67 +115,45 @@ class crypto_ops
                                    const Signature *);
 };
 
-/* Generate a value filled with random bytes.
- */
-template<typename T>
-typename std::enable_if<std::is_pod<T>::value, T>::type rand()
-{
-    typename std::remove_cv<T>::type res;
-    std::lock_guard<std::mutex> lock(random_lock);
-    generate_random_bytes(sizeof(T), &res);
-    return res;
-}
-
-/* Random number engine based on crypto::rand()
- */
-template<typename T>
-class RandomEngine
-{
-public:
-    typedef T result_type;
-
-#ifdef __clang__
-    constexpr static T min() { return (std::numeric_limits<T>::min)(); }
-
-    constexpr static T max() { return (std::numeric_limits<T>::max)(); }
-#else
-    static T(min)() { return (std::numeric_limits<T>::min)(); }
-
-    static T(max)() { return (std::numeric_limits<T>::max)(); }
-#endif
-    typename std::enable_if<std::is_unsigned<T>::value, T>::type operator()() { return rand<T>(); }
-};
+void hashToScalar(const void *data, size_t length, EllipticCurveScalar &res);
 
 /* Generate a new key pair
  */
 inline void generateKeys(PublicKey &publicKey, SecretKey &secretKey)
 {
-    crypto_ops::generateKeys(publicKey, secretKey);
+    CryptoOps::generateKeys(publicKey, secretKey);
 }
 
 inline void generateDeterministicKeys(PublicKey &pub, SecretKey &sec, SecretKey &second)
 {
-    crypto_ops::generateDeterministicKeys(pub, sec, second);
+    CryptoOps::generateDeterministicKeys(pub, sec, second);
 }
 
 inline SecretKey generateMKeys(PublicKey &pub, SecretKey &sec,
                                const SecretKey &recovery_key = SecretKey(), bool recover = false)
 {
-    return crypto_ops::generateMKeys(pub, sec, recovery_key, recover);
+    return CryptoOps::generateMKeys(pub, sec, recovery_key, recover);
 }
 
 /* Check a public key. Returns true if it is valid, false otherwise.
  */
 inline bool checkKey(const PublicKey &publicKey)
 {
-    return crypto_ops::checkKey(publicKey);
+    return CryptoOps::checkKey(publicKey);
 }
 
 /* Checks a private key and computes the corresponding public key.
  */
 inline bool secretKeyToPublicKey(const SecretKey &secretKey, PublicKey &publicKey)
 {
-    return crypto_ops::secretKeyToPublicKey(secretKey, publicKey);
+    return CryptoOps::secretKeyToPublicKey(secretKey, publicKey);
+}
+
+/* Multiply secret key to public key
+ */
+inline bool secretKeyMultPublicKey(const SecretKey &sec, const PublicKey &pub, PublicKey &res)
+{
+    return CryptoOps::secretKeyMultPublicKey(sec, pub, res);
 }
 
 /* To generate an ephemeral key used to send money to:
@@ -200,110 +169,89 @@ inline bool secretKeyToPublicKey(const SecretKey &secretKey, PublicKey &publicKe
 inline bool generateKeyDerivation(const PublicKey &key1, const SecretKey &key2,
                                   KeyDerivation &derivation)
 {
-    return crypto_ops::generateKeyDerivation(key1, key2, derivation);
+    return CryptoOps::generateKeyDerivation(key1, key2, derivation);
 }
 
 inline bool derivePublicKey(const KeyDerivation &derivation, size_t outputIndex,
                             const PublicKey &base, const uint8_t *prefix, size_t prefixLength,
                             PublicKey &derivedKey)
 {
-    return crypto_ops::derivePublicKey(derivation, outputIndex, base, prefix, prefixLength,
+    return CryptoOps::derivePublicKey(derivation, outputIndex, base, prefix, prefixLength,
                                        derivedKey);
 }
 
 inline bool derivePublicKey(const KeyDerivation &derivation, size_t outputIndex,
                             const PublicKey &base, PublicKey &derivedKey)
 {
-    return crypto_ops::derivePublicKey(derivation, outputIndex, base, derivedKey);
+    return CryptoOps::derivePublicKey(derivation, outputIndex, base, derivedKey);
 }
 
 inline bool underivePublicKeyAndGetScalar(const KeyDerivation &keyDerivation,
-                                          std::size_t outputIndex,
-                                          const PublicKey &derivedKey,
-                                          PublicKey &baseKey,
-                                          EllipticCurveScalar &hashedDerivation)
+                                          std::size_t outputIndex, const PublicKey &derivedKey,
+                                          PublicKey &baseKey, EllipticCurveScalar &hashedDerivation)
 {
-    return crypto_ops::underivePublicKeyAndGetScalar(keyDerivation, outputIndex, derivedKey, baseKey,
-                                                     hashedDerivation);
+    return CryptoOps::underivePublicKeyAndGetScalar(keyDerivation, outputIndex, derivedKey,
+                                                     baseKey, hashedDerivation);
 }
 
-inline void deriveSecretKey(const KeyDerivation &keyDerivation,
-                            std::size_t outputIndex,
-                            const SecretKey &baseKey,
-                            const uint8_t *prefix,
-                            size_t prefixLength,
+inline void deriveSecretKey(const KeyDerivation &keyDerivation, std::size_t outputIndex,
+                            const SecretKey &baseKey, const uint8_t *prefix, size_t prefixLength,
                             SecretKey &derivedKey)
 {
-    crypto_ops::deriveSecretKey(keyDerivation, outputIndex, baseKey, prefix, prefixLength, derivedKey);
+    CryptoOps::deriveSecretKey(keyDerivation, outputIndex, baseKey, prefix, prefixLength,
+                                derivedKey);
 }
 
-inline void deriveSecretKey(const KeyDerivation &keyDerivation,
-                            std::size_t outputIndex,
-                            const SecretKey &baseKey,
-                            SecretKey &derivedKey)
+inline void deriveSecretKey(const KeyDerivation &keyDerivation, std::size_t outputIndex,
+                            const SecretKey &baseKey, SecretKey &derivedKey)
 {
-    crypto_ops::deriveSecretKey(keyDerivation, outputIndex, baseKey, derivedKey);
+    CryptoOps::deriveSecretKey(keyDerivation, outputIndex, baseKey, derivedKey);
 }
 
 /* Inverse function of derivePublicKey. It can be used by the receiver to find which "spend" key was
  * used to generate a transaction. This may be useful if the receiver used multiple addresses which
  * only differ in "spend" key.
  */
-inline bool underivePublicKey(const KeyDerivation &keyDerivation,
-                              size_t outputIndex,
-                              const PublicKey &derivedKey,
-                              const uint8_t *prefix,
-                              size_t prefixLength,
-                              PublicKey &baseKey)
+inline bool underivePublicKey(const KeyDerivation &keyDerivation, size_t outputIndex,
+                              const PublicKey &derivedKey, const uint8_t *prefix,
+                              size_t prefixLength, PublicKey &baseKey)
 {
-    return crypto_ops::underivePublicKey(keyDerivation, outputIndex, derivedKey, prefix,
+    return CryptoOps::underivePublicKey(keyDerivation, outputIndex, derivedKey, prefix,
                                          prefixLength, baseKey);
 }
 
-inline bool underivePublicKey(const KeyDerivation &keyDerivation,
-                              size_t outputIndex,
-                              const PublicKey &derivedKey,
-                              PublicKey &baseKey)
+inline bool underivePublicKey(const KeyDerivation &keyDerivation, size_t outputIndex,
+                              const PublicKey &derivedKey, PublicKey &baseKey)
 {
-    return crypto_ops::underivePublicKey(keyDerivation, outputIndex, derivedKey, baseKey);
+    return CryptoOps::underivePublicKey(keyDerivation, outputIndex, derivedKey, baseKey);
 }
 
 /* Generation and checking of a standard signature.
  */
-inline void generateSignature(const Hash &prefixHash,
-                              const PublicKey &publicKey,
-                              const SecretKey &secretKey,
-                              Signature &signature)
+inline void generateSignature(const Hash &prefixHash, const PublicKey &publicKey,
+                              const SecretKey &secretKey, Signature &signature)
 {
-    crypto_ops::generateSignature(prefixHash, publicKey, secretKey, signature);
+    CryptoOps::generateSignature(prefixHash, publicKey, secretKey, signature);
 }
-inline bool checkSignature(const Hash &prefixHash,
-                           const PublicKey &publicKey,
+inline bool checkSignature(const Hash &prefixHash, const PublicKey &publicKey,
                            const Signature &signature)
 {
-    return crypto_ops::checkSignature(prefixHash, publicKey, signature);
+    return CryptoOps::checkSignature(prefixHash, publicKey, signature);
 }
 
 /* Generation and checking of a tx proof; given a tx pubkey R, the recipient's view pubkey A, and
  * the key derivation D, the signature proves the knowledge of the tx secret key r such that R=r*G
  * and D=r*A
  */
-inline void generateTxProof(const Hash &prefixHash,
-                            const PublicKey &R,
-                            const PublicKey &A,
-                            const PublicKey &D,
-                            const SecretKey &r,
-                            Signature &signature)
+inline void generateTxProof(const Hash &prefixHash, const PublicKey &R, const PublicKey &A,
+                            const PublicKey &D, const SecretKey &r, Signature &signature)
 {
-    crypto_ops::generateTxProof(prefixHash, R, A, D, r, signature);
+    CryptoOps::generateTxProof(prefixHash, R, A, D, r, signature);
 }
-inline bool checkTxProof(const Hash &prefixHash,
-                         const PublicKey &R,
-                         const PublicKey &A,
-                         const PublicKey &D,
-                         const Signature &signature)
+inline bool checkTxProof(const Hash &prefixHash, const PublicKey &R, const PublicKey &A,
+                         const PublicKey &D, const Signature &signature)
 {
-    return crypto_ops::checkTxProof(prefixHash, R, A, D, signature);
+    return CryptoOps::checkTxProof(prefixHash, R, A, D, signature);
 }
 
 /* To send money to a key:
@@ -314,69 +262,49 @@ inline bool checkTxProof(const Hash &prefixHash,
  * generate it. To detect double spends, it is necessary to check that each key image is used at
  * most once.
  */
-inline void generateKeyImage(const PublicKey &publicKey, const SecretKey &secretKey, KeyImage &keyImage)
+inline void generateKeyImage(const PublicKey &publicKey, const SecretKey &secretKey,
+                             KeyImage &keyImage)
 {
-    crypto_ops::generateKeyImage(publicKey, secretKey, keyImage);
+    CryptoOps::generateKeyImage(publicKey, secretKey, keyImage);
 }
 
 inline KeyImage scalarMultKey(const KeyImage &P, const KeyImage &a)
 {
-    return crypto_ops::scalarMultKey(P, a);
+    return CryptoOps::scalarMultKey(P, a);
 }
 
 inline void hashDataToEC(const uint8_t *data, std::size_t length, PublicKey &publicKey)
 {
-    crypto_ops::hashDataToEC(data, length, publicKey);
+    CryptoOps::hashDataToEC(data, length, publicKey);
 }
 
-inline void generateRingSignature(const Hash &prefixHash,
-                                  const KeyImage &keyImage,
-                                  const PublicKey *const *pPublicKey,
-                                  std::size_t publicKeyCount,
-                                  const SecretKey &secretKey,
-                                  std::size_t secretKeyIndex,
+inline void generateRingSignature(const Hash &prefixHash, const KeyImage &keyImage,
+                                  const PublicKey *const *pPublicKey, std::size_t publicKeyCount,
+                                  const SecretKey &secretKey, std::size_t secretKeyIndex,
                                   Signature *signature)
 {
-    crypto_ops::generateRingSignature(prefixHash,
-                                      keyImage,
-                                      pPublicKey,
-                                      publicKeyCount,
-                                      secretKey,
-                                      secretKeyIndex,
-                                      signature);
+    CryptoOps::generateRingSignature(prefixHash, keyImage, pPublicKey, publicKeyCount, secretKey,
+                                      secretKeyIndex, signature);
 }
-inline bool checkRingSignature(const Hash &prefixHash,
-                               const KeyImage &keyImage,
-                               const PublicKey *const *pPublicKey,
-                               size_t publicKeyCount,
+inline bool checkRingSignature(const Hash &prefixHash, const KeyImage &keyImage,
+                               const PublicKey *const *pPublicKey, size_t publicKeyCount,
                                const Signature *signature)
 {
-    return crypto_ops::checkRingSignature(prefixHash,
-                                          keyImage,
-                                          pPublicKey,
-                                          publicKeyCount,
+    return CryptoOps::checkRingSignature(prefixHash, keyImage, pPublicKey, publicKeyCount,
                                           signature);
 }
 
 /* Variants with vector<const PublicKey *> parameters.
  */
-inline void generateRingSignature(const Hash &prefixHash,
-                                  const KeyImage &keyImage,
+inline void generateRingSignature(const Hash &prefixHash, const KeyImage &keyImage,
                                   const std::vector<const PublicKey *> &publicKeys,
-                                  const SecretKey &secretKey,
-                                  size_t secretKeyIndex,
+                                  const SecretKey &secretKey, size_t secretKeyIndex,
                                   Signature *signature)
 {
-    generateRingSignature(prefixHash,
-                          keyImage,
-                          publicKeys.data(),
-                          publicKeys.size(),
-                          secretKey,
-                          secretKeyIndex,
-                          signature);
+    generateRingSignature(prefixHash, keyImage, publicKeys.data(), publicKeys.size(), secretKey,
+                          secretKeyIndex, signature);
 }
-inline bool checkRingSignature(const Hash &prefixHash,
-                               const KeyImage &keyImage,
+inline bool checkRingSignature(const Hash &prefixHash, const KeyImage &keyImage,
                                const std::vector<const PublicKey *> &publicKeys,
                                const Signature *signature)
 {
@@ -384,9 +312,26 @@ inline bool checkRingSignature(const Hash &prefixHash,
                               signature);
 }
 
+static inline const KeyImage &EllipticCurveScalar2KeyImage(const EllipticCurveScalar &k)
+{
+    return (const KeyImage &)k;
+}
+static inline const PublicKey &EllipticCurveScalar2PublicKey(const EllipticCurveScalar &k)
+{
+    return (const PublicKey &)k;
+}
+static inline const SecretKey &EllipticCurveScalar2SecretKey(const EllipticCurveScalar &k)
+{
+    return (const SecretKey &)k;
 }
 
-CRYPTO_MAKE_HASHABLE(PublicKey)
-CRYPTO_MAKE_HASHABLE(KeyImage)
-CRYPTO_MAKE_COMPARABLE(Signature)
-CRYPTO_MAKE_COMPARABLE(SecretKey)
+} // namespace Crypto
+
+CRYPTO_MAKE_COMPARABLE(Crypto::Hash, std::memcmp)
+CRYPTO_MAKE_COMPARABLE(Crypto::EllipticCurveScalar, sodiumCompare)
+CRYPTO_MAKE_COMPARABLE(Crypto::EllipticCurvePoint, std::memcmp)
+CRYPTO_MAKE_COMPARABLE(Crypto::PublicKey, std::memcmp)
+CRYPTO_MAKE_COMPARABLE(Crypto::SecretKey, sodiumCompare)
+CRYPTO_MAKE_COMPARABLE(Crypto::KeyDerivation, std::memcmp)
+CRYPTO_MAKE_COMPARABLE(Crypto::KeyImage, std::memcmp)
+CRYPTO_MAKE_COMPARABLE(Crypto::Signature, std::memcmp)

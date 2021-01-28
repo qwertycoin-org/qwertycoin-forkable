@@ -20,8 +20,9 @@
 
 #include "crypto-tests.h"
 
+
 bool checkScalar(const Crypto::EllipticCurveScalar &scalar) {
-  return Crypto::sc_check(reinterpret_cast<const unsigned char*>(&scalar)) == 0;
+  return sc_check(reinterpret_cast<const unsigned char*>(&scalar)) == 0;
 }
 
 void randomScalar(Crypto::EllipticCurveScalar &res) {
@@ -33,13 +34,13 @@ void hashToScalar(const void *data, size_t length, Crypto::EllipticCurveScalar &
 }
 
 void hashToPoint(const Crypto::Hash &h, Crypto::EllipticCurvePoint &res) {
-  Crypto::ge_p2 point;
-  Crypto::ge_fromfe_frombytes_vartime(&point, reinterpret_cast<const unsigned char *>(&h));
-  Crypto::ge_tobytes(reinterpret_cast<unsigned char*>(&res), &point);
+  ge_p2 point;
+  ge_fromfe_frombytes_vartime(&point, reinterpret_cast<const unsigned char *>(&h));
+  ge_tobytes(reinterpret_cast<unsigned char*>(&res), &point);
 }
 
 void hashToEC(const Crypto::PublicKey &key, Crypto::EllipticCurvePoint &res) {
-  Crypto::ge_p3 tmp;
+  ge_p3 tmp;
   Crypto::hashToEC(key, tmp);
-  Crypto::ge_p3_tobytes(reinterpret_cast<unsigned char*>(&res), &tmp);
+  ge_p3_tobytes(reinterpret_cast<unsigned char*>(&res), &tmp);
 }

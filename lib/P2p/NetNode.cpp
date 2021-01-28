@@ -32,6 +32,7 @@
 #include <Common/StdOutputStream.h>
 #include <Common/Util.h>
 #include <crypto/Crypto.h>
+#include <crypto/random.h>
 #include <P2p/ConnectionContext.h>
 #include <P2p/LevinProtocol.h>
 #include <P2p/NetNode.h>
@@ -62,7 +63,7 @@ size_t get_random_index_with_fixed_probability(size_t max_index)
         return 0;
     }
 
-    size_t x = Crypto::rand<size_t>() % (max_index + 1);
+    size_t x = Random::randomValue<size_t>() % (max_index + 1);
 
     return (x * x * x) / (max_index * max_index); //parabola \/
 }
@@ -428,7 +429,7 @@ void NodeServer::externalRelayNotifyToAll(int command, const BinaryArray& data_b
 
 bool NodeServer::make_default_config()
 {
-    m_config.m_peer_id  = Crypto::rand<uint64_t>();
+    m_config.m_peer_id  = Random::randomValue<uint64_t>();
     logger(INFO, BRIGHT_WHITE) << "Generated new peer ID: " << m_config.m_peer_id;
     return true;
 }
@@ -531,7 +532,7 @@ bool NodeServer::handle_command_line(const boost::program_options::variables_map
         std::vector<std::string> perrs = command_line::get_arg(vm, arg_p2p_add_peer);
         for(const std::string &pr_str : perrs) {
             PeerlistEntry pe = boost::value_initialized<PeerlistEntry>();
-            pe.id = Crypto::rand<uint64_t>();
+            pe.id = Random::randomValue<uint64_t>();
             bool r = parse_peer_from_string(pe.adr, pr_str);
             if (!(r)) {
                 logger(ERROR, BRIGHT_RED) << "Failed to parse address from string: " << pr_str;
@@ -1112,7 +1113,7 @@ bool NodeServer::connections_maker()
 
     if(!m_peerlist.get_white_peers_count() && m_seed_nodes.size()) {
         size_t try_count = 0;
-        size_t current_index = Crypto::rand<size_t>() % m_seed_nodes.size();
+        size_t current_index = Random::randomValue<size_t>() % m_seed_nodes.size();
 
         while(true) {
             if(try_to_connect_and_handshake_with_new_peer(m_seed_nodes[current_index], true)) {

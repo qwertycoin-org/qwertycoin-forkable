@@ -407,7 +407,7 @@ void WalletGreen::initWithKeys(const std::string &path,
     );
     ContainerStoragePrefix *prefix = reinterpret_cast<ContainerStoragePrefix*>(newStorage.prefix());
     prefix->version = static_cast<uint8_t>(WalletSerializerV2::SERIALIZATION_VERSION);
-    prefix->nextIv = Crypto::rand<Crypto::chacha8_iv>();
+    prefix->nextIv = Crypto::randomChachaIV();
 
     Crypto::cn_context cnContext;
     Crypto::generate_chacha8_key(cnContext, password, m_key);
@@ -465,7 +465,7 @@ void WalletGreen::initWithKeysAndTimestamp(const std::string &path,
     );
     ContainerStoragePrefix *prefix = reinterpret_cast<ContainerStoragePrefix*>(newStorage.prefix());
     prefix->version = static_cast<uint8_t>(WalletSerializerV2::SERIALIZATION_VERSION);
-    prefix->nextIv = Crypto::rand<Crypto::chacha8_iv>();
+    prefix->nextIv = Crypto::randomChachaIV();
 
     Crypto::cn_context cnContext;
     Crypto::generate_chacha8_key(cnContext, password, m_key);
@@ -879,7 +879,7 @@ void WalletGreen::copyContainerStoragePrefix(ContainerStorage &src,
     auto *srcPrefix = reinterpret_cast<ContainerStoragePrefix *>(src.prefix());
     auto *dstPrefix = reinterpret_cast<ContainerStoragePrefix *>(dst.prefix());
     dstPrefix->version = srcPrefix->version;
-    dstPrefix->nextIv = Crypto::rand<chacha8_iv>();
+    dstPrefix->nextIv = Crypto::randomChachaIV();
 
     Crypto::PublicKey publicKey;
     Crypto::SecretKey secretKey;
@@ -1105,7 +1105,7 @@ void WalletGreen::convertAndLoadWalletFile(const std::string &path,std::ifstream
                             sizeof(ContainerStoragePrefix));
     auto *prefix = reinterpret_cast<ContainerStoragePrefix *>(m_containerStorage.prefix());
     prefix->version = WalletSerializerV2::SERIALIZATION_VERSION;
-    prefix->nextIv = Crypto::rand<Crypto::chacha8_iv>();
+    prefix->nextIv = Crypto::randomChachaIV();
 
 #ifdef USE_LITE_WALLET
     uint64_t creationTimestamp;
@@ -2710,7 +2710,7 @@ std::unique_ptr<CryptoNote::ITransaction> WalletGreen::makeTransaction(
     std::shuffle(
         amountsToAddresses.begin(),
         amountsToAddresses.end(),
-        std::default_random_engine{Crypto::rand<std::default_random_engine::result_type>()});
+        Random::generator());
     std::sort(
         amountsToAddresses.begin(),
         amountsToAddresses.end(),
@@ -2935,7 +2935,7 @@ uint64_t WalletGreen::selectTransfers(uint64_t neededMoney,
         }
     }
 
-    ShuffleGenerator<size_t, Crypto::RandomEngine<size_t>> indexGenerator(walletOuts.size());
+    ShuffleGenerator<size_t> indexGenerator(walletOuts.size());
     while (foundMoney < neededMoney && !indexGenerator.empty()) {
         auto &out = walletOuts[indexGenerator()];
         foundMoney += out.second.amount;
@@ -2946,7 +2946,7 @@ uint64_t WalletGreen::selectTransfers(uint64_t neededMoney,
 
     if (dust && !dustOutputs.empty()) {
         auto dustOutputsSize = dustOutputs.size();
-        ShuffleGenerator<size_t, Crypto::RandomEngine<size_t>> dustIndexGenerator(dustOutputsSize);
+        ShuffleGenerator<size_t> dustIndexGenerator(dustOutputsSize);
         do {
             auto &out = dustOutputs[dustIndexGenerator()];
             foundMoney += out.second.amount;
@@ -4136,7 +4136,7 @@ std::vector<WalletGreen::OutputToTransfer> WalletGreen::pickRandomFusionInputs(
     std::shuffle(
         bucketNumbers.begin(),
         bucketNumbers.end(),
-        std::default_random_engine{Crypto::rand<std::default_random_engine::result_type>()}
+        Random::generator()
     );
     size_t bucketNumberIndex = 0;
     for (; bucketNumberIndex < bucketNumbers.size(); ++bucketNumberIndex) {
@@ -4178,7 +4178,7 @@ std::vector<WalletGreen::OutputToTransfer> WalletGreen::pickRandomFusionInputs(
         return selectedOuts;
     }
 
-    ShuffleGenerator<size_t, Crypto::RandomEngine<size_t>> generator(selectedOuts.size());
+    ShuffleGenerator<size_t> generator(selectedOuts.size());
     std::vector<WalletGreen::OutputToTransfer> trimmedSelectedOuts;
     trimmedSelectedOuts.reserve(maxInputCount);
     for (size_t i = 0; i < maxInputCount; ++i) {

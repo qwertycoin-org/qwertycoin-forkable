@@ -31,13 +31,13 @@
 
 #include <algorithm>
 #include <numeric>
-#include <random>
 #include <set>
 #include <string.h>
 #include <time.h>
 #include <tuple>
 #include <utility>
 #include <crypto/Crypto.h>
+#include <crypto/random.h>
 #include <Common/Base58.h>
 #include <Common/ShuffleGenerator.h>
 #include <Common/StringTools.h>
@@ -54,7 +54,7 @@
 extern "C"
 {
 #include <crypto/keccak.h>
-#include <crypto/crypto-ops.h>
+#include <crypto/CryptoOps.h>
 }
 
 using namespace Crypto;
@@ -795,7 +795,7 @@ std::list<TransactionOutputInformation> WalletLegacy::selectFusionTransfersToSen
     std::shuffle(
         bucketNumbers.begin(),
         bucketNumbers.end(),
-        std::default_random_engine{Crypto::rand<std::default_random_engine::result_type>()});
+        Random::generator());
     size_t bucketNumberIndex = 0;
     for (; bucketNumberIndex < bucketNumbers.size(); ++bucketNumberIndex) {
         if (bucketSizes[bucketNumbers[bucketNumberIndex]] >= minInputCount) {
@@ -838,7 +838,7 @@ std::list<TransactionOutputInformation> WalletLegacy::selectFusionTransfersToSen
         return selectedOutputs;
     }
 
-    ShuffleGenerator<size_t, Crypto::RandomEngine<size_t>> generator(selectedOuts.size());
+    ShuffleGenerator<size_t> generator(selectedOuts.size());
     std::vector<TransactionOutputInformation> trimmedSelectedOuts;
     trimmedSelectedOuts.reserve(maxInputCount);
     for (size_t i = 0; i < maxInputCount; ++i) {

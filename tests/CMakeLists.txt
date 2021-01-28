@@ -92,8 +92,7 @@ set(QwertycoinTests_CryptoTests_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/CryptoTests/crypto.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/CryptoTests/hash.c"
     "${CMAKE_CURRENT_LIST_DIR}/CryptoTests/main.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoTests/random.c"
-)
+        )
 
 set(QwertycoinTests_CryptoTests_LIBS codecov)
 
