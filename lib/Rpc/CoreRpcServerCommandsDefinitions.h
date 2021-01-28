@@ -687,6 +687,23 @@ struct TRANSACTION_SHORT_RESPONSE {
     uint64_t size;
 };
 
+struct TRANSACTION_POOL_RESPONSE {
+    void serialize(ISerializer &s)
+    {
+        KV_MEMBER(hash);
+        KV_MEMBER(fee);
+        KV_MEMBER(amountOut);
+        KV_MEMBER(size);
+        KV_MEMBER(receiveTime);
+    }
+
+    std::string hash;
+    uint64_t fee;
+    uint64_t amountOut;
+    uint64_t size;
+    uint64_t receiveTime;
+};
+
 struct TRANSACTION_DETAILS_EXTRA_RESPONSE {
     void serialize(ISerializer &s)
     {
@@ -982,7 +999,7 @@ struct COMMAND_RPC_GET_POOL {
     };
 };
 
-struct COMMAND_RPC_GET_MEMPOOL {
+struct COMMAND_RPC_GET_MEM_POOL {
     typedef EMPTY_STRUCT request;
 
     struct response {
@@ -993,6 +1010,36 @@ struct COMMAND_RPC_GET_MEMPOOL {
         }
 
         std::vector<MEMPOOL_TRANSACTION_RESPONSE> transactions;
+        std::string status;
+    };
+};
+
+struct COMMAND_RPC_GET_TRANSACTIONS_POOL_SHORT {
+    typedef EMPTY_STRUCT request;
+
+    struct response {
+        void serialize(ISerializer &s)
+        {
+            KV_MEMBER(transactions);
+            KV_MEMBER(status);
+        }
+
+        std::vector<TRANSACTION_POOL_RESPONSE> transactions;
+        std::string status;
+    };
+};
+
+struct COMMAND_RPC_GET_TRANSACTIONS_POOL {
+    typedef EMPTY_STRUCT request;
+
+    struct response {
+        void serialize(ISerializer &s)
+        {
+            KV_MEMBER(transactions);
+            KV_MEMBER(status);
+        }
+
+        std::vector<TransactionDetails> transactions;
         std::string status;
     };
 };

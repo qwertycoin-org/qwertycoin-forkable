@@ -66,15 +66,10 @@ public:
               ICryptoNoteProtocolQuery &protocolQuery);
 
     bool restrictRPC(const bool is_resctricted);
-
     bool enableCors(const std::string domain);
-
     bool setFeeAddress(const std::string &fee_address, const AccountPublicAddress &fee_acc);
-
     bool setViewKey(const std::string &view_key);
-
     bool setContactInfo(const std::string &contact);
-
     bool masternodeCheckIncomingTx(const BinaryArray &tx_blob);
 
     std::string getCorsDomain();
@@ -83,31 +78,23 @@ private:
     void processRequest(const HttpRequest &request, HttpResponse &response) override;
 
     bool processJsonRpcRequest(const HttpRequest &request, HttpResponse &response);
-
     bool isCoreReady();
 
     // binary handlers
     bool onGetBlocks(const COMMAND_RPC_GET_BLOCKS_FAST::request &req,
                      COMMAND_RPC_GET_BLOCKS_FAST::response &res);
-
     bool onQueryBlocks(const COMMAND_RPC_QUERY_BLOCKS::request &req,
                        COMMAND_RPC_QUERY_BLOCKS::response &res);
-
     bool onQueryBlocksLite(const COMMAND_RPC_QUERY_BLOCKS_LITE::request &req,
                            COMMAND_RPC_QUERY_BLOCKS_LITE::response &res);
-
     bool onQueryBlocksDetailed(const COMMAND_RPC_QUERY_BLOCKS_DETAILED::request &req,
                                COMMAND_RPC_QUERY_BLOCKS_DETAILED::response &res);
-
     bool onGetIndexes(const COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::request &req,
                       COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::response &res);
-
     bool onGetRandomOuts(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::request &req,
                          COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::response &res);
-
     bool onGetPoolChanges(const COMMAND_RPC_GET_POOL_CHANGES::request &req,
                           COMMAND_RPC_GET_POOL_CHANGES::response &rsp);
-
     bool onGetPoolChangesLite(const COMMAND_RPC_GET_POOL_CHANGES_LITE::request &req,
                               COMMAND_RPC_GET_POOL_CHANGES_LITE::response &rsp);
 
@@ -235,8 +222,15 @@ private:
     bool onTransactionsPoolJson(const COMMAND_RPC_GET_POOL::request &req,
                                 COMMAND_RPC_GET_POOL::response &res);
 
-    bool onMempoolJson(const COMMAND_RPC_GET_MEMPOOL::request &req,
-                       COMMAND_RPC_GET_MEMPOOL::response &res);
+    bool onMempoolJson(const COMMAND_RPC_GET_MEM_POOL::request &req,
+                       COMMAND_RPC_GET_MEM_POOL::response &res);
+
+    bool onGetTransactionsPool(const COMMAND_RPC_GET_TRANSACTIONS_POOL::request &req,
+                               COMMAND_RPC_GET_TRANSACTIONS_POOL::response &res);
+    bool onGetTransactionsPoolRaw(const COMMAND_RPC_GET_RAW_TRANSACTIONS_FROM_POOL::request &req,
+                                  COMMAND_RPC_GET_RAW_TRANSACTIONS_FROM_POOL::response &res);
+    bool onGetTransactionsPoolShort(const COMMAND_RPC_GET_TRANSACTIONS_POOL_SHORT::request &req,
+                                    COMMAND_RPC_GET_TRANSACTIONS_POOL_SHORT::response &res);
 
     bool onTransactionsByPaymentId(const COMMAND_RPC_GET_TRANSACTIONS_BY_PAYMENT_ID::request &req,
                                    COMMAND_RPC_GET_TRANSACTIONS_BY_PAYMENT_ID::response &res);
