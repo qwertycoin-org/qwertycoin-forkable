@@ -21,9 +21,11 @@
 #include <array>
 #include <string>
 #include <vector>
+
 #include <boost/variant.hpp>
-#include "CryptoTypes.h"
-#include "CryptoNote.h"
+
+#include <CryptoNote.h>
+#include <CryptoTypes.h>
 
 namespace CryptoNote {
 
@@ -38,7 +40,8 @@ struct TransactionOutputToKeyDetails
     Crypto::PublicKey txOutKey;
 };
 
-struct TransactionOutputMultiSignatureDetails {
+struct TransactionOutputMultiSignatureDetails
+{
     std::vector<Crypto::PublicKey> keys;
     uint32_t requiredSignatures;
 };
@@ -62,7 +65,8 @@ struct TransactionInputToKeyDetails
     std::vector<uint32_t> outputIndexes;
 };
 
-struct TransactionInputMultiSignatureDetails {
+struct TransactionInputMultiSignatureDetails
+{
     uint32_t signatures;
     TransactionOutputReferenceDetails output;
 };
@@ -80,17 +84,20 @@ struct KeyInputDetails
     std::vector<TransactionOutputReferenceDetails> outputs;
 };
 
-struct MultiSignatureInputDetails {
+struct MultiSignatureInputDetails
+{
     MultiSignatureInput input;
     TransactionOutputReferenceDetails output;
 };
 
 typedef boost::variant<
     BaseInputDetails,
-    KeyInputDetails, MultiSignatureInputDetails>
+    KeyInputDetails,
+    MultiSignatureInputDetails>
         TransactionInputDetails;
 
-struct TransactionOutputDetails {
+struct TransactionOutputDetails
+{
     TransactionOutput output;
     uint64_t globalIndex;
 };

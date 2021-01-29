@@ -54,5 +54,6 @@ public:
 inline std::error_code make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes e)
 {
     using namespace CryptoNote;
+
     return std::error_code{static_cast<int>(e), error::BlockchainExplorerErrorCategory::INSTANCE};
 }

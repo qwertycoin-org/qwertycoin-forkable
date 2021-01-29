@@ -19,10 +19,13 @@
 #include <functional>
 #include <future>
 #include <memory>
+
 #include <BlockchainExplorer/BlockchainExplorer.h>
 #include <BlockchainExplorer/BlockchainExplorerErrors.h>
+
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/ITransaction.h>
+
 #include <Global/CryptoNoteConfig.h>
 
 using namespace Logging;
@@ -69,7 +72,7 @@ public:
                       const INode::Callback &callback)
     {
         asyncContextCounter.addAsyncContext();
-        m_requestFunc(std::bind(&NodeRequest::asyncCompleteionCallback,
+        m_requestFunc(std::bind(&NodeRequest::asyncCompletionCallback,
                                 callback,
                                 std::ref(asyncContextCounter),
                                 std::placeholders::_1));
@@ -81,7 +84,7 @@ private:
         p.set_value(ec);
     }
 
-    static void asyncCompleteionCallback(const INode::Callback &callback,
+    static void asyncCompletionCallback(const INode::Callback &callback,
                                          WalletAsyncContextCounter &asyncContextCounter,
                                          std::error_code ec)
     {
@@ -237,7 +240,8 @@ bool BlockchainExplorer::getBlocks(const std::vector<uint32_t> &blockHeights,
                                    std::vector<std::vector<BlockDetails>> &blocks)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get blocks by height request came.";
@@ -272,7 +276,8 @@ bool BlockchainExplorer::getBlocks(const std::vector<Hash> &blockHashes,
                                    std::vector<BlockDetails> &blocks)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get blocks by hash request came.";
@@ -310,7 +315,8 @@ bool BlockchainExplorer::getBlocks(uint64_t timestampBegin,
                                    uint32_t &blocksNumberWithinTimestamps)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get blocks by timestamp request came.";
@@ -348,7 +354,8 @@ bool BlockchainExplorer::getBlocks(uint64_t timestampBegin,
 bool BlockchainExplorer::getBlockchainTop(BlockDetails &topBlock)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get blockchain top request came.";
@@ -360,26 +367,28 @@ bool BlockchainExplorer::getBlockchainTop(BlockDetails &topBlock)
     std::vector<std::vector<BlockDetails>> blocks;
     if (!getBlocks(heights, blocks)) {
         logger(ERROR) << "Can't get blockchain top.";
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
     }
 
     assert(blocks.size() == heights.size() && blocks.size() == 1);
 
-    bool gotMainchainBlock = false;
+    bool gotMainChainBlock = false;
     for (const BlockDetails &block : blocks.back()) {
         if (!block.isOrphaned) {
             topBlock = block;
-            gotMainchainBlock = true;
+            gotMainChainBlock = true;
             break;
         }
     }
 
-    if (!gotMainchainBlock) {
+    if (!gotMainChainBlock) {
         logger(ERROR)
             << "Can't get blockchain top: all blocks on height "
             << lastHeightCopy
             << " are orphaned.";
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
     }
 
     return true;
@@ -468,7 +477,8 @@ bool BlockchainExplorer::getTransactions(const std::vector<Hash> &transactionHas
                                          std::vector<TransactionDetails> &transactions)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get transactions by hash request came.";
@@ -527,7 +537,8 @@ bool BlockchainExplorer::getTransactionsByPaymentId(const Hash &paymentId,
 uint64_t BlockchainExplorer::getRewardBlocksWindow()
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     return parameters::CRYPTONOTE_REWARD_BLOCKS_WINDOW;
@@ -536,7 +547,8 @@ uint64_t BlockchainExplorer::getRewardBlocksWindow()
 uint64_t BlockchainExplorer::getFullRewardMaxBlockSize(uint8_t majorVersion)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     return parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
@@ -545,7 +557,8 @@ uint64_t BlockchainExplorer::getFullRewardMaxBlockSize(uint8_t majorVersion)
 bool BlockchainExplorer::isSynchronized()
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(
+                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Synchronization status request came.";
@@ -586,9 +599,12 @@ void BlockchainExplorer::poolChanged()
 
     std::unique_lock<std::mutex> lock(mutex);
 
-    std::shared_ptr<std::vector<std::unique_ptr<ITransactionReader>>> rawNewTransactionsPtr = std::make_shared<std::vector<std::unique_ptr<ITransactionReader>>>();
-    std::shared_ptr<std::vector<Hash>> removedTransactionsPtr = std::make_shared<std::vector<Hash>>();
+    std::shared_ptr<std::vector<std::unique_ptr<ITransactionReader>>> rawNewTransactionsPtr =
+            std::make_shared<std::vector<std::unique_ptr<ITransactionReader>>>();
+    std::shared_ptr<std::vector<Hash>> removedTransactionsPtr =
+            std::make_shared<std::vector<Hash>>();
     std::shared_ptr<bool> isBlockchainActualPtr = std::make_shared<bool>(false);
+
     NodeRequest request([this, rawNewTransactionsPtr, removedTransactionsPtr, isBlockchainActualPtr]
                         (const INode::Callback &callback) {
         std::vector<Hash> hashes;
@@ -739,17 +755,17 @@ void BlockchainExplorer::blockchainSynchronized(uint32_t topHeight)
 
         assert(blocksPtr->size() == blockHeightsPtr->size() && blocksPtr->size() == 1);
 
-        BlockDetails topMainchainBlock = BlockDetails();
-        bool gotMainchainBlock = false;
+        BlockDetails topMainChainBlock = BlockDetails();
+        bool gotMainChainBlock = false;
         for (const BlockDetails &block : blocksPtr->back()) {
             if (!block.isOrphaned) {
-                topMainchainBlock = block;
-                gotMainchainBlock = true;
+                topMainChainBlock = block;
+                gotMainChainBlock = true;
                 break;
             }
         }
 
-        if (!gotMainchainBlock) {
+        if (!gotMainChainBlock) {
             logger(ERROR)
                 << "Can't send blockchainSynchronized notification, can't get blockchain top:"
                 << " all blocks on height "
@@ -758,7 +774,7 @@ void BlockchainExplorer::blockchainSynchronized(uint32_t topHeight)
             return;
         }
 
-        observerManager.notify(&IBlockchainObserver::blockchainSynchronized, topMainchainBlock);
+        observerManager.notify(&IBlockchainObserver::blockchainSynchronized, topMainChainBlock);
         logger(DEBUGGING) << "blockchainSynchronized notification was successfully sent.";
     });
 }

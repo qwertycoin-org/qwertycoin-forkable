@@ -18,21 +18,28 @@
 
 #include <boost/range/combine.hpp>
 #include <boost/utility/value_init.hpp>
+
 #include <BlockchainExplorer/BlockchainExplorerDataBuilder.h>
+
 #include <Common/StringTools.h>
+
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
 #include <CryptoNoteCore/TransactionExtra.h>
+
 #include <Global/CryptoNoteConfig.h>
+
 namespace CryptoNote {
 
 BlockchainExplorerDataBuilder::BlockchainExplorerDataBuilder(ICore &core,
                                                              ICryptoNoteProtocolQuery &protocol)
-    : m_core(core), m_protocol(protocol)
+    : m_core(core),
+      m_protocol(protocol)
 {
 }
 
-bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block, BlockDetails &blockDetails,
+bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block,
+                                                     BlockDetails &blockDetails,
                                                      bool calculatePoW)
 {
     Crypto::Hash hash = getBlockHash(block);
@@ -180,7 +187,7 @@ bool BlockchainExplorerDataBuilder::fillTransactionDetails(const Transaction &tr
     transactionDetails.version = transaction.version;
     transactionDetails.timestamp = timestamp;
 
-    Crypto::Hash blockHash;
+    Crypto::Hash blockHash{};
     uint32_t blockHeight;
 
     if (!m_core.getBlockContainingTx(hash, blockHash, blockHeight)) {
@@ -342,12 +349,12 @@ bool BlockchainExplorerDataBuilder::getMixin(const Transaction &transaction, uin
 {
     mixin = 0;
 
-    for (const TransactionInput &txin : transaction.inputs) {
-        if (txin.type() != typeid(KeyInput)) {
+    for (const TransactionInput &txIn : transaction.inputs) {
+        if (txIn.type() != typeid(KeyInput)) {
             continue;
         }
 
-        uint64_t currentMixin = boost::get<KeyInput>(txin).outputIndexes.size();
+        uint64_t currentMixin = boost::get<KeyInput>(txIn).outputIndexes.size();
         if (currentMixin > mixin) {
             mixin = currentMixin;
         }

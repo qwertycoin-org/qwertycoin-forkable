@@ -28,12 +28,9 @@ class IBlockchainObserver
 
 public:
     virtual ~IBlockchainObserver() = default;
-
     virtual void blockchainSynchronized(const BlockDetails &topBlock) {}
-
     virtual void blockchainUpdated(const std::vector<BlockDetails> &newBlocks,
                                    const std::vector<BlockDetails> &orphanedBlocks) {}
-
     virtual void poolUpdated(const std::vector<TransactionDetails> &newTransactions,
                              const std::vector<RemovedTransactionDetails> &removedTransactions) {}
 };

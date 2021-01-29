@@ -19,7 +19,9 @@
 #pragma once
 
 #include <BlockchainExplorer/BlockchainExplorerData.h>
+
 #include <CryptoNoteCore/ICore.h>
+
 #include <CryptoNoteProtocol/ICryptoNoteProtocolQuery.h>
 
 namespace CryptoNote {
@@ -31,11 +33,9 @@ public:
     BlockchainExplorerDataBuilder(const BlockchainExplorerDataBuilder &) = delete;
     BlockchainExplorerDataBuilder(BlockchainExplorerDataBuilder &&) = delete;
 
-    bool fillBlockDetails(const Block &block,
-                          BlockDetails &blockDetails,
+    bool fillBlockDetails(const Block &block, BlockDetails &blockDetails,
                           bool calculatePoW = false);
-    bool fillTransactionDetails(const Transaction &tx,
-                                TransactionDetails &txRpcInfo,
+    bool fillTransactionDetails(const Transaction &tx, TransactionDetails &txRpcInfo,
                                 uint64_t timestamp = 0);
 
     static bool getPaymentId(const Transaction &transaction, Crypto::Hash &paymentId);
@@ -50,7 +50,7 @@ private:
     static size_t median(std::vector<size_t> &v);
 
     ICore &m_core;
-    ICryptoNoteProtocolQuery &m_protocol; // Not used!
+    ICryptoNoteProtocolQuery &m_protocol; // Not used, but why we have it here?
 };
 
 } // namespace CryptoNote

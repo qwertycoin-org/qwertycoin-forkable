@@ -21,12 +21,17 @@
 #include <atomic>
 #include <mutex>
 #include <unordered_set>
+
+#include <INode.h>
+
 #include <BlockchainExplorer/BlockchainExplorerErrors.h>
 #include <BlockchainExplorer/IBlockchainExplorer.h>
+
 #include <Common/ObserverManager.h>
+
 #include <Logging/LoggerRef.h>
+
 #include <Wallet/WalletAsyncContextCounter.h>
-#include "INode.h"
 
 namespace CryptoNote {
 
