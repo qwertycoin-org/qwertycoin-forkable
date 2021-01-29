@@ -16,12 +16,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <crypto/Crypto.h>
+#include <Crypto/Crypto.h>
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteSerialization.h>
 
 extern "C" {
-#include <crypto/keccak.h>
+#include <Crypto/keccak.h>
 } // extern "C"
 
 namespace CryptoNote {

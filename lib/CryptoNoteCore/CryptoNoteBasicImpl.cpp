@@ -19,7 +19,7 @@
 
 #include <Common/Base58.h>
 #include <Common/int-util.h>
-#include <crypto/hash.h>
+#include <Crypto/hash.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>

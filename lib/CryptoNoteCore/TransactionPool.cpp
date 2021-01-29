@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <vector>
 #include <boost/filesystem.hpp>
-#include <crypto/hash.h>
+#include <Crypto/hash.h>
 #include <Common/int-util.h>
 #include <Common/Util.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>

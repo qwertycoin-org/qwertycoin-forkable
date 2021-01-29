@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include <crypto/hash.h>
-#include <crypto/random.h>
+#include <Crypto/hash.h>
+#include <Crypto/random.h>
 
 #define CHACHA8_KEY_SIZE 32
 #define CHACHA8_IV_SIZE 8

@@ -21,7 +21,7 @@
 #include <future>
 #include <map>
 #include <mutex>
-#include <crypto/hash.h>
+#include <Crypto/hash.h>
 #include <WalletLegacy/IWalletLegacy.h>
 
 namespace CryptoNote {

@@ -17,7 +17,7 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <unordered_set>
-#include <crypto/Crypto.h>
+#include <Crypto/Crypto.h>
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/TransactionExtra.h>

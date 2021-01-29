@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <vector>
 #include <Common/int-util.h>
-#include <crypto/hash.h>
+#include <Crypto/hash.h>
 #include <CryptoNoteCore/Difficulty.h>
 #include <Global/CryptoNoteConfig.h>
 

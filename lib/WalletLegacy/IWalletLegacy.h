@@ -27,7 +27,7 @@
 #include <string>
 #include <system_error>
 #include <boost/optional.hpp>
-#include <crypto/Crypto.h>
+#include <Crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <Global/Constants.h>
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>

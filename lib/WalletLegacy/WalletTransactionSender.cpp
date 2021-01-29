@@ -17,8 +17,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <crypto/Crypto.h>
-#include <crypto/random.h>
+#include <Crypto/Crypto.h>
+#include <Crypto/random.h>
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>

@@ -19,7 +19,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <crypto/Crypto.h>
+#include <Crypto/Crypto.h>
 
 namespace CryptoNote {
 

@@ -22,7 +22,7 @@
 #include <Common/Base58.h>
 #include <Common/int-util.h>
 #include <Common/Varint.h>
-#include <crypto/hash.h>
+#include <Crypto/hash.h>
 
 namespace Tools {
 

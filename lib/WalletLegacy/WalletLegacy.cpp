@@ -36,8 +36,8 @@
 #include <time.h>
 #include <tuple>
 #include <utility>
-#include <crypto/Crypto.h>
-#include <crypto/random.h>
+#include <Crypto/Crypto.h>
+#include <Crypto/random.h>
 #include <Common/Base58.h>
 #include <Common/ShuffleGenerator.h>
 #include <Common/StringTools.h>
@@ -53,8 +53,8 @@
 
 extern "C"
 {
-#include <crypto/keccak.h>
-#include <crypto/CryptoOps.h>
+#include <Crypto/keccak.h>
+#include <Crypto/CryptoOps.h>
 }
 
 using namespace Crypto;

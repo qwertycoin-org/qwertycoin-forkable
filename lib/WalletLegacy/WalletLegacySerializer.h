@@ -22,8 +22,8 @@
 #include <istream>
 #include <ostream>
 #include <vector>
-#include <crypto/chacha8.h>
-#include <crypto/hash.h>
+#include <Crypto/chacha8.h>
+#include <Crypto/hash.h>
 
 namespace CryptoNote {
 

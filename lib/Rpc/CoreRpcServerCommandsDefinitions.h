@@ -21,7 +21,7 @@
 #pragma once
 
 #include <BlockchainExplorer/BlockchainExplorerData.h>
-#include <crypto/hash.h>
+#include <Crypto/hash.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <CryptoNoteCore/Difficulty.h>
 #include <CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h>

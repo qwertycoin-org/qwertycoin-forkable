@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <boost/filesystem/operations.hpp>
 #include <Common/Util.h>
-#include <crypto/Crypto.h>
+#include <Crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/TransactionExtra.h>

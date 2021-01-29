@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <crypto/chacha8.h>
-#include <crypto/Crypto.h>
+#include <Crypto/chacha8.h>
+#include <Crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <Serialization/ISerializer.h>
 

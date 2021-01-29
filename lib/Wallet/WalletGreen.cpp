@@ -35,7 +35,7 @@
 #include <Common/StreamTools.h>
 #include <Common/StringOutputStream.h>
 #include <Common/StringTools.h>
-#include <crypto/Crypto.h>
+#include <Crypto/Crypto.h>
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/Currency.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>

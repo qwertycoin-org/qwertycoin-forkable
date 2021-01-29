@@ -27,7 +27,7 @@
 #include <boost/multi_index/composite_key.hpp>
 #include <boost/multi_index/member.hpp>
 #include <Common/FileMappedVector.h>
-#include <crypto/chacha8.h>
+#include <Crypto/chacha8.h>
 #include <Wallet/IWallet.h>
 #include <ITransfersContainer.h>
 

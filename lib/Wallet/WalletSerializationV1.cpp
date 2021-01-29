@@ -18,7 +18,7 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/optional.hpp>
-#include <crypto/Crypto.h>
+#include <Crypto/Crypto.h>
 #include <Common/MemoryInputStream.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>

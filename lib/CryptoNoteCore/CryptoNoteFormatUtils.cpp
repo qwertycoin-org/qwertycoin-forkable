@@ -19,7 +19,7 @@
 
 #include <set>
 #include <Common/Varint.h>
-#include <crypto/cn_slow_hash.hpp>
+#include <Crypto/cn_slow_hash.hpp>
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>

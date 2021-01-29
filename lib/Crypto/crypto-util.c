@@ -8,7 +8,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-#include <crypto/crypto-util.h>
+#include <Crypto/crypto-util.h>
 
 #ifdef _WIN32
 #include <windows.h>

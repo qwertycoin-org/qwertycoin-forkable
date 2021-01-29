@@ -32,7 +32,7 @@
 #include <Common/int-util.h>
 #include <Common/ObserverManager.h>
 #include <Common/Util.h>
-#include <crypto/hash.h>
+#include <Crypto/hash.h>
 #include <CryptoNoteCore/BlockchainIndices.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>

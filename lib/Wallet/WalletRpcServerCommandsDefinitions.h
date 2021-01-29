@@ -21,7 +21,7 @@
 #pragma once
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h>
-#include <crypto/hash.h>
+#include <Crypto/hash.h>
 #include <Global/CryptoNoteConfig.h>
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
 #include <Wallet/WalletRpcServerErrorCodes.h>

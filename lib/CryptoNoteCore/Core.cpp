@@ -25,7 +25,7 @@
 #include <Common/Math.h>
 #include <Common/StringTools.h>
 #include <Common/Util.h>
-#include <crypto/Crypto.h>
+#include <Crypto/Crypto.h>
 #include <CryptoNoteCore/Core.h>
 #include <CryptoNoteCore/CoreConfig.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>

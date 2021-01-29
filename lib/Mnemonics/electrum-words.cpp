@@ -50,7 +50,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/crc.hpp>
 #include <boost/filesystem.hpp>
-#include <crypto/Crypto.h> // for declaration of Crypto::SecretKey
+#include <Crypto/Crypto.h> // for declaration of Crypto::SecretKey
 #include <Common/Lazy.h>
 #include <Mnemonics/electrum-words.h>
 

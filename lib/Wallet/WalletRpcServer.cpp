@@ -21,7 +21,7 @@
 
 #include <list>
 #include <boost/algorithm/string/predicate.hpp>
-#include <crypto/hash.h>
+#include <Crypto/hash.h>
 #include <Common/Base58.h>
 #include <Common/CommandLine.h>
 #include <Common/StringTools.h>

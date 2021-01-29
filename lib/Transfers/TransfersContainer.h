@@ -26,7 +26,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/ordered_index.hpp>
-#include <crypto/Crypto.h>
+#include <Crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <CryptoNoteCore/CryptoNoteSerialization.h>
 #include <CryptoNoteCore/Currency.h>
