@@ -205,7 +205,7 @@ bool serialize(
     return serializePod(ecPoint, name, serializer);
 }
 
-} // namespace crypto
+} // namespace Crypto
 
 namespace CryptoNote {
 

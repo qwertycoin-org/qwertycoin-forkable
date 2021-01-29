@@ -176,9 +176,9 @@ bool test_generator::constructBlock(CryptoNote::Block& blk, const CryptoNote::Bl
 bool test_generator::constructBlockManually(Block& blk, const Block& prevBlock, const AccountBase& minerAcc,
                                             int actualParams/* = bf_none*/, uint8_t majorVer/* = 0*/,
                                             uint8_t minorVer/* = 0*/, uint64_t timestamp/* = 0*/,
-                                            const Crypto::Hash& previousBlockHash/* = crypto::Hash()*/, const difficulty_type& diffic/* = 1*/,
+                                            const Crypto::Hash& previousBlockHash/* = Crypto::Hash()*/, const difficulty_type& diffic/* = 1*/,
                                             const Transaction& baseTransaction/* = transaction()*/,
-                                            const std::vector<Crypto::Hash>& transactionHashes/* = std::vector<crypto::Hash>()*/,
+                                            const std::vector<Crypto::Hash>& transactionHashes/* = std::vector<Crypto::Hash>()*/,
                                             size_t txsSizes/* = 0*/, uint64_t fee/* = 0*/) {
   blk.majorVersion = actualParams & bf_major_ver ? majorVer  : defaultMajorVersion;
   blk.minorVersion = actualParams & bf_minor_ver ? minorVer  : defaultMinorVersion;

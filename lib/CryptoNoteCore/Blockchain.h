@@ -304,7 +304,7 @@ private:
 
     typedef google::sparse_hash_set<Crypto::KeyImage> key_images_container;
     typedef std::unordered_map<Crypto::Hash, BlockEntry> blocks_ext_by_hash;
-    // crypto::Hash - tx hash, size_t - index of out in transaction
+    // Crypto::Hash - tx hash, size_t - index of out in transaction
     typedef google::sparse_hash_map<uint64_t, std::vector<std::pair<TransactionIndex, uint16_t>>> outputs_container;
     typedef google::sparse_hash_map<uint64_t, std::vector<MultisignatureOutputUsage>> MultisignatureOutputsContainer;
 
@@ -316,7 +316,7 @@ private:
 
     key_images_container m_spent_keys;
     size_t m_current_block_cumul_sz_limit;
-    blocks_ext_by_hash m_alternative_chains; // crypto::Hash -> block_extended_info
+    blocks_ext_by_hash m_alternative_chains; // Crypto::Hash -> block_extended_info
     outputs_container m_outputs;
 
     std::string m_config_folder;

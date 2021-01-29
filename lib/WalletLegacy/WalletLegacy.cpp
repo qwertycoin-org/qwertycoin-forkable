@@ -1342,7 +1342,7 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
 
     for (size_t i = 0; i < selected_transfers.size(); ++i) {
         // have to repeat this to get key image as we don't store m_key_image
-        // prefix_data.append((const char*)&m_transfers[selected_transfers[i]].m_key_image, sizeof(crypto::key_image));
+        // prefix_data.append((const char*)&m_transfers[selected_transfers[i]].m_key_image, sizeof(Crypto::key_image));
         const TransactionOutputInformation &td = selected_transfers[i];
 
         // derive ephemeral secret key

@@ -36,7 +36,7 @@ bool serialize(Signature &sig, Common::StringView name, CN::ISerializer &seriali
 bool serialize(EllipticCurveScalar &ecScalar, Common::StringView name, CN::ISerializer &serializer);
 bool serialize(EllipticCurvePoint &ecPoint, Common::StringView name, CN::ISerializer &serializer);
 
-} // namespace crypto
+} // namespace Crypto
 
 namespace CryptoNote {
 

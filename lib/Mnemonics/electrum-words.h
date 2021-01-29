@@ -43,7 +43,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
-#include <crypto/Crypto.h> // for declaration of crypto::SecretKey
+#include <crypto/Crypto.h> // for declaration of Crypto::SecretKey
 
 namespace Crypto {
 
@@ -97,4 +97,4 @@ bool get_is_old_style_seed(std::string seed);
 
 } // namespace ElectrumWords
 
-} // namespace crypto
+} // namespace Crypto

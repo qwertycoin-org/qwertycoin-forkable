@@ -370,7 +370,7 @@ Crypto::chacha8_iv WalletGreen::getNextIv() const
 
 void WalletGreen::incIv(Crypto::chacha8_iv &iv)
 {
-    static_assert(sizeof(uint64_t) == sizeof(Crypto::chacha8_iv), "Bad crypto::chacha8_iv size");
+    static_assert(sizeof(uint64_t) == sizeof(Crypto::chacha8_iv), "Bad Crypto::chacha8_iv size");
     uint64_t* i = reinterpret_cast<uint64_t*>(&iv);
     if (*i < std::numeric_limits<uint64_t>::max()) {
         ++(*i);
@@ -381,7 +381,7 @@ void WalletGreen::incIv(Crypto::chacha8_iv &iv)
 
 void WalletGreen::incNextIv()
 {
-    static_assert(sizeof(uint64_t) == sizeof(Crypto::chacha8_iv), "Bad crypto::chacha8_iv size");
+    static_assert(sizeof(uint64_t) == sizeof(Crypto::chacha8_iv), "Bad Crypto::chacha8_iv size");
     auto *prefix = reinterpret_cast<ContainerStoragePrefix *>(m_containerStorage.prefix());
     incIv(prefix->nextIv);
 }

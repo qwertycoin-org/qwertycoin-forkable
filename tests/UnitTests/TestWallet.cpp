@@ -934,7 +934,7 @@ TEST_F(WalletApi, transferNegativeAmount) {
 //
 //  params.fee = FEE;
 //
-//  auto secretKey = crypto::SecretKey();
+//  auto secretKey = Crypto::SecretKey();
 //
 //  ASSERT_ANY_THROW(wallet.transfer(params, secretKey));
 //}
@@ -974,7 +974,7 @@ TEST_F(WalletApi, transferNegativeAmount) {
 //  params.changeDestination = src;
 //  params.fee = currency.minimumFee();
 //
-//  auto secretKey = crypto::SecretKey();
+//  auto secretKey = Crypto::SecretKey();
 //
 //  // Make sure, that transaction will contain dust
 //  try {
