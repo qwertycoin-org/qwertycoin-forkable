@@ -62,12 +62,12 @@ void WalletHelper::prepareFileNames(const std::string &file_path,
                                     std::string &keys_file,
                                     std::string &wallet_file)
 {
-    if (Common::GetExtension(file_path) == ".wallet") {
-        keys_file = Common::RemoveExtension(file_path) + ".keys";
+    if (Common::getExtension(file_path) == ".wallet") {
+        keys_file = Common::removeExtension(file_path) + ".keys";
         wallet_file = file_path;
-    } else if (Common::GetExtension(file_path) == ".keys") {
+    } else if (Common::getExtension(file_path) == ".keys") {
         keys_file = file_path;
-        wallet_file = Common::RemoveExtension(file_path) + ".wallet";
+        wallet_file = Common::removeExtension(file_path) + ".wallet";
     } else {
         keys_file = file_path + ".keys";
         wallet_file = file_path + ".wallet";

@@ -27,7 +27,7 @@
 #include <numeric>
 #include <boost/foreach.hpp>
 #include <Common/Math.h>
-#include <Common/int-util.h>
+#include <Common/IntUtil.h>
 #include <Common/ShuffleGenerator.h>
 #include <Common/StdInputStream.h>
 #include <Common/StdOutputStream.h>
@@ -461,7 +461,7 @@ uint32_t Blockchain::getCurrentBlockchainHeight()
 bool Blockchain::init(const std::string &config_folder, bool load_existing)
 {
     std::lock_guard<decltype(m_blockchain_lock)> lk(m_blockchain_lock);
-    if (!config_folder.empty() && !Tools::create_directories_if_necessary(config_folder)) {
+    if (!config_folder.empty() && !Tools::createDirectoriesIfNecessary(config_folder)) {
         logger(ERROR, BRIGHT_RED) << "Failed to create data directory: " << m_config_folder;
         return false;
     }
@@ -1115,7 +1115,7 @@ bool Blockchain::switch_to_alternative_blockchain(
 
             const auto diff_target = CryptoNote::parameters::DIFFICULTY_TARGET;
             double lam = double(high_timestamp - low_timestamp) / double(diff_target);
-            const auto poisson_ln = calc_poisson_ln(lam, alt_chain_size + i);
+            const auto poisson_ln = calcPoissonLn(lam, alt_chain_size + i);
             if (poisson_ln < CryptoNote::parameters::POISSON_LOG_P_REJECT) {
                 logger(INFO) << "Poisson check at depth " << i << " failed!"
                              << " delta_t: " << (high_timestamp - low_timestamp)

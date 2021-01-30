@@ -165,7 +165,7 @@ static void derivationToScalar(const KeyDerivation &derivation, size_t output_in
     } buf;
     char *end = buf.output_index;
     buf.derivation = derivation;
-    Tools::write_varint(end, output_index);
+    Tools::writeVarint(end, output_index);
     assert(end <= buf.output_index + sizeof buf.output_index);
     hashToScalar(&buf, end - reinterpret_cast<char *>(&buf), res);
 }
@@ -180,7 +180,7 @@ static void derivationToScalar(const KeyDerivation &derivation, size_t output_in
     } buf;
     char *end = buf.output_index;
     buf.derivation = derivation;
-    Tools::write_varint(end, output_index);
+    Tools::writeVarint(end, output_index);
     assert(end <= buf.output_index + sizeof buf.output_index);
     size_t bufSize = end - reinterpret_cast<char *>(&buf);
     memcpy(end, suffix, suffixLength);

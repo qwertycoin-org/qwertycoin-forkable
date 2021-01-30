@@ -174,7 +174,7 @@ bool Checkpoints::load_checkpoints_from_dns()
 
     logger(Logging::DEBUGGING) << "Fetching DNS checkpoint records from " << domain;
 
-    if (!Common::fetch_dns_txt(domain, records)) {
+    if (!Common::fetchDnsTxt(domain, records)) {
         logger(Logging::INFO) << "Failed to lookup DNS checkpoint records from " << domain;
     }
 

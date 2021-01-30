@@ -290,22 +290,6 @@ public:
 
         return false;
     }
-//  // Compare elements of two strings, return false if there is a difference.
-//  bool operator==(StringView other) const {
-//    if (size == other.getSize()) {
-//      for (Size i = 0;; ++i) {
-//        if (i == size) {
-//          return true;
-//        }
-//
-//        if (!(*(data + i) == *(other.getData() + i))) {
-//          break;
-//        }
-//      }
-//    }
-//
-//    return false;
-//  }
 
     /*!
         Compare elements two strings, return false if there is no difference.
@@ -585,7 +569,7 @@ public:
     }
 
     /*!
-        Returns substring starting at 'startIndex' and contaning 'endIndex' - 'startIndex' elements.
+        Returns substring starting at 'startIndex' and containing 'endIndex' - 'startIndex' elements.
         The behavior is undefined unless 'startIndex' <= 'endIndex' and 'endIndex' <= 'size'.
     */
     StringView range(Size startIndex, Size endIndex) const
@@ -596,7 +580,7 @@ public:
     }
 
     /*!
-        Returns substring starting at 'startIndex' and contaning 'sliceSize' elements.
+        Returns substring starting at 'startIndex' and containing 'sliceSize' elements.
         The behavior is undefined unless:
         'startIndex' <= 'size' and 'sliceSize' <= 'size' - 'startIndex'.
     */
@@ -648,7 +632,7 @@ public:
     }
 
     /*!
-        Removes substring starting at 'startIndex' and contaning 'cutSize' elements.
+        Removes substring starting at 'startIndex' and containing 'cutSize' elements.
         The behavior is undefined unless:
         'startIndex' <= 'size' and 'cutSize' <= 'size' - 'startIndex'.
     */

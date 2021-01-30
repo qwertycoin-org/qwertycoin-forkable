@@ -29,7 +29,7 @@
 
 #include <CryptoTypes.h>
 
-#include <Common/int-util.h>
+#include <Common/IntUtil.h>
 #include <Common/ObserverManager.h>
 #include <Common/Util.h>
 #include <Crypto/hash.h>

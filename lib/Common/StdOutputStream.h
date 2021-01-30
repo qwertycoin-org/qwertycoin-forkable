@@ -19,6 +19,7 @@
 #pragma once
 
 #include <ostream>
+
 #include <Common/IOutputStream.h>
 
 namespace Common {

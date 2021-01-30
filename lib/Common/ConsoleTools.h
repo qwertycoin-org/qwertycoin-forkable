@@ -48,7 +48,7 @@ enum class Color : uint8_t
 
 void setTextColor(Color color);
 
-bool isConsoleTty();
+bool isConsoleTTY();
 
 } // namespace Console
 

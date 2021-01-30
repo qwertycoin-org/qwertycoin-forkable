@@ -37,6 +37,7 @@ double meanValue(const std::vector<T>& v)
     }
 
     T sum = std::accumulate(v.begin(), v.end(), T());
+
     return double(sum) / double(v.size());
 }
 
@@ -51,6 +52,7 @@ double stddevValue(const std::vector<T>& v)
     std::vector<T> diff(v.size());
     std::transform(v.begin(), v.end(), diff.begin(), [mean](T x) { return x - mean; });
     T sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), T());
+
     return std::sqrt(double(sq_sum) / double(v.size()));
 }
 
@@ -75,62 +77,76 @@ double medianValue(std::vector<T> &v)
 }
 
 template<typename Target, typename Source>
-void integer_cast_throw(const Source &arg)
+void integerCastThrow(const Source &arg)
 {
-    throw std::out_of_range("Cannot convert value " + Common::toString(arg) + " to integer in range [" +
-    Common::toString(std::numeric_limits<Target>::min()) + ".." +
-    Common::toString(std::numeric_limits<Target>::max()) + "]");
+    throw std::out_of_range("Cannot convert value "
+                            + Common::toString(arg)
+                            + " to integer in range ["
+                            + Common::toString(std::numeric_limits<Target>::min()) + ".."
+                            + Common::toString(std::numeric_limits<Target>::max()) + "]");
 }
 
 template<typename Target, typename Source>
-inline Target integer_cast_impl(const Source &arg, std::true_type, std::true_type)
+inline Target integerCastImpl(const Source &arg, std::true_type, std::true_type)
 {
     // both unsigned
-    if (arg > std::numeric_limits<Target>::max())
-        integer_cast_throw<Target>(arg);
+    if (arg > std::numeric_limits<Target>::max()) {
+        integerCastThrow<Target>(arg);
+    }
+
     return static_cast<Target>(arg);
 }
 
 template<typename Target, typename Source>
-inline Target integer_cast_impl(const Source &arg, std::false_type, std::false_type)
+inline Target integerCastImpl(const Source &arg, std::false_type, std::false_type)
 {
     // both signed
-    if (arg > std::numeric_limits<Target>::max())
-        integer_cast_throw<Target>(arg);
-    if (arg < std::numeric_limits<Target>::min())
-        integer_cast_throw<Target>(arg);
+    if (arg > std::numeric_limits<Target>::max()) {
+        integerCastThrow<Target>(arg);
+    }
+
+    if (arg < std::numeric_limits<Target>::min()) {
+        integerCastThrow<Target>(arg);
+    }
+
     return static_cast<Target>(arg);
 }
 
 template<typename Target, typename Source>
-inline Target integer_cast_impl(const Source &arg, std::true_type, std::false_type)
+inline Target integerCastImpl(const Source &arg, std::true_type, std::false_type)
 {
     // signed to unsigned
     typedef typename std::make_unsigned<Source>::type USource;
-    if (arg < 0)
-        integer_cast_throw<Target>(arg);
-    if (static_cast<USource>(arg) > std::numeric_limits<Target>::max())
-        integer_cast_throw<Target>(arg);
+    if (arg < 0) {
+        integerCastThrow<Target>(arg);
+    }
+    if (static_cast<USource>(arg) > std::numeric_limits<Target>::max()) {
+        integerCastThrow<Target>(arg);
+    }
+
     return static_cast<Target>(arg);
 }
 
 template<typename Target, typename Source>
-inline Target integer_cast_impl(const Source &arg, std::false_type, std::true_type)
+inline Target integerCastImpl(const Source &arg, std::false_type, std::true_type)
 {
     // unsigned to signed
     typedef typename std::make_unsigned<Target>::type UTarget;
-    if (arg > static_cast<UTarget>(std::numeric_limits<Target>::max()))
-        integer_cast_throw<Target>(arg);
+    if (arg > static_cast<UTarget>(std::numeric_limits<Target>::max())) {
+
+    }
+
     return static_cast<Target>(arg);
 }
 
 template<typename Target, typename Source>  // source integral
-inline Target integer_cast_is_integral(const Source &arg, std::true_type)
+inline Target integerCastIsIntegral(const Source &arg, std::true_type)
 {
-    return integer_cast_impl<Target, Source>(arg, std::is_unsigned<Target>{}, std::is_unsigned<Source>{});
+    return integerCastImpl<Target, Source>(arg, std::is_unsigned<Target> {},
+                                           std::is_unsigned<Source> {});
 }
 
-inline bool has_sign(const std::string &arg)
+inline bool hasSign(const std::string &arg)
 {
     size_t pos = 0;
     while (pos != arg.size() && isspace(arg[pos]))
@@ -138,7 +154,7 @@ inline bool has_sign(const std::string &arg)
     return pos != arg.size() && arg[pos] == '-';
 }
 
-inline bool has_tail(const std::string &arg, size_t &pos)
+inline bool hasTail(const std::string &arg, size_t &pos)
 {
     while (pos != arg.size() && isspace(arg[pos]))
         pos += 1;
@@ -146,33 +162,48 @@ inline bool has_tail(const std::string &arg, size_t &pos)
 }
 
 template<typename Target, typename Source>  // source not integral (string convertible)
-inline Target integer_cast_is_integral(const Source &arg, std::false_type)
+inline Target integerCastIsIntegral(const Source &arg, std::false_type)
 {
     const std::string &sarg = arg;          // creates tmp object if neccessary
-    if (std::is_unsigned<Target>::value)
-    {  // Crazy stupid C++ standard :(
-        if (has_sign(sarg))
-            throw std::out_of_range("Cannot convert string '" + sarg + "' to integer, must be >= 0");
+    if (std::is_unsigned<Target>::value) {  // Crazy stupid C++ standard :(
+        if (hasSign(sarg)) {
+            throw std::out_of_range("Cannot convert string '"
+                                    + sarg
+                                    + "' to integer, must be >= 0");
+        }
+
         size_t pos = 0;
         auto val = std::stoull(sarg, &pos);
-        if (has_tail(sarg, pos))
-            throw std::out_of_range("Cannot convert string '" + sarg + "' to integer, excess characters not allowed");
-        return integer_cast_is_integral<Target>(val, std::true_type{});
+        if (hasTail(sarg, pos)) {
+            throw std::out_of_range("Cannot convert string '"
+                                    + sarg
+                                    + "' to integer, excess characters not allowed");
+        }
+
+        return integerCastIsIntegral<Target>(val, std::true_type {});
     }
+
     size_t pos = 0;
     auto val = std::stoll(sarg, &pos);
-    if (has_tail(sarg, pos))
-        throw std::out_of_range("Cannot convert string '" + sarg + "' to integer, excess characters '" + sarg.substr(pos) + "' not allowed");
-    return integer_cast_is_integral<Target>(val, std::true_type{});
+    if (hasTail(sarg, pos)) {
+        throw std::out_of_range("Cannot convert string '"
+                                + sarg
+                                + "' to integer, excess characters '"
+                                + sarg.substr(pos)
+                                + "' not allowed");
+    }
+
+    return integerCastIsIntegral<Target>(val, std::true_type {});
 }
 
 template<typename Target, typename Source>
-inline Target integer_cast(const Source &arg)
+inline Target integerCast(const Source &arg)
 {
     static_assert(
         std::is_integral<Target>::value,
         "Target type must be integral, source either integral or string convertible");
-    return integer_cast_is_integral<Target, Source>(arg, std::is_integral<Source>{});
+
+    return integerCastIsIntegral<Target, Source>(arg, std::is_integral<Source> {});
 }
 
 } // namespace Common

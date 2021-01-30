@@ -77,7 +77,7 @@ std::string podToHex(const T &s)
     return toHex(&s, sizeof(s));
 }
 
-bool starts_with(const std::string &str1, const std::string &str2);
+bool startsWith(const std::string &str1, const std::string &str2);
 bool ends_with(const std::string &str1, const std::string &str2);
 
 inline bool split_string_helper(

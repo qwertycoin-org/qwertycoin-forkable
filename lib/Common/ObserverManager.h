@@ -34,6 +34,7 @@ public:
         auto it = std::find(m_observers.begin(), m_observers.end(), observer);
         if (m_observers.end() == it) {
             m_observers.push_back(observer);
+
             return true;
         } else {
             return false;
@@ -49,6 +50,7 @@ public:
             return false;
         } else {
             m_observers.erase(it);
+
             return true;
         }
     }

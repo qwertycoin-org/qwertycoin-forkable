@@ -55,76 +55,76 @@ namespace po = boost::program_options;
 
 namespace {
 
-const command_line::arg_descriptor<std::string> arg_config_file = {
+const CommandLine::ArgDescriptor<std::string> arg_config_file = {
     "config-file",
     "Specify configuration file",
     std::string(CryptoNote::CRYPTONOTE_NAME) + ".conf"
 };
 
-const command_line::arg_descriptor<bool> arg_os_version = {
+const CommandLine::ArgDescriptor<bool> arg_os_version = {
     "os-version",
     ""
 };
 
-const command_line::arg_descriptor<std::string> arg_log_file = {
+const CommandLine::ArgDescriptor<std::string> arg_log_file = {
     "log-file",
     "",
     ""
 };
 
-const command_line::arg_descriptor<int> arg_log_level = {
+const CommandLine::ArgDescriptor<int> arg_log_level = {
     "log-level",
     "",
     2
 }; // info level
 
-const command_line::arg_descriptor<bool> arg_console = {
+const CommandLine::ArgDescriptor<bool> arg_console = {
     "no-console",
     "Disable daemon console commands"
 };
 
-const command_line::arg_descriptor<bool> arg_restricted_rpc = {
+const CommandLine::ArgDescriptor<bool> arg_restricted_rpc = {
     "restricted-rpc",
     "Restrict RPC to view only commands to prevent abuse"
 };
 
-const command_line::arg_descriptor<bool> arg_enable_blockchain_indexes = {
+const CommandLine::ArgDescriptor<bool> arg_enable_blockchain_indexes = {
     "enable-blockchain-indexes",
     "Enable blockchain indexes",
     false
 };
 
-const command_line::arg_descriptor<bool> arg_print_genesis_tx = {
+const CommandLine::ArgDescriptor<bool> arg_print_genesis_tx = {
     "print-genesis-tx",
     "Prints genesis' block tx hex to insert it to config and exits"
 };
 
-const command_line::arg_descriptor<std::string> arg_enable_cors = {
+const CommandLine::ArgDescriptor<std::string> arg_enable_cors = {
     "enable-cors",
     "Adds header 'Access-Control-Allow-Origin' to the daemon's RPC responses. "
     "Uses the value as domain. Use * for all",
     ""
 };
 
-const command_line::arg_descriptor<std::string> arg_set_fee_address = {
+const CommandLine::ArgDescriptor<std::string> arg_set_fee_address = {
     "fee-address",
     "Sets fee address for light wallets to the daemon's RPC responses.",
     ""
 };
 
-const command_line::arg_descriptor<std::string> arg_set_contact = {
+const CommandLine::ArgDescriptor<std::string> arg_set_contact = {
     "contact",
     "Sets node admin contact",
     ""
 };
 
-const command_line::arg_descriptor<std::string> arg_set_view_key = {
+const CommandLine::ArgDescriptor<std::string> arg_set_view_key = {
     "view-key",
     "Sets private view key to check for masternode's fee.",
     ""
 };
 
-const command_line::arg_descriptor<bool> arg_testnet_on  = {
+const CommandLine::ArgDescriptor<bool> arg_testnet_on  = {
     "testnet",
     "Used to deploy test nets. Checkpoints and hardcoded seeds are ignored, "
     "network id is changed. Use it with --data-dir flag. "
@@ -132,25 +132,25 @@ const command_line::arg_descriptor<bool> arg_testnet_on  = {
     false
 };
 
-const command_line::arg_descriptor<bool> arg_fixed_difficulty  = {
+const CommandLine::ArgDescriptor<bool> arg_fixed_difficulty  = {
     "fixed-difficulty",
     "Fixed difficulty used for testing.",
     0
 };
 
 
-const command_line::arg_descriptor<std::string> arg_load_checkpoints = {
+const CommandLine::ArgDescriptor<std::string> arg_load_checkpoints = {
     "load-checkpoints",
     "<filename> Load checkpoints from csv file.",
     ""
 };
 
-const command_line::arg_descriptor<bool> arg_disable_checkpoints = {
+const CommandLine::ArgDescriptor<bool> arg_disable_checkpoints = {
     "without-checkpoints",
     "Synchronize without checkpoints"
 };
 
-const command_line::arg_descriptor<std::string> arg_rollback = {
+const CommandLine::ArgDescriptor<std::string> arg_rollback = {
     "rollback",
     "Rollback blockchain to <height>"
 };
@@ -194,13 +194,13 @@ bool command_line_preprocessor(const boost::program_options::variables_map &vm, 
 {
     bool exit = false;
 
-    if (command_line::get_arg(vm, command_line::arg_version)) {
+    if (CommandLine::getArg(vm, CommandLine::argVersion)) {
         std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL;
         exit = true;
     }
 
-    if (command_line::get_arg(vm, arg_os_version)) {
-        std::cout << "OS: " << Tools::get_os_version_string() << ENDL;
+    if (CommandLine::getArg(vm, arg_os_version)) {
+        std::cout << "OS: " << Tools::getOsVersionString() << ENDL;
         exit = true;
     }
 
@@ -222,28 +222,29 @@ int main(int argc, char *argv[])
         po::options_description desc_cmd_only("Command line options");
         po::options_description desc_cmd_sett("Command line options and settings options");
 
-        command_line::add_arg(desc_cmd_only, command_line::arg_help);
-        command_line::add_arg(desc_cmd_only, command_line::arg_version);
-        command_line::add_arg(desc_cmd_only, arg_os_version);
+        CommandLine::addArg(desc_cmd_only, CommandLine::argHelp);
+        CommandLine::addArg(desc_cmd_only, CommandLine::argVersion);
+        CommandLine::addArg(desc_cmd_only, arg_os_version);
         // tools::get_default_data_dir() can't be called during static initialization
-        command_line::add_arg(desc_cmd_only, command_line::arg_data_dir, Tools::getDefaultDataDirectory());
-        command_line::add_arg(desc_cmd_only, arg_config_file);
+        CommandLine::addArg(desc_cmd_only, CommandLine::argDataDir,
+                             Tools::getDefaultDataDirectory());
+        CommandLine::addArg(desc_cmd_only, arg_config_file);
 
-        command_line::add_arg(desc_cmd_sett, arg_log_file);
-        command_line::add_arg(desc_cmd_sett, arg_log_level);
-        command_line::add_arg(desc_cmd_sett, arg_console);
-        command_line::add_arg(desc_cmd_sett, arg_restricted_rpc);
-        command_line::add_arg(desc_cmd_sett, arg_testnet_on);
-        command_line::add_arg(desc_cmd_sett, arg_fixed_difficulty);
-        command_line::add_arg(desc_cmd_sett, arg_enable_cors);
-        command_line::add_arg(desc_cmd_sett, arg_set_fee_address);
-        command_line::add_arg(desc_cmd_sett, arg_set_view_key);
-        command_line::add_arg(desc_cmd_sett, arg_enable_blockchain_indexes);
-        command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
-        command_line::add_arg(desc_cmd_sett, arg_load_checkpoints);
-        command_line::add_arg(desc_cmd_sett, arg_disable_checkpoints);
-        command_line::add_arg(desc_cmd_sett, arg_rollback);
-        command_line::add_arg(desc_cmd_sett, arg_set_contact);
+        CommandLine::addArg(desc_cmd_sett, arg_log_file);
+        CommandLine::addArg(desc_cmd_sett, arg_log_level);
+        CommandLine::addArg(desc_cmd_sett, arg_console);
+        CommandLine::addArg(desc_cmd_sett, arg_restricted_rpc);
+        CommandLine::addArg(desc_cmd_sett, arg_testnet_on);
+        CommandLine::addArg(desc_cmd_sett, arg_fixed_difficulty);
+        CommandLine::addArg(desc_cmd_sett, arg_enable_cors);
+        CommandLine::addArg(desc_cmd_sett, arg_set_fee_address);
+        CommandLine::addArg(desc_cmd_sett, arg_set_view_key);
+        CommandLine::addArg(desc_cmd_sett, arg_enable_blockchain_indexes);
+        CommandLine::addArg(desc_cmd_sett, arg_print_genesis_tx);
+        CommandLine::addArg(desc_cmd_sett, arg_load_checkpoints);
+        CommandLine::addArg(desc_cmd_sett, arg_disable_checkpoints);
+        CommandLine::addArg(desc_cmd_sett, arg_rollback);
+        CommandLine::addArg(desc_cmd_sett, arg_set_contact);
 
         RpcServerConfig::initOptions(desc_cmd_sett);
         CoreConfig::initOptions(desc_cmd_sett);
@@ -254,17 +255,18 @@ int main(int argc, char *argv[])
         desc_options.add(desc_cmd_only).add(desc_cmd_sett);
 
         po::variables_map vm;
-        bool r = command_line::handle_error_helper(desc_options, [&]() {
+        bool r = CommandLine::handleErrorHelper(desc_options, [&]() {
             po::store(po::parse_command_line(argc, argv, desc_options), vm);
 
-            if (command_line::get_arg(vm, command_line::arg_help)) {
-                std::cout <<CryptoNote::CRYPTONOTE_NAME<<" v"<<PROJECT_VERSION_LONG<<ENDL<<ENDL;
+            if (CommandLine::getArg(vm, CommandLine::argHelp)) {
+                std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL
+                          << ENDL;
                 std::cout << desc_options << std::endl;
                 return false;
             }
 
-            std::string data_dir = command_line::get_arg(vm, command_line::arg_data_dir);
-            std::string config = command_line::get_arg(vm, arg_config_file);
+            std::string data_dir = CommandLine::getArg(vm, CommandLine::argDataDir);
+            std::string config = CommandLine::getArg(vm, arg_config_file);
 
             boost::filesystem::path data_dir_path(data_dir);
             boost::filesystem::path config_path(config);
@@ -274,15 +276,12 @@ int main(int argc, char *argv[])
 
             boost::system::error_code ec;
             if (boost::filesystem::exists(config_path, ec)) {
-                po::store(po::parse_config_file<char>(
-                    config_path.string<std::string>().c_str(),
-                    desc_cmd_sett
-                    ),
-                    vm
-                );
+                po::store(po::parse_config_file<char>(config_path.string<std::string>().c_str(),
+                                                      desc_cmd_sett),
+                          vm);
             }
             po::notify(vm);
-            if (command_line::get_arg(vm, arg_print_genesis_tx)) {
+            if (CommandLine::getArg(vm, arg_print_genesis_tx)) {
                 print_genesis_tx_hex(vm, logManager);
                 return false;
             }
@@ -293,19 +292,19 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        auto modulePath = Common::NativePathToGeneric(argv[0]);
-        auto cfgLogFile = Common::NativePathToGeneric(command_line::get_arg(vm, arg_log_file));
+        auto modulePath = Common::nativePathToGeneric(argv[0]);
+        auto cfgLogFile = Common::nativePathToGeneric(CommandLine::getArg(vm, arg_log_file));
 
         if (cfgLogFile.empty()) {
-            cfgLogFile = Common::ReplaceExtenstion(modulePath, ".log");
+            cfgLogFile = Common::replaceExtenstion(modulePath, ".log");
         } else {
-            if (!Common::HasParentPath(cfgLogFile)) {
-                cfgLogFile = Common::CombinePath(Common::GetPathDirectory(modulePath), cfgLogFile);
+            if (!Common::hasParentPath(cfgLogFile)) {
+                cfgLogFile = Common::combinePath(Common::getPathDirectory(modulePath), cfgLogFile);
             }
         }
 
         auto cfgLogLevel = static_cast<Level>(
-            static_cast<int>(Logging::ERROR) + command_line::get_arg(vm, arg_log_level)
+            static_cast<int>(Logging::ERROR) + CommandLine::getArg(vm, arg_log_level)
         );
 
         // configure logging
@@ -315,7 +314,7 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        std::string contact_str = command_line::get_arg(vm, arg_set_contact);
+        std::string contact_str = CommandLine::getArg(vm, arg_set_contact);
         if (!contact_str.empty() && contact_str.size() > 128) {
             logger(ERROR, BRIGHT_RED) << "Too long contact info";
             return 1;
@@ -325,11 +324,11 @@ int main(int argc, char *argv[])
 
         logger(INFO) << "Program Working Directory: " << argv[0];
 
-        bool testnet_mode = command_line::get_arg(vm, arg_testnet_on);
+        bool testnet_mode = CommandLine::getArg(vm, arg_testnet_on);
         if (testnet_mode) {
             logger(INFO) << "Starting in testnet mode!";
         }
-        difficulty_type fixed_difficulty = command_line::get_arg(vm, arg_fixed_difficulty);
+        difficulty_type fixed_difficulty = CommandLine::getArg(vm, arg_fixed_difficulty);
         if (fixed_difficulty) {
             logger(INFO) << "Use fixed difficulty " << fixed_difficulty;
         }
@@ -353,10 +352,10 @@ int main(int argc, char *argv[])
             currency,
             nullptr,
             logManager,
-            command_line::get_arg(vm, arg_enable_blockchain_indexes)
+                               CommandLine::getArg(vm, arg_enable_blockchain_indexes)
         );
 
-        bool disable_checkpoints = command_line::get_arg(vm, arg_disable_checkpoints);
+        bool disable_checkpoints = CommandLine::getArg(vm, arg_disable_checkpoints);
         if (!disable_checkpoints) {
             CryptoNote::Checkpoints checkpoints(logManager);
             for (const auto &cp : CryptoNote::CHECKPOINTS) {
@@ -367,11 +366,11 @@ int main(int argc, char *argv[])
             checkpoints.load_checkpoints_from_dns();
 #endif
 
-            bool manual_checkpoints = !command_line::get_arg(vm, arg_load_checkpoints).empty();
+            bool manual_checkpoints = !CommandLine::getArg(vm, arg_load_checkpoints).empty();
 
             if (manual_checkpoints && !testnet_mode) {
                 logger(INFO) << "Loading checkpoints from file...";
-                std::string checkpoints_file = command_line::get_arg(vm, arg_load_checkpoints);
+                std::string checkpoints_file = CommandLine::getArg(vm, arg_load_checkpoints);
                 bool results = checkpoints.load_checkpoints_from_file(checkpoints_file);
                 if (!results) {
                     throw std::runtime_error("Failed to load checkpoints");
@@ -398,7 +397,7 @@ int main(int argc, char *argv[])
                 throw std::runtime_error("Directory does not exist: " + coreConfig.configFolder);
             }
         } else {
-            if (!Tools::create_directories_if_necessary(coreConfig.configFolder)) {
+            if (!Tools::createDirectoriesIfNecessary(coreConfig.configFolder)) {
                 throw std::runtime_error("Can't create directory: " + coreConfig.configFolder);
             }
         }
@@ -429,8 +428,8 @@ int main(int argc, char *argv[])
         }
         logger(INFO) << "Core initialized OK";
 
-        if (command_line::has_arg(vm, arg_rollback)) {
-            std::string rollback_str = command_line::get_arg(vm, arg_rollback);
+        if (CommandLine::hasArg(vm, arg_rollback)) {
+            std::string rollback_str = CommandLine::getArg(vm, arg_rollback);
             if (!rollback_str.empty()) {
                 uint32_t _index = 0;
                 if (!Common::fromString(rollback_str, _index)) {
@@ -442,16 +441,16 @@ int main(int argc, char *argv[])
         }
 
         // start components
-        if (!command_line::has_arg(vm, arg_console)) {
+        if (!CommandLine::hasArg(vm, arg_console)) {
             dch.start_handling();
         }
 
         logger(INFO) << "Starting core rpc server on address " << rpcConfig.getBindAddress();
         rpcServer.start(rpcConfig.bindIp, rpcConfig.bindPort);
-        rpcServer.restrictRPC(command_line::get_arg(vm, arg_restricted_rpc));
-        rpcServer.enableCors(command_line::get_arg(vm, arg_enable_cors));
-        if (command_line::has_arg(vm, arg_set_fee_address)) {
-            std::string addr_str = command_line::get_arg(vm, arg_set_fee_address);
+        rpcServer.restrictRPC(CommandLine::getArg(vm, arg_restricted_rpc));
+        rpcServer.enableCors(CommandLine::getArg(vm, arg_enable_cors));
+        if (CommandLine::hasArg(vm, arg_set_fee_address)) {
+            std::string addr_str = CommandLine::getArg(vm, arg_set_fee_address);
             if (!addr_str.empty()) {
                 AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
                 if (!currency.parseAccountAddressString(addr_str, acc)) {
@@ -461,13 +460,13 @@ int main(int argc, char *argv[])
                 rpcServer.setFeeAddress(addr_str, acc);
             }
         }
-        if (command_line::has_arg(vm, arg_set_view_key)) {
-            std::string vk_str = command_line::get_arg(vm, arg_set_view_key);
+        if (CommandLine::hasArg(vm, arg_set_view_key)) {
+            std::string vk_str = CommandLine::getArg(vm, arg_set_view_key);
             if (!vk_str.empty()) {
                 rpcServer.setViewKey(vk_str);
             }
         }
-        if (command_line::has_arg(vm, arg_set_contact)) {
+        if (CommandLine::hasArg(vm, arg_set_contact)) {
             if (!contact_str.empty()) {
                 rpcServer.setContactInfo(contact_str);
             }

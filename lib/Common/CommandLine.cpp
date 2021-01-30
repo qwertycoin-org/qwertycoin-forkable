@@ -16,12 +16,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "CommandLine.h"
+#include <Common/CommandLine.h>
 
-namespace command_line {
+namespace CommandLine {
 
-const arg_descriptor<bool> arg_help = { "help", "Produce help message" };
-const arg_descriptor<bool> arg_version = { "version", "Output version information" };
-const arg_descriptor<std::string> arg_data_dir = { "data-dir", "Specify data directory" };
+const ArgDescriptor<bool> argHelp = { "help", "Produce help message" };
+const ArgDescriptor<bool> argVersion = { "version", "Output version information" };
+const ArgDescriptor<std::string> argDataDir = { "data-dir", "Specify data directory" };
 
-} // namespace command_line
+} // namespace CommandLine

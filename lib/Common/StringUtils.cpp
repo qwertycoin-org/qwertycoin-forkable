@@ -23,7 +23,8 @@
 
 namespace Common {
 
-std::string StringUtils::join(const std::vector<std::string> &tokens, const std::string &delimiter)
+std::string StringUtils::join(const std::vector<std::string> &tokens,
+                              const std::string &delimiter)
 {
     std::stringstream stream;
 
@@ -47,7 +48,8 @@ std::vector<std::string> StringUtils::split(const std::string &str,
     return {first, last};
 }
 
-std::vector<std::string> StringUtils::split(const std::string &str, const std::string &delimiter)
+std::vector<std::string> StringUtils::split(const std::string &str,
+                                            const std::string &delimiter)
 {
     std::vector<std::string> delimiters = {delimiter};
 

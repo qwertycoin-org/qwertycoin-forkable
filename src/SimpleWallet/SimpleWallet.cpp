@@ -114,90 +114,90 @@ namespace po = boost::program_options;
 
 namespace {
 
-const command_line::arg_descriptor<std::string> arg_config_file = {
+const CommandLine::ArgDescriptor<std::string> arg_config_file = {
     "config-file",
     "Specify configuration file",
     ""
 };
-const command_line::arg_descriptor<std::string> arg_wallet_file = {
+const CommandLine::ArgDescriptor<std::string> arg_wallet_file = {
     "wallet-file",
     "Use wallet <arg>",
     ""
 };
-const command_line::arg_descriptor<std::string> arg_generate_new_wallet = {
+const CommandLine::ArgDescriptor<std::string> arg_generate_new_wallet = {
     "generate-new-wallet",
     "Generate new wallet and save it to <arg>",
     ""
 };
-const command_line::arg_descriptor<std::string> arg_daemon_address = {
+const CommandLine::ArgDescriptor<std::string> arg_daemon_address = {
     "daemon-address",
     "Use daemon instance at <host>:<port>",
     ""
 };
-const command_line::arg_descriptor<std::string> arg_daemon_host = {
+const CommandLine::ArgDescriptor<std::string> arg_daemon_host = {
     "daemon-host",
     "Use daemon instance at host <arg> instead of localhost",
     ""
 };
-const command_line::arg_descriptor<std::string> arg_password = {
+const CommandLine::ArgDescriptor<std::string> arg_password = {
     "password",
     "Wallet password",
     "",
     true
 };
-const command_line::arg_descriptor<std::string> arg_change_password = {
+const CommandLine::ArgDescriptor<std::string> arg_change_password = {
     "change-password",
     "Change wallet password and exit",
     "",
     true
 };
-const command_line::arg_descriptor<std::string> arg_mnemonic_seed = {
+const CommandLine::ArgDescriptor<std::string> arg_mnemonic_seed = {
     "mnemonic-seed",
     "Specify mnemonic seed for wallet recovery/creation",
     ""
 };
-const command_line::arg_descriptor<bool> arg_restore_deterministic_wallet = {
+const CommandLine::ArgDescriptor<bool> arg_restore_deterministic_wallet = {
     "restore-deterministic-wallet",
     "Recover wallet using electrum-style mnemonic",
     false
 };
-const command_line::arg_descriptor<bool> arg_non_deterministic = {
+const CommandLine::ArgDescriptor<bool> arg_non_deterministic = {
     "non-deterministic",
     "Creates non-deterministic (classic) view and spend keys",
     false
 };
-const command_line::arg_descriptor<uint16_t> arg_daemon_port = {
+const CommandLine::ArgDescriptor<uint16_t> arg_daemon_port = {
     "daemon-port",
     "Use daemon instance at port <arg> instead of 8197",
     0
 };
-const command_line::arg_descriptor<std::string> arg_log_file = {
+const CommandLine::ArgDescriptor<std::string> arg_log_file = {
     "log-file",
     "Set the log file location",
     ""
 };
-const command_line::arg_descriptor<uint32_t> arg_log_level = {
+const CommandLine::ArgDescriptor<uint32_t> arg_log_level = {
     "log-level",
     "Set the log verbosity level",
     INFO,
     true
 };
-const command_line::arg_descriptor<bool> arg_testnet = {
+const CommandLine::ArgDescriptor<bool> arg_testnet = {
     "testnet",
     "Used to deploy test nets. The daemon must be launched with --testnet flag",
     false
 };
-const command_line::arg_descriptor<bool> arg_rescan = {
+const CommandLine::ArgDescriptor<bool> arg_rescan = {
     "rescan",
     "Start synchronizing from scratch",
     false
 };
-const command_line::arg_descriptor<bool> arg_purge = {
+const CommandLine::ArgDescriptor<bool> arg_purge = {
     "purge",
     "Discard cache data and start synchronizing from scratch",
     false
 };
-const command_line::arg_descriptor< std::vector<std::string> > arg_command = {
+const CommandLine::ArgDescriptor< std::vector<std::string> > arg_command = {
     "command",
     ""
 };
@@ -1525,8 +1525,8 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
         m_daemon_address = std::string("http://")+m_daemon_host+":"+std::to_string(m_daemon_port);
     }
 
-    if (command_line::has_arg(vm, arg_password)) {
-        pwd_container.password(command_line::get_arg(vm, arg_password));
+    if (CommandLine::hasArg(vm, arg_password)) {
+        pwd_container.password(CommandLine::getArg(vm, arg_password));
     } else if (!pwd_container.read_password(
         !m_generate_new.empty() || !m_import_new.empty() || !m_restore_new.empty() || !m_track_new.empty()
         )) {
@@ -1588,11 +1588,11 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
         }
     }
 
-    if (command_line::has_arg(vm, arg_change_password)
-        && command_line::has_arg(vm, arg_password)
+    if (CommandLine::hasArg(vm, arg_change_password)
+        && CommandLine::hasArg(vm, arg_password)
         && !m_wallet_file_arg.empty()) {
         m_wallet.reset(new WalletLegacy(m_currency, *m_node, m_logManager));
-        pwd_container.password(command_line::get_arg(vm, arg_password));
+        pwd_container.password(CommandLine::getArg(vm, arg_password));
         try {
             m_wallet_file = tryToOpenWalletOrLoadKeysOrThrow(
                 logger,
@@ -1610,7 +1610,7 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
         try {
             m_wallet->changePassword(
                 pwd_container.password(),
-                command_line::get_arg(vm, arg_change_password)
+                                     CommandLine::getArg(vm, arg_change_password)
             );
         } catch (const std::exception &e) {
             fail_msg_writer() << "Could not change password: " << e.what();
@@ -1722,7 +1722,7 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
             return false;
         }
 
-        if (Tools::Base58::decode_addr(private_key_string, addressPrefix, data)
+        if (Tools::Base58::decodeAddr(private_key_string, addressPrefix, data)
             && addressPrefix == parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX
             && data.size() == sizeof(keys)) {
             std::memcpy(&keys, data.data(), sizeof(keys));
@@ -1849,10 +1849,10 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
             << "Use \"help\" command to see the list of available commands.\n"
             << "**********************************************************************";
 
-        if (command_line::has_arg(vm, arg_rescan)) {
+        if (CommandLine::hasArg(vm, arg_rescan)) {
             rescan({});
         }
-        if (command_line::has_arg(vm, arg_purge)) {
+        if (CommandLine::hasArg(vm, arg_purge)) {
             purge({});
         }
     }
@@ -1875,14 +1875,14 @@ bool simple_wallet::deinit()
 
 void simple_wallet::handle_command_line(const boost::program_options::variables_map &vm)
 {
-    m_wallet_file_arg = command_line::get_arg(vm, arg_wallet_file);
-    m_generate_new = command_line::get_arg(vm, arg_generate_new_wallet);
-    m_daemon_address = command_line::get_arg(vm, arg_daemon_address);
-    m_daemon_host = command_line::get_arg(vm, arg_daemon_host);
-    m_daemon_port = command_line::get_arg(vm, arg_daemon_port);
-    m_restore_deterministic_wallet = command_line::get_arg(vm, arg_restore_deterministic_wallet);
-    m_non_deterministic = command_line::get_arg(vm, arg_non_deterministic);
-    m_mnemonic_seed = command_line::get_arg(vm, arg_mnemonic_seed);
+    m_wallet_file_arg = CommandLine::getArg(vm, arg_wallet_file);
+    m_generate_new = CommandLine::getArg(vm, arg_generate_new_wallet);
+    m_daemon_address = CommandLine::getArg(vm, arg_daemon_address);
+    m_daemon_host = CommandLine::getArg(vm, arg_daemon_host);
+    m_daemon_port = CommandLine::getArg(vm, arg_daemon_port);
+    m_restore_deterministic_wallet = CommandLine::getArg(vm, arg_restore_deterministic_wallet);
+    m_non_deterministic = CommandLine::getArg(vm, arg_non_deterministic);
+    m_mnemonic_seed = CommandLine::getArg(vm, arg_mnemonic_seed);
 }
 
 bool simple_wallet::gen_wallet(
@@ -2443,9 +2443,9 @@ bool simple_wallet::export_keys(const std::vector<std::string> &args)
     std::cout << "View secret key: " << Common::podToHex(keys.viewSecretKey) << std::endl;
     std::cout
         << "Private keys: "
-        << Tools::Base58::encode_addr(
-            parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
-            std::string(reinterpret_cast<char*>(&keys), sizeof(keys)))
+        << Tools::Base58::encodeAddr(
+                         parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+                         std::string(reinterpret_cast<char *>(&keys), sizeof(keys)))
         << std::endl;
 
     return true;
@@ -2697,7 +2697,7 @@ std::string simple_wallet::resolveAlias(const std::string &aliasUrl)
     std::vector<std::string>records;
     std::string address;
 
-    if (!Common::fetch_dns_txt(aliasUrl, records)) {
+    if (!Common::fetchDnsTxt(aliasUrl, records)) {
         throw std::runtime_error("Failed to lookup DNS record");
     }
 
@@ -3492,27 +3492,27 @@ int main(int argc, char *argv[])
     setbuf(stdout, NULL);
 
     po::options_description desc_general("General options");
-    command_line::add_arg(desc_general, command_line::arg_help);
-    command_line::add_arg(desc_general, command_line::arg_version);
-    command_line::add_arg(desc_general, arg_config_file);
+    CommandLine::addArg(desc_general, CommandLine::argHelp);
+    CommandLine::addArg(desc_general, CommandLine::argVersion);
+    CommandLine::addArg(desc_general, arg_config_file);
 
     po::options_description desc_params("Wallet options");
-    command_line::add_arg(desc_params, arg_wallet_file);
-    command_line::add_arg(desc_params, arg_generate_new_wallet);
-    command_line::add_arg(desc_params, arg_restore_deterministic_wallet);
-    command_line::add_arg(desc_params, arg_non_deterministic);
-    command_line::add_arg(desc_params, arg_mnemonic_seed);
-    command_line::add_arg(desc_params, arg_password);
-    command_line::add_arg(desc_params, arg_change_password);
-    command_line::add_arg(desc_params, arg_daemon_address);
-    command_line::add_arg(desc_params, arg_daemon_host);
-    command_line::add_arg(desc_params, arg_daemon_port);
-    command_line::add_arg(desc_params, arg_command);
-    command_line::add_arg(desc_params, arg_log_file);
-    command_line::add_arg(desc_params, arg_log_level);
-    command_line::add_arg(desc_params, arg_testnet);
-    command_line::add_arg(desc_params, arg_rescan);
-    command_line::add_arg(desc_params, arg_purge);
+    CommandLine::addArg(desc_params, arg_wallet_file);
+    CommandLine::addArg(desc_params, arg_generate_new_wallet);
+    CommandLine::addArg(desc_params, arg_restore_deterministic_wallet);
+    CommandLine::addArg(desc_params, arg_non_deterministic);
+    CommandLine::addArg(desc_params, arg_mnemonic_seed);
+    CommandLine::addArg(desc_params, arg_password);
+    CommandLine::addArg(desc_params, arg_change_password);
+    CommandLine::addArg(desc_params, arg_daemon_address);
+    CommandLine::addArg(desc_params, arg_daemon_host);
+    CommandLine::addArg(desc_params, arg_daemon_port);
+    CommandLine::addArg(desc_params, arg_command);
+    CommandLine::addArg(desc_params, arg_log_file);
+    CommandLine::addArg(desc_params, arg_log_level);
+    CommandLine::addArg(desc_params, arg_testnet);
+    CommandLine::addArg(desc_params, arg_rescan);
+    CommandLine::addArg(desc_params, arg_purge);
     Tools::wallet_rpc_server::init_options(desc_params);
 
     po::positional_options_description positional_options;
@@ -3527,10 +3527,10 @@ int main(int argc, char *argv[])
 
     po::variables_map vm;
 
-    bool r = command_line::handle_error_helper(desc_all, [&]() {
-        po::store(command_line::parse_command_line(argc, argv, desc_general, true), vm);
+    bool r = CommandLine::handleErrorHelper(desc_all, [&]() {
+        po::store(CommandLine::parseCommandLine(argc, argv, desc_general, true), vm);
 
-        if (command_line::get_arg(vm, command_line::arg_help)) {
+        if (CommandLine::getArg(vm, CommandLine::argHelp)) {
             CryptoNote::Currency tmp_currency = CryptoNote::CurrencyBuilder(logManager).currency();
             CryptoNote::simple_wallet tmp_wallet(dispatcher, tmp_currency, logManager);
 
@@ -3539,12 +3539,14 @@ int main(int argc, char *argv[])
             std::cout << desc_all << '\n' << tmp_wallet.get_commands_str();
 
             return false;
-        } else if (command_line::get_arg(vm, command_line::arg_version)) {
+        } else if (CommandLine::getArg(vm, CommandLine::argVersion)) {
             std::cout << CRYPTONOTE_NAME << " wallet v" << PROJECT_VERSION_LONG;
             return false;
         }
 
-        auto parser = po::command_line_parser(argc, argv).options(desc_all).positional(positional_options);
+        auto parser = po::command_line_parser(argc, argv)
+                              .options(desc_all)
+                              .positional(positional_options);
         po::store(parser.run(), vm);
 
         const std::string config = vm["config-file"].as<std::string>();
@@ -3557,14 +3559,9 @@ int main(int argc, char *argv[])
 
             boost::system::error_code ec;
             if (boost::filesystem::exists(config_path, ec)) {
-                po::store(
-                    po::parse_config_file<char>(
-                        config_path.string<std::string>().c_str(),
-                        desc_params,
-                        true
-                    ),
-                    vm
-                );
+                po::store(po::parse_config_file<char>(config_path.string<std::string>().c_str(),
+                                                      desc_params, true),
+                          vm);
             }
         }
 
@@ -3577,21 +3574,21 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    auto modulePath = Common::NativePathToGeneric(argv[0]);
-    auto cfgLogFile = Common::NativePathToGeneric(command_line::get_arg(vm, arg_log_file));
+    auto modulePath = Common::nativePathToGeneric(argv[0]);
+    auto cfgLogFile = Common::nativePathToGeneric(CommandLine::getArg(vm, arg_log_file));
     if (cfgLogFile.empty()) {
-        cfgLogFile = Common::ReplaceExtenstion(modulePath, ".log");
+        cfgLogFile = Common::replaceExtenstion(modulePath, ".log");
     } else {
-        if (!Common::HasParentPath(cfgLogFile)) {
-            cfgLogFile = Common::CombinePath(Common::GetPathDirectory(modulePath), cfgLogFile);
+        if (!Common::hasParentPath(cfgLogFile)) {
+            cfgLogFile = Common::combinePath(Common::getPathDirectory(modulePath), cfgLogFile);
         }
     }
 
     // set up logging options
     Level logLevel = INFO;
 
-    if (command_line::has_arg(vm, arg_log_level)) {
-        logLevel = static_cast<Level>(command_line::get_arg(vm, arg_log_level));
+    if (CommandLine::hasArg(vm, arg_log_level)) {
+        logLevel = static_cast<Level>(CommandLine::getArg(vm, arg_log_level));
     }
 
     logManager.configure(buildLoggerConfiguration(logLevel, cfgLogFile));
@@ -3599,30 +3596,30 @@ int main(int argc, char *argv[])
     logger(INFO, BRIGHT_WHITE)
         << getProjectCLIHeader() << std::endl;
 
-    auto builder = command_line::get_arg(vm, arg_testnet);
+    auto builder = CommandLine::getArg(vm, arg_testnet);
     auto currency = CryptoNote::CurrencyBuilder(logManager).testnet(builder).currency();
 
-    if (command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_bind_port)) {
+    if (CommandLine::hasArg(vm, Tools::wallet_rpc_server::arg_rpc_bind_port)) {
         // runs wallet with rpc interface
 
-        std::string wallet_file = command_line::get_arg(vm, arg_wallet_file);
+        std::string wallet_file = CommandLine::getArg(vm, arg_wallet_file);
         if (wallet_file.empty()) {
             logger(ERROR, BRIGHT_RED) << "Wallet file not set.";
             return 1;
         }
 
         std::string wallet_password;
-        if (!command_line::has_arg(vm, arg_password)) {
+        if (!CommandLine::hasArg(vm, arg_password)) {
             if (pwd_container.read_password()) {
                 wallet_password = pwd_container.password();
             }
         } else {
-            wallet_password = command_line::get_arg(vm, arg_password);
+            wallet_password = CommandLine::getArg(vm, arg_password);
         }
 
-        std::string daemon_address = command_line::get_arg(vm, arg_daemon_address);
-        std::string daemon_host = command_line::get_arg(vm, arg_daemon_host);
-        uint16_t daemon_port = command_line::get_arg(vm, arg_daemon_port);
+        std::string daemon_address = CommandLine::getArg(vm, arg_daemon_address);
+        std::string daemon_host = CommandLine::getArg(vm, arg_daemon_host);
+        uint16_t daemon_port = CommandLine::getArg(vm, arg_daemon_port);
 
         if (!daemon_address.empty()) {
             if (!parseUrlAddress(daemon_address, daemon_host, daemon_port)) {
@@ -3708,7 +3705,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        std::vector<std::string> command = command_line::get_arg(vm, arg_command);
+        std::vector<std::string> command = CommandLine::getArg(vm, arg_command);
         if (!command.empty()) {
             wal.process_command(command);
         }

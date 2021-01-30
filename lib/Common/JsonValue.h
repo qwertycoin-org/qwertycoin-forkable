@@ -29,7 +29,8 @@ public:
     typedef double Real;
     typedef std::string String;
 
-    enum Type {
+    enum Type
+    {
         ARRAY,
         BOOL,
         INTEGER,
@@ -149,7 +150,8 @@ private:
 
 private:
     Type type;
-    union {
+    union
+    {
         uint8_t valueArray[sizeof(Array)];
         Bool valueBool;
         Integer valueInteger;

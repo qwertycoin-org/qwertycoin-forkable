@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+
 #include <Common/IOutputStream.h>
 
 namespace Common {

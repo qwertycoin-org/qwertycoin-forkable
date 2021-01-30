@@ -18,7 +18,7 @@
 // Parts of this file are copyright (c) 2016-2018, The Monero Project
 
 #include <Common/Base58.h>
-#include <Common/int-util.h>
+#include <Common/IntUtil.h>
 #include <Crypto/hash.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
@@ -79,7 +79,7 @@ std::string getAccountAddressAsStr(uint64_t prefix, const AccountPublicAddress &
     BinaryArray ba;
     bool r = toBinaryArray(adr, ba);
     assert(r);
-    return Tools::Base58::encode_addr(prefix, Common::asString(ba));
+    return Tools::Base58::encodeAddr(prefix, Common::asString(ba));
 }
 
 bool is_coinbase(const Transaction &tx)
@@ -99,7 +99,7 @@ bool parseAccountAddressString(uint64_t& prefix, AccountPublicAddress& adr, cons
 {
     std::string data;
 
-    return Tools::Base58::decode_addr(str, prefix, data)
+    return Tools::Base58::decodeAddr(str, prefix, data)
            && fromBinaryArray(adr, asBinaryArray(data))
            && checkKey(adr.spendPublicKey)
            && checkKey(adr.viewPublicKey);

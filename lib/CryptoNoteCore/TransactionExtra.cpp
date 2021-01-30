@@ -17,7 +17,7 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
-#include <Common/int-util.h>
+#include <Common/IntUtil.h>
 #include <Common/MemoryInputStream.h>
 #include <Common/StreamTools.h>
 #include <Common/StringTools.h>
@@ -280,8 +280,8 @@ bool appendMessageToExtra(std::vector<uint8_t> &tx_extra, const tx_extra_message
 
 void appendTTLToExtra(std::vector<uint8_t> &tx_extra, uint64_t ttl)
 {
-    std::string ttlData = Tools::get_varint_data(ttl);
-    std::string extraFieldSize = Tools::get_varint_data(ttlData.size());
+    std::string ttlData = Tools::getVarintData(ttl);
+    std::string extraFieldSize = Tools::getVarintData(ttlData.size());
 
     tx_extra.reserve(tx_extra.size() + 1 + extraFieldSize.size() + ttlData.size());
     tx_extra.push_back(TX_EXTRA_TTL);

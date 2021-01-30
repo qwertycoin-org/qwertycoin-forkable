@@ -18,9 +18,12 @@
 
 
 #include <cstdio>
+
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+
 #include <Common/Util.h>
+
 #include <Global/CryptoNoteConfig.h>
 
 #ifdef _WIN32
@@ -271,7 +274,7 @@ std::string get_nix_version_display_string()
 }
 #endif
 
-std::string get_os_version_string()
+std::string getOsVersionString()
 {
 #ifdef WIN32
     return get_windows_version_display_string();
@@ -345,7 +348,7 @@ std::string getDefaultDataDirectory()
     return config_folder;
 }
 
-bool create_directories_if_necessary(const std::string &path)
+bool createDirectoriesIfNecessary(const std::string &path)
 {
     namespace fs = boost::filesystem;
 
@@ -358,7 +361,7 @@ bool create_directories_if_necessary(const std::string &path)
     return fs::create_directories(fs_path, ec);
 }
 
-std::error_code replace_file(const std::string &replacement_name, const std::string &replaced_name)
+std::error_code replaceFile(const std::string &replacement_name, const std::string &replaced_name)
 {
     int code;
 

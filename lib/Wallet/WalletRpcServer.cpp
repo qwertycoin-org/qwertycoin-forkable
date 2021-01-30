@@ -41,23 +41,23 @@ using namespace Logging;
 
 namespace Tools {
 
-const command_line::arg_descriptor<uint16_t> wallet_rpc_server::arg_rpc_bind_port = {
+const CommandLine::ArgDescriptor<uint16_t> wallet_rpc_server::arg_rpc_bind_port = {
     "rpc-bind-port",
     "Starts wallet as RPC server for wallet operations, sets bind port for server.",
     0,
     true
 };
-const command_line::arg_descriptor<std::string> wallet_rpc_server::arg_rpc_bind_ip = {
+const CommandLine::ArgDescriptor<std::string> wallet_rpc_server::arg_rpc_bind_ip = {
     "rpc-bind-ip",
     "Specify IP to bind RPC server to.",
     "127.0.0.1"
 };
-const command_line::arg_descriptor<std::string> wallet_rpc_server::arg_rpc_user = {
+const CommandLine::ArgDescriptor<std::string> wallet_rpc_server::arg_rpc_user = {
     "rpc-user",
     "Username to use with the RPC server. If empty, no server authorization will be done.",
     ""
 };
-const command_line::arg_descriptor<std::string> wallet_rpc_server::arg_rpc_password = {
+const CommandLine::ArgDescriptor<std::string> wallet_rpc_server::arg_rpc_password = {
     "rpc-password",
     "Password to use with the RPC server. If empty, no server authorization will be done.",
     ""
@@ -65,10 +65,10 @@ const command_line::arg_descriptor<std::string> wallet_rpc_server::arg_rpc_passw
 
 void wallet_rpc_server::init_options(boost::program_options::options_description &desc)
 {
-    command_line::add_arg(desc, arg_rpc_bind_ip);
-    command_line::add_arg(desc, arg_rpc_bind_port);
-    command_line::add_arg(desc, arg_rpc_user);
-    command_line::add_arg(desc, arg_rpc_password);
+    CommandLine::addArg(desc, arg_rpc_bind_ip);
+    CommandLine::addArg(desc, arg_rpc_bind_port);
+    CommandLine::addArg(desc, arg_rpc_user);
+    CommandLine::addArg(desc, arg_rpc_password);
 }
 
 wallet_rpc_server::wallet_rpc_server(System::Dispatcher &dispatcher,
@@ -106,10 +106,10 @@ void wallet_rpc_server::send_stop_signal()
 
 bool wallet_rpc_server::handle_command_line(const boost::program_options::variables_map &vm)
 {
-    m_bind_ip = command_line::get_arg(vm, arg_rpc_bind_ip);
-    m_port = command_line::get_arg(vm, arg_rpc_bind_port);
-    m_rpcUser = command_line::get_arg(vm, arg_rpc_user);
-    m_rpcPassword = command_line::get_arg(vm, arg_rpc_password);
+    m_bind_ip = CommandLine::getArg(vm, arg_rpc_bind_ip);
+    m_port = CommandLine::getArg(vm, arg_rpc_bind_port);
+    m_rpcUser = CommandLine::getArg(vm, arg_rpc_user);
+    m_rpcPassword = CommandLine::getArg(vm, arg_rpc_password);
 
     return true;
 }
@@ -562,8 +562,9 @@ bool wallet_rpc_server::on_query_key(
     if (req.key_type.compare("paperwallet") == 0) {
         AccountKeys keys;
         m_wallet.getAccountKeys(keys);
-        res.key = Tools::Base58::encode_addr(parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
-        std::string(reinterpret_cast<char *>(&keys), sizeof(keys)));
+        res.key = Tools::Base58::encodeAddr(
+                parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+                std::string(reinterpret_cast<char *>(&keys), sizeof(keys)));
     }
 
     return true;

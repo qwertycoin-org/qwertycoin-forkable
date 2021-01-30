@@ -24,6 +24,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+
 #include <Common/BlockingQueue.h>
 #include <Common/ConsoleTools.h>
 
@@ -40,7 +41,7 @@ public:
     ~AsyncConsoleReader();
 
     void start();
-    bool getline(std::string& line);
+    bool getLine(std::string& line);
     void stop();
     bool stopped() const;
     void pause();
@@ -60,7 +61,9 @@ private:
 class ConsoleHandler
 {
     typedef std::function<bool(const std::vector<std::string> &)> ConsoleCommandHandler;
-    typedef std::map<std::string, std::pair<ConsoleCommandHandler, std::string>> CommandHandlersMap;
+    typedef std::map<std::string,
+                     std::pair<ConsoleCommandHandler,
+                               std::string>> CommandHandlersMap;
 public:
     ~ConsoleHandler();
 
@@ -71,7 +74,8 @@ public:
     void requestStop();
     bool runCommand(const std::vector<std::string> &cmdAndArgs);
 
-    void start(bool startThread = true, const std::string &prompt = "",
+    void start(bool startThread = true,
+               const std::string &prompt = "",
                Console::Color promptColor = Console::Color::Default);
     void stop();
     void wait();

@@ -299,7 +299,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
 
         auto it = s_handlers.find(url);
         if (it == s_handlers.end()) {
-            if (Common::starts_with(url, "/api/")) {
+            if (Common::startsWith(url, "/api/")) {
                 // blocks
                 std::string block_height_method = "/api/block/height/";
                 std::string block_hash_method = "/api/block/hash/";
@@ -313,9 +313,9 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                 std::string version_method = "/api/tools/version";
                 std::string hardware_info_method = "/api/tools/hardwareinfo";
 
-                if (Common::starts_with(url, block_height_method)) {
+                if (Common::startsWith(url, block_height_method)) {
                     std::string height_str = url.substr(block_height_method.size());
-                    uint32_t height = Common::integer_cast<uint32_t>(height_str);
+                    uint32_t height = Common::integerCast<uint32_t>(height_str);
                     auto it = s_handlers.find("/get_block_details_by_height");
                     if (!it->second.allowBusyCore && !isCoreReady()) {
                         response.setStatus(HttpResponse::STATUS_500);
@@ -335,7 +335,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                         response.setBody("Internal error");
                     }
                     return;
-                } else if (Common::starts_with(url, block_hash_method)) {
+                } else if (Common::startsWith(url, block_hash_method)) {
                     std::string hash_str = url.substr(block_hash_method.size());
 
                     auto it = s_handlers.find("/get_block_details_by_hash");
@@ -357,7 +357,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                         response.setBody("Internal error");
                     }
                     return;
-                } else if (Common::starts_with(url, tx_height_method)) {
+                } else if (Common::startsWith(url, tx_height_method)) {
                     std::string hash_str = url.substr(tx_height_method.size());
                     uint32_t tempInt = std::stoi(hash_str);
                     auto it = s_handlers.find("/get_transactions_by_heights");
@@ -419,7 +419,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                     }
 
                     return;
-                } else if (Common::starts_with(url, tx_hash_method)) {
+                } else if (Common::startsWith(url, tx_hash_method)) {
                     std::string hash_str = url.substr(tx_hash_method.size());
                     auto it = s_handlers.find("/get_transaction_details_by_hash");
                     if (!it->second.allowBusyCore && !isCoreReady()) {
@@ -441,7 +441,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                     }
                     return;
 
-                } else if (Common::starts_with(url, tx_mempool_method)) {
+                } else if (Common::startsWith(url, tx_mempool_method)) {
                     auto it = s_handlers.find("/get_mempool");
                     if (!it->second.allowBusyCore && !isCoreReady()) {
                         response.setStatus(HttpResponse::STATUS_500);
@@ -461,7 +461,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                     }
 
                     return;
-                } else if (Common::starts_with(url, tx_mempool_detailed_method)) {
+                } else if (Common::startsWith(url, tx_mempool_detailed_method)) {
                     auto it = s_handlers.find("/get_mempool_detailed");
                     if (!it->second.allowBusyCore && !isCoreReady()) {
                         response.setStatus(HttpResponse::STATUS_500);
@@ -481,7 +481,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                     }
 
                     return;
-                } else if (Common::starts_with(url, payment_id_method)) {
+                } else if (Common::startsWith(url, payment_id_method)) {
                     std::string pid_str = url.substr(payment_id_method.size());
 
                     auto it = s_handlers.find("/get_transaction_hashes_by_payment_id");
@@ -503,7 +503,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                         response.setBody("Internal error");
                     }
                     return;
-                } else if (Common::starts_with(url, version_method)) {
+                } else if (Common::startsWith(url, version_method)) {
                     auto it = s_handlers.find("/getversion");
                     if (!it->second.allowBusyCore && !isCoreReady()) {
                         response.setStatus(HttpResponse::STATUS_500);
@@ -522,7 +522,7 @@ void RpcServer::processRequest(const HttpRequest &request, HttpResponse &respons
                         response.setBody("Internal error");
                     }
                     return;
-                } else if (Common::starts_with(url, hardware_info_method)) {
+                } else if (Common::startsWith(url, hardware_info_method)) {
                     auto it = s_handlers.find("/gethardwareinfo");
                     if (!it->second.allowBusyCore && !isCoreReady()) {
                         response.setStatus(HttpResponse::STATUS_500);

@@ -20,71 +20,71 @@
 
 #include <iostream>
 #include <type_traits>
+
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-namespace command_line {
+namespace CommandLine {
 
 template<typename T, bool required = false>
-struct arg_descriptor
-{
+struct ArgDescriptor {
 };
 
 template<typename T>
-struct arg_descriptor<T, false>
+struct ArgDescriptor<T, false>
 {
-    typedef T value_type;
+    typedef T valueType;
 
     const char *name;
     const char *description;
-    T default_value;
-    bool not_use_default;
+    T defaultValue;
+    bool notUseDefault;
 };
 
 template<typename T>
-struct arg_descriptor<std::vector<T>, false>
+struct ArgDescriptor<std::vector<T>, false>
 {
-    typedef std::vector<T> value_type;
+    typedef std::vector<T> valueType;
 
     const char *name;
     const char *description;
 };
 
 template<typename T>
-struct arg_descriptor<T, true>
+struct ArgDescriptor<T, true>
 {
     static_assert(!std::is_same<T, bool>::value, "Boolean switch can't be required");
 
-    typedef T value_type;
+    typedef T valueType;
 
     const char *name;
     const char *description;
 };
 
 template<typename T>
-boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor<T, true> &/*arg*/)
+boost::program_options::typed_value<T, char> *makeSemantic(const ArgDescriptor<T, true> &/*arg*/)
 {
     return boost::program_options::value<T>()->required();
 }
 
 template<typename T>
-boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor<T, false> &arg)
+boost::program_options::typed_value<T, char> *makeSemantic(const ArgDescriptor<T, false> &arg)
 {
     auto semantic = boost::program_options::value<T>();
-    if (!arg.not_use_default) {
-        semantic->default_value(arg.default_value);
+    if (!arg.notUseDefault) {
+        semantic->default_value(arg.defaultValue);
     }
 
     return semantic;
 }
 
 template<typename T>
-boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor<T, false> &arg,
+boost::program_options::typed_value<T, char> *makeSemantic(const ArgDescriptor<T, false> &arg,
                                                             const T &def)
 {
     auto semantic = boost::program_options::value<T>();
-    if (!arg.not_use_default) {
+    if (!arg.notUseDefault) {
         semantic->default_value(def);
     }
 
@@ -92,8 +92,8 @@ boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor
 }
 
 template<typename T>
-boost::program_options::typed_value<std::vector<T>, char> *make_semantic(
-    const arg_descriptor<std::vector<T>, false> &/*arg*/)
+boost::program_options::typed_value<std::vector<T>, char> *makeSemantic(
+    const ArgDescriptor<std::vector<T>, false> &arg /*arg*/)
 {
     auto semantic = boost::program_options::value<std::vector<T>>();
     semantic->default_value(std::vector<T>(), "");
@@ -102,36 +102,36 @@ boost::program_options::typed_value<std::vector<T>, char> *make_semantic(
 }
 
 template<typename T, bool required>
-void add_arg(boost::program_options::options_description &description,
-             const arg_descriptor<T, required> &arg,
-             bool unique = true)
+void addArg(boost::program_options::options_description &description,
+            const ArgDescriptor<T, required> &arg,
+            bool unique = true)
 {
     if (unique && description.find_nothrow(arg.name, false) != nullptr) {
         std::cerr << "Argument already exists: " << arg.name << std::endl;
         return;
     }
 
-    description.add_options()(arg.name, make_semantic(arg), arg.description);
+    description.add_options()(arg.name, makeSemantic(arg), arg.description);
 }
 
 template<typename T>
-void add_arg(boost::program_options::options_description &description,
-             const arg_descriptor<T, false> &arg,
-             const T &def,
-             bool unique = true)
+void addArg(boost::program_options::options_description &description,
+            const ArgDescriptor<T, false> &arg,
+            const T &def,
+            bool unique = true)
 {
     if (unique && description.find_nothrow(arg.name, false) != nullptr) {
         std::cerr << "Argument already exists: " << arg.name << std::endl;
         return;
     }
 
-    description.add_options()(arg.name, make_semantic(arg, def), arg.description);
+    description.add_options()(arg.name, makeSemantic(arg, def), arg.description);
 }
 
 template<>
-inline void add_arg(boost::program_options::options_description &description,
-                    const arg_descriptor<bool, false> &arg,
-                    bool unique)
+inline void addArg(boost::program_options::options_description &description,
+                   const ArgDescriptor<bool, false> &arg,
+                   bool unique)
 {
     if (unique && description.find_nothrow(arg.name, false) != nullptr) {
         std::cerr << "Argument already exists: " << arg.name << std::endl;
@@ -142,15 +142,15 @@ inline void add_arg(boost::program_options::options_description &description,
 }
 
 template<typename charT>
-boost::program_options::basic_parsed_options<charT> parse_command_line(
-    int argc,
-    const charT * const argv[],
-    const boost::program_options::options_description &desc,
-    bool allow_unregistered = false)
+boost::program_options::basic_parsed_options<charT> parseCommandLine(
+        int argc,
+        const charT *const *argv,
+        const boost::program_options::options_description &desc,
+        bool allowUnregistered = false)
 {
     auto parser = boost::program_options::command_line_parser(argc, argv);
     parser.options(desc);
-    if (allow_unregistered) {
+    if (allowUnregistered) {
         parser.allow_unregistered();
     }
 
@@ -158,45 +158,50 @@ boost::program_options::basic_parsed_options<charT> parse_command_line(
 }
 
 template<typename F>
-bool handle_error_helper(const boost::program_options::options_description &desc, F parser)
+bool handleErrorHelper(const boost::program_options::options_description &desc,
+                       F parser)
 {
     try {
         return parser();
     } catch (std::exception& e) {
         std::cerr << "Failed to parse arguments: " << e.what() << std::endl;
         std::cerr << desc << std::endl;
+
         return false;
     } catch (...) {
         std::cerr << "Failed to parse arguments: unknown exception" << std::endl;
         std::cerr << desc << std::endl;
+
         return false;
     }
 }
 
 template<typename T, bool required>
-bool has_arg(const boost::program_options::variables_map &vm,
-             const arg_descriptor<T, required> &arg)
+bool hasArg(const boost::program_options::variables_map &vm,
+             const ArgDescriptor<T, required> &arg)
 {
     auto value = vm[arg.name];
+
     return !value.empty();
 }
 
 
 template<typename T, bool required>
-T get_arg(const boost::program_options::variables_map &vm, const arg_descriptor<T, required> &arg)
+T getArg(const boost::program_options::variables_map &vm,
+         const ArgDescriptor<T, required> &arg)
 {
     return vm[arg.name].template as<T>();
 }
 
 template<>
-inline bool has_arg<bool, false>(const boost::program_options::variables_map &vm,
-                                 const arg_descriptor<bool, false> &arg)
+inline bool hasArg<bool, false>(const boost::program_options::variables_map &vm,
+                                const ArgDescriptor<bool, false> &arg)
 {
-    return get_arg<bool, false>(vm, arg);
+    return getArg<bool, false>(vm, arg);
 }
 
-extern const arg_descriptor<bool> arg_help;
-extern const arg_descriptor<bool> arg_version;
-extern const arg_descriptor<std::string> arg_data_dir;
+extern const ArgDescriptor<bool> argHelp;
+extern const ArgDescriptor<bool> argVersion;
+extern const ArgDescriptor<std::string> argDataDir;
 
-} // namespace command_line
+} // namespace CommandLine

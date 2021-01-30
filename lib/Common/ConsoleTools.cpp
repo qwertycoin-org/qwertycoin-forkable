@@ -16,7 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <stdio.h>
+#include <cstdio>
+
 #include <Common/ConsoleTools.h>
 
 #ifdef _WIN32
@@ -31,20 +32,20 @@ namespace Common {
 
 namespace Console {
 
-bool isConsoleTty()
+bool isConsoleTTY()
 {
 #if defined(WIN32)
-    static bool istty = 0 != _isatty(_fileno(stdout));
+    static bool isTTY = 0 != _isatty(_fileno(stdout));
 #else
-    static bool istty = 0 != isatty(fileno(stdout));
+    static bool isTTY = 0 != isatty(fileno(stdout));
 #endif
 
-    return istty;
+    return isTTY;
 }
 
 void setTextColor(Color color)
 {
-    if (!isConsoleTty()) {
+    if (!isConsoleTTY()) {
         return;
     }
 

@@ -24,7 +24,7 @@
 #include <vector>
 #include <boost/filesystem.hpp>
 #include <Crypto/hash.h>
-#include <Common/int-util.h>
+#include <Common/IntUtil.h>
 #include <Common/Util.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
@@ -584,7 +584,7 @@ bool tx_memory_pool::init(const std::string &config_folder)
 
 bool tx_memory_pool::deinit()
 {
-    if (!Tools::create_directories_if_necessary(m_config_folder)) {
+    if (!Tools::createDirectoriesIfNecessary(m_config_folder)) {
       logger(INFO) << "Failed to create data directory: " << m_config_folder;
       return false;
     }
@@ -805,7 +805,7 @@ bool tx_memory_pool::addTransactionInputs(
             auto ins_res = kei_image_set.insert(id);
             if (!(ins_res.second)) {
                 logger(ERROR, BRIGHT_RED)
-                    << "internal error: try to insert duplicate iterator in key_image set";
+                    << "internal error: try to insert duplicate Iterator in key_image set";
                 return false;
             }
         } else if (in.type() == typeid(MultiSignatureInput)) {

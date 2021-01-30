@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <mutex>
+
 #include <Common/SignalHandler.h>
 
 #ifdef _WIN32
@@ -26,8 +27,9 @@
 #endif
 #include <Windows.h>
 #else
-#include <signal.h>
+#include <csignal>
 #include <cstring>
+#include <utility>
 #endif
 
 namespace {
@@ -76,7 +78,7 @@ bool SignalHandler::install(std::function<void(void)> t)
     }
     return r;
 #else
-    struct sigaction newMask;
+    struct sigaction newMask{};
 
     std::memset(&newMask, 0, sizeof(struct sigaction));
     newMask.sa_handler = posixHandler;
@@ -96,7 +98,7 @@ bool SignalHandler::install(std::function<void(void)> t)
         return false;
     }
 
-    m_handler = t;
+    m_handler = std::move(t);
 
     return true;
 #endif

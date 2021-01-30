@@ -174,9 +174,9 @@ set(QwertycoinFramework_Common_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Common/VectorOutputStream.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Common/VectorOutputStream.h"
     "${CMAKE_CURRENT_LIST_DIR}/Common/VectorUtils.h"
-    "${CMAKE_CURRENT_LIST_DIR}/Common/int-util.h"
-    "${CMAKE_CURRENT_LIST_DIR}/Common/pod-class.h"
-    "${CMAKE_CURRENT_LIST_DIR}/Common/static_assert.h"
+    "${CMAKE_CURRENT_LIST_DIR}/Common/IntUtil.h"
+    "${CMAKE_CURRENT_LIST_DIR}/Common/PodClass.h"
+    "${CMAKE_CURRENT_LIST_DIR}/Common/StaticAssert.h"
     "${CMAKE_CURRENT_LIST_DIR}/Common/HardwareInfo.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Common/HardwareInfo.h")
 

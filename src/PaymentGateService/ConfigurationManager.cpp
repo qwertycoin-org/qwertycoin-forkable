@@ -50,17 +50,11 @@ bool ConfigurationManager::init(int argc, char** argv)
         ("testnet", po::bool_switch(), "testnet mode")
         ("version", "Output version information");
 
-    command_line::add_arg(
-        cmdGeneralOptions,
-        command_line::arg_data_dir,
-        Tools::getDefaultDataDirectory()
-    );
+    CommandLine::addArg(cmdGeneralOptions, CommandLine::argDataDir,
+                         Tools::getDefaultDataDirectory());
 
-    command_line::add_arg(
-        confGeneralOptions,
-        command_line::arg_data_dir,
-        Tools::getDefaultDataDirectory()
-    );
+    CommandLine::addArg(confGeneralOptions, CommandLine::argDataDir,
+                         Tools::getDefaultDataDirectory());
 
     Configuration::initOptions(cmdGeneralOptions);
     Configuration::initOptions(confGeneralOptions);

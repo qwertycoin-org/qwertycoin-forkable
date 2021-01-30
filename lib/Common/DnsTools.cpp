@@ -16,7 +16,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin. If not, see <http://www.gnu.org/licenses/>.
 
-#include <condition_variable>
 #include <cstring>
 #include <future>
 #include <functional>
@@ -24,9 +23,10 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <sstream>
 #include <string>
+
 #include <boost/program_options/variables_map.hpp>
+
 #include <Common/DnsTools.h>
 
 #ifdef _WIN32
@@ -36,18 +36,14 @@
 #include <Rpc.h>
 #else
 #include <arpa/nameser.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <resolv.h>
-#include <netdb.h>
-#include <unistd.h>
 #endif
 
 namespace Common {
 
 #ifndef __ANDROID__
-bool fetch_dns_txt(const std::string &domain, std::vector<std::string> &records)
+bool fetchDnsTxt(const std::string &domain,
+                 std::vector<std::string> &records)
 {
 #ifdef _WIN32
     using namespace std;
@@ -92,20 +88,20 @@ bool fetch_dns_txt(const std::string &domain, std::vector<std::string> &records)
 
     ns_msg nsMsg;
     int response;
-    unsigned char query_buffer[4096];
+    unsigned char queryBuffer[4096];
 
     {
         ns_type type = ns_t_txt;
 
-        const char * c_domain = (domain).c_str();
-        response = res_query(c_domain, 1, type, query_buffer, sizeof(query_buffer));
+        const char *cDomain = (domain).c_str();
+        response = res_query(cDomain, 1, type, queryBuffer, sizeof(queryBuffer));
 
         if (response < 0) {
             return false;
         }
     }
 
-    ns_initparse(query_buffer, response, &nsMsg);
+    ns_initparse(queryBuffer, response, &nsMsg);
 
     map<ns_type, function<void(const ns_rr &rr)>> callbacks;
 

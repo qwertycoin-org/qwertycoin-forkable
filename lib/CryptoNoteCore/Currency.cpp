@@ -25,7 +25,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/round.hpp>
 #include <Common/Base58.h>
-#include <Common/int-util.h>
+#include <Common/IntUtil.h>
 #include <Common/Math.h>
 #include <Common/StringTools.h>
 #include <CryptoNoteCore/Account.h>

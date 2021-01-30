@@ -10,7 +10,9 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+
 #include <boost/algorithm/string.hpp>
+
 #include <Common/ConsoleHandler.h>
 
 #ifdef _WIN32
@@ -19,8 +21,8 @@
 #endif
 #include <Windows.h>
 #else
+#include <cstdio>
 #include <unistd.h>
-#include <stdio.h>
 #endif
 
 using Common::Console::Color;
@@ -40,10 +42,10 @@ AsyncConsoleReader::~AsyncConsoleReader()
 void AsyncConsoleReader::start()
 {
     m_stop = false;
-    m_thread = std::thread(std::bind(&AsyncConsoleReader::consoleThread, this));
+    m_thread = std::thread([this] { consoleThread(); });
 }
 
-bool AsyncConsoleReader::getline(std::string &line)
+bool AsyncConsoleReader::getLine(std::string &line)
 {
     return m_queue.pop(line);
 }
@@ -112,31 +114,31 @@ bool AsyncConsoleReader::waitInput()
 {
 #ifndef _WIN32
     #if defined(__OpenBSD__) || defined(__ANDROID__)
-        int stdin_fileno = fileno(stdin);
+        int stdinFileno = fileno(stdin);
     #else
-        int stdin_fileno = ::fileno(stdin);
+        int stdinFileno = ::fileno(stdin);
     #endif
 
     while (!m_stop) {
-        fd_set read_set;
-        FD_ZERO(&read_set);
-        FD_SET(stdin_fileno, &read_set);
+        fd_set readSet;
+        FD_ZERO(&readSet);
+        FD_SET(stdinFileno, &readSet);
 
         struct timeval tv = timeval();
         tv.tv_sec = 0;
         tv.tv_usec = 100 * 1000;
 
-        int retval = ::select(stdin_fileno + 1, &read_set, nullptr, nullptr, &tv);
+        int retVal = ::select(stdinFileno + 1, &readSet, nullptr, nullptr, &tv);
 
-        if (retval == -1 && errno == EINTR) {
+        if (retVal == -1 && errno == EINTR) {
             continue;
         }
 
-        if (retval < 0) {
+        if (retVal < 0) {
             return false;
         }
 
-        if (retval > 0) {
+        if (retVal > 0) {
             return true;
         }
     }
@@ -169,7 +171,7 @@ void ConsoleHandler::start(bool startThread, const std::string &prompt, Console:
     m_consoleReader.start();
 
     if (startThread) {
-        m_thread = std::thread(std::bind(&ConsoleHandler::handlerThread, this));
+        m_thread = std::thread([this] { handlerThread(); });
     } else {
         handlerThread();
     }
@@ -215,14 +217,16 @@ std::string ConsoleHandler::getUsage() const
 
     std::stringstream ss;
 
-    size_t maxlen = std::max_element(
+    size_t maxLength = std::max_element(
         m_handlers.begin(), m_handlers.end(),
-        [](CommandHandlersMap::const_reference &a, CommandHandlersMap::const_reference &b) {
+        [](CommandHandlersMap::const_reference &a,
+           CommandHandlersMap::const_reference &b)
+    {
         return a.first.size() < b.first.size();
     })->first.size();
 
     for (auto &x : m_handlers) {
-        ss << std::left << std::setw(maxlen + 3) << x.first << x.second.second << std::endl;
+        ss << std::left << std::setw(maxLength + 3) << x.first << x.second.second << std::endl;
     }
 
     return ss.str();
@@ -309,7 +313,7 @@ void ConsoleHandler::handlerThread()
                 }
             }
 
-            if (!m_consoleReader.getline(line)) {
+            if (!m_consoleReader.getLine(line)) {
                 break;
             }
 
@@ -318,7 +322,8 @@ void ConsoleHandler::handlerThread()
                 handleCommand(line);
             }
         } catch (std::exception &) {
-            // ignore errors
+            // ignore errors, best comment EVER SEEN!
+            // i'll add Error logs later
         }
     }
 }

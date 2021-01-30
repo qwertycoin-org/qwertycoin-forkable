@@ -169,7 +169,7 @@ void PaymentGateService::runInProcess(Logging::LoggerRef &log)
             throw std::runtime_error("Directory does not exist: " + config.coreConfig.configFolder);
         }
     } else {
-        if (!Tools::create_directories_if_necessary(config.coreConfig.configFolder)) {
+        if (!Tools::createDirectoriesIfNecessary(config.coreConfig.configFolder)) {
             throw std::runtime_error("Can't create directory: " + config.coreConfig.configFolder);
         }
     }

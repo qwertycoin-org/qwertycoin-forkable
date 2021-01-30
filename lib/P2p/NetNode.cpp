@@ -121,49 +121,49 @@ namespace CryptoNote {
 
 namespace {
 
-const command_line::arg_descriptor<std::string> arg_p2p_bind_ip = {
+const CommandLine::ArgDescriptor<std::string> arg_p2p_bind_ip = {
     "p2p-bind-ip",
     "Interface for p2p network protocol",
     "0.0.0.0"
 };
-const command_line::arg_descriptor<std::string> arg_p2p_bind_port = {
+const CommandLine::ArgDescriptor<std::string> arg_p2p_bind_port = {
     "p2p-bind-port",
     "Port for p2p network protocol",
     std::to_string(CryptoNote::P2P_DEFAULT_PORT)
 };
-const command_line::arg_descriptor<uint32_t> arg_p2p_external_port = {
+const CommandLine::ArgDescriptor<uint32_t> arg_p2p_external_port = {
     "p2p-external-port",
     "External port for p2p network protocol (if port forwarding used with NAT)",
     0
 };
-const command_line::arg_descriptor<bool> arg_p2p_allow_local_ip = {
+const CommandLine::ArgDescriptor<bool> arg_p2p_allow_local_ip = {
     "allow-local-ip",
     "Allow local ip add to peer list, mostly in debug purposes"
 };
-const command_line::arg_descriptor<std::vector<std::string>> arg_p2p_add_peer = {
+const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_add_peer = {
     "add-peer",
     "Manually add peer to local peerlist"
 };
-const command_line::arg_descriptor<std::vector<std::string>> arg_p2p_add_priority_node = {
+const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_add_priority_node = {
     "add-priority-node",
     "Specify list of peers to connect to and attempt to keep the connection open"
 };
-const command_line::arg_descriptor<std::vector<std::string>> arg_p2p_add_exclusive_node = {
+const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_add_exclusive_node = {
     "add-exclusive-node",
     "Specify list of peers to connect to only. "
     "If this option is given the options add-priority-node and seed-node are ignored. "
 };
-const command_line::arg_descriptor<std::vector<std::string>> arg_p2p_seed_node = {
+const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_seed_node = {
     "seed-node",
     "Connect to a node to retrieve peer addresses, and disconnect"
 };
-const command_line::arg_descriptor<bool> arg_p2p_hide_my_port = {
+const CommandLine::ArgDescriptor<bool> arg_p2p_hide_my_port = {
     "hide-my-port",
     "Do not announce yourself as peerlist candidate",
     false,
     true
 };
-const command_line::arg_descriptor<std::string> arg_p2p_exclusive_version = {
+const CommandLine::ArgDescriptor<std::string> arg_p2p_exclusive_version = {
     "exclusive-version",
     "Refuse connections from nodes that are not running the specified version. (specify version in short format, i.e. 5.1.4)"
 };
@@ -354,16 +354,16 @@ int NodeServer::handleCommand(const LevinProtocol::Command &cmd,
 
 void NodeServer::init_options(boost::program_options::options_description &desc)
 {
-    command_line::add_arg(desc, arg_p2p_bind_ip);
-    command_line::add_arg(desc, arg_p2p_bind_port);
-    command_line::add_arg(desc, arg_p2p_external_port);
-    command_line::add_arg(desc, arg_p2p_allow_local_ip);
-    command_line::add_arg(desc, arg_p2p_add_peer);
-    command_line::add_arg(desc, arg_p2p_add_priority_node);
-    command_line::add_arg(desc, arg_p2p_add_exclusive_node);
-    command_line::add_arg(desc, arg_p2p_seed_node);
-    command_line::add_arg(desc, arg_p2p_hide_my_port);
-    command_line::add_arg(desc, arg_p2p_exclusive_version);
+    CommandLine::addArg(desc, arg_p2p_bind_ip);
+    CommandLine::addArg(desc, arg_p2p_bind_port);
+    CommandLine::addArg(desc, arg_p2p_external_port);
+    CommandLine::addArg(desc, arg_p2p_allow_local_ip);
+    CommandLine::addArg(desc, arg_p2p_add_peer);
+    CommandLine::addArg(desc, arg_p2p_add_priority_node);
+    CommandLine::addArg(desc, arg_p2p_add_exclusive_node);
+    CommandLine::addArg(desc, arg_p2p_seed_node);
+    CommandLine::addArg(desc, arg_p2p_hide_my_port);
+    CommandLine::addArg(desc, arg_p2p_exclusive_version);
 }
 
 bool NodeServer::init_config()
@@ -522,14 +522,14 @@ void NodeServer::drop_connection(CryptoNoteConnectionContext &context, bool add_
 
 bool NodeServer::handle_command_line(const boost::program_options::variables_map &vm)
 {
-    m_bind_ip = command_line::get_arg(vm, arg_p2p_bind_ip);
-    m_port = command_line::get_arg(vm, arg_p2p_bind_port);
-    m_external_port = command_line::get_arg(vm, arg_p2p_external_port);
-    m_allow_local_ip = command_line::get_arg(vm, arg_p2p_allow_local_ip);
-    m_node_version = command_line::get_arg(vm, arg_p2p_exclusive_version);
+    m_bind_ip = CommandLine::getArg(vm, arg_p2p_bind_ip);
+    m_port = CommandLine::getArg(vm, arg_p2p_bind_port);
+    m_external_port = CommandLine::getArg(vm, arg_p2p_external_port);
+    m_allow_local_ip = CommandLine::getArg(vm, arg_p2p_allow_local_ip);
+    m_node_version = CommandLine::getArg(vm, arg_p2p_exclusive_version);
 
-    if (command_line::has_arg(vm, arg_p2p_add_peer)) {
-        std::vector<std::string> perrs = command_line::get_arg(vm, arg_p2p_add_peer);
+    if (CommandLine::hasArg(vm, arg_p2p_add_peer)) {
+        std::vector<std::string> perrs = CommandLine::getArg(vm, arg_p2p_add_peer);
         for(const std::string &pr_str : perrs) {
             PeerlistEntry pe = boost::value_initialized<PeerlistEntry>();
             pe.id = Random::randomValue<uint64_t>();
@@ -542,23 +542,23 @@ bool NodeServer::handle_command_line(const boost::program_options::variables_map
         }
     }
 
-    if (command_line::has_arg(vm,arg_p2p_add_exclusive_node)) {
+    if (CommandLine::hasArg(vm, arg_p2p_add_exclusive_node)) {
         if (!parse_peers_and_add_to_container(vm, arg_p2p_add_exclusive_node, m_exclusive_peers)) {
             return false;
         }
     }
-    if (command_line::has_arg(vm, arg_p2p_add_priority_node)) {
+    if (CommandLine::hasArg(vm, arg_p2p_add_priority_node)) {
         if (!parse_peers_and_add_to_container(vm, arg_p2p_add_priority_node, m_priority_peers)) {
             return false;
         }
     }
-    if (command_line::has_arg(vm, arg_p2p_seed_node)) {
+    if (CommandLine::hasArg(vm, arg_p2p_seed_node)) {
         if (!parse_peers_and_add_to_container(vm, arg_p2p_seed_node, m_seed_nodes)) {
             return false;
         }
     }
 
-    if (command_line::has_arg(vm, arg_p2p_hide_my_port)) {
+    if (CommandLine::hasArg(vm, arg_p2p_hide_my_port)) {
         m_hide_my_port = true;
     }
 
@@ -717,7 +717,7 @@ bool NodeServer::deinit()
 bool NodeServer::store_config()
 {
     try {
-        if (!Tools::create_directories_if_necessary(m_config_folder)) {
+        if (!Tools::createDirectoriesIfNecessary(m_config_folder)) {
             logger(INFO) << "Failed to create data directory: " << m_config_folder;
             return false;
         }
@@ -1332,7 +1332,7 @@ int NodeServer::handle_get_stat_info(int command,
     rsp.connections_count = get_connections_count();
     rsp.incoming_connections_count = rsp.connections_count - get_outgoing_connections_count();
     rsp.version = PROJECT_VERSION_LONG;
-    rsp.os_version = Tools::get_os_version_string();
+    rsp.os_version = Tools::getOsVersionString();
 
     m_payload_handler.get_stat_info(rsp.payload_info);
 
@@ -1671,10 +1671,10 @@ bool NodeServer::connect_to_peerlist(const std::vector<NetworkAddress> &peers)
 
 bool NodeServer::parse_peers_and_add_to_container(
     const boost::program_options::variables_map &vm,
-    const command_line::arg_descriptor<std::vector<std::string>> &arg,
+    const CommandLine::ArgDescriptor<std::vector<std::string>> &arg,
     std::vector<NetworkAddress> &container)
 {
-    std::vector<std::string> perrs = command_line::get_arg(vm, arg);
+    std::vector<std::string> perrs = CommandLine::getArg(vm, arg);
 
     for(const std::string &pr_str: perrs) {
         NetworkAddress na;

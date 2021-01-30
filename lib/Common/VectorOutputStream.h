@@ -20,6 +20,7 @@
 
 #include <cstdint>
 #include <vector>
+
 #include <Common/IOutputStream.h>
 
 namespace Common {

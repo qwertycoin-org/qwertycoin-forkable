@@ -268,7 +268,7 @@ private:
 
     bool parse_peers_and_add_to_container(
         const boost::program_options::variables_map &vm,
-        const command_line::arg_descriptor<std::vector<std::string>> &arg,
+        const CommandLine::ArgDescriptor<std::vector<std::string>> &arg,
         std::vector<NetworkAddress> &container);
 
     // debug functions

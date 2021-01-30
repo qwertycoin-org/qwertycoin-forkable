@@ -19,13 +19,15 @@
 
 #include <fstream>
 #include <iomanip>
+
 #include <Common/StringTools.h>
 
 namespace Common {
 
 namespace {
 
-const uint8_t characterValues[256] = {
+const uint8_t characterValues[256] =
+{
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -238,7 +240,7 @@ static const std::string base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                        "abcdefghijklmnopqrstuvwxyz"
                                        "0123456789+/";
 
-bool is_base64(unsigned char c)
+bool isBase64(unsigned char c)
 {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
@@ -283,7 +285,7 @@ std::string base64Decode(const std::string &encoded_string)
     unsigned char char_array_4[4], char_array_3[3];
     std::string ret;
 
-    while (in_len-- && (encoded_string[in_] != '=') && is_base64(encoded_string[in_])) {
+    while (in_len-- && (encoded_string[in_] != '=') && isBase64(encoded_string[in_])) {
         char_array_4[i++] = encoded_string[in_]; in_++;
         if (i == 4) {
             for (i = 0; i <4; i++) {
@@ -432,7 +434,7 @@ std::string timeIntervalToString(uint64_t intervalInSeconds)
     return ss.str();
 }
 
-bool starts_with(const std::string &str1, const std::string &str2)
+bool startsWith(const std::string &str1, const std::string &str2)
 {
     if (str1.length() < str2.length())
         return false;

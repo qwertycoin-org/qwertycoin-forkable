@@ -26,7 +26,9 @@ template<typename T>
 class ShuffleGenerator
 {
 public:
-    explicit ShuffleGenerator(T n) : count(n), N(n) { }
+    explicit ShuffleGenerator(T n) : count(n), N(n)
+    {
+    }
 
     bool empty() const { return count == 0; }
 
