@@ -3129,7 +3129,7 @@ bool RpcServer::onCheckReserveProof(const COMMAND_RPC_CHECK_RESERVE_PROOF::reque
         prefix_data.append((const char *)&proofs[i].key_image, sizeof(Crypto::PublicKey));
     }
     Crypto::Hash prefix_hash;
-    Crypto::cn_fast_hash(prefix_data.data(), prefix_data.size(), prefix_hash);
+    Crypto::cnFastHash(prefix_data.data(), prefix_data.size(), prefix_hash);
 
     // fetch txes
     std::vector<Crypto::Hash> transactionHashes;
