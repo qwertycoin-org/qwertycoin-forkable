@@ -326,7 +326,7 @@ bool miner::worker_thread(uint32_t th_local_index)
     uint32_t nonce = m_starter_nonce + th_local_index;
     difficulty_type local_diff = 0;
     uint32_t local_template_ver = 0;
-    Crypto::cn_context context;
+    Crypto::CnContext context;
     Block b;
 
     while(!m_stop) {
@@ -354,7 +354,7 @@ bool miner::worker_thread(uint32_t th_local_index)
         b.nonce = nonce;
         Crypto::Hash h;
         if (!m_stop && !getBlockLongHash(context, b, h)) {
-            logger(ERROR) << "Failed to get block long hash";
+            logger(ERROR) << "Failed to get block long Hash";
             m_stop = true;
         }
 

@@ -19,7 +19,7 @@
 
 #include <set>
 #include <Common/Varint.h>
-#include <Crypto/cn_slow_hash.hpp>
+#include <Crypto/CnSlowHash.h>
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
@@ -51,7 +51,7 @@ bool parseAndValidateTransactionFromBinaryArray(
     }
 
     //TODO: validate tx
-    cn_fast_hash(tx_blob.data(), tx_blob.size(), tx_hash);
+    cnFastHash(tx_blob.data(), tx_blob.size(), tx_hash);
     getObjectHash(*static_cast<TransactionPrefix *>(&tx), tx_prefix_hash);
 
     return true;
@@ -614,14 +614,14 @@ Hash getBlockHash(const Block &b)
     return p;
 }
 
-bool getBlockLongHash(cn_context &context, const Block &b, Hash &res)
+bool getBlockLongHash(CnContext &context, const Block &b, Hash &res)
 {
     BinaryArray bd;
     if (!get_block_hashing_blob(b, bd)) {
         return false;
     }
 
-    cn_pow_hash_v1 cnh;
+    cnPowHashV1 cnh;
     cnh.hash(bd.data(), bd.size(), res.data);
 
     return true;
@@ -652,7 +652,7 @@ std::vector<uint32_t> absolute_output_offsets_to_relative(const std::vector<uint
 
 void get_tx_tree_hash(const std::vector<Hash> &tx_hashes, Hash &h)
 {
-    tree_hash(tx_hashes.data(), tx_hashes.size(), h);
+    treeHash(tx_hashes.data(), tx_hashes.size(), h);
 }
 
 Hash get_tx_tree_hash(const std::vector<Hash> &tx_hashes)

@@ -20,7 +20,7 @@
 
 #include <unordered_map>
 
-#include <Crypto/random.h>
+#include <Crypto/Random.h>
 
 template<typename T>
 class ShuffleGenerator

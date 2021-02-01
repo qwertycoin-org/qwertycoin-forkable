@@ -38,9 +38,9 @@ extern "C" {
 
   static void hash_tree(const void *data, size_t length, char *hash) {
     if ((length & 31) != 0) {
-      throw ios_base::failure("Invalid input length for tree_hash");
+      throw ios_base::failure("Invalid input length for treeHash");
     }
-    Crypto::tree_hash((const char (*)[32]) data, length >> 5, hash);
+    Crypto::treeHash((const char (*)[32]) data, length >> 5, hash);
   }
 
   static void slow_hash(const void *data, size_t length, char *hash) {
@@ -52,9 +52,9 @@ extern "C" typedef void hash_f(const void *, size_t, char *);
 struct hash_func {
   const string name;
   hash_f &f;
-} hashes[] = {{"fast", Crypto::cn_fast_hash}, {"slow", slow_hash}, {"tree", hash_tree},
-  {"extra-blake", Crypto::hash_extra_blake}, {"extra-groestl", Crypto::hash_extra_groestl},
-  {"extra-jh", Crypto::hash_extra_jh}, {"extra-skein", Crypto::hash_extra_skein}};
+} hashes[] = {{"fast", Crypto::cnFastHash}, {"slow", slowHash}, {"tree", hashTree},
+  {"extra-blake", Crypto::hashExtraBlake}, {"extra-groestl", Crypto::hashExtraGroestl},
+  {"extra-jh", Crypto::hashExtraJh}, {"extra-skein", Crypto::hashExtraSkein}};
 
 int main(int argc, char *argv[]) {
   hash_f *f;

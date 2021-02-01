@@ -21,7 +21,7 @@
 #include <CryptoNoteCore/CryptoNoteSerialization.h>
 
 extern "C" {
-#include <Crypto/keccak.h>
+#include <Crypto/Keccak.h>
 } // extern "C"
 
 namespace CryptoNote {
@@ -65,7 +65,7 @@ Crypto::SecretKey AccountBase::generate_key(
         recover
     );
 
-    // rng for generating second set of keys is hash of first rng.
+    // rng for generating second set of keys is Hash of first rng.
     // means only one set of electrum-style words needed for recovery.
     Crypto::SecretKey second;
     keccak((uint8_t*)&first,sizeof(Crypto::SecretKey),(uint8_t*)&second,sizeof(Crypto::SecretKey));

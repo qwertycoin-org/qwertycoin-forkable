@@ -29,118 +29,128 @@ typedef int32_t fe[10];
 
 /* From ge.h */
 
-typedef struct {
+typedef struct
+{
   fe X;
   fe Y;
   fe Z;
-} ge_p2;
+} GeP2;
 
-typedef struct {
-  fe X;
-  fe Y;
-  fe Z;
-  fe T;
-} ge_p3;
-
-typedef struct {
+typedef struct
+{
   fe X;
   fe Y;
   fe Z;
   fe T;
-} ge_p1p1;
+} GeP3;
 
-typedef struct {
-  fe yplusx;
-  fe yminusx;
-  fe xy2d;
-} ge_precomp;
-
-typedef struct {
-  fe YplusX;
-  fe YminusX;
+typedef struct
+{
+  fe X;
+  fe Y;
   fe Z;
-  fe T2d;
-} ge_cached;
+  fe T;
+} GeP1P1;
+
+typedef struct
+{
+  fe YPlusX;
+  fe YMinusX;
+  fe XY2D;
+} GePrecomp;
+
+typedef struct
+{
+  fe YPlusX;
+  fe YMinusX;
+  fe Z;
+  fe T2D;
+} GeCached;
 
 /* From ge_add.c */
 
-void ge_add(ge_p1p1 *, const ge_p3 *, const ge_cached *);
+void geAdd(GeP1P1 *, const GeP3 *, const GeCached *);
 
 /* From ge_double_scalarmult.c, modified */
 
-typedef ge_cached ge_dsmp[8];
-extern const ge_precomp ge_Bi[8];
-void ge_dsm_precomp(ge_dsmp r, const ge_p3 *s);
-void ge_double_scalarmult_base_vartime(ge_p2 *, const unsigned char *, const ge_p3 *, const unsigned char *);
+typedef GeCached geDsmp[8];
+extern const GePrecomp geBi[8];
+void geDsmPrecomp(geDsmp r, const GeP3 *s);
+void geDoubleScalarmultBaseVartime(GeP2 *, const unsigned char *, const GeP3 *, const unsigned char *);
 
 /* From ge_frombytes.c, modified */
 
-extern const fe fe_sqrtm1;
-extern const fe fe_d;
-int ge_frombytes_vartime(ge_p3 *, const unsigned char *);
+extern const fe feSqrtm1;
+extern const fe feD;
+int geFromBytesVarTime(GeP3 *, const unsigned char *);
 
-/* From ge_p1p1_to_p2.c */
+/* From geP1P1ToP2.c */
 
-void ge_p1p1_to_p2(ge_p2 *, const ge_p1p1 *);
+void geP1P1ToP2(GeP2 *, const GeP1P1 *);
 
-/* From ge_p1p1_to_p3.c */
+/* From geP1P1ToP3.c */
 
-void ge_p1p1_to_p3(ge_p3 *, const ge_p1p1 *);
+void geP1P1ToP3(GeP3 *, const GeP1P1 *);
 
-/* From ge_p2_dbl.c */
+/* From geP2Dbl.c */
 
-void ge_p2_dbl(ge_p1p1 *, const ge_p2 *);
+void geP2Dbl(GeP1P1 *, const GeP2 *);
 
-/* From ge_p3_to_cached.c */
+/* From geP3ToCached.c */
 
-extern const fe fe_d2;
-void ge_p3_to_cached(ge_cached *, const ge_p3 *);
+extern const fe feD2;
+void geP3ToCached(GeCached *, const GeP3 *);
 
-/* From ge_p3_to_p2.c */
+/* From geP3ToP2.c */
 
-void ge_p3_to_p2(ge_p2 *, const ge_p3 *);
+void geP3ToP2(GeP2 *, const GeP3 *);
 
-/* From ge_p3_tobytes.c */
+/* From geP3Tobytes.c */
 
-void ge_p3_tobytes(unsigned char *, const ge_p3 *);
+void geP3Tobytes(unsigned char *, const GeP3 *);
 
-/* From ge_scalarmult_base.c */
+/* From geScalarMultBase.c */
 
-extern const ge_precomp ge_base[32][8];
-void ge_scalarmult_base(ge_p3 *, const unsigned char *);
+extern const GePrecomp ge_base[32][8];
+void geScalarMultBase(GeP3 *, const unsigned char *);
 
-/* From ge_sub.c */
+/* From geSub.c */
 
-void ge_sub(ge_p1p1 *, const ge_p3 *, const ge_cached *);
+void geSub(GeP1P1 *, const GeP3 *, const GeCached *);
 
-/* From ge_tobytes.c */
+/* From geToBytes.c */
 
-void ge_tobytes(unsigned char *, const ge_p2 *);
+void geToBytes(unsigned char *, const GeP2 *);
 
-/* From sc_reduce.c */
+/* From scReduce.c */
 
-void sc_reduce(unsigned char *);
+void scReduce(unsigned char *);
 
 /* New code */
 
-void ge_scalarmult(ge_p2 *, const unsigned char *, const ge_p3 *);
-void ge_double_scalarmult_precomp_vartime(ge_p2 *, const unsigned char *, const ge_p3 *, const unsigned char *, const ge_dsmp);
-void ge_mul8(ge_p1p1 *, const ge_p2 *);
-extern const fe fe_ma2;
-extern const fe fe_ma;
-extern const fe fe_fffb1;
-extern const fe fe_fffb2;
-extern const fe fe_fffb3;
-extern const fe fe_fffb4;
-void ge_fromfe_frombytes_vartime(ge_p2 *, const unsigned char *);
-void sc_0(unsigned char *);
-void sc_reduce32(unsigned char *);
-void sc_add(unsigned char *, const unsigned char *, const unsigned char *);
-void sc_sub(unsigned char *, const unsigned char *, const unsigned char *);
-void sc_mulsub(unsigned char *, const unsigned char *, const unsigned char *, const unsigned char *);
-void sc_mul(unsigned char *, const unsigned char *, const unsigned char *);
-int sc_check(const unsigned char *);
-int sc_isnonzero(const unsigned char *); /* Doesn't normalize */
+void geScalarMult(GeP2 *, const unsigned char *, const GeP3 *);
+void geDoubleScalarMultPrecompVarTime(GeP2 *,
+                                      const unsigned char *,
+                                      const GeP3 *,
+                                      const unsigned char *,
+                                      const geDsmp);
+void geMul8(GeP1P1 *, const GeP2 *);
+
+extern const fe feMa;
+extern const fe feMa2;
+extern const fe feFffb1;
+extern const fe feFffb2;
+extern const fe feFffb3;
+extern const fe feFffb4;
+void geFromFeFromBytesVarTime(GeP2 *, const unsigned char *);
+void sc0(unsigned char *);
+void scReduce32(unsigned char *);
+void scAdd(unsigned char *, const unsigned char *, const unsigned char *);
+void scSub(unsigned char *, const unsigned char *, const unsigned char *);
+void scMulSub(unsigned char *, const unsigned char *, const unsigned char *, const unsigned char *);
+void scMul(unsigned char *, const unsigned char *, const unsigned char *);
+int scCheck(const unsigned char *);
+int scIsNonZero(const unsigned char *); /* Doesn't normalize */
 
 #if defined(__cplusplus)
 }

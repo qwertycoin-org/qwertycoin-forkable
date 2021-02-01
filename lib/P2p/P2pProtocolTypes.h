@@ -22,7 +22,7 @@
 #include <tuple>
 #include <boost/uuid/uuid.hpp>
 #include <Common/StringTools.h>
-#include <android.h>
+#include <Android.h>
 
 namespace CryptoNote {
 

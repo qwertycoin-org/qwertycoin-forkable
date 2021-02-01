@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <limits>
 #include <vector>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 #include <CryptoNoteCore/ITransaction.h>
 #include <IObservable.h>
 #include <IStreamSerializable.h>

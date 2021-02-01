@@ -20,7 +20,7 @@
 
 #include <cstdint>
 #include <vector>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 
 namespace CryptoNote {
 

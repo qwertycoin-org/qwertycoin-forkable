@@ -158,7 +158,7 @@ protected:
         Crypto::PublicKey &publicKey,
         Crypto::SecretKey &secretKey,
         uint64_t &creationTimestamp,
-        const Crypto::chacha8_key &key);
+        const Crypto::Chacha8Key &key);
     void decryptKeyPair(
         const EncryptedWalletRecord &cipher,
         Crypto::PublicKey &publicKey,
@@ -168,14 +168,14 @@ protected:
         const Crypto::PublicKey &publicKey,
         const Crypto::SecretKey &secretKey,
         uint64_t creationTimestamp,
-        const Crypto::chacha8_key &key,
-        const Crypto::chacha8_iv &iv);
+        const Crypto::Chacha8Key &key,
+        const Crypto::Chacha8Iv &iv);
     EncryptedWalletRecord encryptKeyPair(
         const Crypto::PublicKey &publicKey,
         const Crypto::SecretKey &secretKey,
         uint64_t creationTimestamp) const;
-    Crypto::chacha8_iv getNextIv() const;
-    static void incIv(Crypto::chacha8_iv &iv);
+    Crypto::Chacha8Iv getNextIv() const;
+    static void incIv(Crypto::Chacha8Iv &iv);
     void incNextIv();
     void initWithKeys(
         const std::string &path,
@@ -240,7 +240,7 @@ protected:
     struct ContainerStoragePrefix
     {
         uint8_t version;
-        Crypto::chacha8_iv nextIv;
+        Crypto::Chacha8Iv nextIv;
         EncryptedWalletRecord encryptedViewKeys;
     };
 #pragma pack(pop)
@@ -470,23 +470,23 @@ protected:
 
     void copyContainerStorageKeys(
         ContainerStorage &src,
-        const Crypto::chacha8_key &srcKey,
+        const Crypto::Chacha8Key &srcKey,
         ContainerStorage &dst,
-        const Crypto::chacha8_key &dstKey);
+        const Crypto::Chacha8Key &dstKey);
     static void copyContainerStoragePrefix(
         ContainerStorage &src,
-        const Crypto::chacha8_key &srcKey,
+        const Crypto::Chacha8Key &srcKey,
         ContainerStorage &dst,
-        const Crypto::chacha8_key &dstKey);
+        const Crypto::Chacha8Key &dstKey);
     void deleteOrphanTransactions(const std::unordered_set<Crypto::PublicKey> &deletedKeys);
     static void encryptAndSaveContainerData(
         ContainerStorage &storage,
-        const Crypto::chacha8_key &key,
+        const Crypto::Chacha8Key &key,
         const void *containerData,
         size_t containerDataSize);
     static void loadAndDecryptContainerData(
         ContainerStorage &storage,
-        const Crypto::chacha8_key &key,
+        const Crypto::Chacha8Key &key,
         BinaryArray &containerData);
     void initTransactionPool();
     void loadSpendKeys();
@@ -497,7 +497,7 @@ protected:
         std::string &extra);
     void saveWalletCache(
         ContainerStorage &storage,
-        const Crypto::chacha8_key &key,
+        const Crypto::Chacha8Key &key,
         WalletSaveLevel saveLevel,
         const std::string &extra);
     void subscribeWallets();
@@ -575,7 +575,7 @@ private:
     WalletState m_state;
 
     std::string m_password;
-    Crypto::chacha8_key m_key;
+    Crypto::Chacha8Key m_key;
     std::string m_path;
     std::string m_extra; // workaround for wallet reset
 

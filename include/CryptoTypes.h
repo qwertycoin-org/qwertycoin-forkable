@@ -20,7 +20,7 @@
 
 #include <cstdint>
 #include <cstring>
-#include <Crypto/crypto-util.h>
+#include <Crypto/CryptoUtil.h>
 
 namespace Crypto {
 

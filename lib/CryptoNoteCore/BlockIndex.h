@@ -20,7 +20,7 @@
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/random_access_index.hpp>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 
 namespace CryptoNote {
 

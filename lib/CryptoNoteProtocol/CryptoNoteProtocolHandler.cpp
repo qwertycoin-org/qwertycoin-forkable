@@ -323,7 +323,8 @@ int CryptoNoteProtocolHandler::handle_notify_new_block(int command,
         CryptoNote::tx_verification_context tvc = boost::value_initialized<decltype(tvc)>();
 
         auto transactionBinary = asBinaryArray(*tx_blob_it);
-        Crypto::Hash transactionHash = Crypto::cn_fast_hash(transactionBinary.data(), transactionBinary.size());
+        Crypto::Hash transactionHash =
+                Crypto::cnFastHash(transactionBinary.data(), transactionBinary.size());
         logger(DEBUGGING) << "transaction " << transactionHash << " came in NOTIFY_NEW_BLOCK";
 
         m_core.handle_incoming_tx(transactionBinary, tvc, true, true);
@@ -378,8 +379,8 @@ int CryptoNoteProtocolHandler::handle_notify_new_transactions(
 
     for (auto tx_blob_it = arg.txs.begin(); tx_blob_it != arg.txs.end();) {
         auto transactionBinary = asBinaryArray(*tx_blob_it);
-        Crypto::Hash transactionHash = Crypto::cn_fast_hash(transactionBinary.data(),
-                                                            transactionBinary.size());
+        Crypto::Hash transactionHash =
+                Crypto::cnFastHash(transactionBinary.data(), transactionBinary.size());
         logger(DEBUGGING)
             << "transaction "
             << transactionHash
@@ -569,8 +570,8 @@ int CryptoNoteProtocolHandler::processObjects(CryptoNoteConnectionContext &conte
         // process transactions
         for (auto &tx_blob : block_entry.txs) {
             auto transactionBinary = asBinaryArray(tx_blob);
-            Crypto::Hash transactionHash = Crypto::cn_fast_hash(transactionBinary.data(),
-                                                                transactionBinary.size());
+            Crypto::Hash transactionHash =
+                    Crypto::cnFastHash(transactionBinary.data(), transactionBinary.size());
             logger(DEBUGGING) << "transaction " << transactionHash << " came in processObjects";
 
             tx_verification_context tvc = boost::value_initialized<decltype(tvc)>();

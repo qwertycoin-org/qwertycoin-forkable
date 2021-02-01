@@ -37,7 +37,7 @@
 #include <tuple>
 #include <utility>
 #include <Crypto/Crypto.h>
-#include <Crypto/random.h>
+#include <Crypto/Random.h>
 #include <Common/Base58.h>
 #include <Common/ShuffleGenerator.h>
 #include <Common/StringTools.h>
@@ -53,7 +53,7 @@
 
 extern "C"
 {
-#include <Crypto/keccak.h>
+#include <Crypto/Keccak.h>
 #include <Crypto/CryptoOps.h>
 }
 
@@ -562,7 +562,7 @@ bool WalletLegacy::getSeed(std::string &electrum_words)
            (uint8_t *)&second,
            sizeof(Crypto::SecretKey));
 
-    sc_reduce32((uint8_t *)&second);
+    scReduce32((uint8_t *)&second);
 
     return memcmp(second.data,
                   m_account.getAccountKeys().viewSecretKey.data,
@@ -580,7 +580,7 @@ std::string WalletLegacy::getAddress()
 std::string WalletLegacy::sign_message(const std::string &message)
 {
     Crypto::Hash hash;
-    Crypto::cn_fast_hash(message.data(), message.size(), hash);
+    Crypto::cnFastHash(message.data(), message.size(), hash);
     const CryptoNote::AccountKeys &keys = m_account.getAccountKeys();
     Crypto::Signature signature;
     Crypto::generateSignature(hash, keys.address.spendPublicKey, keys.spendSecretKey, signature);
@@ -603,7 +603,7 @@ bool WalletLegacy::verify_message(
     }
 
     Crypto::Hash hash;
-    Crypto::cn_fast_hash(message.data(), message.size(), hash);
+    Crypto::cnFastHash(message.data(), message.size(), hash);
     std::string decoded;
     if (!Tools::Base58::decode(signature.substr(header_len), decoded)) {
         std::cout <<"Signature decoding error";
@@ -1364,7 +1364,7 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
     }
 
     Crypto::Hash prefix_hash;
-    Crypto::cn_fast_hash(prefix_data.data(), prefix_data.size(), prefix_hash);
+    Crypto::cnFastHash(prefix_data.data(), prefix_data.size(), prefix_hash);
 
     // generate proof entries
     std::vector<RESERVE_PROOF_ENTRY> proofs(selected_transfers.size());

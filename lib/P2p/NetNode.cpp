@@ -32,7 +32,7 @@
 #include <Common/StdOutputStream.h>
 #include <Common/Util.h>
 #include <Crypto/Crypto.h>
-#include <Crypto/random.h>
+#include <Crypto/Random.h>
 #include <P2p/ConnectionContext.h>
 #include <P2p/LevinProtocol.h>
 #include <P2p/NetNode.h>

@@ -1639,7 +1639,7 @@ bool Blockchain::handle_alternative_block(const Block &b, const Crypto::Hash &id
             return false;
         }
 
-        // Check the block's hash against the difficulty target for its alt chain
+        // Check the block's Hash against the difficulty target for its alt chain
         difficulty_type current_diff =
                 get_next_difficulty_for_alternative_chain(alt_chain, bei, bei.bl.timestamp);
         if (!(current_diff)) {
@@ -2482,7 +2482,7 @@ bool Blockchain::addNewBlock(const Block &bl, block_verification_context &bvc)
 {
     Crypto::Hash id;
     if (!getBlockHash(bl, id)) {
-        logger(ERROR, BRIGHT_RED) << "Failed to get block hash, possible block has invalid format";
+        logger(ERROR, BRIGHT_RED) << "Failed to get block Hash, possible block has invalid format";
         bvc.m_verification_failed = true;
         return false;
     }
@@ -2506,7 +2506,7 @@ bool Blockchain::addNewBlock(const Block &bl, block_verification_context &bvc)
                               << " at height "
                               << boost::get<BaseInput>(bl.baseTransaction.inputs.front()).blockIndex
                               << " as it doesn't refer to chain tail "
-                              << Common::podToHex(getTailId()) << ", its prev. block hash: "
+                              << Common::podToHex(getTailId()) << ", its prev. block Hash: "
                               << Common::podToHex(bl.previousBlockHash);
             bvc.m_added_to_main_chain = false;
             add_result = handle_alternative_block(bl, id, bvc);
@@ -2930,7 +2930,7 @@ void Blockchain::popTransaction(const Transaction &transaction, const Crypto::Ha
     size_t count = m_transactionMap.erase(transactionHash);
     if (count != 1) {
         logger(ERROR, BRIGHT_RED)
-                << "Blockchain consistency broken - cannot find transaction by hash.";
+                << "Blockchain consistency broken - cannot find transaction by Hash.";
     }
 }
 
@@ -3127,7 +3127,7 @@ bool Blockchain::getAlreadyGeneratedCoins(const Crypto::Hash &hash, uint64_t &ge
         return true;
     }
 
-    logger(DEBUGGING) << "Can't find block with hash " << hash
+    logger(DEBUGGING) << "Can't find block with Hash " << hash
                       << " to get already generated coins.";
 
     return false;
@@ -3151,7 +3151,7 @@ bool Blockchain::getBlockSize(const Crypto::Hash &hash, size_t &size)
         return true;
     }
 
-    logger(DEBUGGING) << "Can't find block with hash " << hash << " to get block size.";
+    logger(DEBUGGING) << "Can't find block with Hash " << hash << " to get block size.";
 
     return false;
 }

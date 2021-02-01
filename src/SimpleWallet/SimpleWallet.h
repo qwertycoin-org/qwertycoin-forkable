@@ -49,7 +49,7 @@
 #include <WalletLegacy/IWalletLegacy.h>
 #include <WalletLegacy/WalletHelper.h>
 #include <WalletLegacy/WalletLegacy.h>
-#include <android.h>
+#include <Android.h>
 #include "PasswordContainer.h"
 
 std::string remote_fee_address;

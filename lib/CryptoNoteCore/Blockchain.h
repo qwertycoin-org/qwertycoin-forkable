@@ -304,14 +304,14 @@ private:
 
     typedef google::sparse_hash_set<Crypto::KeyImage> key_images_container;
     typedef std::unordered_map<Crypto::Hash, BlockEntry> blocks_ext_by_hash;
-    // Crypto::Hash - tx hash, size_t - index of out in transaction
+    // Crypto::Hash - tx Hash, size_t - index of out in transaction
     typedef google::sparse_hash_map<uint64_t, std::vector<std::pair<TransactionIndex, uint16_t>>> outputs_container;
     typedef google::sparse_hash_map<uint64_t, std::vector<MultisignatureOutputUsage>> MultisignatureOutputsContainer;
 
     const Currency &m_currency;
     tx_memory_pool &m_tx_pool;
     std::recursive_mutex m_blockchain_lock; // TODO: add here reader/writer lock
-    Crypto::cn_context m_cn_context;
+    Crypto::CnContext m_cn_context;
     Tools::ObserverManager<IBlockchainStorageObserver> m_observerManager;
 
     key_images_container m_spent_keys;

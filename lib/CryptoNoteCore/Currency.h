@@ -24,7 +24,7 @@
 #include <vector>
 #include <functional>
 #include <boost/utility.hpp>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <CryptoNoteCore/Difficulty.h>
 #include <CryptoNoteCore/IMinerHandler.h>
@@ -212,7 +212,7 @@ public:
         lazy_stat_callback_type& lazy_stat_cb) const;
 
     bool checkProofOfWork(
-        Crypto::cn_context &context,
+        Crypto::CnContext &context,
         const Block &block,
         difficulty_type currentDiffic,
         Crypto::Hash &proofOfWork) const;

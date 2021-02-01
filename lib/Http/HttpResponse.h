@@ -23,7 +23,7 @@
 #include <ostream>
 #include <string>
 #include <map>
-#include <android.h>
+#include <Android.h>
 
 namespace CryptoNote {
 

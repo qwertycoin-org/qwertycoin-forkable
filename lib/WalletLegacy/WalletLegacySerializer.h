@@ -22,8 +22,8 @@
 #include <istream>
 #include <ostream>
 #include <vector>
-#include <Crypto/chacha8.h>
-#include <Crypto/hash.h>
+#include <Crypto/Chacha8.h>
+#include <Crypto/Hash.h>
 
 namespace CryptoNote {
 
@@ -59,14 +59,14 @@ private:
     void saveKeys(CryptoNote::ISerializer &serializer);
     void loadKeys(CryptoNote::ISerializer &serializer);
 
-    Crypto::chacha8_iv encrypt(
+    Crypto::Chacha8Iv encrypt(
         const std::string &plain,
         const std::string &password,
         std::string &cipher);
     void decrypt(
         const std::string &cipher,
         std::string &plain,
-        Crypto::chacha8_iv iv,
+        Crypto::Chacha8Iv iv,
         const std::string &password);
 
     CryptoNote::AccountBase &account;

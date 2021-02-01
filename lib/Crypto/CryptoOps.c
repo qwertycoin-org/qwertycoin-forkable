@@ -19,47 +19,49 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include "CryptoOps.h"
+#include <Crypto/CryptoOps.h>
 
 /* Predeclarations */
 
-static void fe_mul(fe, const fe, const fe);
-static void fe_sq(fe, const fe);
-static void fe_tobytes(unsigned char *, const fe);
-static void ge_madd(ge_p1p1 *, const ge_p3 *, const ge_precomp *);
-static void ge_msub(ge_p1p1 *, const ge_p3 *, const ge_precomp *);
-static void ge_p2_0(ge_p2 *);
-static void ge_p3_dbl(ge_p1p1 *, const ge_p3 *);
-static void fe_divpowm1(fe, const fe, const fe);
+static void feMul(fe, const fe, const fe);
+static void feSq(fe, const fe);
+static void feToBytes(unsigned char *, const fe);
+static void geMAdd(GeP1P1 *r, const GeP3 *p, const GePrecomp *q);
+static void geMSub(GeP1P1 *r, const GeP3 *p, const GePrecomp *q);
+static void geP20(GeP2 *h);
+static void geP3Dbl(GeP1P1 *r, const GeP3 *p);
+static void feDivPowM1(fe, const fe, const fe);
 
 /* Common functions */
 
-static uint64_t load_3(const unsigned char *in)
+static uint64_t load3(const unsigned char *in)
 {
     uint64_t result;
     result = (uint64_t)in[0];
     result |= ((uint64_t)in[1]) << 8;
     result |= ((uint64_t)in[2]) << 16;
+
     return result;
 }
 
-static uint64_t load_4(const unsigned char *in)
+static uint64_t load4(const unsigned char *in)
 {
     uint64_t result;
     result = (uint64_t)in[0];
     result |= ((uint64_t)in[1]) << 8;
     result |= ((uint64_t)in[2]) << 16;
     result |= ((uint64_t)in[3]) << 24;
+
     return result;
 }
 
-/* From fe_0.c */
+/* From fe0.c */
 
 /*
 h = 0
 */
 
-static void fe_0(fe h)
+static void fe0(fe h)
 {
     h[0] = 0;
     h[1] = 0;
@@ -73,13 +75,13 @@ static void fe_0(fe h)
     h[9] = 0;
 }
 
-/* From fe_1.c */
+/* From fe1.c */
 
 /*
 h = 1
 */
 
-static void fe_1(fe h)
+static void fe1(fe h)
 {
     h[0] = 1;
     h[1] = 0;
@@ -93,7 +95,7 @@ static void fe_1(fe h)
     h[9] = 0;
 }
 
-/* From fe_add.c */
+/* From feAdd.c */
 
 /*
 h = f + g
@@ -107,7 +109,7 @@ Postconditions:
    |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
 */
 
-static void fe_add(fe h, const fe f, const fe g)
+static void feAdd(fe h, const fe f, const fe g)
 {
     int32_t f0 = f[0];
     int32_t f1 = f[1];
@@ -151,7 +153,7 @@ static void fe_add(fe h, const fe f, const fe g)
     h[9] = h9;
 }
 
-/* From fe_cmov.c */
+/* From feCmov.c */
 
 /*
 Replace (f,g) with (g,g) if b == 1;
@@ -160,7 +162,7 @@ replace (f,g) with (f,g) if b == 0.
 Preconditions: b in {0,1}.
 */
 
-static void fe_cmov(fe f, const fe g, unsigned int b)
+static void feCmov(fe f, const fe g, unsigned int b)
 {
     int32_t f0 = f[0];
     int32_t f1 = f[1];
@@ -216,13 +218,13 @@ static void fe_cmov(fe f, const fe g, unsigned int b)
     f[9] = f9 ^ x9;
 }
 
-/* From fe_copy.c */
+/* From feCopy.c */
 
 /*
 h = f
 */
 
-static void fe_copy(fe h, const fe f)
+static void feCopy(fe h, const fe f)
 {
     int32_t f0 = f[0];
     int32_t f1 = f[1];
@@ -246,9 +248,9 @@ static void fe_copy(fe h, const fe f)
     h[9] = f9;
 }
 
-/* From fe_invert.c */
+/* From feInvert.c */
 
-static void fe_invert(fe out, const fe z)
+static void feInvert(fe out, const fe z)
 {
     fe t0;
     fe t1;
@@ -256,58 +258,58 @@ static void fe_invert(fe out, const fe z)
     fe t3;
     int i;
 
-    fe_sq(t0, z);
-    fe_sq(t1, t0);
-    fe_sq(t1, t1);
-    fe_mul(t1, z, t1);
-    fe_mul(t0, t0, t1);
-    fe_sq(t2, t0);
-    fe_mul(t1, t1, t2);
-    fe_sq(t2, t1);
+    feSq(t0, z);
+    feSq(t1, t0);
+    feSq(t1, t1);
+    feMul(t1, z, t1);
+    feMul(t0, t0, t1);
+    feSq(t2, t0);
+    feMul(t1, t1, t2);
+    feSq(t2, t1);
     for (i = 0; i < 4; ++i) {
-        fe_sq(t2, t2);
+        feSq(t2, t2);
     }
-    fe_mul(t1, t2, t1);
-    fe_sq(t2, t1);
+    feMul(t1, t2, t1);
+    feSq(t2, t1);
     for (i = 0; i < 9; ++i) {
-        fe_sq(t2, t2);
+        feSq(t2, t2);
     }
-    fe_mul(t2, t2, t1);
-    fe_sq(t3, t2);
+    feMul(t2, t2, t1);
+    feSq(t3, t2);
     for (i = 0; i < 19; ++i) {
-        fe_sq(t3, t3);
+        feSq(t3, t3);
     }
-    fe_mul(t2, t3, t2);
-    fe_sq(t2, t2);
+    feMul(t2, t3, t2);
+    feSq(t2, t2);
     for (i = 0; i < 9; ++i) {
-        fe_sq(t2, t2);
+        feSq(t2, t2);
     }
-    fe_mul(t1, t2, t1);
-    fe_sq(t2, t1);
+    feMul(t1, t2, t1);
+    feSq(t2, t1);
     for (i = 0; i < 49; ++i) {
-        fe_sq(t2, t2);
+        feSq(t2, t2);
     }
-    fe_mul(t2, t2, t1);
-    fe_sq(t3, t2);
+    feMul(t2, t2, t1);
+    feSq(t3, t2);
     for (i = 0; i < 99; ++i) {
-        fe_sq(t3, t3);
+        feSq(t3, t3);
     }
-    fe_mul(t2, t3, t2);
-    fe_sq(t2, t2);
+    feMul(t2, t3, t2);
+    feSq(t2, t2);
     for (i = 0; i < 49; ++i) {
-        fe_sq(t2, t2);
+        feSq(t2, t2);
     }
-    fe_mul(t1, t2, t1);
-    fe_sq(t1, t1);
+    feMul(t1, t2, t1);
+    feSq(t1, t1);
     for (i = 0; i < 4; ++i) {
-        fe_sq(t1, t1);
+        feSq(t1, t1);
     }
-    fe_mul(out, t1, t0);
+    feMul(out, t1, t0);
 
     return;
 }
 
-/* From fe_isnegative.c */
+/* From feIsNegative.c */
 
 /*
 return 1 if f is in {1,3,5,...,q-2}
@@ -317,29 +319,30 @@ Preconditions:
    |f| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
 */
 
-static int fe_isnegative(const fe f)
+static int feIsNegative(const fe f)
 {
     unsigned char s[32];
-    fe_tobytes(s, f);
+    feToBytes(s, f);
+
     return s[0] & 1;
 }
 
-/* From fe_isnonzero.c, modified */
+/* From feIsNonZero.c, modified */
 
-static int fe_isnonzero(const fe f)
+static int feIsNonZero(const fe f)
 {
     unsigned char s[32];
-    fe_tobytes(s, f);
-    return (((int)(s[0] | s[1] | s[2] | s[3] | s[4] | s[5] | s[6] | s[7] | s[8] | s[9] | s[10]
-                   | s[11] | s[12] | s[13] | s[14] | s[15] | s[16] | s[17] | s[18] | s[19] | s[20]
-                   | s[21] | s[22] | s[23] | s[24] | s[25] | s[26] | s[27] | s[28] | s[29] | s[30]
-                   | s[31])
-             - 1)
-            >> 8)
-            + 1;
+    feToBytes(s, f);
+
+    return (
+        ((int)(
+            s[0] | s[1] | s[2] | s[3] | s[4] | s[5] | s[6] | s[7] | s[8] | s[9] | s[10]
+            | s[11] | s[12] | s[13] | s[14] | s[15] | s[16] | s[17] | s[18] | s[19] | s[20]
+            | s[21] | s[22] | s[23] | s[24] | s[25] | s[26] | s[27] | s[28] | s[29] | s[30]
+            | s[31]) - 1) >> 8) + 1;
 }
 
-/* From fe_mul.c */
+/* From feMul.c */
 
 /*
 h = f * g
@@ -373,7 +376,7 @@ Can get away with 11 carries, but then data flow is much deeper.
 With tighter constraints on inputs can squeeze carries into int32.
 */
 
-static void fe_mul(fe h, const fe f, const fe g)
+static void feMul(fe h, const fe f, const fe g)
 {
     int32_t f0 = f[0];
     int32_t f1 = f[1];
@@ -621,7 +624,7 @@ static void fe_mul(fe h, const fe f, const fe g)
     h[9] = (int32_t)h9;
 }
 
-/* From fe_neg.c */
+/* From feNeg.c */
 
 /*
 h = -f
@@ -633,7 +636,7 @@ Postconditions:
    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
 */
 
-static void fe_neg(fe h, const fe f)
+static void feNeg(fe h, const fe f)
 {
     int32_t f0 = f[0];
     int32_t f1 = f[1];
@@ -667,7 +670,7 @@ static void fe_neg(fe h, const fe f)
     h[9] = h9;
 }
 
-/* From fe_sq.c */
+/* From feSq.c */
 
 /*
 h = f * f
@@ -681,10 +684,10 @@ Postconditions:
 */
 
 /*
-See fe_mul.c for discussion of implementation strategy.
+See feMul.c for discussion of implementation strategy.
 */
 
-static void fe_sq(fe h, const fe f)
+static void feSq(fe h, const fe f)
 {
     int32_t f0 = f[0];
     int32_t f1 = f[1];
@@ -840,7 +843,7 @@ static void fe_sq(fe h, const fe f)
     h[9] = (int32_t)h9;
 }
 
-/* From fe_sq2.c */
+/* From feSq2.c */
 
 /*
 h = 2 * f * f
@@ -854,10 +857,10 @@ Postconditions:
 */
 
 /*
-See fe_mul.c for discussion of implementation strategy.
+See feMul.c for discussion of implementation strategy.
 */
 
-static void fe_sq2(fe h, const fe f)
+static void feSq2(fe h, const fe f)
 {
     int32_t f0 = f[0];
     int32_t f1 = f[1];
@@ -1024,7 +1027,7 @@ static void fe_sq2(fe h, const fe f)
     h[9] = (int32_t)h9;
 }
 
-/* From fe_sub.c */
+/* From feSub.c */
 
 /*
 h = f - g
@@ -1038,7 +1041,7 @@ Postconditions:
    |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
 */
 
-static void fe_sub(fe h, const fe f, const fe g)
+static void feSub(fe h, const fe f, const fe g)
 {
     int32_t f0 = f[0];
     int32_t f1 = f[1];
@@ -1082,7 +1085,7 @@ static void fe_sub(fe h, const fe f, const fe g)
     h[9] = h9;
 }
 
-/* From fe_tobytes.c */
+/* From feToBytes.c */
 
 /*
 Preconditions:
@@ -1109,7 +1112,7 @@ Proof:
   so floor(2^(-255)(h + 19 2^(-25) h9 + 2^(-1))) = q.
 */
 
-static void fe_tobytes(unsigned char *s, const fe h)
+static void feToBytes(unsigned char *s, const fe h)
 {
     int32_t h0 = h[0];
     int32_t h1 = h[1];
@@ -1221,22 +1224,22 @@ static void fe_tobytes(unsigned char *s, const fe h)
     s[31] = h9 >> 18;
 }
 
-/* From ge_add.c */
+/* From geAdd.c */
 
-void ge_add(ge_p1p1 *r, const ge_p3 *p, const ge_cached *q)
+void geAdd(GeP1P1 *r, const GeP3 *p, const GeCached *q)
 {
     fe t0;
-    fe_add(r->X, p->Y, p->X);
-    fe_sub(r->Y, p->Y, p->X);
-    fe_mul(r->Z, r->X, q->YplusX);
-    fe_mul(r->Y, r->Y, q->YminusX);
-    fe_mul(r->T, q->T2d, p->T);
-    fe_mul(r->X, p->Z, q->Z);
-    fe_add(t0, r->X, r->X);
-    fe_sub(r->X, r->Z, r->Y);
-    fe_add(r->Y, r->Z, r->Y);
-    fe_add(r->Z, t0, r->T);
-    fe_sub(r->T, t0, r->T);
+    feAdd(r->X, p->Y, p->X);
+    feSub(r->Y, p->Y, p->X);
+    feMul(r->Z, r->X, q->YPlusX);
+    feMul(r->Y, r->Y, q->YMinusX);
+    feMul(r->T, q->T2D, p->T);
+    feMul(r->X, p->Z, q->Z);
+    feAdd(t0, r->X, r->X);
+    feSub(r->X, r->Z, r->Y);
+    feAdd(r->Y, r->Z, r->Y);
+    feAdd(r->Z, t0, r->T);
+    feSub(r->T, t0, r->T);
 }
 
 /* From ge_double_scalarmult.c, modified */
@@ -1275,34 +1278,34 @@ static void slide(signed char *r, const unsigned char *a)
     }
 }
 
-void ge_dsm_precomp(ge_dsmp r, const ge_p3 *s)
+void geDsmPrecomp(geDsmp r, const GeP3 *s)
 {
-    ge_p1p1 t;
-    ge_p3 s2, u;
-    ge_p3_to_cached(&r[0], s);
-    ge_p3_dbl(&t, s);
-    ge_p1p1_to_p3(&s2, &t);
-    ge_add(&t, &s2, &r[0]);
-    ge_p1p1_to_p3(&u, &t);
-    ge_p3_to_cached(&r[1], &u);
-    ge_add(&t, &s2, &r[1]);
-    ge_p1p1_to_p3(&u, &t);
-    ge_p3_to_cached(&r[2], &u);
-    ge_add(&t, &s2, &r[2]);
-    ge_p1p1_to_p3(&u, &t);
-    ge_p3_to_cached(&r[3], &u);
-    ge_add(&t, &s2, &r[3]);
-    ge_p1p1_to_p3(&u, &t);
-    ge_p3_to_cached(&r[4], &u);
-    ge_add(&t, &s2, &r[4]);
-    ge_p1p1_to_p3(&u, &t);
-    ge_p3_to_cached(&r[5], &u);
-    ge_add(&t, &s2, &r[5]);
-    ge_p1p1_to_p3(&u, &t);
-    ge_p3_to_cached(&r[6], &u);
-    ge_add(&t, &s2, &r[6]);
-    ge_p1p1_to_p3(&u, &t);
-    ge_p3_to_cached(&r[7], &u);
+    GeP1P1 t;
+    GeP3 s2, u;
+    geP3ToCached(&r[0], s);
+    geP3Dbl(&t, s);
+    geP1P1ToP3(&s2, &t);
+    geAdd(&t, &s2, &r[0]);
+    geP1P1ToP3(&u, &t);
+    geP3ToCached(&r[1], &u);
+    geAdd(&t, &s2, &r[1]);
+    geP1P1ToP3(&u, &t);
+    geP3ToCached(&r[2], &u);
+    geAdd(&t, &s2, &r[2]);
+    geP1P1ToP3(&u, &t);
+    geP3ToCached(&r[3], &u);
+    geAdd(&t, &s2, &r[3]);
+    geP1P1ToP3(&u, &t);
+    geP3ToCached(&r[4], &u);
+    geAdd(&t, &s2, &r[4]);
+    geP1P1ToP3(&u, &t);
+    geP3ToCached(&r[5], &u);
+    geAdd(&t, &s2, &r[5]);
+    geP1P1ToP3(&u, &t);
+    geP3ToCached(&r[6], &u);
+    geAdd(&t, &s2, &r[6]);
+    geP1P1ToP3(&u, &t);
+    geP3ToCached(&r[7], &u);
 }
 
 /*
@@ -1312,53 +1315,55 @@ and b = b[0]+256*b[1]+...+256^31 b[31].
 B is the Ed25519 base point (x,4/5) with x positive.
 */
 
-void ge_double_scalarmult_base_vartime(ge_p2 *r, const unsigned char *a, const ge_p3 *A,
-                                       const unsigned char *b)
+void geDoubleScalarmultBaseVartime(GeP2 *r,
+                                   const unsigned char *a,
+                                   const GeP3 *A,
+                                   const unsigned char *b)
 {
-    signed char aslide[256];
-    signed char bslide[256];
-    ge_dsmp Ai; /* A, 3A, 5A, 7A, 9A, 11A, 13A, 15A */
-    ge_p1p1 t;
-    ge_p3 u;
+    signed char aSlide[256];
+    signed char bSlide[256];
+    geDsmp Ai; /* A, 3A, 5A, 7A, 9A, 11A, 13A, 15A */
+    GeP1P1 t;
+    GeP3 u;
     int i;
 
-    slide(aslide, a);
-    slide(bslide, b);
-    ge_dsm_precomp(Ai, A);
+    slide(aSlide, a);
+    slide(bSlide, b);
+    geDsmPrecomp(Ai, A);
 
-    ge_p2_0(r);
+    geP20(r);
 
     for (i = 255; i >= 0; --i) {
-        if (aslide[i] || bslide[i])
+        if (aSlide[i] || bSlide[i])
             break;
     }
 
     for (; i >= 0; --i) {
-        ge_p2_dbl(&t, r);
+        geP2Dbl(&t, r);
 
-        if (aslide[i] > 0) {
-            ge_p1p1_to_p3(&u, &t);
-            ge_add(&t, &u, &Ai[aslide[i] / 2]);
-        } else if (aslide[i] < 0) {
-            ge_p1p1_to_p3(&u, &t);
-            ge_sub(&t, &u, &Ai[(-aslide[i]) / 2]);
+        if (aSlide[i] > 0) {
+            geP1P1ToP3(&u, &t);
+            geAdd(&t, &u, &Ai[aSlide[i] / 2]);
+        } else if (aSlide[i] < 0) {
+            geP1P1ToP3(&u, &t);
+            geSub(&t, &u, &Ai[(-aSlide[i]) / 2]);
         }
 
-        if (bslide[i] > 0) {
-            ge_p1p1_to_p3(&u, &t);
-            ge_madd(&t, &u, &ge_Bi[bslide[i] / 2]);
-        } else if (bslide[i] < 0) {
-            ge_p1p1_to_p3(&u, &t);
-            ge_msub(&t, &u, &ge_Bi[(-bslide[i]) / 2]);
+        if (bSlide[i] > 0) {
+            geP1P1ToP3(&u, &t);
+            geMAdd(&t, &u, &geBi[bSlide[i] / 2]);
+        } else if (bSlide[i] < 0) {
+            geP1P1ToP3(&u, &t);
+            geMSub(&t, &u, &geBi[(-bSlide[i]) / 2]);
         }
 
-        ge_p1p1_to_p2(r, &t);
+        geP1P1ToP2(r, &t);
     }
 }
 
 /* From ge_frombytes.c, modified */
 
-int ge_frombytes_vartime(ge_p3 *h, const unsigned char *s)
+int geFromBytesVarTime(GeP3 *h, const unsigned char *s)
 {
     fe u;
     fe v;
@@ -1367,16 +1372,16 @@ int ge_frombytes_vartime(ge_p3 *h, const unsigned char *s)
 
     /* From fe_frombytes.c */
 
-    int64_t h0 = load_4(s);
-    int64_t h1 = load_3(s + 4) << 6;
-    int64_t h2 = load_3(s + 7) << 5;
-    int64_t h3 = load_3(s + 10) << 3;
-    int64_t h4 = load_3(s + 13) << 2;
-    int64_t h5 = load_4(s + 16);
-    int64_t h6 = load_3(s + 20) << 7;
-    int64_t h7 = load_3(s + 23) << 5;
-    int64_t h8 = load_3(s + 26) << 4;
-    int64_t h9 = (load_3(s + 29) & 8388607) << 2;
+    int64_t h0 = load4(s);
+    int64_t h1 = load3(s + 4) << 6;
+    int64_t h2 = load3(s + 7) << 5;
+    int64_t h3 = load3(s + 10) << 3;
+    int64_t h4 = load3(s + 13) << 2;
+    int64_t h5 = load4(s + 16);
+    int64_t h6 = load3(s + 20) << 7;
+    int64_t h7 = load3(s + 23) << 5;
+    int64_t h8 = load3(s + 26) << 4;
+    int64_t h9 = (load3(s + 29) & 8388607) << 2;
     int64_t carry0;
     int64_t carry1;
     int64_t carry2;
@@ -1440,210 +1445,210 @@ int ge_frombytes_vartime(ge_p3 *h, const unsigned char *s)
 
     /* End fe_frombytes.c */
 
-    fe_1(h->Z);
-    fe_sq(u, h->Y);
-    fe_mul(v, u, fe_d);
-    fe_sub(u, u, h->Z); /* u = y^2-1 */
-    fe_add(v, v, h->Z); /* v = dy^2+1 */
+    fe1(h->Z);
+    feSq(u, h->Y);
+    feMul(v, u, feD);
+    feSub(u, u, h->Z); /* u = y^2-1 */
+    feAdd(v, v, h->Z); /* v = dy^2+1 */
 
-    fe_divpowm1(h->X, u, v); /* x = uv^3(uv^7)^((q-5)/8) */
+    feDivPowM1(h->X, u, v); /* x = uv^3(uv^7)^((q-5)/8) */
 
-    fe_sq(vxx, h->X);
-    fe_mul(vxx, vxx, v);
-    fe_sub(check, vxx, u); /* vx^2-u */
-    if (fe_isnonzero(check)) {
-        fe_add(check, vxx, u); /* vx^2+u */
-        if (fe_isnonzero(check)) {
+    feSq(vxx, h->X);
+    feMul(vxx, vxx, v);
+    feSub(check, vxx, u); /* vx^2-u */
+    if (feIsNonZero(check)) {
+        feAdd(check, vxx, u); /* vx^2+u */
+        if (feIsNonZero(check)) {
             return -1;
         }
-        fe_mul(h->X, h->X, fe_sqrtm1);
+        feMul(h->X, h->X, feSqrtm1);
     }
 
-    if (fe_isnegative(h->X) != (s[31] >> 7)) {
+    if (feIsNegative(h->X) != (s[31] >> 7)) {
         /* If x = 0, the sign must be positive */
-        if (!fe_isnonzero(h->X)) {
+        if (!feIsNonZero(h->X)) {
             return -1;
         }
-        fe_neg(h->X, h->X);
+        feNeg(h->X, h->X);
     }
 
-    fe_mul(h->T, h->X, h->Y);
+    feMul(h->T, h->X, h->Y);
     return 0;
 }
 
-/* From ge_madd.c */
+/* From geMAdd.c */
 
 /*
 r = p + q
 */
 
-static void ge_madd(ge_p1p1 *r, const ge_p3 *p, const ge_precomp *q)
+static void geMAdd(GeP1P1 *r, const GeP3 *p, const GePrecomp *q)
 {
     fe t0;
-    fe_add(r->X, p->Y, p->X);
-    fe_sub(r->Y, p->Y, p->X);
-    fe_mul(r->Z, r->X, q->yplusx);
-    fe_mul(r->Y, r->Y, q->yminusx);
-    fe_mul(r->T, q->xy2d, p->T);
-    fe_add(t0, p->Z, p->Z);
-    fe_sub(r->X, r->Z, r->Y);
-    fe_add(r->Y, r->Z, r->Y);
-    fe_add(r->Z, t0, r->T);
-    fe_sub(r->T, t0, r->T);
+    feAdd(r->X, p->Y, p->X);
+    feSub(r->Y, p->Y, p->X);
+    feMul(r->Z, r->X, q->YPlusX);
+    feMul(r->Y, r->Y, q->YMinusX);
+    feMul(r->T, q->XY2D, p->T);
+    feAdd(t0, p->Z, p->Z);
+    feSub(r->X, r->Z, r->Y);
+    feAdd(r->Y, r->Z, r->Y);
+    feAdd(r->Z, t0, r->T);
+    feSub(r->T, t0, r->T);
 }
 
-/* From ge_msub.c */
+/* From geMSub.c */
 
 /*
 r = p - q
 */
 
-static void ge_msub(ge_p1p1 *r, const ge_p3 *p, const ge_precomp *q)
+static void geMSub(GeP1P1 *r, const GeP3 *p, const GePrecomp *q)
 {
     fe t0;
-    fe_add(r->X, p->Y, p->X);
-    fe_sub(r->Y, p->Y, p->X);
-    fe_mul(r->Z, r->X, q->yminusx);
-    fe_mul(r->Y, r->Y, q->yplusx);
-    fe_mul(r->T, q->xy2d, p->T);
-    fe_add(t0, p->Z, p->Z);
-    fe_sub(r->X, r->Z, r->Y);
-    fe_add(r->Y, r->Z, r->Y);
-    fe_sub(r->Z, t0, r->T);
-    fe_add(r->T, t0, r->T);
+    feAdd(r->X, p->Y, p->X);
+    feSub(r->Y, p->Y, p->X);
+    feMul(r->Z, r->X, q->YMinusX);
+    feMul(r->Y, r->Y, q->YPlusX);
+    feMul(r->T, q->XY2D, p->T);
+    feAdd(t0, p->Z, p->Z);
+    feSub(r->X, r->Z, r->Y);
+    feAdd(r->Y, r->Z, r->Y);
+    feSub(r->Z, t0, r->T);
+    feAdd(r->T, t0, r->T);
 }
 
-/* From ge_p1p1_to_p2.c */
+/* From geP1P1ToP2.c */
 
 /*
 r = p
 */
 
-void ge_p1p1_to_p2(ge_p2 *r, const ge_p1p1 *p)
+void geP1P1ToP2(GeP2 *r, const GeP1P1 *p)
 {
-    fe_mul(r->X, p->X, p->T);
-    fe_mul(r->Y, p->Y, p->Z);
-    fe_mul(r->Z, p->Z, p->T);
+    feMul(r->X, p->X, p->T);
+    feMul(r->Y, p->Y, p->Z);
+    feMul(r->Z, p->Z, p->T);
 }
 
-/* From ge_p1p1_to_p3.c */
+/* From geP1P1ToP3.c */
 
 /*
 r = p
 */
 
-void ge_p1p1_to_p3(ge_p3 *r, const ge_p1p1 *p)
+void geP1P1ToP3(GeP3 *r, const GeP1P1 *p)
 {
-    fe_mul(r->X, p->X, p->T);
-    fe_mul(r->Y, p->Y, p->Z);
-    fe_mul(r->Z, p->Z, p->T);
-    fe_mul(r->T, p->X, p->Y);
+    feMul(r->X, p->X, p->T);
+    feMul(r->Y, p->Y, p->Z);
+    feMul(r->Z, p->Z, p->T);
+    feMul(r->T, p->X, p->Y);
 }
 
-/* From ge_p2_0.c */
+/* From geP20.c */
 
-static void ge_p2_0(ge_p2 *h)
+static void geP20(GeP2 *h)
 {
-    fe_0(h->X);
-    fe_1(h->Y);
-    fe_1(h->Z);
+    fe0(h->X);
+    fe1(h->Y);
+    fe1(h->Z);
 }
 
-/* From ge_p2_dbl.c */
+/* From geP2Dbl.c */
 
 /*
 r = 2 * p
 */
 
-void ge_p2_dbl(ge_p1p1 *r, const ge_p2 *p)
+void geP2Dbl(GeP1P1 *r, const GeP2 *p)
 {
     fe t0;
-    fe_sq(r->X, p->X);
-    fe_sq(r->Z, p->Y);
-    fe_sq2(r->T, p->Z);
-    fe_add(r->Y, p->X, p->Y);
-    fe_sq(t0, r->Y);
-    fe_add(r->Y, r->Z, r->X);
-    fe_sub(r->Z, r->Z, r->X);
-    fe_sub(r->X, t0, r->Y);
-    fe_sub(r->T, r->T, r->Z);
+    feSq(r->X, p->X);
+    feSq(r->Z, p->Y);
+    feSq2(r->T, p->Z);
+    feAdd(r->Y, p->X, p->Y);
+    feSq(t0, r->Y);
+    feAdd(r->Y, r->Z, r->X);
+    feSub(r->Z, r->Z, r->X);
+    feSub(r->X, t0, r->Y);
+    feSub(r->T, r->T, r->Z);
 }
 
-/* From ge_p3_0.c */
+/* From geP30.c */
 
-static void ge_p3_0(ge_p3 *h)
+static void geP30(GeP3 *h)
 {
-    fe_0(h->X);
-    fe_1(h->Y);
-    fe_1(h->Z);
-    fe_0(h->T);
+    fe0(h->X);
+    fe1(h->Y);
+    fe1(h->Z);
+    fe0(h->T);
 }
 
-/* From ge_p3_dbl.c */
+/* From geP3Dbl.c */
 
 /*
 r = 2 * p
 */
 
-static void ge_p3_dbl(ge_p1p1 *r, const ge_p3 *p)
+static void geP3Dbl(GeP1P1 *r, const GeP3 *p)
 {
-    ge_p2 q;
-    ge_p3_to_p2(&q, p);
-    ge_p2_dbl(r, &q);
+    GeP2 q;
+    geP3ToP2(&q, p);
+    geP2Dbl(r, &q);
 }
 
-/* From ge_p3_to_cached.c */
+/* From geP3ToCached.c */
 
 /*
 r = p
 */
 
-void ge_p3_to_cached(ge_cached *r, const ge_p3 *p)
+void geP3ToCached(GeCached *r, const GeP3 *p)
 {
-    fe_add(r->YplusX, p->Y, p->X);
-    fe_sub(r->YminusX, p->Y, p->X);
-    fe_copy(r->Z, p->Z);
-    fe_mul(r->T2d, p->T, fe_d2);
+    feAdd(r->YPlusX, p->Y, p->X);
+    feSub(r->YMinusX, p->Y, p->X);
+    feCopy(r->Z, p->Z);
+    feMul(r->T2D, p->T, feD2);
 }
 
-/* From ge_p3_to_p2.c */
+/* From geP3ToP2.c */
 
 /*
 r = p
 */
 
-void ge_p3_to_p2(ge_p2 *r, const ge_p3 *p)
+void geP3ToP2(GeP2 *r, const GeP3 *p)
 {
-    fe_copy(r->X, p->X);
-    fe_copy(r->Y, p->Y);
-    fe_copy(r->Z, p->Z);
+    feCopy(r->X, p->X);
+    feCopy(r->Y, p->Y);
+    feCopy(r->Z, p->Z);
 }
 
-/* From ge_p3_tobytes.c */
+/* From geP3Tobytes.c */
 
-void ge_p3_tobytes(unsigned char *s, const ge_p3 *h)
+void geP3Tobytes(unsigned char *s, const GeP3 *h)
 {
     fe recip;
     fe x;
     fe y;
 
-    fe_invert(recip, h->Z);
-    fe_mul(x, h->X, recip);
-    fe_mul(y, h->Y, recip);
-    fe_tobytes(s, y);
-    s[31] ^= fe_isnegative(x) << 7;
+    feInvert(recip, h->Z);
+    feMul(x, h->X, recip);
+    feMul(y, h->Y, recip);
+    feToBytes(s, y);
+    s[31] ^= feIsNegative(x) << 7;
 }
 
-/* From ge_precomp_0.c */
+/* From gePrecomp0.c */
 
-static void ge_precomp_0(ge_precomp *h)
+static void gePrecomp0(GePrecomp *h)
 {
-    fe_1(h->yplusx);
-    fe_1(h->yminusx);
-    fe_0(h->xy2d);
+    fe1(h->YPlusX);
+    fe1(h->YMinusX);
+    fe0(h->XY2D);
 }
 
-/* From ge_scalarmult_base.c */
+/* From geScalarMultBase.c */
 
 static unsigned char equal(signed char b, signed char c)
 {
@@ -1653,6 +1658,7 @@ static unsigned char equal(signed char b, signed char c)
     uint32_t y = x; /* 0: yes; 1..255: no */
     y -= 1; /* 4294967295: yes; 0..254: no */
     y >>= 31; /* 1: yes; 0: no */
+
     return y;
 }
 
@@ -1660,35 +1666,38 @@ static unsigned char negative(signed char b)
 {
     unsigned long long x = b; /* 18446744073709551361..18446744073709551615: yes; 0..255: no */
     x >>= 63; /* 1: yes; 0: no */
+
     return (unsigned char)x;
 }
 
-static void ge_precomp_cmov(ge_precomp *t, const ge_precomp *u, unsigned char b)
+static void gePrecompCMov(GePrecomp *t,
+                          const GePrecomp *u,
+                          unsigned char b)
 {
-    fe_cmov(t->yplusx, u->yplusx, b);
-    fe_cmov(t->yminusx, u->yminusx, b);
-    fe_cmov(t->xy2d, u->xy2d, b);
+    feCmov(t->YPlusX, u->YPlusX, b);
+    feCmov(t->YMinusX, u->YMinusX, b);
+    feCmov(t->XY2D, u->XY2D, b);
 }
 
-static void select(ge_precomp *t, int pos, signed char b)
+static void select(GePrecomp *t, int pos, signed char b)
 {
-    ge_precomp minust;
-    unsigned char bnegative = negative(b);
-    unsigned char babs = b - (((-bnegative) & b) << 1);
+    GePrecomp minusT;
+    unsigned char bNegative = negative(b);
+    unsigned char bAbs = b - (((-bNegative) & b) << 1);
 
-    ge_precomp_0(t);
-    ge_precomp_cmov(t, &ge_base[pos][0], equal(babs, 1));
-    ge_precomp_cmov(t, &ge_base[pos][1], equal(babs, 2));
-    ge_precomp_cmov(t, &ge_base[pos][2], equal(babs, 3));
-    ge_precomp_cmov(t, &ge_base[pos][3], equal(babs, 4));
-    ge_precomp_cmov(t, &ge_base[pos][4], equal(babs, 5));
-    ge_precomp_cmov(t, &ge_base[pos][5], equal(babs, 6));
-    ge_precomp_cmov(t, &ge_base[pos][6], equal(babs, 7));
-    ge_precomp_cmov(t, &ge_base[pos][7], equal(babs, 8));
-    fe_copy(minust.yplusx, t->yminusx);
-    fe_copy(minust.yminusx, t->yplusx);
-    fe_neg(minust.xy2d, t->xy2d);
-    ge_precomp_cmov(t, &minust, bnegative);
+    gePrecomp0(t);
+    gePrecompCMov(t, &ge_base[pos][0], equal(bAbs, 1));
+    gePrecompCMov(t, &ge_base[pos][1], equal(bAbs, 2));
+    gePrecompCMov(t, &ge_base[pos][2], equal(bAbs, 3));
+    gePrecompCMov(t, &ge_base[pos][3], equal(bAbs, 4));
+    gePrecompCMov(t, &ge_base[pos][4], equal(bAbs, 5));
+    gePrecompCMov(t, &ge_base[pos][5], equal(bAbs, 6));
+    gePrecompCMov(t, &ge_base[pos][6], equal(bAbs, 7));
+    gePrecompCMov(t, &ge_base[pos][7], equal(bAbs, 8));
+    feCopy(minusT.YPlusX, t->YMinusX);
+    feCopy(minusT.YMinusX, t->YPlusX);
+    feNeg(minusT.XY2D, t->XY2D);
+    gePrecompCMov(t, &minusT, bNegative);
 }
 
 /*
@@ -1700,13 +1709,13 @@ Preconditions:
   a[31] <= 127
 */
 
-void ge_scalarmult_base(ge_p3 *h, const unsigned char *a)
+void geScalarMultBase(GeP3 *h, const unsigned char *a)
 {
     signed char e[64];
     signed char carry;
-    ge_p1p1 r;
-    ge_p2 s;
-    ge_precomp t;
+    GeP1P1 r;
+    GeP2 s;
+    GePrecomp t;
     int i;
 
     for (i = 0; i < 32; ++i) {
@@ -1726,67 +1735,67 @@ void ge_scalarmult_base(ge_p3 *h, const unsigned char *a)
     e[63] += carry;
     /* each e[i] is between -8 and 8 */
 
-    ge_p3_0(h);
+    geP30(h);
     for (i = 1; i < 64; i += 2) {
         select(&t, i / 2, e[i]);
-        ge_madd(&r, h, &t);
-        ge_p1p1_to_p3(h, &r);
+        geMAdd(&r, h, &t);
+        geP1P1ToP3(h, &r);
     }
 
-    ge_p3_dbl(&r, h);
-    ge_p1p1_to_p2(&s, &r);
-    ge_p2_dbl(&r, &s);
-    ge_p1p1_to_p2(&s, &r);
-    ge_p2_dbl(&r, &s);
-    ge_p1p1_to_p2(&s, &r);
-    ge_p2_dbl(&r, &s);
-    ge_p1p1_to_p3(h, &r);
+    geP3Dbl(&r, h);
+    geP1P1ToP2(&s, &r);
+    geP2Dbl(&r, &s);
+    geP1P1ToP2(&s, &r);
+    geP2Dbl(&r, &s);
+    geP1P1ToP2(&s, &r);
+    geP2Dbl(&r, &s);
+    geP1P1ToP3(h, &r);
 
     for (i = 0; i < 64; i += 2) {
         select(&t, i / 2, e[i]);
-        ge_madd(&r, h, &t);
-        ge_p1p1_to_p3(h, &r);
+        geMAdd(&r, h, &t);
+        geP1P1ToP3(h, &r);
     }
 }
 
-/* From ge_sub.c */
+/* From geSub.c */
 
 /*
 r = p - q
 */
 
-void ge_sub(ge_p1p1 *r, const ge_p3 *p, const ge_cached *q)
+void geSub(GeP1P1 *r, const GeP3 *p, const GeCached *q)
 {
     fe t0;
-    fe_add(r->X, p->Y, p->X);
-    fe_sub(r->Y, p->Y, p->X);
-    fe_mul(r->Z, r->X, q->YminusX);
-    fe_mul(r->Y, r->Y, q->YplusX);
-    fe_mul(r->T, q->T2d, p->T);
-    fe_mul(r->X, p->Z, q->Z);
-    fe_add(t0, r->X, r->X);
-    fe_sub(r->X, r->Z, r->Y);
-    fe_add(r->Y, r->Z, r->Y);
-    fe_sub(r->Z, t0, r->T);
-    fe_add(r->T, t0, r->T);
+    feAdd(r->X, p->Y, p->X);
+    feSub(r->Y, p->Y, p->X);
+    feMul(r->Z, r->X, q->YMinusX);
+    feMul(r->Y, r->Y, q->YPlusX);
+    feMul(r->T, q->T2D, p->T);
+    feMul(r->X, p->Z, q->Z);
+    feAdd(t0, r->X, r->X);
+    feSub(r->X, r->Z, r->Y);
+    feAdd(r->Y, r->Z, r->Y);
+    feSub(r->Z, t0, r->T);
+    feAdd(r->T, t0, r->T);
 }
 
-/* From ge_tobytes.c */
+/* From geToBytes.c */
 
-void ge_tobytes(unsigned char *s, const ge_p2 *h)
+void geToBytes(unsigned char *s, const GeP2 *h)
 {
     fe recip;
     fe x;
     fe y;
 
-    fe_invert(recip, h->Z);
-    fe_mul(x, h->X, recip);
-    fe_mul(y, h->Y, recip);
-    fe_tobytes(s, y);
-    s[31] ^= fe_isnegative(x) << 7;
+    feInvert(recip, h->Z);
+    feMul(x, h->X, recip);
+    feMul(y, h->Y, recip);
+    feToBytes(s, y);
+    s[31] ^= feIsNegative(x) << 7;
 }
 
-/* From sc_reduce.c */
+/* From scReduce.c */
 
 /*
 Input:
@@ -1798,32 +1807,32 @@ Output:
   Overwrites s in place.
 */
 
-void sc_reduce(unsigned char *s)
+void scReduce(unsigned char *s)
 {
-    int64_t s0 = 2097151 & load_3(s);
-    int64_t s1 = 2097151 & (load_4(s + 2) >> 5);
-    int64_t s2 = 2097151 & (load_3(s + 5) >> 2);
-    int64_t s3 = 2097151 & (load_4(s + 7) >> 7);
-    int64_t s4 = 2097151 & (load_4(s + 10) >> 4);
-    int64_t s5 = 2097151 & (load_3(s + 13) >> 1);
-    int64_t s6 = 2097151 & (load_4(s + 15) >> 6);
-    int64_t s7 = 2097151 & (load_3(s + 18) >> 3);
-    int64_t s8 = 2097151 & load_3(s + 21);
-    int64_t s9 = 2097151 & (load_4(s + 23) >> 5);
-    int64_t s10 = 2097151 & (load_3(s + 26) >> 2);
-    int64_t s11 = 2097151 & (load_4(s + 28) >> 7);
-    int64_t s12 = 2097151 & (load_4(s + 31) >> 4);
-    int64_t s13 = 2097151 & (load_3(s + 34) >> 1);
-    int64_t s14 = 2097151 & (load_4(s + 36) >> 6);
-    int64_t s15 = 2097151 & (load_3(s + 39) >> 3);
-    int64_t s16 = 2097151 & load_3(s + 42);
-    int64_t s17 = 2097151 & (load_4(s + 44) >> 5);
-    int64_t s18 = 2097151 & (load_3(s + 47) >> 2);
-    int64_t s19 = 2097151 & (load_4(s + 49) >> 7);
-    int64_t s20 = 2097151 & (load_4(s + 52) >> 4);
-    int64_t s21 = 2097151 & (load_3(s + 55) >> 1);
-    int64_t s22 = 2097151 & (load_4(s + 57) >> 6);
-    int64_t s23 = (load_4(s + 60) >> 3);
+    int64_t s0 = 2097151 & load3(s);
+    int64_t s1 = 2097151 & (load4(s + 2) >> 5);
+    int64_t s2 = 2097151 & (load3(s + 5) >> 2);
+    int64_t s3 = 2097151 & (load4(s + 7) >> 7);
+    int64_t s4 = 2097151 & (load4(s + 10) >> 4);
+    int64_t s5 = 2097151 & (load3(s + 13) >> 1);
+    int64_t s6 = 2097151 & (load4(s + 15) >> 6);
+    int64_t s7 = 2097151 & (load3(s + 18) >> 3);
+    int64_t s8 = 2097151 & load3(s + 21);
+    int64_t s9 = 2097151 & (load4(s + 23) >> 5);
+    int64_t s10 = 2097151 & (load3(s + 26) >> 2);
+    int64_t s11 = 2097151 & (load4(s + 28) >> 7);
+    int64_t s12 = 2097151 & (load4(s + 31) >> 4);
+    int64_t s13 = 2097151 & (load3(s + 34) >> 1);
+    int64_t s14 = 2097151 & (load4(s + 36) >> 6);
+    int64_t s15 = 2097151 & (load3(s + 39) >> 3);
+    int64_t s16 = 2097151 & load3(s + 42);
+    int64_t s17 = 2097151 & (load4(s + 44) >> 5);
+    int64_t s18 = 2097151 & (load3(s + 47) >> 2);
+    int64_t s19 = 2097151 & (load4(s + 49) >> 7);
+    int64_t s20 = 2097151 & (load4(s + 52) >> 4);
+    int64_t s21 = 2097151 & (load3(s + 55) >> 1);
+    int64_t s22 = 2097151 & (load4(s + 57) >> 6);
+    int64_t s23 = (load4(s + 60) >> 3);
     int64_t carry0;
     int64_t carry1;
     int64_t carry2;
@@ -2122,95 +2131,97 @@ void sc_reduce(unsigned char *s)
 
 /* New code */
 
-static void fe_divpowm1(fe r, const fe u, const fe v)
+static void feDivPowM1(fe r, const fe u, const fe v)
 {
     fe v3, uv7, t0, t1, t2;
     int i;
 
-    fe_sq(v3, v);
-    fe_mul(v3, v3, v); /* v3 = v^3 */
-    fe_sq(uv7, v3);
-    fe_mul(uv7, uv7, v);
-    fe_mul(uv7, uv7, u); /* uv7 = uv^7 */
+    feSq(v3, v);
+    feMul(v3, v3, v); /* v3 = v^3 */
+    feSq(uv7, v3);
+    feMul(uv7, uv7, v);
+    feMul(uv7, uv7, u); /* uv7 = uv^7 */
 
     /*fe_pow22523(uv7, uv7);*/
 
     /* From fe_pow22523.c */
 
-    fe_sq(t0, uv7);
-    fe_sq(t1, t0);
-    fe_sq(t1, t1);
-    fe_mul(t1, uv7, t1);
-    fe_mul(t0, t0, t1);
-    fe_sq(t0, t0);
-    fe_mul(t0, t1, t0);
-    fe_sq(t1, t0);
+    feSq(t0, uv7);
+    feSq(t1, t0);
+    feSq(t1, t1);
+    feMul(t1, uv7, t1);
+    feMul(t0, t0, t1);
+    feSq(t0, t0);
+    feMul(t0, t1, t0);
+    feSq(t1, t0);
     for (i = 0; i < 4; ++i) {
-        fe_sq(t1, t1);
+        feSq(t1, t1);
     }
-    fe_mul(t0, t1, t0);
-    fe_sq(t1, t0);
+    feMul(t0, t1, t0);
+    feSq(t1, t0);
     for (i = 0; i < 9; ++i) {
-        fe_sq(t1, t1);
+        feSq(t1, t1);
     }
-    fe_mul(t1, t1, t0);
-    fe_sq(t2, t1);
+    feMul(t1, t1, t0);
+    feSq(t2, t1);
     for (i = 0; i < 19; ++i) {
-        fe_sq(t2, t2);
+        feSq(t2, t2);
     }
-    fe_mul(t1, t2, t1);
+    feMul(t1, t2, t1);
     for (i = 0; i < 10; ++i) {
-        fe_sq(t1, t1);
+        feSq(t1, t1);
     }
-    fe_mul(t0, t1, t0);
-    fe_sq(t1, t0);
+    feMul(t0, t1, t0);
+    feSq(t1, t0);
     for (i = 0; i < 49; ++i) {
-        fe_sq(t1, t1);
+        feSq(t1, t1);
     }
-    fe_mul(t1, t1, t0);
-    fe_sq(t2, t1);
+    feMul(t1, t1, t0);
+    feSq(t2, t1);
     for (i = 0; i < 99; ++i) {
-        fe_sq(t2, t2);
+        feSq(t2, t2);
     }
-    fe_mul(t1, t2, t1);
+    feMul(t1, t2, t1);
     for (i = 0; i < 50; ++i) {
-        fe_sq(t1, t1);
+        feSq(t1, t1);
     }
-    fe_mul(t0, t1, t0);
-    fe_sq(t0, t0);
-    fe_sq(t0, t0);
-    fe_mul(t0, t0, uv7);
+    feMul(t0, t1, t0);
+    feSq(t0, t0);
+    feSq(t0, t0);
+    feMul(t0, t0, uv7);
 
     /* End fe_pow22523.c */
     /* t0 = (uv^7)^((q-5)/8) */
-    fe_mul(t0, t0, v3);
-    fe_mul(r, t0, u); /* u^(m+1)v^(-(m+1)) */
+    feMul(t0, t0, v3);
+    feMul(r, t0, u); /* u^(m+1)v^(-(m+1)) */
 }
 
-static void ge_cached_0(ge_cached *r)
+static void geCached0(GeCached *r)
 {
-    fe_1(r->YplusX);
-    fe_1(r->YminusX);
-    fe_1(r->Z);
-    fe_0(r->T2d);
+    fe1(r->YPlusX);
+    fe1(r->YMinusX);
+    fe1(r->Z);
+    fe0(r->T2D);
 }
 
-static void ge_cached_cmov(ge_cached *t, const ge_cached *u, unsigned char b)
+static void geCachedCmov(GeCached *t, const GeCached *u, unsigned char b)
 {
-    fe_cmov(t->YplusX, u->YplusX, b);
-    fe_cmov(t->YminusX, u->YminusX, b);
-    fe_cmov(t->Z, u->Z, b);
-    fe_cmov(t->T2d, u->T2d, b);
+    feCmov(t->YPlusX, u->YPlusX, b);
+    feCmov(t->YMinusX, u->YMinusX, b);
+    feCmov(t->Z, u->Z, b);
+    feCmov(t->T2D, u->T2D, b);
 }
 
 /* Assumes that a[31] <= 127 */
-void ge_scalarmult(ge_p2 *r, const unsigned char *a, const ge_p3 *A)
+void geScalarMult(GeP2 *r,
+                  const unsigned char *a,
+                  const GeP3 *A)
 {
     signed char e[64];
     int carry, carry2, i;
-    ge_cached Ai[8]; /* 1 * A, 2 * A, ..., 8 * A */
-    ge_p1p1 t;
-    ge_p3 u;
+    GeCached Ai[8]; /* 1 * A, 2 * A, ..., 8 * A */
+    GeP1P1 t;
+    GeP3 u;
 
     carry = 0; /* 0..1 */
     for (i = 0; i < 31; i++) {
@@ -2225,117 +2236,120 @@ void ge_scalarmult(ge_p2 *r, const unsigned char *a, const ge_p3 *A)
     e[62] = carry - (carry2 << 4); /* -8..7 */
     e[63] = carry2; /* 0..8 */
 
-    ge_p3_to_cached(&Ai[0], A);
+    geP3ToCached(&Ai[0], A);
     for (i = 0; i < 7; i++) {
-        ge_add(&t, A, &Ai[i]);
-        ge_p1p1_to_p3(&u, &t);
-        ge_p3_to_cached(&Ai[i + 1], &u);
+        geAdd(&t, A, &Ai[i]);
+        geP1P1ToP3(&u, &t);
+        geP3ToCached(&Ai[i + 1], &u);
     }
 
-    ge_p2_0(r);
+    geP20(r);
     for (i = 63; i >= 0; i--) {
         signed char b = e[i];
         unsigned char bnegative = negative(b);
         unsigned char babs = b - (((-bnegative) & b) << 1);
-        ge_cached cur, minuscur;
-        ge_p2_dbl(&t, r);
-        ge_p1p1_to_p2(r, &t);
-        ge_p2_dbl(&t, r);
-        ge_p1p1_to_p2(r, &t);
-        ge_p2_dbl(&t, r);
-        ge_p1p1_to_p2(r, &t);
-        ge_p2_dbl(&t, r);
-        ge_p1p1_to_p3(&u, &t);
-        ge_cached_0(&cur);
-        ge_cached_cmov(&cur, &Ai[0], equal(babs, 1));
-        ge_cached_cmov(&cur, &Ai[1], equal(babs, 2));
-        ge_cached_cmov(&cur, &Ai[2], equal(babs, 3));
-        ge_cached_cmov(&cur, &Ai[3], equal(babs, 4));
-        ge_cached_cmov(&cur, &Ai[4], equal(babs, 5));
-        ge_cached_cmov(&cur, &Ai[5], equal(babs, 6));
-        ge_cached_cmov(&cur, &Ai[6], equal(babs, 7));
-        ge_cached_cmov(&cur, &Ai[7], equal(babs, 8));
-        fe_copy(minuscur.YplusX, cur.YminusX);
-        fe_copy(minuscur.YminusX, cur.YplusX);
-        fe_copy(minuscur.Z, cur.Z);
-        fe_neg(minuscur.T2d, cur.T2d);
-        ge_cached_cmov(&cur, &minuscur, bnegative);
-        ge_add(&t, &u, &cur);
-        ge_p1p1_to_p2(r, &t);
+        GeCached cur, minuscur;
+        geP2Dbl(&t, r);
+        geP1P1ToP2(r, &t);
+        geP2Dbl(&t, r);
+        geP1P1ToP2(r, &t);
+        geP2Dbl(&t, r);
+        geP1P1ToP2(r, &t);
+        geP2Dbl(&t, r);
+        geP1P1ToP3(&u, &t);
+        geCached0(&cur);
+        geCachedCmov(&cur, &Ai[0], equal(babs, 1));
+        geCachedCmov(&cur, &Ai[1], equal(babs, 2));
+        geCachedCmov(&cur, &Ai[2], equal(babs, 3));
+        geCachedCmov(&cur, &Ai[3], equal(babs, 4));
+        geCachedCmov(&cur, &Ai[4], equal(babs, 5));
+        geCachedCmov(&cur, &Ai[5], equal(babs, 6));
+        geCachedCmov(&cur, &Ai[6], equal(babs, 7));
+        geCachedCmov(&cur, &Ai[7], equal(babs, 8));
+        feCopy(minuscur.YPlusX, cur.YMinusX);
+        feCopy(minuscur.YMinusX, cur.YPlusX);
+        feCopy(minuscur.Z, cur.Z);
+        feNeg(minuscur.T2D, cur.T2D);
+        geCachedCmov(&cur, &minuscur, bnegative);
+        geAdd(&t, &u, &cur);
+        geP1P1ToP2(r, &t);
     }
 }
 
-void ge_double_scalarmult_precomp_vartime(ge_p2 *r, const unsigned char *a, const ge_p3 *A,
-                                          const unsigned char *b, const ge_dsmp Bi)
+void geDoubleScalarMultPrecompVarTime(GeP2 *r,
+                                      const unsigned char *a,
+                                      const GeP3 *A,
+                                      const unsigned char *b,
+                                      const geDsmp Bi)
 {
-    signed char aslide[256];
-    signed char bslide[256];
-    ge_dsmp Ai; /* A, 3A, 5A, 7A, 9A, 11A, 13A, 15A */
-    ge_p1p1 t;
-    ge_p3 u;
+    signed char aSlide[256];
+    signed char bSlide[256];
+    geDsmp Ai; /* A, 3A, 5A, 7A, 9A, 11A, 13A, 15A */
+    GeP1P1 t;
+    GeP3 u;
     int i;
 
-    slide(aslide, a);
-    slide(bslide, b);
-    ge_dsm_precomp(Ai, A);
+    slide(aSlide, a);
+    slide(bSlide, b);
+    geDsmPrecomp(Ai, A);
 
-    ge_p2_0(r);
+    geP20(r);
 
     for (i = 255; i >= 0; --i) {
-        if (aslide[i] || bslide[i])
+        if (aSlide[i] || bSlide[i])
             break;
     }
 
     for (; i >= 0; --i) {
-        ge_p2_dbl(&t, r);
+        geP2Dbl(&t, r);
 
-        if (aslide[i] > 0) {
-            ge_p1p1_to_p3(&u, &t);
-            ge_add(&t, &u, &Ai[aslide[i] / 2]);
-        } else if (aslide[i] < 0) {
-            ge_p1p1_to_p3(&u, &t);
-            ge_sub(&t, &u, &Ai[(-aslide[i]) / 2]);
+        if (aSlide[i] > 0) {
+            geP1P1ToP3(&u, &t);
+            geAdd(&t, &u, &Ai[aSlide[i] / 2]);
+        } else if (aSlide[i] < 0) {
+            geP1P1ToP3(&u, &t);
+            geSub(&t, &u, &Ai[(-aSlide[i]) / 2]);
         }
 
-        if (bslide[i] > 0) {
-            ge_p1p1_to_p3(&u, &t);
-            ge_add(&t, &u, &Bi[bslide[i] / 2]);
-        } else if (bslide[i] < 0) {
-            ge_p1p1_to_p3(&u, &t);
-            ge_sub(&t, &u, &Bi[(-bslide[i]) / 2]);
+        if (bSlide[i] > 0) {
+            geP1P1ToP3(&u, &t);
+            geAdd(&t, &u, &Bi[bSlide[i] / 2]);
+        } else if (bSlide[i] < 0) {
+            geP1P1ToP3(&u, &t);
+            geSub(&t, &u, &Bi[(-bSlide[i]) / 2]);
         }
 
-        ge_p1p1_to_p2(r, &t);
+        geP1P1ToP2(r, &t);
     }
 }
 
-void ge_mul8(ge_p1p1 *r, const ge_p2 *t)
+void geMul8(GeP1P1 *r, const GeP2 *t)
 {
-    ge_p2 u;
-    ge_p2_dbl(r, t);
-    ge_p1p1_to_p2(&u, r);
-    ge_p2_dbl(r, &u);
-    ge_p1p1_to_p2(&u, r);
-    ge_p2_dbl(r, &u);
+    GeP2 u;
+    geP2Dbl(r, t);
+    geP1P1ToP2(&u, r);
+    geP2Dbl(r, &u);
+    geP1P1ToP2(&u, r);
+    geP2Dbl(r, &u);
 }
 
-void ge_fromfe_frombytes_vartime(ge_p2 *r, const unsigned char *s)
+void geFromFeFromBytesVarTime(GeP2 *r, const unsigned char *s)
 {
     fe u, v, w, x, y, z;
     unsigned char sign;
 
     /* From fe_frombytes.c */
 
-    int64_t h0 = load_4(s);
-    int64_t h1 = load_3(s + 4) << 6;
-    int64_t h2 = load_3(s + 7) << 5;
-    int64_t h3 = load_3(s + 10) << 3;
-    int64_t h4 = load_3(s + 13) << 2;
-    int64_t h5 = load_4(s + 16);
-    int64_t h6 = load_3(s + 20) << 7;
-    int64_t h7 = load_3(s + 23) << 5;
-    int64_t h8 = load_3(s + 26) << 4;
-    int64_t h9 = load_3(s + 29) << 2;
+    int64_t h0 = load4(s);
+    int64_t h1 = load3(s + 4) << 6;
+    int64_t h2 = load3(s + 7) << 5;
+    int64_t h3 = load3(s + 10) << 3;
+    int64_t h4 = load3(s + 13) << 2;
+    int64_t h5 = load4(s + 16);
+    int64_t h6 = load3(s + 20) << 7;
+    int64_t h7 = load3(s + 23) << 5;
+    int64_t h8 = load3(s + 26) << 4;
+    int64_t h9 = load3(s + 29) << 2;
     int64_t carry0;
     int64_t carry1;
     int64_t carry2;
@@ -2392,92 +2406,93 @@ void ge_fromfe_frombytes_vartime(ge_p2 *r, const unsigned char *s)
 
     /* End fe_frombytes.c */
 
-    fe_sq2(v, u); /* 2 * u^2 */
-    fe_1(w);
-    fe_add(w, v, w); /* w = 2 * u^2 + 1 */
-    fe_sq(x, w); /* w^2 */
-    fe_mul(y, fe_ma2, v); /* -2 * A^2 * u^2 */
-    fe_add(x, x, y); /* x = w^2 - 2 * A^2 * u^2 */
-    fe_divpowm1(r->X, w, x); /* (w / x)^(m + 1) */
-    fe_sq(y, r->X);
-    fe_mul(x, y, x);
-    fe_sub(y, w, x);
-    fe_copy(z, fe_ma);
-    if (fe_isnonzero(y)) {
-        fe_add(y, w, x);
-        if (fe_isnonzero(y)) {
+    feSq2(v, u); /* 2 * u^2 */
+    fe1(w);
+    feAdd(w, v, w); /* w = 2 * u^2 + 1 */
+    feSq(x, w); /* w^2 */
+    feMul(y, feMa2, v); /* -2 * A^2 * u^2 */
+    feAdd(x, x, y); /* x = w^2 - 2 * A^2 * u^2 */
+    feDivPowM1(r->X, w, x); /* (w / x)^(m + 1) */
+    feSq(y, r->X);
+    feMul(x, y, x);
+    feSub(y, w, x);
+    feCopy(z, feMa);
+    if (feIsNonZero(y)) {
+        feAdd(y, w, x);
+        if (feIsNonZero(y)) {
             goto negative;
         } else {
-            fe_mul(r->X, r->X, fe_fffb1);
+            feMul(r->X, r->X, feFffb1);
         }
     } else {
-        fe_mul(r->X, r->X, fe_fffb2);
+        feMul(r->X, r->X, feFffb2);
     }
-    fe_mul(r->X, r->X, u); /* u * sqrt(2 * A * (A + 2) * w / x) */
-    fe_mul(z, z, v); /* -2 * A * u^2 */
+    feMul(r->X, r->X, u); /* u * sqrt(2 * A * (A + 2) * w / x) */
+    feMul(z, z, v); /* -2 * A * u^2 */
     sign = 0;
-    goto setsign;
+    goto setSign;
 negative:
-    fe_mul(x, x, fe_sqrtm1);
-    fe_sub(y, w, x);
-    if (fe_isnonzero(y)) {
-        assert((fe_add(y, w, x), !fe_isnonzero(y)));
-        fe_mul(r->X, r->X, fe_fffb3);
+    feMul(x, x, feSqrtm1);
+    feSub(y, w, x);
+    if (feIsNonZero(y)) {
+        assert((feAdd(y, w, x), !feIsNonZero(y)));
+        feMul(r->X, r->X, feFffb3);
     } else {
-        fe_mul(r->X, r->X, fe_fffb4);
+        feMul(r->X, r->X, feFffb4);
     }
     /* r->X = sqrt(A * (A + 2) * w / x) */
     /* z = -A */
     sign = 1;
-setsign:
-    if (fe_isnegative(r->X) != sign) {
-        assert(fe_isnonzero(r->X));
-        fe_neg(r->X, r->X);
+setSign:
+    if (feIsNegative(r->X) != sign) {
+        assert(feIsNonZero(r->X));
+        feNeg(r->X, r->X);
     }
-    fe_add(r->Z, z, w);
-    fe_sub(r->Y, z, w);
-    fe_mul(r->X, r->X, r->Z);
+    feAdd(r->Z, z, w);
+    feSub(r->Y, z, w);
+    feMul(r->X, r->X, r->Z);
 #if !defined(NDEBUG)
     {
         fe check_x, check_y, check_iz, check_v;
-        fe_invert(check_iz, r->Z);
-        fe_mul(check_x, r->X, check_iz);
-        fe_mul(check_y, r->Y, check_iz);
-        fe_sq(check_x, check_x);
-        fe_sq(check_y, check_y);
-        fe_mul(check_v, check_x, check_y);
-        fe_mul(check_v, fe_d, check_v);
-        fe_add(check_v, check_v, check_x);
-        fe_sub(check_v, check_v, check_y);
-        fe_1(check_x);
-        fe_add(check_v, check_v, check_x);
-        assert(!fe_isnonzero(check_v));
+        feInvert(check_iz, r->Z);
+        feMul(check_x, r->X, check_iz);
+        feMul(check_y, r->Y, check_iz);
+        feSq(check_x, check_x);
+        feSq(check_y, check_y);
+        feMul(check_v, check_x, check_y);
+        feMul(check_v, feD, check_v);
+        feAdd(check_v, check_v, check_x);
+        feSub(check_v, check_v, check_y);
+        fe1(check_x);
+        feAdd(check_v, check_v, check_x);
+        assert(!feIsNonZero(check_v));
     }
 #endif
 }
 
-void sc_0(unsigned char *s)
+void sc0(unsigned char *s)
 {
     int i;
+
     for (i = 0; i < 32; i++) {
         s[i] = 0;
     }
 }
 
-void sc_reduce32(unsigned char *s)
+void scReduce32(unsigned char *s)
 {
-    int64_t s0 = 2097151 & load_3(s);
-    int64_t s1 = 2097151 & (load_4(s + 2) >> 5);
-    int64_t s2 = 2097151 & (load_3(s + 5) >> 2);
-    int64_t s3 = 2097151 & (load_4(s + 7) >> 7);
-    int64_t s4 = 2097151 & (load_4(s + 10) >> 4);
-    int64_t s5 = 2097151 & (load_3(s + 13) >> 1);
-    int64_t s6 = 2097151 & (load_4(s + 15) >> 6);
-    int64_t s7 = 2097151 & (load_3(s + 18) >> 3);
-    int64_t s8 = 2097151 & load_3(s + 21);
-    int64_t s9 = 2097151 & (load_4(s + 23) >> 5);
-    int64_t s10 = 2097151 & (load_3(s + 26) >> 2);
-    int64_t s11 = (load_4(s + 28) >> 7);
+    int64_t s0 = 2097151 & load3(s);
+    int64_t s1 = 2097151 & (load4(s + 2) >> 5);
+    int64_t s2 = 2097151 & (load3(s + 5) >> 2);
+    int64_t s3 = 2097151 & (load4(s + 7) >> 7);
+    int64_t s4 = 2097151 & (load4(s + 10) >> 4);
+    int64_t s5 = 2097151 & (load3(s + 13) >> 1);
+    int64_t s6 = 2097151 & (load4(s + 15) >> 6);
+    int64_t s7 = 2097151 & (load3(s + 18) >> 3);
+    int64_t s8 = 2097151 & load3(s + 21);
+    int64_t s9 = 2097151 & (load4(s + 23) >> 5);
+    int64_t s10 = 2097151 & (load3(s + 26) >> 2);
+    int64_t s11 = (load4(s + 28) >> 7);
     int64_t s12 = 0;
     int64_t carry0;
     int64_t carry1;
@@ -2650,32 +2665,32 @@ void sc_reduce32(unsigned char *s)
     s[31] = (unsigned char)(s11 >> 17);
 }
 
-void sc_add(unsigned char *s, const unsigned char *a, const unsigned char *b)
+void scAdd(unsigned char *s, const unsigned char *a, const unsigned char *b)
 {
-    int64_t a0 = 2097151 & load_3(a);
-    int64_t a1 = 2097151 & (load_4(a + 2) >> 5);
-    int64_t a2 = 2097151 & (load_3(a + 5) >> 2);
-    int64_t a3 = 2097151 & (load_4(a + 7) >> 7);
-    int64_t a4 = 2097151 & (load_4(a + 10) >> 4);
-    int64_t a5 = 2097151 & (load_3(a + 13) >> 1);
-    int64_t a6 = 2097151 & (load_4(a + 15) >> 6);
-    int64_t a7 = 2097151 & (load_3(a + 18) >> 3);
-    int64_t a8 = 2097151 & load_3(a + 21);
-    int64_t a9 = 2097151 & (load_4(a + 23) >> 5);
-    int64_t a10 = 2097151 & (load_3(a + 26) >> 2);
-    int64_t a11 = (load_4(a + 28) >> 7);
-    int64_t b0 = 2097151 & load_3(b);
-    int64_t b1 = 2097151 & (load_4(b + 2) >> 5);
-    int64_t b2 = 2097151 & (load_3(b + 5) >> 2);
-    int64_t b3 = 2097151 & (load_4(b + 7) >> 7);
-    int64_t b4 = 2097151 & (load_4(b + 10) >> 4);
-    int64_t b5 = 2097151 & (load_3(b + 13) >> 1);
-    int64_t b6 = 2097151 & (load_4(b + 15) >> 6);
-    int64_t b7 = 2097151 & (load_3(b + 18) >> 3);
-    int64_t b8 = 2097151 & load_3(b + 21);
-    int64_t b9 = 2097151 & (load_4(b + 23) >> 5);
-    int64_t b10 = 2097151 & (load_3(b + 26) >> 2);
-    int64_t b11 = (load_4(b + 28) >> 7);
+    int64_t a0 = 2097151 & load3(a);
+    int64_t a1 = 2097151 & (load4(a + 2) >> 5);
+    int64_t a2 = 2097151 & (load3(a + 5) >> 2);
+    int64_t a3 = 2097151 & (load4(a + 7) >> 7);
+    int64_t a4 = 2097151 & (load4(a + 10) >> 4);
+    int64_t a5 = 2097151 & (load3(a + 13) >> 1);
+    int64_t a6 = 2097151 & (load4(a + 15) >> 6);
+    int64_t a7 = 2097151 & (load3(a + 18) >> 3);
+    int64_t a8 = 2097151 & load3(a + 21);
+    int64_t a9 = 2097151 & (load4(a + 23) >> 5);
+    int64_t a10 = 2097151 & (load3(a + 26) >> 2);
+    int64_t a11 = (load4(a + 28) >> 7);
+    int64_t b0 = 2097151 & load3(b);
+    int64_t b1 = 2097151 & (load4(b + 2) >> 5);
+    int64_t b2 = 2097151 & (load3(b + 5) >> 2);
+    int64_t b3 = 2097151 & (load4(b + 7) >> 7);
+    int64_t b4 = 2097151 & (load4(b + 10) >> 4);
+    int64_t b5 = 2097151 & (load3(b + 13) >> 1);
+    int64_t b6 = 2097151 & (load4(b + 15) >> 6);
+    int64_t b7 = 2097151 & (load3(b + 18) >> 3);
+    int64_t b8 = 2097151 & load3(b + 21);
+    int64_t b9 = 2097151 & (load4(b + 23) >> 5);
+    int64_t b10 = 2097151 & (load3(b + 26) >> 2);
+    int64_t b11 = (load4(b + 28) >> 7);
     int64_t s0 = a0 + b0;
     int64_t s1 = a1 + b1;
     int64_t s2 = a2 + b2;
@@ -2860,32 +2875,32 @@ void sc_add(unsigned char *s, const unsigned char *a, const unsigned char *b)
     s[31] = (unsigned char)(s11 >> 17);
 }
 
-void sc_sub(unsigned char *s, const unsigned char *a, const unsigned char *b)
+void scSub(unsigned char *s, const unsigned char *a, const unsigned char *b)
 {
-    int64_t a0 = 2097151 & load_3(a);
-    int64_t a1 = 2097151 & (load_4(a + 2) >> 5);
-    int64_t a2 = 2097151 & (load_3(a + 5) >> 2);
-    int64_t a3 = 2097151 & (load_4(a + 7) >> 7);
-    int64_t a4 = 2097151 & (load_4(a + 10) >> 4);
-    int64_t a5 = 2097151 & (load_3(a + 13) >> 1);
-    int64_t a6 = 2097151 & (load_4(a + 15) >> 6);
-    int64_t a7 = 2097151 & (load_3(a + 18) >> 3);
-    int64_t a8 = 2097151 & load_3(a + 21);
-    int64_t a9 = 2097151 & (load_4(a + 23) >> 5);
-    int64_t a10 = 2097151 & (load_3(a + 26) >> 2);
-    int64_t a11 = (load_4(a + 28) >> 7);
-    int64_t b0 = 2097151 & load_3(b);
-    int64_t b1 = 2097151 & (load_4(b + 2) >> 5);
-    int64_t b2 = 2097151 & (load_3(b + 5) >> 2);
-    int64_t b3 = 2097151 & (load_4(b + 7) >> 7);
-    int64_t b4 = 2097151 & (load_4(b + 10) >> 4);
-    int64_t b5 = 2097151 & (load_3(b + 13) >> 1);
-    int64_t b6 = 2097151 & (load_4(b + 15) >> 6);
-    int64_t b7 = 2097151 & (load_3(b + 18) >> 3);
-    int64_t b8 = 2097151 & load_3(b + 21);
-    int64_t b9 = 2097151 & (load_4(b + 23) >> 5);
-    int64_t b10 = 2097151 & (load_3(b + 26) >> 2);
-    int64_t b11 = (load_4(b + 28) >> 7);
+    int64_t a0 = 2097151 & load3(a);
+    int64_t a1 = 2097151 & (load4(a + 2) >> 5);
+    int64_t a2 = 2097151 & (load3(a + 5) >> 2);
+    int64_t a3 = 2097151 & (load4(a + 7) >> 7);
+    int64_t a4 = 2097151 & (load4(a + 10) >> 4);
+    int64_t a5 = 2097151 & (load3(a + 13) >> 1);
+    int64_t a6 = 2097151 & (load4(a + 15) >> 6);
+    int64_t a7 = 2097151 & (load3(a + 18) >> 3);
+    int64_t a8 = 2097151 & load3(a + 21);
+    int64_t a9 = 2097151 & (load4(a + 23) >> 5);
+    int64_t a10 = 2097151 & (load3(a + 26) >> 2);
+    int64_t a11 = (load4(a + 28) >> 7);
+    int64_t b0 = 2097151 & load3(b);
+    int64_t b1 = 2097151 & (load4(b + 2) >> 5);
+    int64_t b2 = 2097151 & (load3(b + 5) >> 2);
+    int64_t b3 = 2097151 & (load4(b + 7) >> 7);
+    int64_t b4 = 2097151 & (load4(b + 10) >> 4);
+    int64_t b5 = 2097151 & (load3(b + 13) >> 1);
+    int64_t b6 = 2097151 & (load4(b + 15) >> 6);
+    int64_t b7 = 2097151 & (load3(b + 18) >> 3);
+    int64_t b8 = 2097151 & load3(b + 21);
+    int64_t b9 = 2097151 & (load4(b + 23) >> 5);
+    int64_t b10 = 2097151 & (load3(b + 26) >> 2);
+    int64_t b11 = (load4(b + 28) >> 7);
     int64_t s0 = a0 - b0;
     int64_t s1 = a1 - b1;
     int64_t s2 = a2 - b2;
@@ -3077,49 +3092,51 @@ Input:
   c[0]+256*c[1]+...+256^31*c[31] = c
 
 Output:
-  s[0]+256*s[1]+...+256^31*s[31] = (c-ab) mod l
+  s[0]+256*s[1]+...+256^31*s[31] = (c-Ab) mod l
   where l = 2^252 + 27742317777372353535851937790883648493.
 */
 
-void sc_mulsub(unsigned char *s, const unsigned char *a, const unsigned char *b,
-               const unsigned char *c)
+void scMulSub(unsigned char *s,
+              const unsigned char *a,
+              const unsigned char *b,
+              const unsigned char *c)
 {
-    int64_t a0 = 2097151 & load_3(a);
-    int64_t a1 = 2097151 & (load_4(a + 2) >> 5);
-    int64_t a2 = 2097151 & (load_3(a + 5) >> 2);
-    int64_t a3 = 2097151 & (load_4(a + 7) >> 7);
-    int64_t a4 = 2097151 & (load_4(a + 10) >> 4);
-    int64_t a5 = 2097151 & (load_3(a + 13) >> 1);
-    int64_t a6 = 2097151 & (load_4(a + 15) >> 6);
-    int64_t a7 = 2097151 & (load_3(a + 18) >> 3);
-    int64_t a8 = 2097151 & load_3(a + 21);
-    int64_t a9 = 2097151 & (load_4(a + 23) >> 5);
-    int64_t a10 = 2097151 & (load_3(a + 26) >> 2);
-    int64_t a11 = (load_4(a + 28) >> 7);
-    int64_t b0 = 2097151 & load_3(b);
-    int64_t b1 = 2097151 & (load_4(b + 2) >> 5);
-    int64_t b2 = 2097151 & (load_3(b + 5) >> 2);
-    int64_t b3 = 2097151 & (load_4(b + 7) >> 7);
-    int64_t b4 = 2097151 & (load_4(b + 10) >> 4);
-    int64_t b5 = 2097151 & (load_3(b + 13) >> 1);
-    int64_t b6 = 2097151 & (load_4(b + 15) >> 6);
-    int64_t b7 = 2097151 & (load_3(b + 18) >> 3);
-    int64_t b8 = 2097151 & load_3(b + 21);
-    int64_t b9 = 2097151 & (load_4(b + 23) >> 5);
-    int64_t b10 = 2097151 & (load_3(b + 26) >> 2);
-    int64_t b11 = (load_4(b + 28) >> 7);
-    int64_t c0 = 2097151 & load_3(c);
-    int64_t c1 = 2097151 & (load_4(c + 2) >> 5);
-    int64_t c2 = 2097151 & (load_3(c + 5) >> 2);
-    int64_t c3 = 2097151 & (load_4(c + 7) >> 7);
-    int64_t c4 = 2097151 & (load_4(c + 10) >> 4);
-    int64_t c5 = 2097151 & (load_3(c + 13) >> 1);
-    int64_t c6 = 2097151 & (load_4(c + 15) >> 6);
-    int64_t c7 = 2097151 & (load_3(c + 18) >> 3);
-    int64_t c8 = 2097151 & load_3(c + 21);
-    int64_t c9 = 2097151 & (load_4(c + 23) >> 5);
-    int64_t c10 = 2097151 & (load_3(c + 26) >> 2);
-    int64_t c11 = (load_4(c + 28) >> 7);
+    int64_t a0 = 2097151 & load3(a);
+    int64_t a1 = 2097151 & (load4(a + 2) >> 5);
+    int64_t a2 = 2097151 & (load3(a + 5) >> 2);
+    int64_t a3 = 2097151 & (load4(a + 7) >> 7);
+    int64_t a4 = 2097151 & (load4(a + 10) >> 4);
+    int64_t a5 = 2097151 & (load3(a + 13) >> 1);
+    int64_t a6 = 2097151 & (load4(a + 15) >> 6);
+    int64_t a7 = 2097151 & (load3(a + 18) >> 3);
+    int64_t a8 = 2097151 & load3(a + 21);
+    int64_t a9 = 2097151 & (load4(a + 23) >> 5);
+    int64_t a10 = 2097151 & (load3(a + 26) >> 2);
+    int64_t a11 = (load4(a + 28) >> 7);
+    int64_t b0 = 2097151 & load3(b);
+    int64_t b1 = 2097151 & (load4(b + 2) >> 5);
+    int64_t b2 = 2097151 & (load3(b + 5) >> 2);
+    int64_t b3 = 2097151 & (load4(b + 7) >> 7);
+    int64_t b4 = 2097151 & (load4(b + 10) >> 4);
+    int64_t b5 = 2097151 & (load3(b + 13) >> 1);
+    int64_t b6 = 2097151 & (load4(b + 15) >> 6);
+    int64_t b7 = 2097151 & (load3(b + 18) >> 3);
+    int64_t b8 = 2097151 & load3(b + 21);
+    int64_t b9 = 2097151 & (load4(b + 23) >> 5);
+    int64_t b10 = 2097151 & (load3(b + 26) >> 2);
+    int64_t b11 = (load4(b + 28) >> 7);
+    int64_t c0 = 2097151 & load3(c);
+    int64_t c1 = 2097151 & (load4(c + 2) >> 5);
+    int64_t c2 = 2097151 & (load3(c + 5) >> 2);
+    int64_t c3 = 2097151 & (load4(c + 7) >> 7);
+    int64_t c4 = 2097151 & (load4(c + 10) >> 4);
+    int64_t c5 = 2097151 & (load3(c + 13) >> 1);
+    int64_t c6 = 2097151 & (load4(c + 15) >> 6);
+    int64_t c7 = 2097151 & (load3(c + 18) >> 3);
+    int64_t c8 = 2097151 & load3(c + 21);
+    int64_t c9 = 2097151 & (load4(c + 23) >> 5);
+    int64_t c10 = 2097151 & (load3(c + 26) >> 2);
+    int64_t c11 = (load4(c + 28) >> 7);
     int64_t s0;
     int64_t s1;
     int64_t s2;
@@ -3553,32 +3570,34 @@ void sc_mulsub(unsigned char *s, const unsigned char *a, const unsigned char *b,
     s[31] = (unsigned char)(s11 >> 17);
 }
 
-void sc_mul(unsigned char *s, const unsigned char *a, const unsigned char *b)
+void scMul(unsigned char *s,
+           const unsigned char *a,
+           const unsigned char *b)
 {
-    int64_t a0 = 2097151 & load_3(a);
-    int64_t a1 = 2097151 & (load_4(a + 2) >> 5);
-    int64_t a2 = 2097151 & (load_3(a + 5) >> 2);
-    int64_t a3 = 2097151 & (load_4(a + 7) >> 7);
-    int64_t a4 = 2097151 & (load_4(a + 10) >> 4);
-    int64_t a5 = 2097151 & (load_3(a + 13) >> 1);
-    int64_t a6 = 2097151 & (load_4(a + 15) >> 6);
-    int64_t a7 = 2097151 & (load_3(a + 18) >> 3);
-    int64_t a8 = 2097151 & load_3(a + 21);
-    int64_t a9 = 2097151 & (load_4(a + 23) >> 5);
-    int64_t a10 = 2097151 & (load_3(a + 26) >> 2);
-    int64_t a11 = (load_4(a + 28) >> 7);
-    int64_t b0 = 2097151 & load_3(b);
-    int64_t b1 = 2097151 & (load_4(b + 2) >> 5);
-    int64_t b2 = 2097151 & (load_3(b + 5) >> 2);
-    int64_t b3 = 2097151 & (load_4(b + 7) >> 7);
-    int64_t b4 = 2097151 & (load_4(b + 10) >> 4);
-    int64_t b5 = 2097151 & (load_3(b + 13) >> 1);
-    int64_t b6 = 2097151 & (load_4(b + 15) >> 6);
-    int64_t b7 = 2097151 & (load_3(b + 18) >> 3);
-    int64_t b8 = 2097151 & load_3(b + 21);
-    int64_t b9 = 2097151 & (load_4(b + 23) >> 5);
-    int64_t b10 = 2097151 & (load_3(b + 26) >> 2);
-    int64_t b11 = (load_4(b + 28) >> 7);
+    int64_t a0 = 2097151 & load3(a);
+    int64_t a1 = 2097151 & (load4(a + 2) >> 5);
+    int64_t a2 = 2097151 & (load3(a + 5) >> 2);
+    int64_t a3 = 2097151 & (load4(a + 7) >> 7);
+    int64_t a4 = 2097151 & (load4(a + 10) >> 4);
+    int64_t a5 = 2097151 & (load3(a + 13) >> 1);
+    int64_t a6 = 2097151 & (load4(a + 15) >> 6);
+    int64_t a7 = 2097151 & (load3(a + 18) >> 3);
+    int64_t a8 = 2097151 & load3(a + 21);
+    int64_t a9 = 2097151 & (load4(a + 23) >> 5);
+    int64_t a10 = 2097151 & (load3(a + 26) >> 2);
+    int64_t a11 = (load4(a + 28) >> 7);
+    int64_t b0 = 2097151 & load3(b);
+    int64_t b1 = 2097151 & (load4(b + 2) >> 5);
+    int64_t b2 = 2097151 & (load3(b + 5) >> 2);
+    int64_t b3 = 2097151 & (load4(b + 7) >> 7);
+    int64_t b4 = 2097151 & (load4(b + 10) >> 4);
+    int64_t b5 = 2097151 & (load3(b + 13) >> 1);
+    int64_t b6 = 2097151 & (load4(b + 15) >> 6);
+    int64_t b7 = 2097151 & (load3(b + 18) >> 3);
+    int64_t b8 = 2097151 & load3(b + 21);
+    int64_t b9 = 2097151 & (load4(b + 23) >> 5);
+    int64_t b10 = 2097151 & (load3(b + 26) >> 2);
+    int64_t b11 = (load4(b + 28) >> 7);
     int64_t s0;
     int64_t s1;
     int64_t s2;
@@ -4008,35 +4027,40 @@ void sc_mul(unsigned char *s, const unsigned char *a, const unsigned char *b)
 }
 
 /* Assumes that a != INT64_MIN */
-static int64_t signum(int64_t a)
+static int64_t sigNum(int64_t a)
 {
     return (a >> 63) - ((-a) >> 63);
 }
 
-int sc_check(const unsigned char *s)
+int scCheck(const unsigned char *s)
 {
-    int64_t s0 = load_4(s);
-    int64_t s1 = load_4(s + 4);
-    int64_t s2 = load_4(s + 8);
-    int64_t s3 = load_4(s + 12);
-    int64_t s4 = load_4(s + 16);
-    int64_t s5 = load_4(s + 20);
-    int64_t s6 = load_4(s + 24);
-    int64_t s7 = load_4(s + 28);
-    return (int)((signum(1559614444 - s0) + (signum(1477600026 - s1) << 1)
-                  + (signum(2734136534 - s2) << 2) + (signum(350157278 - s3) << 3)
-                  + (signum(-s4) << 4) + (signum(-s5) << 5) + (signum(-s6) << 6)
-                  + (signum(268435456 - s7) << 7))
+    int64_t s0 = load4(s);
+    int64_t s1 = load4(s + 4);
+    int64_t s2 = load4(s + 8);
+    int64_t s3 = load4(s + 12);
+    int64_t s4 = load4(s + 16);
+    int64_t s5 = load4(s + 20);
+    int64_t s6 = load4(s + 24);
+    int64_t s7 = load4(s + 28);
+
+    return (int)((sigNum(1559614444 - s0)
+                  + (sigNum(1477600026 - s1) << 1)
+                  + (sigNum(2734136534 - s2) << 2)
+                  + (sigNum(350157278 - s3) << 3)
+                  + (sigNum(-s4) << 4)
+                  + (sigNum(-s5) << 5)
+                  + (sigNum(-s6) << 6)
+                  + (sigNum(268435456 - s7) << 7))
                  >> 8);
 }
 
-int sc_isnonzero(const unsigned char *s)
+int scIsNonZero(const unsigned char *s)
 {
-    return (((int)(s[0] | s[1] | s[2] | s[3] | s[4] | s[5] | s[6] | s[7] | s[8] | s[9] | s[10]
-                   | s[11] | s[12] | s[13] | s[14] | s[15] | s[16] | s[17] | s[18] | s[19] | s[20]
-                   | s[21] | s[22] | s[23] | s[24] | s[25] | s[26] | s[27] | s[28] | s[29] | s[30]
-                   | s[31])
-             - 1)
-            >> 8)
-            + 1;
+    return (
+        ((int)(
+            s[0] | s[1] | s[2] | s[3] | s[4] | s[5] | s[6] | s[7] | s[8] | s[9] | s[10]
+            | s[11] | s[12] | s[13] | s[14] | s[15] | s[16] | s[17] | s[18] | s[19] | s[20]
+            | s[21] | s[22] | s[23] | s[24] | s[25] | s[26] | s[27] | s[28] | s[29] | s[30]
+            | s[31])
+        - 1) >> 8) + 1;
 }

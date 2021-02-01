@@ -1117,7 +1117,7 @@ bool core::findStartAndFullOffsets(const std::vector<Crypto::Hash> &knownBlockId
     }
 
     if (knownBlockIds.back() != m_blockchain.getBlockIdByHeight(0)) {
-        logger(ERROR, BRIGHT_RED) << "knownBlockIds doesn't end with genesis block hash: "
+        logger(ERROR, BRIGHT_RED) << "knownBlockIds doesn't end with genesis block Hash: "
                                   << knownBlockIds.back();
         return false;
     }

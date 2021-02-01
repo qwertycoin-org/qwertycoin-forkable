@@ -54,7 +54,7 @@ bool Currency::init()
     }
 
     if (!getBlockHash(m_genesisBlock, m_genesisBlockHash)) {
-        logger(ERROR, BRIGHT_RED) << "Failed to get genesis block hash";
+        logger(ERROR, BRIGHT_RED) << "Failed to get genesis block Hash";
         return false;
     }
 
@@ -915,7 +915,7 @@ difficulty_type Currency::getClifDifficulty(uint32_t height, uint8_t blockMajorV
     return new_diff;
 }
 
-bool Currency::checkProofOfWork(Crypto::cn_context &context, const Block &block,
+bool Currency::checkProofOfWork(Crypto::CnContext &context, const Block &block,
                                 difficulty_type currentDiffic, Crypto::Hash &proofOfWork) const
 {
     if (!getBlockLongHash(context, block, proofOfWork)) {

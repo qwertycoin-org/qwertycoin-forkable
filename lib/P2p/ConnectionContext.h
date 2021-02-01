@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <boost/uuid/uuid.hpp>
 #include <Common/StringTools.h>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 
 namespace CryptoNote {
 

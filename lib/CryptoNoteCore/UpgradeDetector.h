@@ -185,7 +185,7 @@ public:
                         << Common::timeIntervalToString(interval)
                         << ")! Current last block index "
                         << (m_blockchain.size() - 1)
-                        << ", hash "
+                        << ", Hash "
                         << getBlockHash(m_blockchain.back().bl);
                 }
             } else if (m_blockchain.size() == upgradeHeight() + 1) {

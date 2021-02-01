@@ -465,7 +465,7 @@ bool tx_extra_message::encrypt(
         }
         key_data.magic1 = 0x80;
         key_data.magic2 = 0;
-        Hash h = cn_fast_hash(&key_data, sizeof(message_key_data));
+        Hash h = cnFastHash(&key_data, sizeof(message_key_data));
         uint64_t nonce = SWAP64LE(index);
         uint8_t *nonce8 = reinterpret_cast<uint8_t *>(&nonce);
         chacha(10, buf.get(), mlen, reinterpret_cast<uint8_t *>(&h), nonce8, buf.get());
@@ -496,7 +496,7 @@ bool tx_extra_message::decrypt(
         }
         key_data.magic1 = 0x80;
         key_data.magic2 = 0;
-        Hash h = cn_fast_hash(&key_data, sizeof(message_key_data));
+        Hash h = cnFastHash(&key_data, sizeof(message_key_data));
         uint64_t nonce = SWAP64LE(index);
         uint8_t *nonce8 = reinterpret_cast<uint8_t *>(&nonce);
         chacha(10, data.data(), mlen, reinterpret_cast<uint8_t *>(&h), nonce8, ptr.get());
@@ -543,7 +543,7 @@ bool tx_extra_sender::encrypt(
         }
         key_data.magic1 = 0x80;
         key_data.magic2 = 0;
-        Hash h = cn_fast_hash(&key_data, sizeof(sender_key_data));
+        Hash h = cnFastHash(&key_data, sizeof(sender_key_data));
         uint64_t nonce = SWAP64LE(index);
         uint8_t *nonce8 = reinterpret_cast<uint8_t *>(&nonce);
         chacha(10, buf.get(), mlen, reinterpret_cast<uint8_t *>(&h), nonce8, buf.get());
@@ -574,7 +574,7 @@ bool tx_extra_sender::decrypt(
         }
         key_data.magic1 = 0x80;
         key_data.magic2 = 0;
-        Hash h = cn_fast_hash(&key_data, sizeof(sender_key_data));
+        Hash h = cnFastHash(&key_data, sizeof(sender_key_data));
         uint64_t nonce = SWAP64LE(index);
         uint8_t *nonce8 = reinterpret_cast<uint8_t *>(&nonce);
         chacha(10, data.data(), mlen, reinterpret_cast<uint8_t *>(&h), nonce8, ptr.get());

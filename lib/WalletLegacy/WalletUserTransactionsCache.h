@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 #include <WalletLegacy/IWalletLegacy.h>
 #include <WalletLegacy/WalletLegacyEvent.h>
 #include <WalletLegacy/WalletUnconfirmedTransactions.h>

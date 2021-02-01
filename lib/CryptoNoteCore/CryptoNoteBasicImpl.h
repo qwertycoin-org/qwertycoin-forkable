@@ -20,7 +20,7 @@
 
 #include <Common/StringTools.h>
 #include <Crypto/Crypto.h>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 
 namespace CryptoNote {

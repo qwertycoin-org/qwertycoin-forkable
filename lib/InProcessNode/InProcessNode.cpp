@@ -532,11 +532,7 @@ void InProcessNode::updateLastLocalBlockHeaderInfo()
     Crypto::Hash hash;
     Block block;
     uint64_t difficulty;
-    /*
-    do {
-        core.get_blockchain_top(height, hash);
-    } while (!core.getBlockByHash(hash, block) || !core.getBlockDifficulty(height, difficulty));
-    */
+
     try {
         core.get_blockchain_top(height, hash);
         core.getBlockByHash(hash, block);

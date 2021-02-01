@@ -148,7 +148,7 @@ std::string short_hash_str(const Crypto::Hash &h);
 bool get_block_hashing_blob(const Block &b, BinaryArray &blob);
 bool getBlockHash(const Block &b, Crypto::Hash &res);
 Crypto::Hash getBlockHash(const Block &b);
-bool getBlockLongHash(Crypto::cn_context &context, const Block &b, Crypto::Hash &res);
+bool getBlockLongHash(Crypto::CnContext &context, const Block &b, Crypto::Hash &res);
 bool getInputsMoneyAmount(const Transaction &tx, uint64_t &money);
 uint64_t getOutsMoneyAmount(const Transaction &tx);
 bool check_inputs_types_supported(const TransactionPrefix &tx);

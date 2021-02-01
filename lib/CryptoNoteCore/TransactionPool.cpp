@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <vector>
 #include <boost/filesystem.hpp>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 #include <Common/IntUtil.h>
 #include <Common/Util.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
@@ -768,7 +768,7 @@ bool tx_memory_pool::removeTransactionInputs(
             }
             key_image_set.erase(it_in_set);
             if (key_image_set.empty()) {
-                // it is now empty hash container for this key_image
+                // it is now empty Hash container for this key_image
                 m_spent_key_images.erase(it);
             }
         } else if (in.type() == typeid(MultiSignatureInput)) {

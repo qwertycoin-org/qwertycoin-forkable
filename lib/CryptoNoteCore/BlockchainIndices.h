@@ -23,7 +23,7 @@
 #include <string>
 #include <unordered_map>
 #include <boost/functional/hash.hpp>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 
 namespace CryptoNote {

@@ -49,7 +49,7 @@ bool Checkpoints::add_checkpoint(uint32_t height, const std::string &hash_str)
     Crypto::Hash h = NULL_HASH;
 
     if (!Common::podFromHex(hash_str, h)) {
-        logger(WARNING) << "Wrong hash in checkpoint for height " << height;
+        logger(WARNING) << "Wrong Hash in checkpoint for height " << height;
         return false;
     }
 

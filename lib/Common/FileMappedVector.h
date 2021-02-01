@@ -25,7 +25,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include <android.h>
+#include <Android.h>
 
 #include <Common/ScopeExit.h>
 

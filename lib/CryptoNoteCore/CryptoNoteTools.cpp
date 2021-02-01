@@ -38,7 +38,7 @@ bool toBinaryArray(const BinaryArray &object, BinaryArray &binaryArray)
 
 void getBinaryArrayHash(const BinaryArray &binaryArray, Crypto::Hash &hash)
 {
-    cn_fast_hash(binaryArray.data(), binaryArray.size(), hash);
+    cnFastHash(binaryArray.data(), binaryArray.size(), hash);
 }
 
 Crypto::Hash getBinaryArrayHash(const BinaryArray &binaryArray)

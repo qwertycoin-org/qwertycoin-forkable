@@ -1738,7 +1738,7 @@ bool RpcServer::onSendRawTx(const COMMAND_RPC_SEND_RAW_TX::request &req,
         return true;
     }
 
-    Crypto::Hash transactionHash = Crypto::cn_fast_hash(tx_blob.data(), tx_blob.size());
+    Crypto::Hash transactionHash = Crypto::cnFastHash(tx_blob.data(), tx_blob.size());
     logger(DEBUGGING) << "transaction " << transactionHash << " came in on_send_raw_tx";
 
     tx_verification_context tvc = boost::value_initialized<tx_verification_context>();
@@ -3236,7 +3236,7 @@ bool RpcServer::onVerifyMessage(const COMMAND_RPC_VERIFY_MESSAGE::request &req,
                                 COMMAND_RPC_VERIFY_MESSAGE::response &res)
 {
     Crypto::Hash hash;
-    Crypto::cn_fast_hash(req.message.data(), req.message.size(), hash);
+    Crypto::cnFastHash(req.message.data(), req.message.size(), hash);
 
     AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
     if (!m_core.currency().parseAccountAddressString(req.address, acc)) {

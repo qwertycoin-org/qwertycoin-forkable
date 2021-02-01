@@ -19,7 +19,7 @@
 #include <Common/CommandLine.h>
 #include <Global/CryptoNoteConfig.h>
 #include <Rpc/RpcServerConfig.h>
-#include <android.h>
+#include <Android.h>
 
 namespace CryptoNote {
 

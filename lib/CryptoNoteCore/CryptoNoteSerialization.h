@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <Crypto/chacha8.h>
+#include <Crypto/Chacha8.h>
 #include <Crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <Serialization/ISerializer.h>
@@ -30,7 +30,7 @@ namespace Crypto {
 bool serialize(PublicKey &pubKey, Common::StringView name, CN::ISerializer &serializer);
 bool serialize(SecretKey &secKey, Common::StringView name, CN::ISerializer &serializer);
 bool serialize(Hash &h, Common::StringView name, CN::ISerializer &serializer);
-bool serialize(chacha8_iv &chacha, Common::StringView name, CN::ISerializer &serializer);
+bool serialize(Chacha8Iv &chacha, Common::StringView name, CN::ISerializer &serializer);
 bool serialize(KeyImage& keyImage, Common::StringView name, CN::ISerializer &serializer);
 bool serialize(Signature &sig, Common::StringView name, CN::ISerializer &serializer);
 bool serialize(EllipticCurveScalar &ecScalar, Common::StringView name, CN::ISerializer &serializer);

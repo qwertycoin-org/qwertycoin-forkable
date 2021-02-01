@@ -280,7 +280,7 @@ bool BlockchainExplorer::getBlocks(const std::vector<Hash> &blockHashes,
                 make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
-    logger(DEBUGGING) << "Get blocks by hash request came.";
+    logger(DEBUGGING) << "Get blocks by Hash request came.";
     NodeRequest request(
         std::bind(
             static_cast<
@@ -299,7 +299,7 @@ bool BlockchainExplorer::getBlocks(const std::vector<Hash> &blockHashes,
 
     std::error_code ec = request.performBlocking();
     if (ec) {
-        logger(ERROR) << "Can't get blocks by hash: " << ec.message();
+        logger(ERROR) << "Can't get blocks by Hash: " << ec.message();
         throw std::system_error(ec);
     }
 
@@ -481,7 +481,7 @@ bool BlockchainExplorer::getTransactions(const std::vector<Hash> &transactionHas
                 make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
-    logger(DEBUGGING) << "Get transactions by hash request came.";
+    logger(DEBUGGING) << "Get transactions by Hash request came.";
     NodeRequest request(
         std::bind(
             static_cast<
@@ -500,7 +500,7 @@ bool BlockchainExplorer::getTransactions(const std::vector<Hash> &transactionHas
 
     std::error_code ec = request.performBlocking();
     if (ec) {
-        logger(ERROR) << "Can't get transactions by hash: " << ec.message();
+        logger(ERROR) << "Can't get transactions by Hash: " << ec.message();
         throw std::system_error(ec);
     }
 

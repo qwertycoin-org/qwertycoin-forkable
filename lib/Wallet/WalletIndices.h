@@ -27,7 +27,7 @@
 #include <boost/multi_index/composite_key.hpp>
 #include <boost/multi_index/member.hpp>
 #include <Common/FileMappedVector.h>
-#include <Crypto/chacha8.h>
+#include <Crypto/Chacha8.h>
 #include <Wallet/IWallet.h>
 #include <ITransfersContainer.h>
 
@@ -48,7 +48,7 @@ struct WalletRecord
 #pragma pack(push, 1)
 struct EncryptedWalletRecord
 {
-    Crypto::chacha8_iv iv;
+    Crypto::Chacha8Iv iv;
     // secret key, public key and creation timestamp
     uint8_t data[sizeof(Crypto::PublicKey) + sizeof(Crypto::SecretKey) + sizeof(uint64_t)];
 };

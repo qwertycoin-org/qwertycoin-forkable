@@ -19,7 +19,7 @@
 #pragma once
 
 #include <Common/IInputStream.h>
-#include <Crypto/chacha8.h>
+#include <Crypto/Chacha8.h>
 #include <Serialization/BinaryInputStreamSerializer.h>
 #include <Transfers/TransfersSynchronizer.h>
 #include <Wallet/WalletIndices.h>
@@ -45,24 +45,24 @@ public:
         uint32_t transactionSoftLockTime
     );
 
-    void load(const Crypto::chacha8_key &key, Common::IInputStream &source);
+    void load(const Crypto::Chacha8Key &key, Common::IInputStream &source);
 
     struct CryptoContext
     {
         void incIv();
 
-        Crypto::chacha8_key key;
-        Crypto::chacha8_iv iv;
+        Crypto::Chacha8Key key;
+        Crypto::Chacha8Iv iv;
     };
 
     static const uint32_t SERIALIZATION_VERSION;
 
 private:
-    void loadWallet(Common::IInputStream &source, const Crypto::chacha8_key &key, uint32_t version);
-    void loadWalletV1(Common::IInputStream &source, const Crypto::chacha8_key &key);
+    void loadWallet(Common::IInputStream &source, const Crypto::Chacha8Key &key, uint32_t version);
+    void loadWalletV1(Common::IInputStream &source, const Crypto::Chacha8Key &key);
 
     uint32_t loadVersion(Common::IInputStream &source);
-    void loadIv(Common::IInputStream &source, Crypto::chacha8_iv &iv);
+    void loadIv(Common::IInputStream &source, Crypto::Chacha8Iv &iv);
     void loadKeys(Common::IInputStream &source, CryptoContext &cryptoContext);
     void loadPublicKey(Common::IInputStream &source, CryptoContext &cryptoContext);
     void loadSecretKey(Common::IInputStream &source, CryptoContext &cryptoContext);

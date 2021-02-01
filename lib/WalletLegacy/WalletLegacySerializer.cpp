@@ -86,7 +86,7 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
     std::string plain = plainArchive.str();
     std::string cipher;
 
-    Crypto::chacha8_iv iv = encrypt(plain, password, cipher);
+    Crypto::Chacha8Iv iv = encrypt(plain, password, cipher);
 
     uint32_t version = walletSerializationVersion;
     StdOutputStream output(stream);
@@ -114,18 +114,18 @@ void WalletLegacySerializer::saveKeys(CryptoNote::ISerializer &serializer)
     keys.serialize(serializer, "keys");
 }
 
-Crypto::chacha8_iv WalletLegacySerializer::encrypt(
+Crypto::Chacha8Iv WalletLegacySerializer::encrypt(
     const std::string &plain,
     const std::string &password,
     std::string &cipher)
 {
-    Crypto::chacha8_key key;
-    Crypto::cn_context context;
-    Crypto::generate_chacha8_key(context, password, key);
+    Crypto::Chacha8Key key;
+    Crypto::CnContext context;
+    Crypto::generateChacha8Key(context, password, key);
 
     cipher.resize(plain.size());
 
-    Crypto::chacha8_iv iv = Crypto::randomChachaIV();
+    Crypto::Chacha8Iv iv = Crypto::randomChachaIV();
     Crypto::chacha8(plain.data(), plain.size(), key, iv, &cipher[0]);
 
     return iv;
@@ -146,7 +146,7 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
     // set serialization version global variable
     CryptoNote::WALLET_LEGACY_SERIALIZATION_VERSION = version;
 
-    Crypto::chacha8_iv iv;
+    Crypto::Chacha8Iv iv;
     serializerEncrypted(iv, "iv");
 
     std::string cipher;
@@ -208,12 +208,12 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
 void WalletLegacySerializer::decrypt(
     const std::string &cipher,
     std::string &plain,
-    Crypto::chacha8_iv iv,
+    Crypto::Chacha8Iv iv,
     const std::string &password)
 {
-    Crypto::chacha8_key key;
-    Crypto::cn_context context;
-    Crypto::generate_chacha8_key(context, password, key);
+    Crypto::Chacha8Key key;
+    Crypto::CnContext context;
+    Crypto::generateChacha8Key(context, password, key);
 
     plain.resize(cipher.size());
 

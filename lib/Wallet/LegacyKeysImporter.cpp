@@ -41,7 +41,7 @@ struct keys_file_data
         s(account_data, "account_data");
     }
 
-    chacha8_iv iv;
+    Chacha8Iv iv;
     std::string account_data;
 };
 
@@ -66,9 +66,9 @@ void loadKeysFromFile(const std::string &filename,
         );
     }
 
-    chacha8_key key;
-    cn_context cn_context;
-    generate_chacha8_key(cn_context, password, key);
+    Chacha8Key key;
+    CnContext cn_context;
+    generateChacha8Key(cn_context, password, key);
     std::string account_data;
     account_data.resize(keys_file_data.account_data.size());
     chacha8(keys_file_data.account_data.data(),

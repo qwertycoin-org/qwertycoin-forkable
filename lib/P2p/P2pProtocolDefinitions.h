@@ -216,7 +216,7 @@ inline Crypto::Hash get_proof_of_trust_hash(const proof_of_trust &pot)
     s.append(reinterpret_cast<const char*>(&pot.peer_id), sizeof(pot.peer_id));
     s.append(reinterpret_cast<const char*>(&pot.time), sizeof(pot.time));
 
-    return Crypto::cn_fast_hash(s.data(), s.size());
+    return Crypto::cnFastHash(s.data(), s.size());
 }
 
 struct COMMAND_REQUEST_STAT_INFO

@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <vector>
 #include <Common/IntUtil.h>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 #include <CryptoNoteCore/Difficulty.h>
 #include <Global/CryptoNoteConfig.h>
 
@@ -59,7 +59,7 @@ static inline bool cadc(uint64_t a, uint64_t b, bool c)
 bool check_hash(const Crypto::Hash &hash, difficulty_type difficulty)
 {
     uint64_t low, high, top, cur;
-    // First check the highest word, this will most likely fail for a random hash.
+    // First check the highest word, this will most likely fail for a random Hash.
     mul(swap64le(((const uint64_t *) &hash)[3]), difficulty, top, high);
     if (high != 0) {
         return false;

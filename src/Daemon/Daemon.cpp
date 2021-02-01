@@ -24,7 +24,7 @@
 #include <Common/SignalHandler.h>
 #include <Common/StringTools.h>
 #include <Common/PathTools.h>
-#include <Crypto/hash.h>
+#include <Crypto/Hash.h>
 #include <Breakpad/Breakpad.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
 #include <CryptoNoteCore/Core.h>
