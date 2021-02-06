@@ -66,7 +66,7 @@ public:
     }
 };
 
-class ITransfersSubscription : public IObservable <ITransfersObserver>
+class ITransfersSubscription : public TObservable <ITransfersObserver>
 {
 public:
     virtual ~ITransfersSubscription() = default;

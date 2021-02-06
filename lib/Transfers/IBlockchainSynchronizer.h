@@ -23,7 +23,7 @@
 #include <system_error>
 #include <unordered_set>
 
-#include <IObservable.h>
+#include <TObservable.h>
 #include <IStreamSerializable.h>
 #include <ITransfersSynchronizer.h>
 
@@ -51,7 +51,7 @@ public:
 
 class IBlockchainConsumerObserver;
 
-class IBlockchainConsumer : public IObservable<IBlockchainConsumerObserver>
+class IBlockchainConsumer : public TObservable<IBlockchainConsumerObserver>
 {
 public:
     virtual ~IBlockchainConsumer() = default;
@@ -99,7 +99,7 @@ public:
     }
 };
 
-class IBlockchainSynchronizer : public IObservable<IBlockchainSynchronizerObserver>,
+class IBlockchainSynchronizer : public TObservable<IBlockchainSynchronizerObserver>,
                                 public IStreamSerializable
 {
 public:

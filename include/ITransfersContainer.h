@@ -22,8 +22,8 @@
 #include <limits>
 #include <vector>
 
-#include <IObservable.h>
 #include <IStreamSerializable.h>
+#include <TObservable.h>
 
 #include <Crypto/Hash.h>
 
