@@ -51,7 +51,8 @@ public:
 
   INodeNonTrivialRefreshStub(TestBlockchainGenerator& generator) : INodeTrivialRefreshStub(generator), blocksWasQueried(false), poolWasQueried(false) {}
 
-  virtual void queryBlocks(std::vector<Hash>&& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks, uint32_t& startHeight, const Callback& callback) override {
+  virtual void queryBlocks(std::vector<Hash>&& knownBlockIds, uint64_t timestamp,
+						   std::vector<FBlockShortEntry>& newBlocks, uint32_t& startHeight, const Callback& callback) override {
     blocksWasQueried = true;
     INodeTrivialRefreshStub::queryBlocks(std::move(knownBlockIds), timestamp, newBlocks, startHeight, callback);
   }
@@ -76,26 +77,33 @@ public:
 
   INodeFunctorialStub(TestBlockchainGenerator& generator)
     : INodeNonTrivialRefreshStub(generator)
-    , queryBlocksFunctor([](const std::vector<Hash>&, uint64_t, std::vector<BlockShortEntry>&, uint32_t&, const Callback&) -> bool { return true; })
-    , getPoolSymmetricDifferenceFunctor([](const std::vector<Hash>&, Hash, bool&, std::vector<std::unique_ptr<ITransactionReader>>&, std::vector<Hash>&, const Callback&)->bool {return true; }) {
+    , queryBlocksFunctor([](const std::vector<FHash>&, uint64_t, std::vector<FBlockShortEntry>&,
+            uint32_t&, const Callback&) -> bool { return true; })
+    , getPoolSymmetricDifferenceFunctor([](const std::vector<FHash>&, FHash, bool&,
+    		std::vector<std::unique_ptr<ITransactionReader>>&, std::vector<FHash>&, const
+    		        Callback&)->bool {return true; }) {
   }
 
-  virtual void queryBlocks(std::vector<Hash>&& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks,
+  virtual void queryBlocks(std::vector<FHash>&& knownBlockIds, uint64_t timestamp,
+						   std::vector<FBlockShortEntry>& newBlocks,
     uint32_t& startHeight, const Callback& callback) override {
     if (queryBlocksFunctor(knownBlockIds, timestamp, newBlocks, startHeight, callback)) {
       INodeNonTrivialRefreshStub::queryBlocks(std::move(knownBlockIds), timestamp, newBlocks, startHeight, callback);
     }
   }
 
-  virtual void getPoolSymmetricDifference(std::vector<Hash>&& known_pool_tx_ids, Hash known_block_id, bool& is_bc_actual,
-          std::vector<std::unique_ptr<ITransactionReader>>& new_txs, std::vector<Hash>& deleted_tx_ids, const Callback& callback) override {
+  virtual void getPoolSymmetricDifference(std::vector<FHash>&& known_pool_tx_ids, FHash
+  known_block_id, bool& is_bc_actual,
+          std::vector<std::unique_ptr<ITransactionReader>>& new_txs, std::vector<FHash>&
+                  deleted_tx_ids, const Callback& callback) override {
     if (getPoolSymmetricDifferenceFunctor(known_pool_tx_ids, known_block_id, is_bc_actual, new_txs, deleted_tx_ids, callback)) {
       INodeNonTrivialRefreshStub::getPoolSymmetricDifference(std::move(known_pool_tx_ids), known_block_id, is_bc_actual, new_txs, deleted_tx_ids, callback);
     }
   }
 
-  std::function<bool(const std::vector<Hash>&, uint64_t, std::vector<BlockShortEntry>&, uint32_t&, const Callback&)> queryBlocksFunctor;
-  std::function<bool(const std::vector<Hash>&, Hash, bool&, std::vector<std::unique_ptr<ITransactionReader>>&, std::vector<Hash>&, const Callback&)> getPoolSymmetricDifferenceFunctor;
+  std::function<bool(const std::vector<FHash>&, uint64_t, std::vector<FBlockShortEntry>&,
+          uint32_t&, const Callback&)> queryBlocksFunctor;
+  std::function<bool(const std::vector<FHash>&, FHash, bool&, std::vector<std::unique_ptr<ITransactionReader>>&, std::vector<FHash>&, const Callback&)> getPoolSymmetricDifferenceFunctor;
 };
 
 class IBlockchainSynchronizerTrivialObserver : public IBlockchainSynchronizerObserver {
@@ -1013,7 +1021,8 @@ TEST_F(BcSTest, checkINodeError) {
     errc = ec;
   };
 
-  m_node.queryBlocksFunctor = [](const std::vector<Hash>& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks, uint32_t& startHeight, const INode::Callback& callback) -> bool {
+  m_node.queryBlocksFunctor = [](const std::vector<FHash>& knownBlockIds, uint64_t timestamp,
+  		std::vector<FBlockShortEntry>& newBlocks, uint32_t& startHeight, const INode::Callback& callback) -> bool {
     callback(std::make_error_code(std::errc::invalid_argument));
     return false;
   };
@@ -1249,7 +1258,8 @@ TEST_F(BcSTest, checkStatePreservingBetweenSynchronizations) {
 
   Hash receivedLastBlockHash;
 
-  m_node.queryBlocksFunctor = [&receivedLastBlockHash](const std::vector<Hash>& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks, uint32_t& startHeight, const INode::Callback& callback) -> bool {
+  m_node.queryBlocksFunctor = [&receivedLastBlockHash](const std::vector<FHash>& knownBlockIds,
+  		uint64_t timestamp, std::vector<FBlockShortEntry>& newBlocks, uint32_t& startHeight, const INode::Callback& callback) -> bool {
     receivedLastBlockHash = knownBlockIds.front();
     startHeight = 1;
     callback(std::make_error_code(std::errc::interrupted));
@@ -1308,7 +1318,8 @@ TEST_F(BcSTest, checkBlocksRerequestingOnError) {
     return true;
   };
 
-  m_node.queryBlocksFunctor = [&](const std::vector<Hash>& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks, uint32_t& startHeight, const INode::Callback& callback) -> bool {
+  m_node.queryBlocksFunctor = [&](const std::vector<FHash>& knownBlockIds, uint64_t timestamp,
+  		std::vector<FBlockShortEntry>& newBlocks, uint32_t& startHeight, const INode::Callback& callback) -> bool {
     ++requestsCount;
 
     if (requestsCount == 2) {
@@ -1364,7 +1375,7 @@ TEST_F(BcSTest, checkTxOrder) {
 
   auto last_block = generator.getBlockchain().back();
 
-  BlockShortEntry bse;
+  FBlockShortEntry bse;
   bse.hasBlock = true;
   bse.blockHash = getBlockHash(last_block);;
   bse.block = last_block;
@@ -1372,11 +1383,14 @@ TEST_F(BcSTest, checkTxOrder) {
   bse.txsShortInfo.push_back({tx2hash, tx2});
   bse.txsShortInfo.push_back({tx3hash, tx3});
 
-  std::vector<Hash> expectedTxHashes = { getObjectHash(last_block.baseTransaction), tx1hash, tx2hash, tx3hash };
+  std::vector<FHash> expectedTxHashes = { getObjectHash(last_block.baseTransaction), tx1hash,
+										  tx2hash, tx3hash };
 
   int requestNumber = 0;
 
-  m_node.queryBlocksFunctor = [&bse, &requestNumber](const std::vector<Hash>& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks, uint32_t& startHeight, const INode::Callback& callback) -> bool {
+  m_node.queryBlocksFunctor = [&bse, &requestNumber](const std::vector<FHash>& knownBlockIds,
+  		uint64_t timestamp, std::vector<FBlockShortEntry>& newBlocks, uint32_t& startHeight,
+  		const INode::Callback& callback) -> bool {
     startHeight = 1;
     newBlocks.push_back(bse);
     if (requestNumber > 0) {
@@ -1389,12 +1403,12 @@ TEST_F(BcSTest, checkTxOrder) {
     return false;
   };
 
-  std::vector<Hash> receivedTxHashes = {};
+  std::vector<FHash> receivedTxHashes = {};
 
   c.onNewBlocksFunctor = [&](const CompleteBlock* blocks, uint32_t, size_t count) -> bool {
     for (auto& tx : blocks[count - 1].transactions) {
       auto hash = tx->getTransactionHash();
-      receivedTxHashes.push_back(*reinterpret_cast<Hash*>(&hash));
+      receivedTxHashes.push_back(*reinterpret_cast<FHash*>(&hash));
     }
 
     return true;

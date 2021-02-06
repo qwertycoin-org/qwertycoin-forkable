@@ -240,9 +240,10 @@ void INodeTrivialRefreshStub::doGetRandomOutsByAmounts(std::vector<uint64_t> amo
   callback(std::error_code());
 }
 
-void INodeTrivialRefreshStub::queryBlocks(std::vector<Crypto::Hash>&& knownBlockIds, uint64_t timestamp,
-        std::vector<BlockShortEntry>& newBlocks, uint32_t& startHeight, const Callback& callback) {
-  auto resultHolder = std::make_shared<std::vector<BlockCompleteEntry>>();
+void INodeTrivialRefreshStub::queryBlocks(std::vector<Crypto::FHash>&& knownBlockIds, uint64_t
+timestamp,
+        std::vector<FBlockShortEntry>& newBlocks, uint32_t& startHeight, const Callback& callback) {
+  auto resultHolder = std::make_shared<std::vector<FBlockCompleteEntry>>();
 
   getNewBlocks(std::move(knownBlockIds), *resultHolder, startHeight, [resultHolder, callback, &startHeight, &newBlocks](std::error_code ec)
   {
@@ -252,7 +253,7 @@ void INodeTrivialRefreshStub::queryBlocks(std::vector<Crypto::Hash>&& knownBlock
     }
 
     for (const auto& item : *resultHolder) {
-      BlockShortEntry entry;
+      FBlockShortEntry entry;
 
       if (!fromBinaryArray(entry.block, asBinaryArray(item.block))) {
         callback(std::make_error_code(std::errc::invalid_argument));
@@ -269,7 +270,7 @@ void INodeTrivialRefreshStub::queryBlocks(std::vector<Crypto::Hash>&& knownBlock
           return;
         }
 
-        TransactionShortInfo tsi;
+        FTransactionShortInfo tsi;
         tsi.txId = getObjectHash(tx);
         tsi.txPrefix = tx;
 

@@ -688,7 +688,7 @@ std::error_code TransfersConsumer::getGlobalIndices(
     std::promise<std::error_code> prom;
     std::future<std::error_code> f = prom.get_future();
 
-    INode::Callback cb = [&prom](std::error_code ec) {
+    INode::UCallback cb = [&prom](std::error_code ec) {
         std::promise<std::error_code> p(std::move(prom));
         p.set_value(ec);
     };

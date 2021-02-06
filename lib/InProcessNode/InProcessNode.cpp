@@ -88,7 +88,7 @@ bool InProcessNode::removeObserver(INodeObserver *observer)
     return observerManager.remove(observer);
 }
 
-void InProcessNode::init(const Callback &callback)
+void InProcessNode::init(const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     std::error_code ec;
@@ -142,7 +142,7 @@ void InProcessNode::workerFunc()
 void InProcessNode::getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                                  std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                                  uint32_t &startHeight,
-                                 const Callback &callback)
+                                 const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -164,7 +164,7 @@ void InProcessNode::getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
 
 void InProcessNode::getNewBlocksAsync(std::vector<Crypto::FHash> &knownBlockIds,
                                       std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
-                                      uint32_t &startHeight, const Callback &callback)
+                                      uint32_t &startHeight, const UCallback &callback)
 {
     std::error_code ec = doGetNewBlocks(std::move(knownBlockIds), newBlocks, startHeight);
     callback(ec);
@@ -228,7 +228,7 @@ std::error_code InProcessNode::doGetNewBlocks(
 
 void InProcessNode::getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                                     std::vector<uint32_t> &outsGlobalIndices,
-                                                    const Callback &callback)
+                                                    const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -249,7 +249,7 @@ void InProcessNode::getTransactionOutsGlobalIndices(const Crypto::FHash &transac
 
 void InProcessNode::getTransactionOutsGlobalIndicesAsync(const Crypto::FHash &transactionHash,
                                                          std::vector<uint32_t>& outsGlobalIndices,
-                                                         const Callback &callback)
+                                                         const UCallback &callback)
 {
     std::error_code ec = doGetTransactionOutsGlobalIndices(transactionHash, outsGlobalIndices);
     callback(ec);
@@ -285,7 +285,7 @@ void InProcessNode::getRandomOutsByAmounts(
     std::vector<uint64_t> &&amounts,
     uint64_t outsCount,
     std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result,
-    const Callback &callback)
+    const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -309,7 +309,7 @@ void InProcessNode::getRandomOutsByAmountsAsync(
     std::vector<uint64_t> &amounts,
     uint64_t outsCount,
     std::vector<QwertyNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result,
-    const Callback &callback)
+    const UCallback &callback)
 {
     std::error_code ec = doGetRandomOutsByAmounts(std::move(amounts), outsCount, result);
     callback(ec);
@@ -350,7 +350,7 @@ std::error_code InProcessNode::doGetRandomOutsByAmounts(
 
 
 void InProcessNode::relayTransaction(const QwertyNote::Transaction &transaction,
-                                     const Callback &callback)
+                                     const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -369,7 +369,7 @@ void InProcessNode::relayTransaction(const QwertyNote::Transaction &transaction,
 }
 
 void InProcessNode::relayTransactionAsync(const QwertyNote::Transaction &transaction,
-                                          const Callback &callback)
+                                          const UCallback &callback)
 {
     std::error_code ec = doRelayTransaction(transaction);
     callback(ec);
@@ -433,7 +433,7 @@ uint32_t InProcessNode::getLocalBlockCount() const
         throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
     }
 
-    return lastLocalBlockHeaderInfo.index + 1;
+    return lastLocalBlockHeaderInfo.uIndex + 1;
 }
 
 uint32_t InProcessNode::getNodeHeight() const
@@ -460,7 +460,7 @@ uint32_t InProcessNode::getLastLocalBlockHeight() const
         throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
     }
 
-    return lastLocalBlockHeaderInfo.index;
+    return lastLocalBlockHeaderInfo.uIndex;
 }
 
 uint32_t InProcessNode::getLastKnownBlockHeight() const
@@ -482,7 +482,7 @@ uint64_t InProcessNode::getLastLocalBlockTimestamp() const
         throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
     }
 
-    return lastLocalBlockHeaderInfo.timestamp;
+    return lastLocalBlockHeaderInfo.uTimestamp;
 }
 
 uint64_t InProcessNode::getMinimalFee() const
@@ -492,7 +492,7 @@ uint64_t InProcessNode::getMinimalFee() const
     return core.getMinimalFee();
 }
 
-BlockHeaderInfo InProcessNode::getLastLocalBlockHeaderInfo() const
+FBlockHeaderInfo InProcessNode::getLastLocalBlockHeaderInfo() const
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -522,7 +522,7 @@ void InProcessNode::blockchainUpdated()
 {
     std::unique_lock<std::mutex> lock(mutex);
     updateLastLocalBlockHeaderInfo();
-    uint32_t blockIndex = lastLocalBlockHeaderInfo.index;
+    uint32_t blockIndex = lastLocalBlockHeaderInfo.uIndex;
     lock.unlock();
     observerManager.notify(&INodeObserver::localBlockchainUpdated, blockIndex);
 }
@@ -547,32 +547,32 @@ void InProcessNode::updateLastLocalBlockHeaderInfo()
         return;
     }
 
-    lastLocalBlockHeaderInfo.index = height;
-    lastLocalBlockHeaderInfo.majorVersion = block.majorVersion;
-    lastLocalBlockHeaderInfo.minorVersion = block.minorVersion;
-    lastLocalBlockHeaderInfo.timestamp  = block.timestamp;
-    lastLocalBlockHeaderInfo.hash = hash;
-    lastLocalBlockHeaderInfo.prevHash = block.previousBlockHash;
-    lastLocalBlockHeaderInfo.nonce = block.nonce;
-    lastLocalBlockHeaderInfo.isAlternative = false;
-    lastLocalBlockHeaderInfo.depth = 0;
-    lastLocalBlockHeaderInfo.difficulty = difficulty;
-    lastLocalBlockHeaderInfo.reward = getBlockReward(block);
+    lastLocalBlockHeaderInfo.uIndex = height;
+    lastLocalBlockHeaderInfo.uMajorVersion = block.majorVersion;
+    lastLocalBlockHeaderInfo.uMinorVersion = block.minorVersion;
+    lastLocalBlockHeaderInfo.uTimestamp  = block.timestamp;
+    lastLocalBlockHeaderInfo.sHash = hash;
+    lastLocalBlockHeaderInfo.sPrevHash = block.previousBlockHash;
+    lastLocalBlockHeaderInfo.uNonce = block.nonce;
+    lastLocalBlockHeaderInfo.bIsAlternative = false;
+    lastLocalBlockHeaderInfo.uDepth = 0;
+    lastLocalBlockHeaderInfo.sDifficulty = difficulty;
+    lastLocalBlockHeaderInfo.uReward = getBlockReward(block);
 }
 
 void InProcessNode::resetLastLocalBlockHeaderInfo()
 {
-    lastLocalBlockHeaderInfo.index = 0;
-    lastLocalBlockHeaderInfo.majorVersion = 0;
-    lastLocalBlockHeaderInfo.minorVersion = 0;
-    lastLocalBlockHeaderInfo.timestamp = 0;
-    lastLocalBlockHeaderInfo.hash = NULL_HASH;
-    lastLocalBlockHeaderInfo.prevHash = NULL_HASH;
-    lastLocalBlockHeaderInfo.nonce = 0;
-    lastLocalBlockHeaderInfo.isAlternative = false;
-    lastLocalBlockHeaderInfo.depth = 0;
-    lastLocalBlockHeaderInfo.difficulty = 0;
-    lastLocalBlockHeaderInfo.reward = 0;
+    lastLocalBlockHeaderInfo.uIndex = 0;
+    lastLocalBlockHeaderInfo.uMajorVersion = 0;
+    lastLocalBlockHeaderInfo.uMinorVersion = 0;
+    lastLocalBlockHeaderInfo.uTimestamp = 0;
+    lastLocalBlockHeaderInfo.sHash = NULL_HASH;
+    lastLocalBlockHeaderInfo.sPrevHash = NULL_HASH;
+    lastLocalBlockHeaderInfo.uNonce = 0;
+    lastLocalBlockHeaderInfo.bIsAlternative = false;
+    lastLocalBlockHeaderInfo.uDepth = 0;
+    lastLocalBlockHeaderInfo.sDifficulty = 0;
+    lastLocalBlockHeaderInfo.uReward = 0;
 }
 
 void InProcessNode::blockchainSynchronized(uint32_t topHeight)
@@ -582,9 +582,9 @@ void InProcessNode::blockchainSynchronized(uint32_t topHeight)
 
 void InProcessNode::queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                                 uint64_t timestamp,
-                                std::vector<BlockShortEntry> &newBlocks,
+                                std::vector<FBlockShortEntry> &newBlocks,
                                 uint32_t &startHeight,
-                                const Callback &callback)
+                                const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -607,9 +607,9 @@ void InProcessNode::queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
 
 void InProcessNode::queryBlocksLiteAsync(std::vector<Crypto::FHash> &knownBlockIds,
                                          uint64_t timestamp,
-                                         std::vector<BlockShortEntry> &newBlocks,
+                                         std::vector<FBlockShortEntry> &newBlocks,
                                          uint32_t &startHeight,
-                                         const Callback &callback)
+                                         const UCallback &callback)
 {
     std::error_code ec = doQueryBlocksLite(std::move(knownBlockIds),
                                            timestamp,
@@ -620,7 +620,7 @@ void InProcessNode::queryBlocksLiteAsync(std::vector<Crypto::FHash> &knownBlockI
 
 std::error_code InProcessNode::doQueryBlocksLite(std::vector<Crypto::FHash> &&knownBlockIds,
                                                  uint64_t timestamp,
-                                                 std::vector<BlockShortEntry> &newBlocks,
+                                                 std::vector<FBlockShortEntry> &newBlocks,
                                                  uint32_t &startHeight)
 {
     uint32_t currentHeight, fullOffset;
@@ -631,23 +631,23 @@ std::error_code InProcessNode::doQueryBlocksLite(std::vector<Crypto::FHash> &&kn
     }
 
     for (const auto &entry: entries) {
-        BlockShortEntry bse;
-        bse.blockHash = entry.blockId;
-        bse.hasBlock = false;
+        FBlockShortEntry bse;
+        bse.sBlockHash = entry.blockId;
+        bse.bHasBlock = false;
 
         if (!entry.block.empty()) {
-            bse.hasBlock = true;
-            if (!fromBinaryArray(bse.block, asBinaryArray(entry.block))) {
+            bse.bHasBlock = true;
+            if (!fromBinaryArray(bse.sBlock, asBinaryArray(entry.block))) {
                 return std::make_error_code(std::errc::invalid_argument);
             }
         }
 
         for (const auto &tsi: entry.txPrefixes) {
-            TransactionShortInfo tpi;
-            tpi.txId = tsi.txHash;
-            tpi.txPrefix = tsi.txPrefix;
+            FTransactionShortInfo tpi;
+            tpi.sTxId = tsi.txHash;
+            tpi.sTxPrefix = tsi.txPrefix;
 
-            bse.txsShortInfo.push_back(std::move(tpi));
+            bse.vTxsShortInfo.push_back(std::move(tpi));
         }
 
         newBlocks.push_back(std::move(bse));
@@ -663,7 +663,7 @@ void InProcessNode::getPoolSymmetricDifference(
     bool &isBcActual,
     std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
     std::vector<Crypto::FHash> &deletedTxIds,
-    const Callback &callback)
+    const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -690,7 +690,7 @@ void InProcessNode::getPoolSymmetricDifferenceAsync(
     bool &isBcActual,
     std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
     std::vector<Crypto::FHash> &deletedTxIds,
-    const Callback &callback)
+    const UCallback &callback)
 {
     std::error_code ec = std::error_code();
 
@@ -713,7 +713,7 @@ void InProcessNode::getPoolSymmetricDifferenceAsync(
 void InProcessNode::getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                                          uint32_t gindex,
                                                          MultiSignatureOutput &out,
-                                                         const Callback &callback)
+                                                         const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -731,7 +731,7 @@ void InProcessNode::getMultisignatureOutputByGlobalIndex(uint64_t amount,
 void InProcessNode::getOutByMSigGIndexAsync(uint64_t amount,
                                             uint32_t gindex,
                                             MultiSignatureOutput &out,
-                                            const Callback &callback)
+                                            const UCallback &callback)
 {
     std::error_code ec = std::error_code();
     bool result = core.getOutByMultiSigGlobalIndex(amount, gindex, out);
@@ -747,7 +747,7 @@ void InProcessNode::getOutByMSigGIndexAsync(uint64_t amount,
 
 void InProcessNode::getBlocks(const std::vector<uint32_t> &blockHeights,
                               std::vector<std::vector<BlockDetails>> &blocks,
-                              const Callback &callback)
+                              const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -761,7 +761,7 @@ void InProcessNode::getBlocks(const std::vector<uint32_t> &blockHeights,
         static_cast<void(InProcessNode::*)(
             const std::vector<uint32_t> &,
             std::vector<std::vector<BlockDetails>> &,
-            const Callback &)>(&InProcessNode::getBlocksAsync),
+            const UCallback &)>(&InProcessNode::getBlocksAsync),
         this,
         std::cref(blockHeights),
         std::ref(blocks),
@@ -771,7 +771,7 @@ void InProcessNode::getBlocks(const std::vector<uint32_t> &blockHeights,
 
 void InProcessNode::getBlocksAsync(const std::vector<uint32_t> &blockHeights,
                                    std::vector<std::vector<BlockDetails>> &blocks,
-                                   const Callback &callback)
+                                   const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
         static_cast<
@@ -835,7 +835,7 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<uint32_t> &blockHei
 
 void InProcessNode::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                               std::vector<BlockDetails> &blocks,
-                              const Callback &callback)
+                              const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -849,7 +849,7 @@ void InProcessNode::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
         static_cast<void(InProcessNode::*)(
             const std::vector<Crypto::FHash> &,
             std::vector<BlockDetails> &,
-            const Callback &)>(&InProcessNode::getBlocksAsync),
+            const UCallback &)>(&InProcessNode::getBlocksAsync),
         this,
         std::cref(blockHashes),
         std::ref(blocks),
@@ -859,7 +859,7 @@ void InProcessNode::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
 
 void InProcessNode::getBlocksAsync(const std::vector<Crypto::FHash> &blockHashes,
                                    std::vector<BlockDetails> &blocks,
-                                   const Callback &callback)
+                                   const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
         static_cast<std::error_code(InProcessNode::*)(
@@ -902,7 +902,7 @@ void InProcessNode::getBlocks(uint64_t timestampBegin,
                               uint32_t blocksNumberLimit,
                               std::vector<BlockDetails> &blocks,
                               uint32_t &blocksNumberWithinTimestamps,
-                              const Callback &callback)
+                              const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -919,7 +919,7 @@ void InProcessNode::getBlocks(uint64_t timestampBegin,
             uint32_t,
             std::vector<BlockDetails> &,
             uint32_t &,
-            const Callback&)>(&InProcessNode::getBlocksAsync),
+            const UCallback&)>(&InProcessNode::getBlocksAsync),
         this,
         timestampBegin,
         timestampEnd,
@@ -935,7 +935,7 @@ void InProcessNode::getBlocksAsync(uint64_t timestampBegin,
                                    uint32_t blocksNumberLimit,
                                    std::vector<BlockDetails> &blocks,
                                    uint32_t &blocksNumberWithinTimestamps,
-                                   const Callback &callback)
+                                   const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
         static_cast<std::error_code(InProcessNode::*)(
@@ -990,7 +990,7 @@ std::error_code InProcessNode::doGetBlocks(uint64_t timestampBegin,
 
 void InProcessNode::getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                                     std::vector<TransactionDetails> &transactions,
-                                    const Callback &callback)
+                                    const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -1004,7 +1004,7 @@ void InProcessNode::getTransactions(const std::vector<Crypto::FHash> &transactio
         static_cast<void(InProcessNode::*)(
             const std::vector<Crypto::FHash> &,
             std::vector<TransactionDetails> &,
-            const Callback &)>(&InProcessNode::getTransactionsAsync),
+            const UCallback &)>(&InProcessNode::getTransactionsAsync),
         this,
         std::cref(transactionHashes),
         std::ref(transactions),
@@ -1014,7 +1014,7 @@ void InProcessNode::getTransactions(const std::vector<Crypto::FHash> &transactio
 
 void InProcessNode::getTransactionsAsync(const std::vector<Crypto::FHash> &transactionHashes,
                                          std::vector<TransactionDetails> &transactions,
-                                         const Callback &callback)
+                                         const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
         static_cast<std::error_code(InProcessNode::*)(
@@ -1059,7 +1059,7 @@ void InProcessNode::getPoolTransactions(uint64_t timestampBegin,
                                         uint32_t transactionsNumberLimit,
                                         std::vector<TransactionDetails> &transactions,
                                         uint64_t &transactionsNumberWithinTimestamps,
-                                        const Callback &callback)
+                                        const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -1086,7 +1086,7 @@ void InProcessNode::getPoolTransactionsAsync(uint64_t timestampBegin,
                                              uint32_t transactionsNumberLimit,
                                              std::vector<TransactionDetails> &transactions,
                                              uint64_t &transactionsNumberWithinTimestamps,
-                                             const Callback &callback)
+                                             const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
         &InProcessNode::doGetPoolTransactions,
@@ -1135,7 +1135,7 @@ std::error_code InProcessNode::doGetPoolTransactions(
 
 void InProcessNode::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                                std::vector<TransactionDetails> &transactions,
-                                               const Callback &callback)
+                                               const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -1157,7 +1157,7 @@ void InProcessNode::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
 void InProcessNode::getTransactionsByPaymentIdAsync(
     const Crypto::FHash &paymentId,
     std::vector<TransactionDetails> &transactions,
-    const Callback &callback)
+    const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
         &InProcessNode::doGetTransactionsByPaymentId,
@@ -1195,7 +1195,7 @@ std::error_code InProcessNode::doGetTransactionsByPaymentId(
     return std::error_code{};
 }
 
-void InProcessNode::isSynchronized(bool &syncStatus, const Callback &callback)
+void InProcessNode::isSynchronized(bool &syncStatus, const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -1213,7 +1213,7 @@ void InProcessNode::isSynchronized(bool &syncStatus, const Callback &callback)
     ));
 }
 
-void InProcessNode::isSynchronizedAsync(bool &syncStatus, const Callback &callback)
+void InProcessNode::isSynchronizedAsync(bool &syncStatus, const UCallback &callback)
 {
     syncStatus = protocol.isSynchronized();
     callback(std::error_code());

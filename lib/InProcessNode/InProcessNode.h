@@ -50,7 +50,7 @@ public:
     InProcessNode(InProcessNode &&) = delete;
     ~InProcessNode() override;
 
-    void init(const Callback &callback) override;
+    void init(const UCallback &callback) override;
     bool shutdown() override;
 
     bool addObserver(INodeObserver *observer) override;
@@ -64,64 +64,64 @@ public:
     uint32_t getNodeHeight() const override;
     uint64_t getLastLocalBlockTimestamp() const override;
     uint64_t getMinimalFee() const override;
-    BlockHeaderInfo getLastLocalBlockHeaderInfo() const override;
+    FBlockHeaderInfo getLastLocalBlockHeaderInfo() const override;
     uint32_t getGRBHeight() const override;
 
     void getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                       std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                       uint32_t &startHeight,
-                      const Callback &callback) override;
+                      const UCallback &callback) override;
     void getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                          std::vector<uint32_t> &outsGlobalIndices,
-                                         const Callback &callback) override;
+                                         const UCallback &callback) override;
     void getRandomOutsByAmounts(
         std::vector<uint64_t> &&amounts,
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result,
-        const Callback &callback) override;
+        const UCallback &callback) override;
     void relayTransaction(const QwertyNote::Transaction &transaction,
-                          const Callback &callback) override;
+                          const UCallback &callback) override;
     void queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                      uint64_t timestamp,
-                     std::vector<BlockShortEntry> &newBlocks,
+                     std::vector<FBlockShortEntry> &newBlocks,
                      uint32_t &startHeight,
-                     const Callback &callback) override;
+                     const UCallback &callback) override;
     void getPoolSymmetricDifference(std::vector<Crypto::FHash> &&knownPoolTxIds,
                                     Crypto::FHash knownBlockId,
                                     bool &isBcActual,
                                     std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
                                     std::vector<Crypto::FHash> &deletedTxIds,
-                                    const Callback &callback) override;
+                                    const UCallback &callback) override;
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                               uint32_t gindex,
                                               MultiSignatureOutput &out,
-                                              const Callback &callback) override;
+                                              const UCallback &callback) override;
 
     void getBlocks(const std::vector<uint32_t> &blockHeights,
                    std::vector<std::vector<BlockDetails>> &blocks,
-                   const Callback &callback) override;
+                   const UCallback &callback) override;
     void getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                    std::vector<BlockDetails> &blocks,
-                   const Callback &callback) override;
+                   const UCallback &callback) override;
     void getBlocks(uint64_t timestampBegin,
                    uint64_t timestampEnd,
                    uint32_t blocksNumberLimit,
                    std::vector<BlockDetails> &blocks,
                    uint32_t &blocksNumberWithinTimestamps,
-                   const Callback &callback) override;
+                   const UCallback &callback) override;
     void getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                          std::vector<TransactionDetails> &transactions,
-                         const Callback &callback) override;
+                         const UCallback &callback) override;
     void getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                     std::vector<TransactionDetails> &transactions,
-                                    const Callback &callback) override;
+                                    const UCallback &callback) override;
     void getPoolTransactions(uint64_t timestampBegin,
                              uint64_t timestampEnd,
                              uint32_t transactionsNumberLimit,
                              std::vector<TransactionDetails> &transactions,
                              uint64_t &transactionsNumberWithinTimestamps,
-                             const Callback &callback) override;
-    void isSynchronized(bool &syncStatus, const Callback &callback) override;
+                             const UCallback &callback) override;
+    void isSynchronized(bool &syncStatus, const UCallback &callback) override;
 
     InProcessNode &operator=(const InProcessNode &) = delete;
     InProcessNode &operator=(InProcessNode &&) = delete;
@@ -138,14 +138,14 @@ private:
     void getNewBlocksAsync(std::vector<Crypto::FHash> &knownBlockIds,
                            std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                            uint32_t &startHeight,
-                           const Callback &callback);
+                           const UCallback &callback);
     std::error_code doGetNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                                    std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                                    uint32_t &startHeight);
 
     void getTransactionOutsGlobalIndicesAsync(const Crypto::FHash &transactionHash,
                                               std::vector<uint32_t> &outsGlobalIndices,
-                                              const Callback &callback);
+                                              const UCallback &callback);
     std::error_code doGetTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                                       std::vector<uint32_t> &outsGlobalIndices);
 
@@ -153,23 +153,23 @@ private:
         std::vector<uint64_t> &amounts,
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result,
-        const Callback &callback);
+        const UCallback &callback);
     std::error_code doGetRandomOutsByAmounts(
         std::vector<uint64_t> &&amounts,
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result);
 
-    void relayTransactionAsync(const QwertyNote::Transaction &transaction, const Callback &callback);
+    void relayTransactionAsync(const QwertyNote::Transaction &transaction, const UCallback &callback);
     std::error_code doRelayTransaction(const QwertyNote::Transaction &transaction);
 
     void queryBlocksLiteAsync(std::vector<Crypto::FHash> &knownBlockIds,
                               uint64_t timestamp,
-                              std::vector<BlockShortEntry> &newBlocks,
+                              std::vector<FBlockShortEntry> &newBlocks,
                               uint32_t &startHeight,
-                              const Callback &callback);
+                              const UCallback &callback);
     std::error_code doQueryBlocksLite(std::vector<Crypto::FHash> &&knownBlockIds,
                                       uint64_t timestamp,
-                                      std::vector<BlockShortEntry> &newBlocks,
+                                      std::vector<FBlockShortEntry> &newBlocks,
                                       uint32_t &startHeight);
 
     void getPoolSymmetricDifferenceAsync(std::vector<Crypto::FHash> &&knownPoolTxIds,
@@ -177,21 +177,21 @@ private:
                                          bool &isBcActual,
                                          std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
                                          std::vector<Crypto::FHash> &deletedTxIds,
-                                         const Callback &callback);
+                                         const UCallback &callback);
 
     void getOutByMSigGIndexAsync(uint64_t amount,
                                  uint32_t gindex, MultiSignatureOutput &out,
-                                 const Callback &callback);
+                                 const UCallback &callback);
 
     void getBlocksAsync(const std::vector<uint32_t> &blockHeights,
                         std::vector<std::vector<BlockDetails>> &blocks,
-                        const Callback &callback);
+                        const UCallback &callback);
     std::error_code doGetBlocks(const std::vector<uint32_t> &blockHeights,
                                 std::vector<std::vector<BlockDetails>> &blocks);
 
     void getBlocksAsync(const std::vector<Crypto::FHash> &blockHashes,
                         std::vector<BlockDetails> &blocks,
-                        const Callback &callback);
+                        const UCallback &callback);
     std::error_code doGetBlocks(const std::vector<Crypto::FHash> &blockHashes,
                                 std::vector<BlockDetails> &blocks);
 
@@ -200,7 +200,7 @@ private:
                         uint32_t blocksNumberLimit,
                         std::vector<BlockDetails> &blocks,
                         uint32_t &blocksNumberWithinTimestamps,
-                        const Callback &callback);
+                        const UCallback &callback);
     std::error_code doGetBlocks(uint64_t timestampBegin,
                                 uint64_t timestampEnd,
                                 uint32_t blocksNumberLimit,
@@ -209,7 +209,7 @@ private:
 
     void getTransactionsAsync(const std::vector<Crypto::FHash> &transactionHashes,
                               std::vector<TransactionDetails> &transactions,
-                              const Callback &callback);
+                              const UCallback &callback);
     std::error_code doGetTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                                       std::vector<TransactionDetails> &transactions);
 
@@ -218,7 +218,7 @@ private:
                                   uint32_t transactionsNumberLimit,
                                   std::vector<TransactionDetails> &transactions,
                                   uint64_t &transactionsNumberWithinTimestamps,
-                                  const Callback &callback);
+                                  const UCallback &callback);
     std::error_code doGetPoolTransactions(uint64_t timestampBegin,
                                           uint64_t timestampEnd,
                                           uint32_t transactionsNumberLimit,
@@ -227,11 +227,11 @@ private:
 
     void getTransactionsByPaymentIdAsync(const Crypto::FHash &paymentId,
                                          std::vector<TransactionDetails> &transactions,
-                                         const Callback &callback);
+                                         const UCallback &callback);
     std::error_code doGetTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                                  std::vector<TransactionDetails> &transactions);
 
-    void isSynchronizedAsync(bool& syncStatus, const Callback& callback);
+    void isSynchronizedAsync(bool& syncStatus, const UCallback& callback);
 
     void workerFunc();
     bool doShutdown();
@@ -246,7 +246,7 @@ private:
     QwertyNote::ICore &core;
     QwertyNote::IQwertyNoteProtocolQuery &protocol;
     Tools::ObserverManager<INodeObserver> observerManager;
-    BlockHeaderInfo lastLocalBlockHeaderInfo;
+    FBlockHeaderInfo lastLocalBlockHeaderInfo;
 
     boost::asio::io_service ioService;
     std::unique_ptr<std::thread> workerThread;

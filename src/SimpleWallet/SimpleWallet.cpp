@@ -3242,7 +3242,7 @@ bool simple_wallet::consolidate(const std::vector<std::string> &args)
     }
 
     bool synchronized = false;
-    QwertyNote::NodeRpcProxy::Callback cb = [](std::error_code){};
+    QwertyNote::NodeRpcProxy::UCallback cb = [](std::error_code){};
     m_node->isSynchronized(synchronized, cb);
     if (!synchronized) {
         fail_msg_writer() << "Node is not synchronized. Try to consolidate it later.";

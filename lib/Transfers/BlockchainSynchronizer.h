@@ -39,7 +39,7 @@ class BlockchainSynchronizer : public IObservableImpl<
     struct GetBlocksResponse
     {
         uint32_t startHeight;
-        std::vector<BlockShortEntry> newBlocks;
+        std::vector<FBlockShortEntry> newBlocks;
     };
 
     struct GetBlocksRequest

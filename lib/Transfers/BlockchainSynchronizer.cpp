@@ -606,19 +606,19 @@ void BlockchainSynchronizer::processBlocks(GetBlocksResponse &response)
         }
 
         CompleteBlock completeBlock;
-        completeBlock.blockHash = block.blockHash;
+        completeBlock.blockHash = block.sBlockHash;
         interval.blocks.push_back(completeBlock.blockHash);
-        if (block.hasBlock) {
-            completeBlock.block = std::move(block.block);
+        if (block.bHasBlock) {
+            completeBlock.block = std::move(block.sBlock);
             completeBlock.transactions.push_back(createTransactionPrefix(
                 completeBlock.block->baseTransaction
             ));
 
             try {
-                for (const auto &txShortInfo : block.txsShortInfo) {
+                for (const auto &txShortInfo : block.vTxsShortInfo) {
                     completeBlock.transactions.push_back(createTransactionPrefix(
-                        txShortInfo.txPrefix,
-                        reinterpret_cast<const FHash&>(txShortInfo.txId)
+                        txShortInfo.sTxPrefix,
+                        reinterpret_cast<const FHash&>(txShortInfo.sTxId)
                     ));
                 }
             } catch (const std::exception &e) {

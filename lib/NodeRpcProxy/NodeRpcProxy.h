@@ -62,7 +62,7 @@ public:
     NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort);
     ~NodeRpcProxy() override;
 
-    void init(const Callback &callback) override;
+    void init(const UCallback &callback) override;
     bool shutdown() override;
 
     bool addObserver(QwertyNote::INodeObserver *observer) override;
@@ -79,63 +79,63 @@ public:
     uint64_t getLastLocalBlockTimestamp() const override;
     uint64_t getMinimalFee() const override;
     uint32_t getNodeHeight() const override;
-    BlockHeaderInfo getLastLocalBlockHeaderInfo() const override;
+    FBlockHeaderInfo getLastLocalBlockHeaderInfo() const override;
     uint32_t getGRBHeight() const override;
 
     void relayTransaction(const QwertyNote::Transaction &transaction,
-                          const Callback &callback) override;
+                          const UCallback &callback) override;
     void getRandomOutsByAmounts(
         std::vector<uint64_t> &&amounts,
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result,
-        const Callback &callback) override;
+        const UCallback &callback) override;
     void getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                       std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                       uint32_t &startHeight,
-                      const Callback &callback) override;
+                      const UCallback &callback) override;
     void getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                          std::vector<uint32_t> &outsGlobalIndices,
-                                         const Callback &callback) override;
+                                         const UCallback &callback) override;
     void queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                      uint64_t timestamp,
-                     std::vector<BlockShortEntry> &newBlocks,
+                     std::vector<FBlockShortEntry> &newBlocks,
                      uint32_t &startHeight,
-                     const Callback &callback) override;
+                     const UCallback &callback) override;
     void getPoolSymmetricDifference(std::vector<Crypto::FHash> &&knownPoolTxIds,
                                     Crypto::FHash knownBlockId,
                                     bool &isBcActual,
                                     std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
                                     std::vector<Crypto::FHash> &deletedTxIds,
-                                    const Callback &callback) override;
+                                    const UCallback &callback) override;
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                               uint32_t gindex,
                                               MultiSignatureOutput &out,
-                                              const Callback &callback) override;
+                                              const UCallback &callback) override;
     void getBlocks(const std::vector<uint32_t> &blockHeights,
                    std::vector<std::vector<BlockDetails>> &blocks,
-                   const Callback &callback) override;
+                   const UCallback &callback) override;
     void getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                    std::vector<BlockDetails> &blocks,
-                   const Callback &callback) override;
+                   const UCallback &callback) override;
     void getBlocks(uint64_t timestampBegin,
                    uint64_t timestampEnd,
                    uint32_t blocksNumberLimit,
                    std::vector<BlockDetails> &blocks,
                    uint32_t &blocksNumberWithinTimestamps,
-                   const Callback &callback) override;
+                   const UCallback &callback) override;
     void getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                          std::vector<TransactionDetails> &transactions,
-                         const Callback &callback) override;
+                         const UCallback &callback) override;
     void getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                     std::vector<TransactionDetails> &transactions,
-                                    const Callback &callback) override;
+                                    const UCallback &callback) override;
     void getPoolTransactions(uint64_t timestampBegin,
                              uint64_t timestampEnd,
                              uint32_t transactionsNumberLimit,
                              std::vector<TransactionDetails> &transactions,
                              uint64_t &transactionsNumberWithinTimestamps,
-                             const Callback &callback) override;
-    void isSynchronized(bool &syncStatus, const Callback &callback) override;
+                             const UCallback &callback) override;
+    void isSynchronized(bool &syncStatus, const UCallback &callback) override;
 
     unsigned int rpcTimeout() const { return m_rpcTimeout; }
     void rpcTimeout(unsigned int val) { m_rpcTimeout = val; }
@@ -145,7 +145,7 @@ public:
 
 private:
     void resetInternalState();
-    void workerThread(const Callback &initialized_callback);
+    void workerThread(const UCallback &initialized_callback);
 
     std::vector<Crypto::FHash> getKnownTxsVector() const;
 
@@ -178,7 +178,7 @@ private:
                                                      > &newTxs,
                                                  std::vector<Crypto::FHash> &deletedTxIds);
 
-    void scheduleRequest(std::function<std::error_code()> &&procedure, const Callback &callback);
+    void scheduleRequest(std::function<std::error_code()> &&procedure, const UCallback &callback);
 
     template <typename Request, typename Response>
     std::error_code binaryCommand(const std::string &url, const Request &req, Response &res);
@@ -211,7 +211,7 @@ private:
     std::atomic<uint64_t> m_minimalFee;
     std::atomic<uint32_t> m_GRBHeight;
 
-    BlockHeaderInfo lastLocalBlockHeaderInfo;
+    FBlockHeaderInfo lastLocalBlockHeaderInfo;
     // protect it with mutex if decided to add worker threads
     std::unordered_set<Crypto::FHash> m_knownTxs;
 

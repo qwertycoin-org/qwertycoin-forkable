@@ -31,7 +31,7 @@ public:
     bool addObserver(QwertyNote::INodeObserver *observer) override { return true; }
     bool removeObserver(QwertyNote::INodeObserver *observer) override { return true; }
 
-    void init(const Callback &callback) override { }
+    void init(const UCallback &callback) override { }
     bool shutdown() override { return true; }
 
     size_t getPeerCount() const override { return 0; }
@@ -43,14 +43,14 @@ public:
     uint32_t getNodeHeight() const override { return 0; }
     uint64_t getMinimalFee() const override{ return 0; }
 
-    CryptoNote::BlockHeaderInfo getLastLocalBlockHeaderInfo() const override
+    QwertyNote::FBlockHeaderInfo getLastLocalBlockHeaderInfo() const override
     {
         return QwertyNote::FBlockHeaderInfo{};
     }
     uint32_t getGRBHeight() const override { return 0; };
 
     void relayTransaction(const QwertyNote::Transaction &transaction,
-                          const Callback &callback) override
+                          const UCallback &callback) override
     {
         callback(std::error_code());
     }
@@ -59,7 +59,7 @@ public:
         std::vector<uint64_t> &&amounts,
         uint64_t outsCount,
         std::vector<QwertyNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>&result,
-        const Callback &callback) override
+        const UCallback &callback) override
     {
     }
 
@@ -67,7 +67,7 @@ public:
         std::vector<Crypto::FHash> &&knownBlockIds,
         std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
         uint32_t &startHeight,
-        const Callback &callback) override
+        const UCallback &callback) override
     {
         startHeight = 0;
         callback(std::error_code());
@@ -75,7 +75,7 @@ public:
 
     void getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                          std::vector<uint32_t> &outsGlobalIndices,
-                                         const Callback &callback) override
+                                         const UCallback &callback) override
     {
     }
 
@@ -83,7 +83,7 @@ public:
                      uint64_t timestamp,
                      std::vector<QwertyNote::FBlockShortEntry> &newBlocks,
                      uint32_t &startHeight,
-                     const Callback &callback) override
+                     const UCallback &callback) override
     {
         startHeight = 0;
         callback(std::error_code());
@@ -95,7 +95,7 @@ public:
         bool &isBcActual,
         std::vector<std::unique_ptr<QwertyNote::ITransactionReader>> &newTxs,
         std::vector<Crypto::FHash> &deletedTxIds,
-        const Callback &callback) override
+        const UCallback &callback) override
     {
         isBcActual = true;
         callback(std::error_code());
@@ -103,40 +103,40 @@ public:
 
     void getBlocks(const std::vector<uint32_t> &blockHeights,
                    std::vector<std::vector<QwertyNote::BlockDetails>> &blocks,
-                   const Callback &callback) override { }
+                   const UCallback &callback) override { }
 
     void getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                    std::vector<QwertyNote::BlockDetails> &blocks,
-                   const Callback &callback) override { }
+                   const UCallback &callback) override { }
 
     void getBlocks(uint64_t timestampBegin,
                    uint64_t timestampEnd,
                    uint32_t blocksNumberLimit,
                    std::vector<QwertyNote::BlockDetails> &blocks,
                    uint32_t &blocksNumberWithinTimestamps,
-                   const Callback &callback) override { }
+                   const UCallback &callback) override { }
 
     void getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                          std::vector<QwertyNote::TransactionDetails> &transactions,
-                         const Callback &callback) override { }
+                         const UCallback &callback) override { }
 
     void getPoolTransactions(uint64_t timestampBegin,
                              uint64_t timestampEnd,
                              uint32_t transactionsNumberLimit,
                              std::vector<QwertyNote::TransactionDetails> &transactions,
                              uint64_t &transactionsNumberWithinTimestamps,
-                             const Callback &callback) override { }
+                             const UCallback &callback) override { }
 
     void getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                     std::vector<QwertyNote::TransactionDetails> &transactions,
-                                    const Callback &callback) override { }
+                                    const UCallback &callback) override { }
 
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                               uint32_t gindex,
                                               QwertyNote::MultiSignatureOutput &out,
-                                              const Callback &callback) override { }
+                                              const UCallback &callback) override { }
 
-    void isSynchronized(bool &syncStatus, const Callback &callback) override { }
+    void isSynchronized(bool &syncStatus, const UCallback &callback) override { }
 };
 
 class NodeInitObserver

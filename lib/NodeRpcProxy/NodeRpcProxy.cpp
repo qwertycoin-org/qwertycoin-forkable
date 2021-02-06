@@ -93,7 +93,7 @@ NodeRpcProxy::~NodeRpcProxy()
     }
 }
 
-void NodeRpcProxy::init(const INode::Callback &callback)
+void NodeRpcProxy::init(const INode::UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -148,21 +148,21 @@ void NodeRpcProxy::resetInternalState()
     m_peerCount.store(0, std::memory_order_relaxed);
     m_networkHeight.store(0, std::memory_order_relaxed);
     m_GRBHeight.store(0, std::memory_order_relaxed);
-    lastLocalBlockHeaderInfo.index = 0;
-    lastLocalBlockHeaderInfo.majorVersion = 0;
-    lastLocalBlockHeaderInfo.minorVersion = 0;
-    lastLocalBlockHeaderInfo.timestamp = 0;
-    lastLocalBlockHeaderInfo.hash = NULL_HASH;
-    lastLocalBlockHeaderInfo.prevHash = NULL_HASH;
-    lastLocalBlockHeaderInfo.nonce = 0;
-    lastLocalBlockHeaderInfo.isAlternative = false;
-    lastLocalBlockHeaderInfo.depth = 0;
-    lastLocalBlockHeaderInfo.difficulty = 0;
-    lastLocalBlockHeaderInfo.reward = 0;
+    lastLocalBlockHeaderInfo.uIndex = 0;
+    lastLocalBlockHeaderInfo.uMajorVersion = 0;
+    lastLocalBlockHeaderInfo.uMinorVersion = 0;
+    lastLocalBlockHeaderInfo.uTimestamp = 0;
+    lastLocalBlockHeaderInfo.sHash = NULL_HASH;
+    lastLocalBlockHeaderInfo.sPrevHash = NULL_HASH;
+    lastLocalBlockHeaderInfo.uNonce = 0;
+    lastLocalBlockHeaderInfo.bIsAlternative = false;
+    lastLocalBlockHeaderInfo.uDepth = 0;
+    lastLocalBlockHeaderInfo.sDifficulty = 0;
+    lastLocalBlockHeaderInfo.uReward = 0;
     m_knownTxs.clear();
 }
 
-void NodeRpcProxy::workerThread(const INode::Callback &initialized_callback)
+void NodeRpcProxy::workerThread(const INode::UCallback &initialized_callback)
 {
     try {
         Dispatcher dispatcher;
@@ -223,7 +223,7 @@ void NodeRpcProxy::updateNodeStatus()
 bool NodeRpcProxy::updatePoolStatus()
 {
     std::vector<Crypto::FHash> knownTxs = getKnownTxsVector();
-    Crypto::FHash tailBlock = lastLocalBlockHeaderInfo.hash;
+    Crypto::FHash tailBlock = lastLocalBlockHeaderInfo.sHash;
 
     bool isBcActual = false;
     std::vector<std::unique_ptr<ITransactionReader>> addedTxs;
@@ -267,18 +267,18 @@ void NodeRpcProxy::updateBlockchainStatus()
 
         std::unique_lock<std::mutex> lock(m_mutex);
         uint32_t blockIndex = rsp.block_header.height;
-        if (blockHash != lastLocalBlockHeaderInfo.hash) {
-            lastLocalBlockHeaderInfo.index = blockIndex;
-            lastLocalBlockHeaderInfo.majorVersion = rsp.block_header.major_version;
-            lastLocalBlockHeaderInfo.minorVersion = rsp.block_header.minor_version;
-            lastLocalBlockHeaderInfo.timestamp = rsp.block_header.timestamp;
-            lastLocalBlockHeaderInfo.hash = blockHash;
-            lastLocalBlockHeaderInfo.prevHash = prevBlockHash;
-            lastLocalBlockHeaderInfo.nonce = rsp.block_header.nonce;
-            lastLocalBlockHeaderInfo.isAlternative = rsp.block_header.orphan_status;
-            lastLocalBlockHeaderInfo.depth = rsp.block_header.depth;
-            lastLocalBlockHeaderInfo.difficulty = rsp.block_header.difficulty;
-            lastLocalBlockHeaderInfo.reward = rsp.block_header.reward;
+        if (blockHash != lastLocalBlockHeaderInfo.sHash) {
+            lastLocalBlockHeaderInfo.uIndex = blockIndex;
+            lastLocalBlockHeaderInfo.uMajorVersion = rsp.block_header.major_version;
+            lastLocalBlockHeaderInfo.uMinorVersion = rsp.block_header.minor_version;
+            lastLocalBlockHeaderInfo.uTimestamp = rsp.block_header.timestamp;
+            lastLocalBlockHeaderInfo.sHash = blockHash;
+            lastLocalBlockHeaderInfo.sPrevHash = prevBlockHash;
+            lastLocalBlockHeaderInfo.uNonce = rsp.block_header.nonce;
+            lastLocalBlockHeaderInfo.bIsAlternative = rsp.block_header.orphan_status;
+            lastLocalBlockHeaderInfo.uDepth = rsp.block_header.depth;
+            lastLocalBlockHeaderInfo.sDifficulty = rsp.block_header.difficulty;
+            lastLocalBlockHeaderInfo.uReward = rsp.block_header.reward;
 
             lock.unlock();
 
@@ -295,7 +295,7 @@ void NodeRpcProxy::updateBlockchainStatus()
         // have the 'last_known_block_index' parameter in RPC so it may have zero value.
         std::unique_lock<std::mutex> lock(m_mutex);
         auto lastKnownBlockIndex = std::max(getInfoResp.last_known_block_index,
-                                            lastLocalBlockHeaderInfo.index);
+                                            lastLocalBlockHeaderInfo.uIndex);
         lock.unlock();
         if (m_networkHeight.load(std::memory_order_relaxed) != lastKnownBlockIndex) {
             m_networkHeight.store(lastKnownBlockIndex, std::memory_order_relaxed);
@@ -374,7 +374,7 @@ uint32_t NodeRpcProxy::getLastLocalBlockHeight() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    return lastLocalBlockHeaderInfo.index;
+    return lastLocalBlockHeaderInfo.uIndex;
 }
 
 uint32_t NodeRpcProxy::getLastKnownBlockHeight() const
@@ -386,7 +386,7 @@ uint32_t NodeRpcProxy::getLocalBlockCount() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    return lastLocalBlockHeaderInfo.index + 1;
+    return lastLocalBlockHeaderInfo.uIndex + 1;
 }
 
 uint32_t NodeRpcProxy::getKnownBlockCount() const
@@ -398,7 +398,7 @@ uint64_t NodeRpcProxy::getLastLocalBlockTimestamp() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    return lastLocalBlockHeaderInfo.timestamp;
+    return lastLocalBlockHeaderInfo.uTimestamp;
 }
 
 uint64_t NodeRpcProxy::getMinimalFee() const
@@ -406,7 +406,7 @@ uint64_t NodeRpcProxy::getMinimalFee() const
     return m_minimalFee.load(std::memory_order_relaxed);
 }
 
-BlockHeaderInfo NodeRpcProxy::getLastLocalBlockHeaderInfo() const
+FBlockHeaderInfo NodeRpcProxy::getLastLocalBlockHeaderInfo() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -424,7 +424,7 @@ uint32_t NodeRpcProxy::getNodeHeight() const
 }
 
 void NodeRpcProxy::relayTransaction(const QwertyNote::Transaction &transaction,
-                                    const Callback &callback)
+                                    const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -439,7 +439,7 @@ void NodeRpcProxy::getRandomOutsByAmounts(
     std::vector<uint64_t> &&amounts,
     uint64_t outsCount,
     std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &outs,
-    const Callback &callback)
+    const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -461,7 +461,7 @@ void NodeRpcProxy::getRandomOutsByAmounts(
 void NodeRpcProxy::getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                                 std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                                 uint32_t &startHeight,
-                                const Callback &callback)
+                                const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -482,7 +482,7 @@ void NodeRpcProxy::getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
 
 void NodeRpcProxy::getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                                    std::vector<uint32_t> &outsGlobalIndices,
-                                                   const Callback &callback)
+                                                   const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -502,9 +502,9 @@ void NodeRpcProxy::getTransactionOutsGlobalIndices(const Crypto::FHash &transact
 
 void NodeRpcProxy::queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                                uint64_t timestamp,
-                               std::vector<BlockShortEntry> &newBlocks,
+                               std::vector<FBlockShortEntry> &newBlocks,
                                uint32_t &startHeight,
-                               const Callback &callback)
+                               const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -530,7 +530,7 @@ void NodeRpcProxy::getPoolSymmetricDifference(
     bool &isBcActual,
     std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
     std::vector<Crypto::FHash> &deletedTxIds,
-    const Callback &callback)
+    const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -556,7 +556,7 @@ void NodeRpcProxy::getPoolSymmetricDifference(
 void NodeRpcProxy::getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                                         uint32_t gindex,
                                                         MultiSignatureOutput &out,
-                                                        const Callback &callback)
+                                                        const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -570,7 +570,7 @@ void NodeRpcProxy::getMultisignatureOutputByGlobalIndex(uint64_t amount,
 
 void NodeRpcProxy::getBlocks(const std::vector<uint32_t> &blockHeights,
                              std::vector<std::vector<BlockDetails>> &blocks,
-                             const Callback &callback)
+                             const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -587,7 +587,7 @@ void NodeRpcProxy::getBlocks(uint64_t timestampBegin,
                              uint32_t blocksNumberLimit,
                              std::vector<BlockDetails> &blocks,
                              uint32_t &blocksNumberWithinTimestamps,
-                             const Callback &callback)
+                             const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -601,7 +601,7 @@ void NodeRpcProxy::getBlocks(uint64_t timestampBegin,
 
 void NodeRpcProxy::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                              std::vector<BlockDetails> &blocks,
-                             const Callback &callback)
+                             const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -615,7 +615,7 @@ void NodeRpcProxy::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
 
 void NodeRpcProxy::getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                                    std::vector<TransactionDetails> &transactions,
-                                   const Callback &callback)
+                                   const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -632,7 +632,7 @@ void NodeRpcProxy::getPoolTransactions(uint64_t timestampBegin,
                                        uint32_t transactionsNumberLimit,
                                        std::vector<TransactionDetails> &transactions,
                                        uint64_t &transactionsNumberWithinTimestamps,
-                                       const Callback &callback)
+                                       const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -646,7 +646,7 @@ void NodeRpcProxy::getPoolTransactions(uint64_t timestampBegin,
 
 void NodeRpcProxy::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                               std::vector<TransactionDetails> &transactions,
-                                              const Callback &callback)
+                                              const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -658,7 +658,7 @@ void NodeRpcProxy::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
     callback(std::error_code{});
 }
 
-void NodeRpcProxy::isSynchronized(bool &syncStatus, const Callback &callback)
+void NodeRpcProxy::isSynchronized(bool &syncStatus, const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -667,7 +667,7 @@ void NodeRpcProxy::isSynchronized(bool &syncStatus, const Callback &callback)
         return;
     }
 
-    syncStatus = (lastLocalBlockHeaderInfo.index == m_networkHeight);
+    syncStatus = (lastLocalBlockHeaderInfo.uIndex == m_networkHeight);
     callback(std::error_code{});
 }
 
@@ -758,23 +758,23 @@ std::error_code NodeRpcProxy::doQueryBlocksLite(const std::vector<Crypto::FHash>
     startHeight = static_cast<uint32_t>(rsp.startHeight);
 
     for (auto &item: rsp.items) {
-        BlockShortEntry bse;
-        bse.hasBlock = false;
+        FBlockShortEntry bse;
+        bse.bHasBlock = false;
 
-        bse.blockHash = std::move(item.blockId);
+        bse.sBlockHash = std::move(item.blockId);
         if (!item.block.empty()) {
-            if (!fromBinaryArray(bse.block, asBinaryArray(item.block))) {
+            if (!fromBinaryArray(bse.sBlock, asBinaryArray(item.block))) {
                 return std::make_error_code(std::errc::invalid_argument);
             }
 
-            bse.hasBlock = true;
+            bse.bHasBlock = true;
         }
 
         for (const auto &txp: item.txPrefixes) {
-            TransactionShortInfo tsi;
-            tsi.txId = txp.txHash;
-            tsi.txPrefix = txp.txPrefix;
-            bse.txsShortInfo.push_back(std::move(tsi));
+            FTransactionShortInfo tsi;
+            tsi.sTxId = txp.txHash;
+            tsi.sTxPrefix = txp.txPrefix;
+            bse.vTxsShortInfo.push_back(std::move(tsi));
         }
 
         newBlocks.push_back(std::move(bse));
@@ -814,15 +814,15 @@ std::error_code NodeRpcProxy::doGetPoolSymmetricDifference(
 }
 
 void NodeRpcProxy::scheduleRequest(std::function<std::error_code()> &&procedure,
-                                   const Callback &callback)
+                                   const UCallback &callback)
 {
     // callback is located on stack, so copy it inside binder
     class Wrapper
     {
     public:
-        Wrapper(std::function<void(std::function<std::error_code()> &, Callback &)> &&_func,
+        Wrapper(std::function<void(std::function<std::error_code()> &, UCallback &)> &&_func,
                 std::function<std::error_code()> &&_procedure,
-                const Callback &_callback)
+                const UCallback &_callback)
             : func(std::move(_func)),
               procedure(std::move(_procedure)),
               callback(std::move(_callback))
@@ -848,17 +848,17 @@ void NodeRpcProxy::scheduleRequest(std::function<std::error_code()> &&procedure,
             func(procedure, callback);
         }
     private:
-        std::function<void(std::function<std::error_code()>&, Callback&)> func;
+        std::function<void(std::function<std::error_code()>&, UCallback&)> func;
         std::function<std::error_code()> procedure;
-        Callback callback;
+        UCallback callback;
     };
 
     assert(m_dispatcher != nullptr && m_context_group != nullptr);
 
     m_dispatcher->remoteSpawn(Wrapper([this](std::function<std::error_code()> &procedure,
-                                             Callback &callback) {
+											 UCallback &callback) {
         m_context_group->spawn(Wrapper([this](std::function<std::error_code()> &procedure,
-                                              const Callback &callback) {
+                                              const UCallback &callback) {
             if (m_stop) {
                 callback(std::make_error_code(std::errc::operation_canceled));
             } else {

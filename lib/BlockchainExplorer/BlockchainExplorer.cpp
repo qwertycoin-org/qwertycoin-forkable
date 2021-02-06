@@ -53,7 +53,7 @@ private:
 class NodeRequest
 {
 public:
-    explicit NodeRequest(const std::function<void(const INode::Callback &)> &request)
+    explicit NodeRequest(const std::function<void(const INode::UCallback &)> &request)
         : m_requestFunc(request)
     {
     }
@@ -69,7 +69,7 @@ public:
     }
 
     void performAsync(WalletAsyncContextCounter &asyncContextCounter,
-                      const INode::Callback &callback)
+                      const INode::UCallback &callback)
     {
         asyncContextCounter.addAsyncContext();
         m_requestFunc(std::bind(&NodeRequest::asyncCompletionCallback,
@@ -84,7 +84,7 @@ private:
         p.set_value(ec);
     }
 
-    static void asyncCompletionCallback(const INode::Callback &callback,
+    static void asyncCompletionCallback(const INode::UCallback &callback,
                                          WalletAsyncContextCounter &asyncContextCounter,
                                          std::error_code ec)
     {
@@ -96,7 +96,7 @@ private:
         }
     }
 
-    const std::function<void(const INode::Callback &)> m_requestFunc;
+    const std::function<void(const INode::UCallback &)> m_requestFunc;
 };
 
 class ScopeExitHandler
@@ -252,7 +252,7 @@ bool BlockchainExplorer::getBlocks(const std::vector<uint32_t> &blockHeights,
                 void(INode::*)(
                     const std::vector<uint32_t> &,
                     std::vector<std::vector<BlockDetails>> &,
-                    const INode::Callback &
+                    const INode::UCallback &
                 )
             >(&INode::getBlocks),
             std::ref(node),
@@ -288,7 +288,7 @@ bool BlockchainExplorer::getBlocks(const std::vector<FHash> &blockHashes,
                 void(INode::*)(
                     const std::vector<FHash> &,
                     std::vector<BlockDetails> &,
-                    const INode::Callback &
+                    const INode::UCallback &
                 )
             >(&INode::getBlocks),
             std::ref(node),
@@ -330,7 +330,7 @@ bool BlockchainExplorer::getBlocks(uint64_t timestampBegin,
                     uint32_t,
                     std::vector<BlockDetails> &,
                     uint32_t &,
-                    const INode::Callback &
+                    const INode::UCallback &
                 )
             >(&INode::getBlocks),
             std::ref(node),
@@ -410,7 +410,7 @@ bool BlockchainExplorer::getPoolState(const std::vector<FHash> &knownPoolTransac
     logger(DEBUGGING) << "Get pool state request came.";
     std::vector<std::unique_ptr<ITransactionReader>> rawNewTransactions;
 
-    NodeRequest request([&](const INode::Callback& callback) {
+    NodeRequest request([&](const INode::UCallback& callback) {
         std::vector<FHash> hashes;
         for (FHash hash : knownPoolTransactionHashes) {
             hashes.push_back(std::move(hash));
@@ -489,7 +489,7 @@ bool BlockchainExplorer::getTransactions(const std::vector<FHash> &transactionHa
                 void(INode::*)(
                     const std::vector<FHash> &,
                     std::vector<TransactionDetails> &,
-                    const INode::Callback &
+                    const INode::UCallback &
                 )
             >(&INode::getTransactions),
             std::ref(node),
@@ -607,7 +607,7 @@ void BlockchainExplorer::poolChanged()
     std::shared_ptr<bool> isBlockchainActualPtr = std::make_shared<bool>(false);
 
     NodeRequest request([this, rawNewTransactionsPtr, removedTransactionsPtr, isBlockchainActualPtr]
-                        (const INode::Callback &callback) {
+                        (const INode::UCallback &callback) {
         std::vector<FHash> hashes;
         hashes.resize(mKnownPoolState.size());
         for (const FHash &hash : mKnownPoolState) {
@@ -673,7 +673,7 @@ void BlockchainExplorer::poolChanged()
                     void(INode::*)(
                         const std::vector<FHash> &,
                         std::vector<TransactionDetails> &,
-                        const INode::Callback &
+                        const INode::UCallback &
                     )
                 >(&INode::getTransactions),
                 std::ref(node),
@@ -735,7 +735,7 @@ void BlockchainExplorer::blockchainSynchronized(uint32_t topHeight)
                 void(INode::*)(
                     const std::vector<uint32_t> &,
                     std::vector<std::vector<BlockDetails>> &,
-                    const INode::Callback &
+                    const INode::UCallback &
                 )
             >(&INode::getBlocks),
             std::ref(node),
@@ -808,7 +808,7 @@ void BlockchainExplorer::localBlockchainUpdated(uint32_t height)
                 void(INode::*)(
                     const std::vector<uint32_t> &,
                     std::vector<std::vector<BlockDetails>> &,
-                    const INode::Callback &
+                    const INode::UCallback &
                 )
             >(&INode::getBlocks),
             std::ref(node),

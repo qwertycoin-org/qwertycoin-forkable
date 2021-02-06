@@ -112,9 +112,10 @@
 - `Template` classes are prefixed by `T`
 - All other classes are prefixed by `Q`
 - `Enums` are prefixed by `E`
-- `Structs` are prefixed by `F` for (F for Framework)
+- `Structs` are prefixed by `F` (F for Framework)
 - Namespaces doesn't have a prefix letter
-
+- Typedefs should be prefixed by whatever is appropriate for that type: F if it's a typedef of a struct, E if it's a typedef of a Enum and so on. 
+- `std::function` typedefs are prefixed by `U`
 
 ```cpp
 // Wrong
