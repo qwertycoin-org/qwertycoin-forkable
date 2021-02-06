@@ -89,8 +89,8 @@ struct WalletTransaction
     WalletTransactionState state;
     uint64_t timestamp;
     uint32_t blockHeight;
-    Crypto::Hash hash;
-    boost::optional<Crypto::SecretKey> secretKey;
+    Crypto::FHash hash;
+    boost::optional<Crypto::FSecretKey> secretKey;
     int64_t totalAmount;
     uint64_t fee;
     uint64_t creationTime;
@@ -145,7 +145,7 @@ struct WalletTransactionWithTransfers
 
 struct TransactionsInBlockInfo
 {
-    Crypto::Hash blockHash;
+    Crypto::FHash blockHash;
     std::vector<WalletTransactionWithTransfers> transactions;
 };
 
@@ -158,11 +158,11 @@ public:
     virtual void initializeWithViewKey(
         const std::string &path,
         const std::string &password,
-        const Crypto::SecretKey &viewSecretKey) = 0;
+        const Crypto::FSecretKey &viewSecretKey) = 0;
     virtual void initializeWithViewKeyAndTimestamp(
         const std::string &path,
         const std::string &password,
-        const Crypto::SecretKey &viewSecretKey,
+        const Crypto::FSecretKey &viewSecretKey,
         const uint64_t &creationTimestamp) = 0;
     virtual void load(const std::string &path, const std::string &password, std::string &extra) = 0;
     virtual void load(const std::string &path, const std::string &password) = 0;
@@ -185,13 +185,13 @@ public:
     virtual KeyPair getAddressSpendKey(const std::string &address) const = 0;
     virtual KeyPair getViewKey() const = 0;
     virtual std::string createAddress() = 0;
-    virtual std::string createAddress(const Crypto::SecretKey &spendSecretKey, bool reset = true)=0;
-    virtual std::string createAddress(const Crypto::PublicKey &spendPublicKey) = 0;
+    virtual std::string createAddress(const Crypto::FSecretKey &spendSecretKey, bool reset = true)=0;
+    virtual std::string createAddress(const Crypto::FPublicKey &spendPublicKey) = 0;
     virtual std::vector<std::string> createAddressList(
-        const std::vector<Crypto::SecretKey> &spendSecretKeys,
+        const std::vector<Crypto::FSecretKey> &spendSecretKeys,
         bool reset = true) = 0;
     virtual std::string createAddressWithTimestamp(
-        const Crypto::SecretKey &spendSecretKey,
+        const Crypto::FSecretKey &spendSecretKey,
         const uint64_t &creationTimestamp) = 0;
     virtual void deleteAddress(const std::string &address) = 0;
 
@@ -202,21 +202,21 @@ public:
 
     virtual size_t getTransactionCount() const = 0;
     virtual WalletTransaction getTransaction(size_t transactionIndex) const = 0;
-    virtual Crypto::SecretKey getTransactionSecretKey(size_t transactionIndex) const = 0;
+    virtual Crypto::FSecretKey getTransactionSecretKey(size_t transactionIndex) const = 0;
     virtual size_t getTransactionTransferCount(size_t transactionIndex) const = 0;
     virtual WalletTransfer getTransactionTransfer(
         size_t transactionIndex,
         size_t transferIndex) const = 0;
 
     virtual WalletTransactionWithTransfers getTransaction(
-        const Crypto::Hash &transactionHash) const = 0;
+        const Crypto::FHash &transactionHash) const = 0;
     virtual std::vector<TransactionsInBlockInfo> getTransactions(
-        const Crypto::Hash &blockHash,
+        const Crypto::FHash &blockHash,
         size_t count) const = 0;
     virtual std::vector<TransactionsInBlockInfo> getTransactions(
         uint32_t blockIndex,
         size_t count) const = 0;
-    virtual std::vector<Crypto::Hash> getBlockHashes(uint32_t blockIndex, size_t count) const = 0;
+    virtual std::vector<Crypto::FHash> getBlockHashes(uint32_t blockIndex, size_t count) const = 0;
     virtual uint32_t getBlockCount() const  = 0;
     virtual std::vector<WalletTransactionWithTransfers> getUnconfirmedTransactions() const = 0;
     virtual std::vector<size_t> getDelayedTransactionIds() const = 0;
@@ -226,7 +226,7 @@ public:
 
     virtual size_t transfer(
         const TransactionParameters &sendingTransaction,
-        Crypto::SecretKey &txSecretKey) = 0;
+        Crypto::FSecretKey &txSecretKey) = 0;
 
     virtual size_t makeTransaction(const TransactionParameters &sendingTransaction) = 0;
     virtual void commitTransaction(size_t transactionId) = 0;

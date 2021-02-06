@@ -102,7 +102,7 @@ void importLegacyKeys(const std::string &legacyKeysFilename,
     std::string cache;
 
     CryptoNote::WalletLegacySerializer importer(account, transactionsCache);
-    std::vector<Crypto::Hash> safeTxes;
+    std::vector<Crypto::FHash> safeTxes;
     importer.serialize(destination, password, false, cache, safeTxes);
 }
 

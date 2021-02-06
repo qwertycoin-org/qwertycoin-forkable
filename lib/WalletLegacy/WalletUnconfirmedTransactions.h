@@ -43,7 +43,7 @@ struct hash<CryptoNote::TransactionOutputId>
 {
     size_t operator()(const CryptoNote::TransactionOutputId &_v) const
     {
-        return hash<Crypto::PublicKey>()(_v.first) ^ _v.second;
+        return hash<Crypto::FPublicKey>()(_v.first) ^ _v.second;
     }
 };
 
@@ -66,15 +66,15 @@ struct UnconfirmedTransferDetails
     time_t sentTime;
     TransactionId transactionId;
     std::vector<TransactionOutputId> usedOutputs;
-    Crypto::SecretKey secretKey;
+    Crypto::FSecretKey secretKey;
 };
 
 class WalletUnconfirmedTransactions
 {
     typedef std::unordered_map<
-            Crypto::Hash,
+            Crypto::FHash,
             UnconfirmedTransferDetails,
-            boost::hash<Crypto::Hash
+            boost::hash<Crypto::FHash
         >
     > UnconfirmedTxsContainer;
 
@@ -85,14 +85,14 @@ public:
 
     bool serialize(CryptoNote::ISerializer &s);
 
-    bool findTransactionId(const Crypto::Hash &hash, TransactionId &id);
-    void erase(const Crypto::Hash &hash);
+    bool findTransactionId(const Crypto::FHash &hash, TransactionId &id);
+    void erase(const Crypto::FHash &hash);
     void add(const CryptoNote::Transaction &tx,
              TransactionId transactionId,
              uint64_t amount,
              const std::list<TransactionOutputInformation> &usedOutputs,
-             Crypto::SecretKey &tx_key);
-    void updateTransactionId(const Crypto::Hash &hash, TransactionId id);
+             Crypto::FSecretKey &tx_key);
+    void updateTransactionId(const Crypto::FHash &hash, TransactionId id);
 
     uint64_t countUnconfirmedOutsAmount() const;
     uint64_t countUnconfirmedTransactionsAmount() const;

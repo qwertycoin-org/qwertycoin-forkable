@@ -37,18 +37,18 @@ enum class TransactionRemoveReason : uint8_t
 
 struct TransactionOutputToKeyDetails
 {
-    Crypto::PublicKey txOutKey;
+    Crypto::FPublicKey txOutKey;
 };
 
 struct TransactionOutputMultiSignatureDetails
 {
-    std::vector<Crypto::PublicKey> keys;
+    std::vector<Crypto::FPublicKey> keys;
     uint32_t requiredSignatures;
 };
 
 struct TransactionOutputReferenceDetails
 {
-    Crypto::Hash transactionHash;
+    Crypto::FHash transactionHash;
     size_t number;
 };
 
@@ -59,7 +59,7 @@ struct TransactionInputGenerateDetails
 
 struct TransactionInputToKeyDetails
 {
-    Crypto::KeyImage keyImage;
+    Crypto::FKeyImage keyImage;
     uint64_t mixin;
     std::vector<TransactionOutputReferenceDetails> outputs;
     std::vector<uint32_t> outputIndexes;
@@ -105,7 +105,7 @@ struct TransactionOutputDetails
 struct TransactionExtraDetails
 {
     std::vector<size_t> padding;
-    std::vector<Crypto::PublicKey> publicKey;
+    std::vector<Crypto::FPublicKey> publicKey;
     BinaryArray nonce;
     BinaryArray raw;
     size_t size = 0;
@@ -113,7 +113,7 @@ struct TransactionExtraDetails
 
 struct TransactionDetails
 {
-    Crypto::Hash hash;
+    Crypto::FHash hash;
     uint64_t size = 0;
     uint64_t fee = 0;
     uint64_t totalInputsAmount = 0;
@@ -122,13 +122,13 @@ struct TransactionDetails
     uint64_t unlockTime = 0;
     uint64_t timestamp = 0;
     uint8_t version = 0;
-    Crypto::Hash paymentId;
+    Crypto::FHash paymentId;
     bool hasPaymentId = false;
     bool inBlockchain = false;
-    Crypto::Hash blockHash;
+    Crypto::FHash blockHash;
     uint32_t blockHeight = 0;
     TransactionExtraDetails extra;
-    std::vector<std::vector<Crypto::Signature>> signatures;
+    std::vector<std::vector<Crypto::FSignature>> signatures;
     std::vector<TransactionInputDetails> inputs;
     std::vector<TransactionOutputDetails> outputs;
 };
@@ -138,13 +138,13 @@ struct BlockDetails
     uint8_t majorVersion = 0;
     uint8_t minorVersion = 0;
     uint64_t timestamp = 0;
-    Crypto::Hash prevBlockHash;
-    Crypto::Hash proofOfWork;
+    Crypto::FHash prevBlockHash;
+    Crypto::FHash proofOfWork;
     uint32_t nonce = 0;
     bool isOrphaned = false;
     uint32_t height = 0;
     uint32_t depth = 0;
-    Crypto::Hash hash;
+    Crypto::FHash hash;
     uint64_t difficulty = 0;
     uint64_t cumulativeDifficulty = 0;
     uint64_t reward = 0;

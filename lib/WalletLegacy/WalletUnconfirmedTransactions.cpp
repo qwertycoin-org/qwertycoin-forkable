@@ -46,7 +46,7 @@ bool WalletUnconfirmedTransactions::serialize(ISerializer &s)
     return true;
 }
 
-bool WalletUnconfirmedTransactions::findTransactionId(const Hash &hash, TransactionId &id)
+bool WalletUnconfirmedTransactions::findTransactionId(const FHash &hash, TransactionId &id)
 {
     auto it = m_unconfirmedTxs.find(hash);
     if (it == m_unconfirmedTxs.end()) {
@@ -58,7 +58,7 @@ bool WalletUnconfirmedTransactions::findTransactionId(const Hash &hash, Transact
     return true;
 }
 
-void WalletUnconfirmedTransactions::erase(const Hash &hash)
+void WalletUnconfirmedTransactions::erase(const FHash &hash)
 {
     auto it = m_unconfirmedTxs.find(hash);
     if (it == m_unconfirmedTxs.end()) {
@@ -75,7 +75,7 @@ void WalletUnconfirmedTransactions::add(
     TransactionId transactionId,
     uint64_t amount,
     const std::list<TransactionOutputInformation> &usedOutputs,
-    Crypto::SecretKey &tx_key)
+    Crypto::FSecretKey &tx_key)
 {
     UnconfirmedTransferDetails &utd = m_unconfirmedTxs[getObjectHash(tx)];
 
@@ -98,7 +98,7 @@ void WalletUnconfirmedTransactions::add(
     utd.outsAmount = outsAmount;
 }
 
-void WalletUnconfirmedTransactions::updateTransactionId(const Hash &hash, TransactionId id)
+void WalletUnconfirmedTransactions::updateTransactionId(const FHash &hash, TransactionId id)
 {
     auto it = m_unconfirmedTxs.find(hash);
     if (it != m_unconfirmedTxs.end()) {

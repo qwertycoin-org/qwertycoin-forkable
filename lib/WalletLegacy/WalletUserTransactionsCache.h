@@ -64,19 +64,19 @@ public:
         const CryptoNote::Transaction &tx,
         uint64_t amount,
         const std::list<TransactionOutputInformation> &usedOutputs,
-        Crypto::SecretKey &tx_key);
+        Crypto::FSecretKey &tx_key);
     void updateTransactionSendingState(TransactionId transactionId, std::error_code ec);
 
     std::shared_ptr<WalletLegacyEvent> onTransactionUpdated(
         const TransactionInformation &txInfo,
         int64_t txBalance);
-    std::shared_ptr<WalletLegacyEvent> onTransactionDeleted(const Crypto::Hash &transactionHash);
+    std::shared_ptr<WalletLegacyEvent> onTransactionDeleted(const Crypto::FHash &transactionHash);
 
     TransactionId findTransactionByTransferId(TransferId transferId) const;
 
     bool getTransaction(TransactionId transactionId, WalletLegacyTransaction &transaction) const;
     WalletLegacyTransaction &getTransaction(TransactionId transactionId);
-    TransactionId findTransactionByHash(const Crypto::Hash &hash);
+    TransactionId findTransactionByHash(const Crypto::FHash &hash);
     bool getTransfer(TransferId transferId, WalletLegacyTransfer &transfer) const;
     WalletLegacyTransfer& getTransfer(TransferId transferId);
 
@@ -87,29 +87,29 @@ public:
 
     std::vector<Payments> getTransactionsByPaymentIds(const std::vector<PaymentId>&paymentIds)const;
 
-    void setConsolidateHeight(uint32_t height, const Crypto::Hash &consolidateTx) {
+    void setConsolidateHeight(uint32_t height, const Crypto::FHash &consolidateTx) {
         m_prevConsolidateHeight = m_consolidateHeight;
         m_prevConsolidateTx = m_consolidateTx;
         m_consolidateHeight = height;
         m_consolidateTx = consolidateTx;
     }
     // used in external serialization
-    void setPrevConsolidateHeight(uint32_t height, const Crypto::Hash &consolidateTx) {
+    void setPrevConsolidateHeight(uint32_t height, const Crypto::FHash &consolidateTx) {
         m_prevConsolidateHeight = height;
         m_prevConsolidateTx = consolidateTx;
     }
     uint32_t getConsolidateHeight() const { return m_consolidateHeight; }
-    Crypto::Hash getConsolidateTx() const { return m_consolidateTx; }
+    Crypto::FHash getConsolidateTx() const { return m_consolidateTx; }
     // used in external serialization
     uint32_t getPrevConsolidateHeight() const { return m_prevConsolidateHeight; }
     // used in external serialization
-    Crypto::Hash getPrevConsolidateTx() const { return m_prevConsolidateTx; }
+    Crypto::FHash getPrevConsolidateTx() const { return m_prevConsolidateTx; }
     void resetConsolidateHeight()
     {
         m_consolidateHeight = m_prevConsolidateHeight;
         m_consolidateTx = m_prevConsolidateTx;
         m_prevConsolidateHeight = 0;
-        m_prevConsolidateTx = boost::value_initialized<Crypto::Hash>();
+        m_prevConsolidateTx = boost::value_initialized<Crypto::FHash>();
     }
 private:
     TransactionId insertTransaction(WalletLegacyTransaction &&Transaction);
@@ -140,9 +140,9 @@ private:
     WalletUnconfirmedTransactions m_unconfirmedTransactions;
     UserPaymentIndex m_paymentsIndex;
     uint32_t m_consolidateHeight;
-    Crypto::Hash m_consolidateTx;
+    Crypto::FHash m_consolidateTx;
     uint32_t m_prevConsolidateHeight;
-    Crypto::Hash m_prevConsolidateTx;
+    Crypto::FHash m_prevConsolidateTx;
 };
 
 } // namespace CryptoNote

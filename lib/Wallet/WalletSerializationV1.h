@@ -32,8 +32,8 @@ class WalletSerializerV1
 public:
     WalletSerializerV1(
         ITransfersObserver &transfersObserver,
-        Crypto::PublicKey &viewPublicKey,
-        Crypto::SecretKey &viewSecretKey,
+        Crypto::FPublicKey &viewPublicKey,
+        Crypto::FSecretKey &viewSecretKey,
         uint64_t &actualBalance,
         uint64_t &pendingBalance,
         WalletsContainer &walletsContainer,
@@ -94,8 +94,8 @@ private:
 
 private:
     ITransfersObserver &m_transfersObserver;
-    Crypto::PublicKey &m_viewPublicKey;
-    Crypto::SecretKey &m_viewSecretKey;
+    Crypto::FPublicKey &m_viewPublicKey;
+    Crypto::FSecretKey &m_viewSecretKey;
     uint64_t &m_actualBalance;
     uint64_t &m_pendingBalance;
     WalletsContainer &m_walletsContainer;

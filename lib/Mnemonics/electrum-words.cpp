@@ -50,7 +50,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/crc.hpp>
 #include <boost/filesystem.hpp>
-#include <Crypto/Crypto.h> // for declaration of Crypto::SecretKey
+#include <Crypto/Crypto.h> // for declaration of Crypto::FSecretKey
 #include <Common/Lazy.h>
 #include <Mnemonics/electrum-words.h>
 
@@ -254,7 +254,7 @@ namespace ElectrumWords {
 
     \return false if not a multiple of 3 words, or if word is not in the words list
 */
-bool words_to_bytes(std::string words, Crypto::SecretKey &dst, std::string &language_name)
+bool words_to_bytes(std::string words, Crypto::FSecretKey &dst, std::string &language_name)
 {
     std::vector<std::string> seed;
 
@@ -301,12 +301,12 @@ bool words_to_bytes(std::string words, Crypto::SecretKey &dst, std::string &lang
             return false;
         }
 
-        memcpy(dst.data + i * 4, &val, 4); // copy 4 bytes to position
+        memcpy(dst.uData + i * 4, &val, 4); // copy 4 bytes to position
     }
 
     std::string wlist_copy = words;
     if (seed.size() == seed_length / 2) {
-        memcpy(dst.data + 16, dst.data, 16); // if electrum 12-word seed, duplicate
+        memcpy(dst.uData + 16, dst.uData, 16); // if electrum 12-word seed, duplicate
         wlist_copy += ' ';
         wlist_copy += words;
     }
@@ -323,11 +323,11 @@ bool words_to_bytes(std::string words, Crypto::SecretKey &dst, std::string &lang
 
     \return true if successful false if not. Unsuccessful if wrong key size.
 */
-bool bytes_to_words(const Crypto::SecretKey &src,
+bool bytes_to_words(const Crypto::FSecretKey &src,
                     std::string &words,
                     const std::string &language_name)
 {
-    if (sizeof(src.data) % 4 != 0 || sizeof(src.data) == 0) {
+    if (sizeof(src.uData) % 4 != 0 || sizeof(src.uData) == 0) {
         return false;
     }
 
@@ -343,11 +343,11 @@ bool bytes_to_words(const Crypto::SecretKey &src,
 
     uint32_t word_list_length = static_cast<uint32_t>(word_list.size());
     // 8 bytes -> 3 words.  8 digits base 16 -> 3 digits base 1626
-    for (unsigned int i=0; i < sizeof(src.data)/4; i++, words += ' ') {
+    for (unsigned int i=0; i < sizeof(src.uData) / 4; i++, words += ' ') {
         uint32_t w1, w2, w3;
         uint32_t val;
 
-        memcpy(&val, (src.data) + (i * 4), 4);
+        memcpy(&val, (src.uData) + (i * 4), 4);
 
         w1 = val % word_list_length;
         w2 = ((val / word_list_length) + w1) % word_list_length;

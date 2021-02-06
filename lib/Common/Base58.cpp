@@ -256,7 +256,7 @@ std::string encodeAddr(uint64_t tag, const std::string &data)
     std::string buf = getVarintData(tag);
     buf += data;
 
-    Crypto::Hash hash = Crypto::cnFastHash(buf.data(), buf.size());
+    Crypto::FHash hash = Crypto::cnFastHash(buf.data(), buf.size());
 
     const char *hashData = reinterpret_cast<const char*>(&hash);
     buf.append(hashData, addrChecksumSize);
@@ -279,7 +279,7 @@ bool decodeAddr(std::string addr, uint64_t &tag, std::string &data)
     checksum = addrData.substr(addrData.size() - addrChecksumSize);
 
     addrData.resize(addrData.size() - addrChecksumSize);
-    Crypto::Hash hash = Crypto::cnFastHash(addrData.data(), addrData.size());
+    Crypto::FHash hash = Crypto::cnFastHash(addrData.data(), addrData.size());
     std::string expectedChecksum(reinterpret_cast<const char *>(&hash), addrChecksumSize);
     if (expectedChecksum != checksum) {
         return false;

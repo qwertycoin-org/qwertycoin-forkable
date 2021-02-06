@@ -99,7 +99,7 @@ void SynchronizationState::detach(uint32_t height)
     m_blockchain.resize(height);
 }
 
-void SynchronizationState::addBlocks(const Crypto::Hash *blockHashes,uint32_t height,uint32_t count)
+void SynchronizationState::addBlocks(const Crypto::FHash *blockHashes, uint32_t height, uint32_t count)
 {
     assert(blockHashes);
     auto size = m_blockchain.size();
@@ -112,7 +112,7 @@ uint32_t SynchronizationState::getHeight() const
     return static_cast<uint32_t>(m_blockchain.size());
 }
 
-const std::vector<Crypto::Hash> &SynchronizationState::getKnownBlockHashes() const
+const std::vector<Crypto::FHash> &SynchronizationState::getKnownBlockHashes() const
 {
     return m_blockchain;
 }

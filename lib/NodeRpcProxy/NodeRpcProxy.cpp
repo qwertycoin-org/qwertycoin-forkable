@@ -215,12 +215,12 @@ void NodeRpcProxy::updateNodeStatus()
 
 bool NodeRpcProxy::updatePoolStatus()
 {
-    std::vector<Crypto::Hash> knownTxs = getKnownTxsVector();
-    Crypto::Hash tailBlock = lastLocalBlockHeaderInfo.hash;
+    std::vector<Crypto::FHash> knownTxs = getKnownTxsVector();
+    Crypto::FHash tailBlock = lastLocalBlockHeaderInfo.hash;
 
     bool isBcActual = false;
     std::vector<std::unique_ptr<ITransactionReader>> addedTxs;
-    std::vector<Crypto::Hash> deletedTxsIds;
+    std::vector<Crypto::FHash> deletedTxsIds;
 
     std::error_code ec = doGetPoolSymmetricDifference(std::move(knownTxs),
                                                       tailBlock,
@@ -251,8 +251,8 @@ void NodeRpcProxy::updateBlockchainStatus()
     std::error_code ec = jsonRpcCommand("getlastblockheader", req, rsp);
 
     if (!ec) {
-        Crypto::Hash blockHash;
-        Crypto::Hash prevBlockHash;
+        Crypto::FHash blockHash;
+        Crypto::FHash prevBlockHash;
         if (!parse_hash256(rsp.block_header.hash, blockHash)
             || !parse_hash256(rsp.block_header.prev_hash, prevBlockHash)) {
             return;
@@ -321,21 +321,21 @@ void NodeRpcProxy::updatePeerCount(size_t peerCount)
 }
 
 void NodeRpcProxy::updatePoolState(const std::vector<std::unique_ptr<ITransactionReader>> &addedTxs,
-                                   const std::vector<Crypto::Hash> &deletedTxsIds)
+                                   const std::vector<Crypto::FHash> &deletedTxsIds)
 {
     for (const auto& hash : deletedTxsIds) {
         m_knownTxs.erase(hash);
     }
 
     for (const auto& tx : addedTxs) {
-        Hash hash = tx->getTransactionHash();
+        FHash hash = tx->getTransactionHash();
         m_knownTxs.emplace(std::move(hash));
     }
 }
 
-std::vector<Crypto::Hash> NodeRpcProxy::getKnownTxsVector() const
+std::vector<Crypto::FHash> NodeRpcProxy::getKnownTxsVector() const
 {
-    return std::vector<Crypto::Hash>(m_knownTxs.begin(), m_knownTxs.end());
+    return std::vector<Crypto::FHash>(m_knownTxs.begin(), m_knownTxs.end());
 }
 
 bool NodeRpcProxy::addObserver(INodeObserver *observer)
@@ -451,7 +451,7 @@ void NodeRpcProxy::getRandomOutsByAmounts(
         callback);
 }
 
-void NodeRpcProxy::getNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
+void NodeRpcProxy::getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                                 std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                                 uint32_t &startHeight,
                                 const Callback &callback)
@@ -473,7 +473,7 @@ void NodeRpcProxy::getNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
         callback);
 }
 
-void NodeRpcProxy::getTransactionOutsGlobalIndices(const Crypto::Hash &transactionHash,
+void NodeRpcProxy::getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                                    std::vector<uint32_t> &outsGlobalIndices,
                                                    const Callback &callback)
 {
@@ -493,7 +493,7 @@ void NodeRpcProxy::getTransactionOutsGlobalIndices(const Crypto::Hash &transacti
         callback);
 }
 
-void NodeRpcProxy::queryBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
+void NodeRpcProxy::queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                                uint64_t timestamp,
                                std::vector<BlockShortEntry> &newBlocks,
                                uint32_t &startHeight,
@@ -518,11 +518,11 @@ void NodeRpcProxy::queryBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
 }
 
 void NodeRpcProxy::getPoolSymmetricDifference(
-    std::vector<Crypto::Hash> &&knownPoolTxIds,
-    Crypto::Hash knownBlockId,
+    std::vector<Crypto::FHash> &&knownPoolTxIds,
+    Crypto::FHash knownBlockId,
     bool &isBcActual,
     std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
-    std::vector<Crypto::Hash> &deletedTxIds,
+    std::vector<Crypto::FHash> &deletedTxIds,
     const Callback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -592,7 +592,7 @@ void NodeRpcProxy::getBlocks(uint64_t timestampBegin,
     callback(std::error_code{});
 }
 
-void NodeRpcProxy::getBlocks(const std::vector<Crypto::Hash> &blockHashes,
+void NodeRpcProxy::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                              std::vector<BlockDetails> &blocks,
                              const Callback &callback)
 {
@@ -606,7 +606,7 @@ void NodeRpcProxy::getBlocks(const std::vector<Crypto::Hash> &blockHashes,
     callback(std::error_code{});
 }
 
-void NodeRpcProxy::getTransactions(const std::vector<Crypto::Hash> &transactionHashes,
+void NodeRpcProxy::getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                                    std::vector<TransactionDetails> &transactions,
                                    const Callback &callback)
 {
@@ -637,7 +637,7 @@ void NodeRpcProxy::getPoolTransactions(uint64_t timestampBegin,
     callback(std::error_code{});
 }
 
-void NodeRpcProxy::getTransactionsByPaymentId(const Crypto::Hash &paymentId,
+void NodeRpcProxy::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                               std::vector<TransactionDetails> &transactions,
                                               const Callback &callback)
 {
@@ -694,7 +694,7 @@ std::error_code NodeRpcProxy::doGetRandomOutsByAmounts(
 }
 
 std::error_code NodeRpcProxy::doGetNewBlocks(
-    std::vector<Crypto::Hash> &knownBlockIds,
+    std::vector<Crypto::FHash> &knownBlockIds,
     std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
     uint32_t &startHeight)
 {
@@ -713,7 +713,7 @@ std::error_code NodeRpcProxy::doGetNewBlocks(
 }
 
 std::error_code NodeRpcProxy::doGetTransactionOutsGlobalIndices(
-    const Crypto::Hash &transactionHash,
+    const Crypto::FHash &transactionHash,
     std::vector<uint32_t> &outsGlobalIndices)
 {
     CryptoNote::COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::request req = AUTO_VAL_INIT(req);
@@ -732,7 +732,7 @@ std::error_code NodeRpcProxy::doGetTransactionOutsGlobalIndices(
     return ec;
 }
 
-std::error_code NodeRpcProxy::doQueryBlocksLite(const std::vector<Crypto::Hash> &knownBlockIds,
+std::error_code NodeRpcProxy::doQueryBlocksLite(const std::vector<Crypto::FHash> &knownBlockIds,
                                                 uint64_t timestamp,
                                                 std::vector<CryptoNote::BlockShortEntry> &newBlocks,
                                                 uint32_t &startHeight)
@@ -777,11 +777,11 @@ std::error_code NodeRpcProxy::doQueryBlocksLite(const std::vector<Crypto::Hash> 
 }
 
 std::error_code NodeRpcProxy::doGetPoolSymmetricDifference(
-    std::vector<Crypto::Hash> &&knownPoolTxIds,
-    Crypto::Hash knownBlockId,
+    std::vector<Crypto::FHash> &&knownPoolTxIds,
+    Crypto::FHash knownBlockId,
     bool &isBcActual,
     std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
-    std::vector<Crypto::Hash> &deletedTxIds)
+    std::vector<Crypto::FHash> &deletedTxIds)
 {
     CryptoNote::COMMAND_RPC_GET_POOL_CHANGES_LITE::request req = AUTO_VAL_INIT(req);
     CryptoNote::COMMAND_RPC_GET_POOL_CHANGES_LITE::response rsp = AUTO_VAL_INIT(rsp);

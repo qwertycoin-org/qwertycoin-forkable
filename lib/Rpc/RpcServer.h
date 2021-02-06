@@ -202,7 +202,7 @@ private:
                                   COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::response &res);
 
     void fillBlockHeaderResponse(const Block &blk, bool orphan_status, uint64_t height,
-                                 const Crypto::Hash &hash,
+                                 const Crypto::FHash &hash,
                                  BLOCK_HEADER_RESPONSE_ENTRY &responseEntry);
 
     bool onBlocksListJson(const COMMAND_RPC_GET_BLOCKS_LIST::request &req,
@@ -276,7 +276,7 @@ private:
     std::string m_cors_domain;
     std::string m_fee_address;
     std::string m_contact_info;
-    Crypto::SecretKey m_view_key = NULL_SECRET_KEY;
+    Crypto::FSecretKey m_view_key = NULL_SECRET_KEY;
     AccountPublicAddress m_fee_acc;
 };
 

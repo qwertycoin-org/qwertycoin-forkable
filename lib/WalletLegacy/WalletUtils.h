@@ -33,12 +33,12 @@ inline void throwIf(bool expr, CryptoNote::error::WalletErrorCodes ec)
     }
 }
 
-inline std::ostream &operator<<(std::ostream &ostr, const Crypto::Hash &hash)
+inline std::ostream &operator<<(std::ostream &ostr, const Crypto::FHash &hash)
 {
     std::ios_base::fmtflags flags = ostr.setf(std::ios_base::hex, std::ios_base::basefield);
     char fill = ostr.fill('0');
 
-    for (auto b : hash.data) {
+    for (auto b : hash.uData) {
         ostr << std::setw(2) << static_cast<unsigned int>(b);
     }
 

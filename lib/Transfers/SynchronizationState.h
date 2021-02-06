@@ -37,9 +37,9 @@ public:
         uint32_t newBlockHeight;
     };
 
-    typedef std::vector<Crypto::Hash> ShortHistory;
+    typedef std::vector<Crypto::FHash> ShortHistory;
 
-    explicit SynchronizationState(const Crypto::Hash &genesisBlockHash)
+    explicit SynchronizationState(const Crypto::FHash &genesisBlockHash)
     {
         m_blockchain.push_back(genesisBlockHash);
     }
@@ -48,9 +48,9 @@ public:
     CheckResult checkInterval(const BlockchainInterval &interval) const;
 
     void detach(uint32_t height);
-    void addBlocks(const Crypto::Hash *blockHashes, uint32_t height, uint32_t count);
+    void addBlocks(const Crypto::FHash *blockHashes, uint32_t height, uint32_t count);
     uint32_t getHeight() const;
-    const std::vector<Crypto::Hash> &getKnownBlockHashes() const;
+    const std::vector<Crypto::FHash> &getKnownBlockHashes() const;
 
     // IStreamSerializable
     void save(std::ostream &os) override;
@@ -60,7 +60,7 @@ public:
     CryptoNote::ISerializer &serialize(CryptoNote::ISerializer &s, const std::string &name);
 
 private:
-    std::vector<Crypto::Hash> m_blockchain;
+    std::vector<Crypto::FHash> m_blockchain;
 };
 
 } // namespace CryptoNote

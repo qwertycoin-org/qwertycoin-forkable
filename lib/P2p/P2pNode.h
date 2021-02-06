@@ -48,7 +48,7 @@ public:
     P2pNode(const P2pNodeConfig &cfg,
             System::Dispatcher &dispatcher,
             Logging::ILogger &log,
-            const Crypto::Hash &genesisHash,
+            const Crypto::FHash &genesisHash,
             PeerIdType peerId);
 
     ~P2pNode();
@@ -102,7 +102,7 @@ private:
     bool m_stopRequested;
     const P2pNodeConfig m_cfg;
     const PeerIdType m_myPeerId;
-    const Crypto::Hash m_genesisHash;
+    const Crypto::FHash m_genesisHash;
     const CORE_SYNC_DATA m_genesisPayload;
     System::Dispatcher &m_dispatcher;
     System::ContextGroup workingContextGroup;

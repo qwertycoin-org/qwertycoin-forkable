@@ -77,8 +77,8 @@ struct WalletLegacyTransaction
     uint64_t fee;
     uint64_t sentTime;
     uint64_t unlockTime;
-    Crypto::Hash hash;
-    boost::optional<Crypto::SecretKey> secretKey = NULL_SECRET_KEY;
+    Crypto::FHash hash;
+    boost::optional<Crypto::FSecretKey> secretKey = NULL_SECRET_KEY;
     bool isCoinbase;
     uint32_t blockHeight;
     uint64_t timestamp;
@@ -87,7 +87,7 @@ struct WalletLegacyTransaction
     std::vector<std::string> messages;
 };
 
-using PaymentId = Crypto::Hash;
+using PaymentId = Crypto::FHash;
 
 struct Payments
 {
@@ -124,9 +124,9 @@ public:
 
     virtual void initAndGenerate(const std::string &password) = 0;
     virtual void initAndGenerateDeterministic(const std::string &password) = 0;
-    virtual Crypto::SecretKey generateKey(
+    virtual Crypto::FSecretKey generateKey(
         const std::string &password,
-        const Crypto::SecretKey &recovery_param = Crypto::SecretKey(),
+        const Crypto::FSecretKey &recovery_param = Crypto::FSecretKey(),
         bool recover = false,
         bool two_random = false) = 0;
     virtual void initAndLoad(std::istream &source, const std::string &password) = 0;
@@ -161,12 +161,12 @@ public:
         const std::vector<PaymentId> &paymentIds) const = 0;
     virtual bool getTxProof(
         Crypto::Hash &txid,
-        CryptoNote::AccountPublicAddress &address,
+			Crypto::FSecretKey &tx_key,
         Crypto::SecretKey &tx_key,
         std::string &sig_str) = 0;
     virtual std::string getReserveProof(const uint64_t &reserve, const std::string &message) = 0;
-    virtual Crypto::SecretKey getTxKey(Crypto::Hash &txid) = 0;
-    virtual bool get_tx_key(Crypto::Hash &txid, Crypto::SecretKey &txSecretKey) = 0;
+    virtual Crypto::FSecretKey getTxKey(Crypto::FHash &txid) = 0;
+    virtual bool get_tx_key(Crypto::FHash &txid, Crypto::FSecretKey &txSecretKey) = 0;
     virtual void getAccountKeys(AccountKeys &keys) = 0;
     virtual bool getSeed(std::string &electrum_words) = 0;
 
@@ -216,11 +216,11 @@ public:
 
     virtual bool isTrackingWallet() = 0;
 
-    virtual void setConsolidateHeight(uint32_t height, const Crypto::Hash &consolidateTx) = 0;
+    virtual void setConsolidateHeight(uint32_t height, const Crypto::FHash &consolidateTx) = 0;
     virtual uint32_t getConsolidateHeight() const = 0;
-    virtual Crypto::Hash getConsolidateTx() const = 0;
+    virtual Crypto::FHash getConsolidateTx() const = 0;
 
-    virtual void markTransactionSafe(const Crypto::Hash &transactionHash) = 0;
+    virtual void markTransactionSafe(const Crypto::FHash &transactionHash) = 0;
 };
 
 } // namespace CryptoNOte

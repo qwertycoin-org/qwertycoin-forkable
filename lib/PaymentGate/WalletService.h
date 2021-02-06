@@ -189,7 +189,7 @@ private:
                                                                      size_t blockCount) const;
 
     std::vector<TransactionHashesInBlockRpcInfo> getRpcTransactionHashes(
-        const Crypto::Hash &blockHash,
+        const Crypto::FHash &blockHash,
         size_t blockCount,
         const TransactionsInBlockInfoFilter &filter) const;
     std::vector<TransactionHashesInBlockRpcInfo> getRpcTransactionHashes(
@@ -198,7 +198,7 @@ private:
         const TransactionsInBlockInfoFilter &filter) const;
 
     std::vector<TransactionsInBlockRpcInfo> getRpcTransactions(
-        const Crypto::Hash &blockHash,
+        const Crypto::FHash &blockHash,
         size_t blockCount,
         const TransactionsInBlockInfoFilter &filter) const;
     std::vector<TransactionsInBlockRpcInfo> getRpcTransactions(

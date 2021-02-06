@@ -36,9 +36,9 @@ namespace CryptoNote {
 WalletUserTransactionsCache::WalletUserTransactionsCache(uint64_t mempoolTxLiveTime)
     : m_unconfirmedTransactions(mempoolTxLiveTime),
       m_consolidateHeight(0),
-      m_consolidateTx(boost::value_initialized<Crypto::Hash>()),
+      m_consolidateTx(boost::value_initialized<Crypto::FHash>()),
       m_prevConsolidateHeight(0),
-      m_prevConsolidateTx(boost::value_initialized<Crypto::Hash>())
+      m_prevConsolidateTx(boost::value_initialized<Crypto::FHash>())
 {
 }
 
@@ -200,7 +200,7 @@ void WalletUserTransactionsCache::updateTransaction(
     const CryptoNote::Transaction &tx,
     uint64_t amount,
     const std::list<TransactionOutputInformation> &usedOutputs,
-    Crypto::SecretKey &tx_key)
+    Crypto::FSecretKey &tx_key)
 {
     // update extra field from created transaction
     auto &txInfo = m_transactions.at(transactionId);
@@ -272,7 +272,7 @@ std::shared_ptr<WalletLegacyEvent> WalletUserTransactionsCache::onTransactionUpd
 }
 
 std::shared_ptr<WalletLegacyEvent> WalletUserTransactionsCache::onTransactionDeleted(
-    const Hash &transactionHash)
+    const FHash &transactionHash)
 {
     TransactionId id = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
     if (m_unconfirmedTransactions.findTransactionId(transactionHash, id)) {
@@ -389,7 +389,7 @@ TransactionId WalletUserTransactionsCache::insertTransaction(WalletLegacyTransac
     return m_transactions.size() - 1;
 }
 
-TransactionId WalletUserTransactionsCache::findTransactionByHash(const Hash &hash)
+TransactionId WalletUserTransactionsCache::findTransactionByHash(const FHash &hash)
 {
     auto it = std::find_if(
         m_transactions.begin(),

@@ -75,7 +75,7 @@ public:
 
     bool getBlocks(const std::vector<uint32_t> &blockHeights,
                    std::vector<std::vector<BlockDetails>> &blocks) override;
-    bool getBlocks(const std::vector<Crypto::Hash> &blockHashes,
+    bool getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                    std::vector<BlockDetails> &blocks) override;
     bool getBlocks(uint64_t timestampBegin,
                    uint64_t timestampEnd,
@@ -85,19 +85,19 @@ public:
 
     bool getBlockchainTop(BlockDetails &topBlock) override;
 
-    bool getPoolState(const std::vector<Crypto::Hash> &knownPoolTransactionHashes,
-                      Crypto::Hash knownBlockchainTop,
+    bool getPoolState(const std::vector<Crypto::FHash> &knownPoolTransactionHashes,
+                      Crypto::FHash knownBlockchainTop,
                       bool &isBlockchainActual,
                       std::vector<TransactionDetails> &newTransactions,
-                      std::vector<Crypto::Hash> &removedTransactions) override;
+                      std::vector<Crypto::FHash> &removedTransactions) override;
     bool getPoolTransactions(uint64_t timestampBegin,
                              uint64_t timestampEnd,
                              uint32_t transactionsNumberLimit,
                              std::vector<TransactionDetails> &transactions,
                              uint64_t &transactionsNumberWithinTimestamps) override;
-    bool getTransactions(const std::vector<Crypto::Hash> &transactionHashes,
+    bool getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                          std::vector<TransactionDetails> &transactions) override;
-    bool getTransactionsByPaymentId(const Crypto::Hash &paymentId,
+    bool getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                     std::vector<TransactionDetails> &transactions) override;
 
     uint64_t getRewardBlocksWindow() override;

@@ -51,7 +51,7 @@ public:
 
     virtual void onTransactionUpdated(
         ITransfersSubscription *object,
-        const Crypto::Hash &transactionHash)
+        const Crypto::FHash &transactionHash)
     {
     }
 
@@ -59,7 +59,7 @@ public:
     // after onTransactionUpdated() is called for the same \a transactionHash.
     virtual void onTransactionDeleted(
         ITransfersSubscription *object,
-        const Crypto::Hash &transactionHash)
+        const Crypto::FHash &transactionHash)
     {
     }
 };
@@ -77,20 +77,20 @@ class ITransfersSynchronizerObserver
 {
 public:
     virtual void onBlocksAdded(
-        const Crypto::PublicKey &viewPublicKey,
-        const std::vector<Crypto::Hash> &blockHashes) {}
+        const Crypto::FPublicKey &viewPublicKey,
+        const std::vector<Crypto::FHash> &blockHashes) {}
     virtual void onBlockchainDetach(
-        const Crypto::PublicKey &viewPublicKey,
+        const Crypto::FPublicKey &viewPublicKey,
         uint32_t blockIndex) {}
     virtual void onTransactionDeleteBegin(
-        const Crypto::PublicKey &viewPublicKey,
-        Crypto::Hash transactionHash) {}
+        const Crypto::FPublicKey &viewPublicKey,
+        Crypto::FHash transactionHash) {}
     virtual void onTransactionDeleteEnd(
-        const Crypto::PublicKey &viewPublicKey,
-        Crypto::Hash transactionHash) {}
+        const Crypto::FPublicKey &viewPublicKey,
+        Crypto::FHash transactionHash) {}
     virtual void onTransactionUpdated(
-        const Crypto::PublicKey &viewPublicKey,
-        const Crypto::Hash &transactionHash,
+        const Crypto::FPublicKey &viewPublicKey,
+        const Crypto::FHash &transactionHash,
         const std::vector<ITransfersContainer *> &containers) {}
 };
 
@@ -104,7 +104,7 @@ public:
     virtual void getSubscriptions(std::vector<AccountPublicAddress> &subscriptions) = 0;
     // returns nullptr if address is not found
     virtual ITransfersSubscription* getSubscription(const AccountPublicAddress &acc) = 0;
-    virtual std::vector<Crypto::Hash>getViewKeyKnownBlocks(const Crypto::PublicKey&publicViewKey)=0;
+    virtual std::vector<Crypto::FHash>getViewKeyKnownBlocks(const Crypto::FPublicKey&publicViewKey)=0;
 };
 
 } // namespace CryptoNote

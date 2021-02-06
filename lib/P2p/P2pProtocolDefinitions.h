@@ -85,7 +85,7 @@ struct CORE_SYNC_DATA
     }
 
     uint32_t current_height;
-    Crypto::Hash top_id;
+    Crypto::FHash top_id;
 };
 
 #define P2P_COMMANDS_POOL_BASE 1000
@@ -207,10 +207,10 @@ struct proof_of_trust
 
     PeerIdType peer_id;
     uint64_t time;
-    Crypto::Signature sign;
+    Crypto::FSignature sign;
 };
 
-inline Crypto::Hash get_proof_of_trust_hash(const proof_of_trust &pot)
+inline Crypto::FHash get_proof_of_trust_hash(const proof_of_trust &pot)
 {
     std::string s;
     s.append(reinterpret_cast<const char*>(&pot.peer_id), sizeof(pot.peer_id));

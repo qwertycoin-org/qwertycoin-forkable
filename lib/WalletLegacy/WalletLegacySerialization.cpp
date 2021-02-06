@@ -68,7 +68,7 @@ void serialize(WalletLegacyTransaction &txi, CryptoNote::ISerializer &serializer
 
     if (CryptoNote::WALLET_LEGACY_SERIALIZATION_VERSION >= 2) {
         auto secretKeyRef = txi.secretKey.get();
-        Crypto::SecretKey secretKey = reinterpret_cast<const Crypto::SecretKey &>(secretKeyRef);
+        Crypto::FSecretKey secretKey = reinterpret_cast<const Crypto::FSecretKey &>(secretKeyRef);
         serializer(secretKey, "secret_key");
         txi.secretKey = secretKey;
     }

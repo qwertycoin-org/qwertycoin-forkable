@@ -23,11 +23,11 @@
 
 namespace CryptoNote {
 
-void throwIfKeysMissmatch(const Crypto::SecretKey &secretKey,
-                          const Crypto::PublicKey &expectedPublicKey,
+void throwIfKeysMissmatch(const Crypto::FSecretKey &secretKey,
+                          const Crypto::FPublicKey &expectedPublicKey,
                           const std::string &message)
 {
-    Crypto::PublicKey pub;
+    Crypto::FPublicKey pub;
     bool r = Crypto::secretKeyToPublicKey(secretKey, pub);
     if (!r || expectedPublicKey != pub) {
         throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD), message);

@@ -128,7 +128,7 @@ void doWithTimeoutAndThrow(System::Dispatcher &dispatcher,
 P2pNode::P2pNode(const P2pNodeConfig &cfg,
                  Dispatcher &dispatcher,
                  Logging::ILogger &log,
-                 const Crypto::Hash &genesisHash,
+                 const Crypto::FHash &genesisHash,
                  PeerIdType peerId)
     : logger(log, "P2pNode:" + std::to_string(cfg.getBindPort())),
       m_stopRequested(false),

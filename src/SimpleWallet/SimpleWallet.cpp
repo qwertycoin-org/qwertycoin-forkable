@@ -397,7 +397,7 @@ struct TransferCommand
 #endif
 
                     if (!m_currency.parseAccountAddressString(arg, de.addr)) {
-                        Crypto::Hash paymentId;
+                        Crypto::FHash paymentId;
                         if (CryptoNote::parsePaymentId(arg, paymentId)) {
                             logger(ERROR, BRIGHT_RED)
                                 << "Invalid payment ID usage. "
@@ -544,7 +544,7 @@ struct TransferCommand
 #endif // !__ANDROID__
 
                   if (!m_currency.parseAccountAddressString(arg, de.addr)) {
-                      Crypto::Hash paymentID;
+                      Crypto::FHash paymentID;
 
                       if (CryptoNote::parsePaymentId(arg, paymentID)) {
                           logger(ERROR, BRIGHT_RED) << "Invalid payment ID usage.";
@@ -804,7 +804,7 @@ void printListTransfersItem(
 {
     std::vector<uint8_t> extraVec = Common::asBinaryArray(txInfo.extra);
 
-    Crypto::Hash paymentId;
+    Crypto::FHash paymentId;
     std::string paymentIdStr = (
         getPaymentIdFromTxExtra(extraVec, paymentId)
         && paymentId != NULL_HASH
@@ -1252,8 +1252,8 @@ bool simple_wallet::set_log(const std::vector<std::string> &args)
 
 bool simple_wallet::payment_id(const std::vector<std::string> &args)
 {
-    Crypto::Hash result;
-    Random::randomBytes(32, result.data);
+    Crypto::FHash result;
+    Random::randomBytes(32, result.uData);
     std::string pid_str = Common::podToHex(result);
     success_msg_writer() << "Payment ID: " << pid_str;
     return true;
@@ -1266,13 +1266,13 @@ bool simple_wallet::get_tx_key(const std::vector<std::string> &args)
         return true;
     }
     const std::string &str_hash = args[0];
-    Crypto::Hash txid;
+    Crypto::FHash txid;
     if (!parse_hash256(str_hash, txid)) {
         fail_msg_writer() << "Failed to parse txid";
         return true;
     }
 
-    Crypto::SecretKey tx_key = m_wallet->getTxKey(txid);
+    Crypto::FSecretKey tx_key = m_wallet->getTxKey(txid);
     if (tx_key != NULL_SECRET_KEY) {
         success_msg_writer() << "Tx key: " << Common::podToHex(tx_key);
         return true;
@@ -1290,7 +1290,7 @@ bool simple_wallet::get_tx_proof(const std::vector<std::string> &args)
     }
 
     const std::string &str_hash = args[0];
-    Crypto::Hash txid;
+    Crypto::FHash txid;
     if (!parse_hash256(str_hash, txid)) {
         fail_msg_writer() << "Failed to parse txid";
         return true;
@@ -1304,18 +1304,18 @@ bool simple_wallet::get_tx_proof(const std::vector<std::string> &args)
     }
 
     std::string sig_str;
-    Crypto::SecretKey tx_key, tx_key2;
+    Crypto::FSecretKey tx_key, tx_key2;
     bool r = m_wallet->get_tx_key(txid, tx_key);
 
     if (args.size() == 3) {
-        Crypto::Hash tx_key_hash;
+        Crypto::FHash tx_key_hash;
         size_t size;
         if (!Common::fromHex(args[2], &tx_key_hash, sizeof(tx_key_hash), size)
             || size != sizeof(tx_key_hash)) {
             fail_msg_writer() << "failed to parse tx_key";
             return true;
         }
-        tx_key2 = *(struct Crypto::SecretKey *) &tx_key_hash;
+        tx_key2 = *(struct Crypto::FSecretKey *) &tx_key_hash;
 
         if (r) {
             if (args.size() == 3 && tx_key != tx_key2) {
@@ -1663,8 +1663,8 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
             boost::algorithm::trim(private_view_key_string);
         } while (private_view_key_string.empty());
 
-        Crypto::Hash private_spend_key_hash;
-        Crypto::Hash private_view_key_hash;
+        Crypto::FHash private_spend_key_hash;
+        Crypto::FHash private_view_key_hash;
         size_t size;
         if (!Common::fromHex(
                 private_spend_key_string,
@@ -1682,8 +1682,8 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
             return false;
         }
 
-        Crypto::SecretKey private_spend_key = *(struct Crypto::SecretKey *) &private_spend_key_hash;
-        Crypto::SecretKey private_view_key = *(struct Crypto::SecretKey *) &private_view_key_hash;
+        Crypto::FSecretKey private_spend_key = *(struct Crypto::FSecretKey *) &private_spend_key_hash;
+        Crypto::FSecretKey private_view_key = *(struct Crypto::FSecretKey *) &private_view_key_hash;
 
         if (!new_wallet(
                 private_spend_key,
@@ -1764,10 +1764,10 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
         std::string private_spend_key_string = tracking_key_string.substr(128, 64);
         std::string private_view_key_string = tracking_key_string.substr(192, 64);
 
-        Crypto::Hash public_spend_key_hash;
-        Crypto::Hash public_view_key_hash;
-        Crypto::Hash private_spend_key_hash;
-        Crypto::Hash private_view_key_hash;
+        Crypto::FHash public_spend_key_hash;
+        Crypto::FHash public_view_key_hash;
+        Crypto::FHash private_spend_key_hash;
+        Crypto::FHash private_view_key_hash;
 
         size_t size;
         if (!Common::fromHex(
@@ -1799,10 +1799,10 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
             return false;
         }
 
-        Crypto::PublicKey public_spend_key = *(struct Crypto::PublicKey*) &public_spend_key_hash;
-        Crypto::PublicKey public_view_key = *(struct Crypto::PublicKey*) &public_view_key_hash;
-        Crypto::SecretKey private_spend_key = *(struct Crypto::SecretKey*) &private_spend_key_hash;
-        Crypto::SecretKey private_view_key = *(struct Crypto::SecretKey*) &private_view_key_hash;
+        Crypto::FPublicKey public_spend_key = *(struct Crypto::FPublicKey*) &public_spend_key_hash;
+        Crypto::FPublicKey public_view_key = *(struct Crypto::FPublicKey*) &public_view_key_hash;
+        Crypto::FSecretKey private_spend_key = *(struct Crypto::FSecretKey*) &private_spend_key_hash;
+        Crypto::FSecretKey private_view_key = *(struct Crypto::FSecretKey*) &private_view_key_hash;
 
         keys.address.spendPublicKey = public_spend_key;
         keys.address.viewPublicKey = public_view_key;
@@ -1839,7 +1839,7 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
 
         AccountKeys keys;
         m_wallet->getAccountKeys(keys);
-        if (keys.spendSecretKey == boost::value_initialized<Crypto::SecretKey>()) {
+        if (keys.spendSecretKey == boost::value_initialized<Crypto::FSecretKey>()) {
             m_trackingWallet = true;
             success_msg_writer() << "This is tracking wallet. Spending unavailable.\n";
         }
@@ -1888,7 +1888,7 @@ void simple_wallet::handle_command_line(const boost::program_options::variables_
 bool simple_wallet::gen_wallet(
     const std::string &wallet_file,
     const std::string &password,
-	const Crypto::SecretKey &recovery_key,
+	const Crypto::FSecretKey &recovery_key,
 	bool recover,
 	bool two_random)
 {
@@ -1898,7 +1898,7 @@ bool simple_wallet::gen_wallet(
     m_node->addObserver(static_cast<INodeObserver*>(this));
     m_wallet->addObserver(this);
 
-    Crypto::SecretKey recovery_val;
+    Crypto::FSecretKey recovery_val;
     try {
         m_initResultPromise.reset(new std::promise<std::error_code>());
         std::future<std::error_code> f_initError = m_initResultPromise->get_future();
@@ -2029,8 +2029,8 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
 }
 
 bool simple_wallet::new_wallet(
-    Crypto::SecretKey &secret_key,
-    Crypto::SecretKey &view_key,
+    Crypto::FSecretKey &secret_key,
+    Crypto::FSecretKey &view_key,
     const std::string &wallet_file,
     const std::string &password)
 {
@@ -2125,7 +2125,7 @@ bool simple_wallet::new_wallet(
 
         logger(INFO, BRIGHT_WHITE) << "Imported wallet: " << m_wallet->getAddress() << std::endl;
 
-        if (keys.spendSecretKey == boost::value_initialized<Crypto::SecretKey>()) {
+        if (keys.spendSecretKey == boost::value_initialized<Crypto::FSecretKey>()) {
             m_trackingWallet = true;
         }
     } catch (const std::exception &e) {
@@ -2456,7 +2456,7 @@ bool simple_wallet::export_tracking_key(const std::vector<std::string> &args)
     AccountKeys keys;
     m_wallet->getAccountKeys(keys);
     std::string spend_public_key = Common::podToHex(keys.address.spendPublicKey);
-    keys.spendSecretKey = boost::value_initialized<Crypto::SecretKey>();
+    keys.spendSecretKey = boost::value_initialized<Crypto::FSecretKey>();
     success_msg_writer(true)
         << "Tracking key: "
         << spend_public_key
@@ -2581,9 +2581,9 @@ bool simple_wallet::listMessages(const std::vector<std::string> &args)
 
         AccountKeys keys;
         m_wallet->getAccountKeys(keys);
-        Crypto::SecretKey *sKey = &keys.spendSecretKey;
+        Crypto::FSecretKey *sKey = &keys.spendSecretKey;
         std::vector<uint8_t> extraVec = Common::asBinaryArray(txInfo.extra);
-        Crypto::PublicKey txPub = getTransactionPublicKeyFromExtra(extraVec);
+        Crypto::FPublicKey txPub = getTransactionPublicKeyFromExtra(extraVec);
         std::vector<std::string> msgs = getMessagesFromExtra(extraVec, txPub, sKey);
         std::vector<std::string> sndr = getSendersFromExtra(extraVec, txPub, sKey);
 
@@ -3453,7 +3453,7 @@ bool simple_wallet::verify_message(const std::vector<std::string> &args)
         fail_msg_writer() << ("Signature decoding error");
         return false;
     }
-    Crypto::Signature s;
+    Crypto::FSignature s;
     if (sizeof(s) != decoded.size()) {
         fail_msg_writer() << ("Signature decoding error");
         return false;

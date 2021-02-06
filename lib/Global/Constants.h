@@ -27,9 +27,9 @@
 
 namespace Qwertycoin {
 
-const Crypto::Hash NULL_HASH = boost::value_initialized<Crypto::Hash>();
-const Crypto::PublicKey NULL_PUBLIC_KEY = boost::value_initialized<Crypto::PublicKey>();
-const Crypto::SecretKey NULL_SECRET_KEY = boost::value_initialized<Crypto::SecretKey>();
+const Crypto::FHash NULL_HASH = boost::value_initialized<Crypto::FHash>();
+const Crypto::FPublicKey NULL_PUBLIC_KEY = boost::value_initialized<Crypto::FPublicKey>();
+const Crypto::FSecretKey NULL_SECRET_KEY = boost::value_initialized<Crypto::FSecretKey>();
 
 /*!
     You can change things in this file, but you probably shouldn't.

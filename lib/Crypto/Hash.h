@@ -34,14 +34,14 @@ extern "C" {
   CryptoNight Hash functions
 */
 
-inline void cnFastHash(const void *data, size_t length, Hash &hash)
+inline void cnFastHash(const void *data, size_t length, FHash &hash)
 {
     cnFastHash(data, length, reinterpret_cast<char *>(&hash));
 }
 
-inline Hash cnFastHash(const void *data, size_t length)
+inline FHash cnFastHash(const void *data, size_t length)
 {
-    Hash h {};
+    FHash h {};
     cnFastHash(data, length, reinterpret_cast<char *>(&h));
     return h;
 }
@@ -61,35 +61,35 @@ private:
     friend inline void cnSlowHash(CnContext &context,
                                   const void *data,
                                   size_t length,
-                                  Hash &hash);
+								  FHash &hash);
 };
 
 inline void cnSlowHash(CnContext &context,
                        const void *data,
                        size_t length,
-                       Hash &hash)
+					   FHash &hash)
 {
     cnSlowHash(data, length, reinterpret_cast<char *>(&hash));
 }
 
-inline void treeHash(const Hash *hashes, size_t count, Hash &root_hash)
+inline void treeHash(const FHash *hashes, size_t count, FHash &root_hash)
 {
     treeHash(reinterpret_cast<const char(*)[HASH_SIZE]>(hashes), count,
              reinterpret_cast<char *>(&root_hash));
 }
 
-inline void treeBranch(const Hash *hashes, size_t count, Hash *branch)
+inline void treeBranch(const FHash *hashes, size_t count, FHash *branch)
 {
     treeBranch(reinterpret_cast<const char(*)[HASH_SIZE]>(hashes),
                count,
                reinterpret_cast<char(*)[HASH_SIZE]>(branch));
 }
 
-inline void treeHashFromBranch(const Hash *branch,
+inline void treeHashFromBranch(const FHash *branch,
                                size_t depth,
-                               const Hash &leaf,
+							   const FHash &leaf,
                                const void *path,
-                               Hash &root_hash)
+							   FHash &root_hash)
 {
     treeHashFromBranch(reinterpret_cast<const char(*)[HASH_SIZE]>(branch), depth,
                        reinterpret_cast<const char *>(&leaf), path,
@@ -98,10 +98,10 @@ inline void treeHashFromBranch(const Hash *branch,
 
 }
 
-CRYPTO_MAKE_HASHABLE(Hash)
-CRYPTO_MAKE_HASHABLE(EllipticCurveScalar)
-CRYPTO_MAKE_HASHABLE(EllipticCurvePoint)
-CRYPTO_MAKE_HASHABLE(PublicKey)
-CRYPTO_MAKE_HASHABLE(SecretKey)
-CRYPTO_MAKE_HASHABLE(KeyDerivation)
-CRYPTO_MAKE_HASHABLE(KeyImage)
+CRYPTO_MAKE_HASHABLE(FHash)
+CRYPTO_MAKE_HASHABLE(FEllipticCurveScalar)
+CRYPTO_MAKE_HASHABLE(FEllipticCurvePoint)
+CRYPTO_MAKE_HASHABLE(FPublicKey)
+CRYPTO_MAKE_HASHABLE(FSecretKey)
+CRYPTO_MAKE_HASHABLE(FKeyDerivation)
+CRYPTO_MAKE_HASHABLE(FKeyImage)

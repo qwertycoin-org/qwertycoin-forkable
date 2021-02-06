@@ -35,8 +35,8 @@ using namespace Logging;
 using namespace Common;
 using namespace Qwertycoin;
 
-std::unordered_set<Crypto::Hash> transactions_hash_seen;
-std::unordered_set<Crypto::PublicKey> public_keys_seen;
+std::unordered_set<Crypto::FHash> transactions_hash_seen;
+std::unordered_set<Crypto::FPublicKey> public_keys_seen;
 std::mutex seen_mutex;
 
 namespace {
@@ -44,14 +44,14 @@ namespace {
 using namespace CryptoNote;
 
 void checkOutputKey(
-    const KeyDerivation &derivation,
-    const PublicKey &key,
+    const FKeyDerivation &derivation,
+    const FPublicKey &key,
     size_t keyIndex,
     size_t outputIndex,
-    const std::unordered_set<PublicKey> &spendKeys,
-    std::unordered_map<PublicKey, std::vector<uint32_t>> &outputs)
+    const std::unordered_set<FPublicKey> &spendKeys,
+    std::unordered_map<FPublicKey, std::vector<uint32_t>> &outputs)
 {
-    PublicKey spendKey;
+    FPublicKey spendKey;
     underivePublicKey(derivation, keyIndex, key, spendKey);
 
     if (spendKeys.find(spendKey) != spendKeys.end()) {
@@ -61,13 +61,13 @@ void checkOutputKey(
 
 void findMyOutputs(
     const ITransactionReader &tx,
-    const SecretKey &viewSecretKey,
-    const std::unordered_set<PublicKey> &spendKeys,
-    std::unordered_map<PublicKey, std::vector<uint32_t>> &outputs)
+    const FSecretKey &viewSecretKey,
+    const std::unordered_set<FPublicKey> &spendKeys,
+    std::unordered_map<FPublicKey, std::vector<uint32_t>> &outputs)
 {
     auto txPublicKey = tx.getTransactionPublicKey();
 
-    KeyDerivation derivation;
+    FKeyDerivation derivation;
 
     if (!generateKeyDerivation(txPublicKey, viewSecretKey, derivation)) {
         return;
@@ -101,7 +101,7 @@ void findMyOutputs(
 
 std::vector<Crypto::Hash> getBlockHashes(const CryptoNote::CompleteBlock *blocks, size_t count)
 {
-    std::vector<Crypto::Hash> result;
+    std::vector<Crypto::FHash> result;
     result.reserve(count);
 
     for (size_t i = 0; i < count; ++i) {
@@ -119,7 +119,7 @@ TransfersConsumer::TransfersConsumer(
     const CryptoNote::Currency &currency,
     INode &node,
     Logging::ILogger &logger,
-    const SecretKey &viewSecret)
+    const FSecretKey &viewSecret)
     : m_node(node),
       m_viewSecret(viewSecret),
       m_currency(currency),
@@ -176,12 +176,12 @@ void TransfersConsumer::getSubscriptions(std::vector<AccountPublicAddress> &subs
 }
 
 void TransfersConsumer::initTransactionPool(
-    const std::unordered_set<Crypto::Hash> &uncommitedTransactions)
+    const std::unordered_set<Crypto::FHash> &uncommitedTransactions)
 {
     for (auto itSubscriptions = m_subscriptions.begin();
          itSubscriptions != m_subscriptions.end();
          ++itSubscriptions) {
-        std::vector<Crypto::Hash> unconfirmedTransactions;
+        std::vector<Crypto::FHash> unconfirmedTransactions;
         itSubscriptions->second->getContainer().getUnconfirmedTransactions(unconfirmedTransactions);
         for (auto itTransactions = unconfirmedTransactions.begin();
              itTransactions != unconfirmedTransactions.end();
@@ -320,7 +320,7 @@ bool TransfersConsumer::onNewBlocks(const CompleteBlock *blocks,uint32_t startHe
         }
     }
 
-    std::vector<Crypto::Hash> blockHashes = getBlockHashes(blocks, count);
+    std::vector<Crypto::FHash> blockHashes = getBlockHashes(blocks, count);
     if (!processingError) {
         m_observerManager.notify(&IBlockchainConsumerObserver::onBlocksAdded, this, blockHashes);
 
@@ -354,7 +354,7 @@ bool TransfersConsumer::onNewBlocks(const CompleteBlock *blocks,uint32_t startHe
 
 std::error_code TransfersConsumer::onPoolUpdated(
     const std::vector<std::unique_ptr<ITransactionReader>> &addedTransactions,
-    const std::vector<Hash> &deletedTransactions)
+    const std::vector<FHash> &deletedTransactions)
 {
     TransactionBlockInfo unconfirmedBlockInfo;
     unconfirmedBlockInfo.timestamp = 0;
@@ -382,7 +382,7 @@ std::error_code TransfersConsumer::onPoolUpdated(
         );
         for (auto &sub : m_subscriptions) {
             sub.second->deleteUnconfirmedTransaction(
-                *reinterpret_cast<const Hash *>(&deletedTxHash)
+                *reinterpret_cast<const FHash *>(&deletedTxHash)
             );
         }
 
@@ -396,7 +396,7 @@ std::error_code TransfersConsumer::onPoolUpdated(
     return std::error_code{};
 }
 
-const std::unordered_set<Crypto::Hash> &TransfersConsumer::getKnownPoolTxIds() const
+const std::unordered_set<Crypto::FHash> &TransfersConsumer::getKnownPoolTxIds() const
 {
     return m_poolTxs;
 }
@@ -411,7 +411,7 @@ std::error_code TransfersConsumer::addUnconfirmedTransaction(const ITransactionR
     return processTransaction(unconfirmedBlockInfo, transaction);
 }
 
-void TransfersConsumer::removeUnconfirmedTransaction(const Crypto::Hash& transactionHash)
+void TransfersConsumer::removeUnconfirmedTransaction(const Crypto::FHash& transactionHash)
 {
     m_observerManager.notify(
         &IBlockchainConsumerObserver::onTransactionDeleteBegin,
@@ -428,7 +428,7 @@ void TransfersConsumer::removeUnconfirmedTransaction(const Crypto::Hash& transac
                 );
 }
 
-void TransfersConsumer::markTransactionSafe(const Hash &transactionHash)
+void TransfersConsumer::markTransactionSafe(const FHash &transactionHash)
 {
     forEachSubscription([transactionHash](TransfersSubscription &sub) {
         sub.markTransactionSafe(transactionHash);
@@ -436,8 +436,8 @@ void TransfersConsumer::markTransactionSafe(const Hash &transactionHash)
 }
 
 void TransfersConsumer::addPublicKeysSeen(
-    const Crypto::Hash &transactionHash,
-    const Crypto::PublicKey &outputKey)
+    const Crypto::FHash &transactionHash,
+    const Crypto::FPublicKey &outputKey)
 {
     std::lock_guard<std::mutex> lk(seen_mutex);
     transactions_hash_seen.insert(transactionHash);
@@ -454,7 +454,7 @@ std::error_code TransfersConsumer::createTransfers(
 {
     auto txPubKey = tx.getTransactionPublicKey();
     auto txHash = tx.getTransactionHash();
-    std::vector<PublicKey> temp_keys;
+    std::vector<FPublicKey> temp_keys;
     std::lock_guard<std::mutex> lk(seen_mutex);
 
     for (auto idx : outputs) {
@@ -491,7 +491,7 @@ std::error_code TransfersConsumer::createTransfers(
                 info.keyImage
             );
 
-            assert(out.key == reinterpret_cast<const PublicKey &>(in_ephemeral.publicKey));
+            assert(out.key == reinterpret_cast<const FPublicKey &>(in_ephemeral.publicKey));
 
             auto it = transactions_hash_seen.find(txHash);
             if (it == transactions_hash_seen.end()) {
@@ -562,7 +562,7 @@ std::error_code TransfersConsumer::preprocessOutputs(
     const ITransactionReader &tx,
     PreprocessInfo &info)
 {
-    std::unordered_map<PublicKey, std::vector<uint32_t>> outputs;
+    std::unordered_map<FPublicKey, std::vector<uint32_t>> outputs;
     findMyOutputs(tx, m_viewSecret, m_spendKeys, outputs);
     if (outputs.empty()) {
         return std::error_code{};
@@ -571,7 +571,7 @@ std::error_code TransfersConsumer::preprocessOutputs(
     std::error_code errorCode;
     auto txHash = tx.getTransactionHash();
     if (blockInfo.height != WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
-        errorCode = getGlobalIndices(reinterpret_cast<const Hash &>(txHash), info.globalIdxs);
+        errorCode = getGlobalIndices(reinterpret_cast<const FHash &>(txHash), info.globalIdxs);
         if (errorCode) {
             return errorCode;
         }
@@ -676,7 +676,7 @@ void TransfersConsumer::processOutputs(
 }
 
 std::error_code TransfersConsumer::getGlobalIndices(
-    const Hash &transactionHash,
+    const FHash &transactionHash,
     std::vector<uint32_t> &outsGlobalIndices)
 {
     std::promise<std::error_code> prom;

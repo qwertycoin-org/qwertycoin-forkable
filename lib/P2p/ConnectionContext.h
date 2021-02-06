@@ -48,8 +48,8 @@ struct CryptoNoteConnectionContext
     };
 
     state m_state = state_befor_handshake;
-    std::list<Crypto::Hash> m_needed_objects;
-    std::unordered_set<Crypto::Hash> m_requested_objects;
+    std::list<Crypto::FHash> m_needed_objects;
+    std::unordered_set<Crypto::FHash> m_requested_objects;
     uint32_t m_remote_blockchain_height = 0;
     uint32_t m_last_response_height = 0;
 };

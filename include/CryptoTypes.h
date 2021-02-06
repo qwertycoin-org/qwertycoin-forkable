@@ -20,80 +20,81 @@
 
 #include <cstdint>
 #include <cstring>
+
 #include <Crypto/CryptoUtil.h>
 
 namespace Crypto {
 
 #pragma pack(push, 1)
 
-struct EllipticCurvePoint {
-    uint8_t data[32];
+struct FEllipticCurvePoint {
+    uint8_t uData[32];
 };
 
-struct EllipticCurveScalar {
-    uint8_t data[32];
+struct FEllipticCurveScalar {
+    uint8_t uData[32];
 };
 
-struct Hash {
-    uint8_t data[32];
+struct FHash {
+    uint8_t uData[32];
 };
 
 // This structure can be used to store Hashes in ordered containers
-// like std::set<Hash, HashCompare>
-struct HashCompare {
-    bool operator()(const Hash &lh, const Hash &rh) const
+// like std::set<FHash, FHashCompare>
+struct FHashCompare {
+    bool operator()(const FHash &lh, const FHash &rh) const
     {
-        return memcmp(lh.data, rh.data, 32) > 0;
+        return memcmp(lh.uData, rh.uData, 32) > 0;
     }
 };
 
-struct PublicKey : public EllipticCurvePoint {
+struct FPublicKey : public FEllipticCurvePoint {
 };
 
-struct SecretKey : public EllipticCurveScalar {
-    ~SecretKey() { sodiumMemZero(data, sizeof(data)); }
+struct FSecretKey : public FEllipticCurveScalar {
+    ~FSecretKey() { sodiumMemZero(uData, sizeof(uData)); }
 };
 
-struct KeyDerivation : public EllipticCurvePoint {
+struct FKeyDerivation : public FEllipticCurvePoint {
 };
 
-struct KeyImage : public EllipticCurvePoint {
+struct FKeyImage : public FEllipticCurvePoint {
 };
 
-struct Signature {
-    EllipticCurveScalar c, r;
+struct FSignature {
+    FEllipticCurveScalar c, r;
 };
 
 #pragma pack(pop)
 
-static_assert(sizeof(EllipticCurvePoint) == 32 && sizeof(EllipticCurveScalar) == 32,
+static_assert(sizeof(FEllipticCurvePoint) == 32 && sizeof(FEllipticCurveScalar) == 32,
               "Invalid structure size");
 
-static_assert(sizeof(Hash) == 32 && sizeof(PublicKey) == 32 && sizeof(SecretKey) == 32
-                      && sizeof(KeyDerivation) == 32 && sizeof(KeyImage) == 32
-                      && sizeof(Signature) == 64,
+static_assert(sizeof(FHash) == 32 && sizeof(FPublicKey) == 32 && sizeof(FSecretKey) == 32
+			  && sizeof(FKeyDerivation) == 32 && sizeof(FKeyImage) == 32
+			  && sizeof(FSignature) == 64,
               "Invalid structure size");
 
 // identity (a zero elliptic curve point)
-const struct EllipticCurveScalar I = { { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+const struct FEllipticCurveScalar I = {{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
 
 // curve order
-const struct EllipticCurveScalar L = { { 0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
+const struct FEllipticCurveScalar L = {{0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
                                          0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10 } };
 
 // zero scalar
-const struct EllipticCurveScalar Z = { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+const struct FEllipticCurveScalar Z = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
 
 // curve basepoint
-const struct EllipticCurveScalar G = { { 0x58, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
+const struct FEllipticCurveScalar G = {{0x58, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
                                          0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
                                          0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
                                          0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66 } };

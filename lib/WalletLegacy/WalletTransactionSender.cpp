@@ -70,7 +70,7 @@ void constructTx(
     const std::vector<tx_message_entry> &messages,
     uint64_t ttl,
     const std::string &sender,
-    Crypto::SecretKey &tx_key)
+    Crypto::FSecretKey &tx_key)
 {
     std::vector<uint8_t> extraVec;
     extraVec.reserve(extra.size());

@@ -39,7 +39,7 @@ SynchronizationStart TransfersSubscription::getSyncStart()
 
 void TransfersSubscription::onBlockchainDetach(uint32_t height)
 {
-    std::vector<Hash> deletedTransactions = transfers.detach(height);
+    std::vector<FHash> deletedTransactions = transfers.detach(height);
     for (auto &hash : deletedTransactions) {
         m_observerManager.notify(&ITransfersObserver::onTransactionDeleted, this, hash);
     }
@@ -90,7 +90,7 @@ ITransfersContainer& TransfersSubscription::getContainer()
     return transfers;
 }
 
-void TransfersSubscription::deleteUnconfirmedTransaction(const Hash &transactionHash)
+void TransfersSubscription::deleteUnconfirmedTransaction(const FHash &transactionHash)
 {
     if (transfers.deleteUnconfirmedTransaction(transactionHash)) {
         m_observerManager.notify(&ITransfersObserver::onTransactionDeleted, this, transactionHash);
@@ -98,14 +98,14 @@ void TransfersSubscription::deleteUnconfirmedTransaction(const Hash &transaction
 }
 
 void TransfersSubscription::markTransactionConfirmed(const TransactionBlockInfo &block,
-                                                     const Hash &transactionHash,
+                                                     const FHash &transactionHash,
                                                      const std::vector<uint32_t> &globalIndices)
 {
     transfers.markTransactionConfirmed(block, transactionHash, globalIndices);
     m_observerManager.notify(&ITransfersObserver::onTransactionUpdated, this, transactionHash);
 }
 
-void TransfersSubscription::markTransactionSafe(const Hash &transactionHash)
+void TransfersSubscription::markTransactionSafe(const FHash &transactionHash)
 {
     transfers.markTransactionSafe(transactionHash);
     m_observerManager.notify(&ITransfersObserver::onTransactionUpdated, this, transactionHash);

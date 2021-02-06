@@ -31,8 +31,8 @@ class WalletSerializerV2
 public:
     WalletSerializerV2(
         ITransfersObserver &transfersObserver,
-        Crypto::PublicKey &viewPublicKey,
-        Crypto::SecretKey &viewSecretKey,
+        Crypto::FPublicKey &viewPublicKey,
+        Crypto::FSecretKey &viewSecretKey,
         uint64_t &actualBalance,
         uint64_t &pendingBalance,
         WalletsContainer &walletsContainer,
@@ -48,8 +48,8 @@ public:
     void load(Common::IInputStream &source, uint8_t version);
     void save(Common::IOutputStream &destination, WalletSaveLevel saveLevel);
 
-    std::unordered_set<Crypto::PublicKey> &addedKeys();
-    std::unordered_set<Crypto::PublicKey> &deletedKeys();
+    std::unordered_set<Crypto::FPublicKey> &addedKeys();
+    std::unordered_set<Crypto::FPublicKey> &deletedKeys();
 
     static const uint8_t MIN_VERSION = 6;
     static const uint8_t SERIALIZATION_VERSION = 6;
@@ -83,8 +83,8 @@ private:
     std::string &m_extra;
     uint32_t m_transactionSoftLockTime;
 
-    std::unordered_set<Crypto::PublicKey> m_addedKeys;
-    std::unordered_set<Crypto::PublicKey> m_deletedKeys;
+    std::unordered_set<Crypto::FPublicKey> m_addedKeys;
+    std::unordered_set<Crypto::FPublicKey> m_deletedKeys;
 };
 
 } // namespace CryptoNote

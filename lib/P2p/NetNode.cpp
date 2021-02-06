@@ -1305,9 +1305,9 @@ bool NodeServer::check_trust(const proof_of_trust &tr)
         return false;
     }
 
-    Crypto::PublicKey pk;
+    Crypto::FPublicKey pk;
     Common::podFromHex(CryptoNote::P2P_STAT_TRUSTED_PUB_KEY, pk);
-    Crypto::Hash h = get_proof_of_trust_hash(tr);
+    Crypto::FHash h = get_proof_of_trust_hash(tr);
     if (!Crypto::checkSignature(h, pk, tr.sign)) {
         logger(ERROR) << "check_trust failed: sign check failed";
         return false;

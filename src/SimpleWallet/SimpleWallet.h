@@ -97,10 +97,10 @@ private:
     void handle_command_line(const boost::program_options::variables_map &vm);
 
     bool new_wallet(const std::string &wallet_file, const std::string &password);
-    bool new_wallet(Crypto::SecretKey &secret_key, Crypto::SecretKey &view_key,
+    bool new_wallet(Crypto::FSecretKey &secret_key, Crypto::FSecretKey &view_key,
                     const std::string &wallet_file, const std::string &password);
     bool gen_wallet(const std::string &wallet_file, const std::string &password,
-                    const Crypto::SecretKey &recovery_key = Crypto::SecretKey(),
+                    const Crypto::FSecretKey &recovery_key = Crypto::FSecretKey(),
                     bool recover = false, bool two_random = false);
     bool new_wallet(AccountKeys &private_key, const std::string &wallet_file,
                     const std::string &password);
@@ -214,7 +214,7 @@ private:
     std::string m_mnemonic_seed;
     std::string m_wallet_file;
     uint16_t m_daemon_port;
-    Crypto::SecretKey m_recovery_key; // recovery key (used as random for wallet gen)
+    Crypto::FSecretKey m_recovery_key; // recovery key (used as random for wallet gen)
     bool m_restore_deterministic_wallet; // recover flag
     bool m_non_deterministic; // old 2-random generation
 

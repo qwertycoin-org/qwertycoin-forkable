@@ -45,7 +45,7 @@ public:
 
 struct OutEntry {
     uint32_t outGlobalIndex;
-    Crypto::PublicKey outKey;
+    Crypto::FPublicKey outKey;
 };
 
 struct OutsForAmount {
@@ -54,12 +54,12 @@ struct OutsForAmount {
 };
 
 struct TransactionShortInfo {
-    Crypto::Hash txId;
+    Crypto::FHash txId;
     TransactionPrefix txPrefix;
 };
 
 struct BlockShortEntry {
-    Crypto::Hash blockHash;
+    Crypto::FHash blockHash;
     bool hasBlock;
     CryptoNote::Block block;
     std::vector<TransactionShortInfo> txsShortInfo;
@@ -70,8 +70,8 @@ struct BlockHeaderInfo {
     uint8_t majorVersion;
     uint8_t minorVersion;
     uint64_t timestamp;
-    Crypto::Hash hash;
-    Crypto::Hash prevHash;
+    Crypto::FHash hash;
+    Crypto::FHash prevHash;
     uint32_t nonce;
     bool isAlternative;
     uint32_t depth; // last block index = current block index + depth
@@ -109,19 +109,19 @@ public:
             std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>
                     &result,
             const Callback &callback) = 0;
-    virtual void getNewBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
+    virtual void getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                               std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
                               uint32_t &startHeight, const Callback &callback) = 0;
-    virtual void getTransactionOutsGlobalIndices(const Crypto::Hash &transactionHash,
+    virtual void getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                                  std::vector<uint32_t> &outsGlobalIndices,
                                                  const Callback &callback) = 0;
-    virtual void queryBlocks(std::vector<Crypto::Hash> &&knownBlockIds, uint64_t timestamp,
+    virtual void queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds, uint64_t timestamp,
                              std::vector<BlockShortEntry> &newBlocks, uint32_t &startHeight,
                              const Callback &callback) = 0;
     virtual void getPoolSymmetricDifference(
-            std::vector<Crypto::Hash> &&knownPoolTxIds, Crypto::Hash knownBlockId, bool &isBcActual,
+			std::vector<Crypto::FHash> &&knownPoolTxIds, Crypto::FHash knownBlockId, bool &isBcActual,
             std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
-            std::vector<Crypto::Hash> &deletedTxIds, const Callback &callback) = 0;
+			std::vector<Crypto::FHash> &deletedTxIds, const Callback &callback) = 0;
     virtual void getMultisignatureOutputByGlobalIndex(uint64_t amount, uint32_t gindex,
                                                       MultiSignatureOutput &out,
                                                       const Callback &callback) = 0;
@@ -129,15 +129,15 @@ public:
     virtual void getBlocks(const std::vector<uint32_t> &blockHeights,
                            std::vector<std::vector<BlockDetails>> &blocks,
                            const Callback &callback) = 0;
-    virtual void getBlocks(const std::vector<Crypto::Hash> &blockHashes,
+    virtual void getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                            std::vector<BlockDetails> &blocks, const Callback &callback) = 0;
     virtual void getBlocks(uint64_t timestampBegin, uint64_t timestampEnd,
                            uint32_t blocksNumberLimit, std::vector<BlockDetails> &blocks,
                            uint32_t &blocksNumberWithinTimestamps, const Callback &callback) = 0;
-    virtual void getTransactions(const std::vector<Crypto::Hash> &transactionHashes,
+    virtual void getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                                  std::vector<TransactionDetails> &transactions,
                                  const Callback &callback) = 0;
-    virtual void getTransactionsByPaymentId(const Crypto::Hash &paymentId,
+    virtual void getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                             std::vector<TransactionDetails> &transactions,
                                             const Callback &callback) = 0;
     virtual void getPoolTransactions(uint64_t timestampBegin, uint64_t timestampEnd,

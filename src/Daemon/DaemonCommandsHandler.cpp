@@ -261,7 +261,7 @@ bool DaemonCommandsHandler::status(const std::vector<std::string> &args)
         static_cast<uint32_t>(1),
         protocolQuery.getObservedHeight()
         ) - 1;
-    Crypto::Hash last_block_hash = m_core.getBlockIdByHeight(height);
+    Crypto::FHash last_block_hash = m_core.getBlockIdByHeight(height);
     size_t total_conn = m_srv.get_connections_count();
     size_t rpc_conn = m_prpc_server->get_connections_count();
     size_t outgoing_connections_count = m_srv.get_outgoing_connections_count();
@@ -473,7 +473,7 @@ bool DaemonCommandsHandler::print_block_by_height(uint32_t height)
         print_as_json(blocks.front());
     } else {
         uint32_t current_height;
-        Crypto::Hash top_id;
+        Crypto::FHash top_id;
         m_core.get_blockchain_top(current_height, top_id);
         std::cout
             << "block wasn't found. Current block chain height: " << current_height
@@ -487,15 +487,15 @@ bool DaemonCommandsHandler::print_block_by_height(uint32_t height)
 
 bool DaemonCommandsHandler::print_block_by_hash(const std::string &arg)
 {
-    Crypto::Hash block_hash;
+    Crypto::FHash block_hash;
     if (!parse_hash256(arg, block_hash)) {
         return false;
     }
 
-    std::list<Crypto::Hash> block_ids;
+    std::list<Crypto::FHash> block_ids;
     block_ids.push_back(block_hash);
     std::list<CryptoNote::Block> blocks;
-    std::list<Crypto::Hash> missed_ids;
+    std::list<Crypto::FHash> missed_ids;
     m_core.get_blocks(block_ids, blocks, missed_ids);
 
     if (1 == blocks.size()) {
@@ -534,15 +534,15 @@ bool DaemonCommandsHandler::print_tx(const std::vector<std::string> &args)
     }
 
     const std::string &str_hash = args.front();
-    Crypto::Hash tx_hash;
+    Crypto::FHash tx_hash;
     if (!parse_hash256(str_hash, tx_hash)) {
         return true;
     }
 
-    std::vector<Crypto::Hash> tx_ids;
+    std::vector<Crypto::FHash> tx_ids;
     tx_ids.push_back(tx_hash);
     std::list<CryptoNote::Transaction> txs;
-    std::list<Crypto::Hash> missed_ids;
+    std::list<Crypto::FHash> missed_ids;
     m_core.getTransactions(tx_ids, txs, missed_ids, true);
 
     if (1 == txs.size()) {

@@ -38,7 +38,7 @@ public:
     bool fillTransactionDetails(const Transaction &tx, TransactionDetails &txRpcInfo,
                                 uint64_t timestamp = 0);
 
-    static bool getPaymentId(const Transaction &transaction, Crypto::Hash &paymentId);
+    static bool getPaymentId(const Transaction &transaction, Crypto::FHash &paymentId);
 
     BlockchainExplorerDataBuilder &operator=(const BlockchainExplorerDataBuilder &) = delete;
     BlockchainExplorerDataBuilder &operator=(BlockchainExplorerDataBuilder &&) = delete;

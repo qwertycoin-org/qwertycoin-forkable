@@ -43,7 +43,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
-#include <Crypto/Crypto.h> // for declaration of Crypto::SecretKey
+#include <Crypto/Crypto.h> // for declaration of Crypto::FSecretKey
 
 namespace Crypto {
 
@@ -63,7 +63,7 @@ const std::string old_language_name = "English";
     \return false if not a multiple of 3 words, or if word is not in the words list
 */
 bool words_to_bytes(std::string words,
-                    Crypto::SecretKey &dst,
+                    Crypto::FSecretKey &dst,
                     std::string &language_name);
 
 /*!
@@ -75,7 +75,7 @@ bool words_to_bytes(std::string words,
 
     \return true if successful false if not. Unsuccessful if wrong key size.
 */
-bool bytes_to_words(const Crypto::SecretKey &src,
+bool bytes_to_words(const Crypto::FSecretKey &src,
                     std::string &words,
                     const std::string &language_name);
 

@@ -81,9 +81,9 @@ public:
     void rescan() override;
     void purge() override;
 
-    Crypto::SecretKey generateKey(
+    Crypto::FSecretKey generateKey(
         const std::string &password,
-        const Crypto::SecretKey &recovery_param = Crypto::SecretKey(),
+        const Crypto::FSecretKey &recovery_param = Crypto::FSecretKey(),
         bool recover = false,
         bool two_random = false) override;
 
@@ -112,12 +112,12 @@ public:
     std::vector<Payments> getTransactionsByPaymentIds(const std::vector<PaymentId> &paymentIds) const override;
     bool getTxProof(
         Crypto::Hash &txid,
-        CryptoNote::AccountPublicAddress &address,
+			Crypto::FSecretKey &tx_key,
         Crypto::SecretKey &tx_key,
         std::string &sig_str) override;
     std::string getReserveProof(const uint64_t &reserve, const std::string &message) override;
-    Crypto::SecretKey getTxKey(Crypto::Hash &txid) override;
-    bool get_tx_key(Crypto::Hash &txid, Crypto::SecretKey &txSecretKey) override;
+    Crypto::FSecretKey getTxKey(Crypto::FHash &txid) override;
+    bool get_tx_key(Crypto::FHash &txid, Crypto::FSecretKey &txSecretKey) override;
     void getAccountKeys(AccountKeys &keys) override;
     bool getSeed(std::string &electrum_words) override;
 
@@ -167,11 +167,11 @@ public:
 
     bool isTrackingWallet() override;
 
-    void setConsolidateHeight(uint32_t height, const Crypto::Hash &consolidateTx) override;
+    void setConsolidateHeight(uint32_t height, const Crypto::FHash &consolidateTx) override;
     uint32_t getConsolidateHeight() const override;
-    Crypto::Hash getConsolidateTx() const override;
+    Crypto::FHash getConsolidateTx() const override;
 
-    void markTransactionSafe(const Crypto::Hash &transactionHash) override;
+    void markTransactionSafe(const Crypto::FHash &transactionHash) override;
 private:
     // IBlockchainSynchronizerObserver
     void synchronizationProgressUpdated(uint32_t current, uint32_t total) override;
@@ -180,10 +180,10 @@ private:
     // ITransfersObserver
     void onTransactionUpdated(
         ITransfersSubscription *object,
-        const Crypto::Hash &transactionHash) override;
+        const Crypto::FHash &transactionHash) override;
     void onTransactionDeleted(
         ITransfersSubscription *object,
-        const Crypto::Hash &transactionHash) override;
+        const Crypto::FHash &transactionHash) override;
 
     void initSync();
     void throwIfNotInitialised();

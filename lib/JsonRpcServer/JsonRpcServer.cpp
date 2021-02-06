@@ -128,7 +128,7 @@ void JsonRpcServer::makeErrorResponse(const std::error_code &ec, Common::JsonVal
 
     error.insert("code", code);
     error.insert("message", message);
-    error.insert("data", data);
+    error.insert("uData", data);
 
     resp.insert("error", error);
 }

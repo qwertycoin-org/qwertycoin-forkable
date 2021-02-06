@@ -24,7 +24,7 @@ namespace CryptoNote {
 
 class IBlockchainObserver
 {
-    typedef std::pair<Crypto::Hash, TransactionRemoveReason> RemovedTransactionDetails;
+    typedef std::pair<Crypto::FHash, TransactionRemoveReason> RemovedTransactionDetails;
 
 public:
     virtual ~IBlockchainObserver() = default;

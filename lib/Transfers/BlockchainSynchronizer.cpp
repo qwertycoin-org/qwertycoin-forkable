@@ -88,7 +88,7 @@ namespace CryptoNote {
 BlockchainSynchronizer::BlockchainSynchronizer(
     INode &node,
     Logging::ILogger &logger,
-    const Hash &genesisBlockHash)
+    const FHash &genesisBlockHash)
     : m_logger(logger, "BlockchainSynchronizer"),
       m_node(node),
       m_genesisBlockHash(genesisBlockHash),
@@ -157,7 +157,7 @@ IStreamSerializable* BlockchainSynchronizer::getConsumerState(IBlockchainConsume
     return getConsumerSynchronizationState(consumer);
 }
 
-std::vector<Crypto::Hash> BlockchainSynchronizer::getConsumerKnownBlocks(
+std::vector<Crypto::FHash> BlockchainSynchronizer::getConsumerKnownBlocks(
     IBlockchainConsumer &consumer) const
 {
     std::unique_lock<std::mutex> lk(m_consumersMutex);
@@ -196,7 +196,7 @@ std::future<std::error_code> BlockchainSynchronizer::addUnconfirmedTransaction(
 }
 
 std::future<void> BlockchainSynchronizer::removeUnconfirmedTransaction(
-    const Crypto::Hash &transactionHash)
+    const Crypto::FHash &transactionHash)
 {
     m_logger(INFO, BRIGHT_WHITE) << "Removing unconfirmed transaction, hash " << transactionHash;
 
@@ -253,7 +253,7 @@ std::error_code BlockchainSynchronizer::doAddUnconfirmedTransaction(
     return ec;
 }
 
-void BlockchainSynchronizer::doRemoveUnconfirmedTransaction(const Crypto::Hash &transactionHash)
+void BlockchainSynchronizer::doRemoveUnconfirmedTransaction(const Crypto::FHash &transactionHash)
 {
     std::unique_lock<std::mutex> lk(m_consumersMutex);
 
@@ -274,7 +274,7 @@ void BlockchainSynchronizer::save(std::ostream &os)
 void BlockchainSynchronizer::load(std::istream &in)
 {
     m_logger(INFO, BRIGHT_WHITE) << "Loading...";
-    Hash genesisBlockHash;
+    FHash genesisBlockHash;
     in.read(reinterpret_cast<char *>(&genesisBlockHash), sizeof(genesisBlockHash));
     if (genesisBlockHash != m_genesisBlockHash) {
         auto message = "Failed to load: genesis block hash does not match stored state";
@@ -322,7 +322,7 @@ void BlockchainSynchronizer::actualizeFutureState()
 
     while (!m_removeTransactionTasks.empty()) {
         auto &task = m_removeTransactionTasks.front();
-        const Crypto::Hash &transactionHash = *task.first;
+        const Crypto::FHash &transactionHash = *task.first;
         auto detachedPromise = std::move(task.second);
         m_removeTransactionTasks.pop_front();
 
@@ -467,8 +467,8 @@ void BlockchainSynchronizer::poolChanged()
 }
 
 void BlockchainSynchronizer::getPoolUnionAndIntersection(
-    std::unordered_set<Crypto::Hash> &poolUnion,
-    std::unordered_set<Crypto::Hash> &poolIntersection) const
+    std::unordered_set<Crypto::FHash> &poolUnion,
+    std::unordered_set<Crypto::FHash> &poolIntersection) const
 {
     std::unique_lock<std::mutex> lk(m_consumersMutex);
 
@@ -615,7 +615,7 @@ void BlockchainSynchronizer::processBlocks(GetBlocksResponse &response)
                 for (const auto &txShortInfo : block.txsShortInfo) {
                     completeBlock.transactions.push_back(createTransactionPrefix(
                         txShortInfo.txPrefix,
-                        reinterpret_cast<const Hash&>(txShortInfo.txId)
+                        reinterpret_cast<const FHash&>(txShortInfo.txId)
                     ));
                 }
             } catch (const std::exception &e) {
@@ -733,8 +733,8 @@ void BlockchainSynchronizer::removeOutdatedTransactions()
 {
     m_logger(INFO, BRIGHT_WHITE) << "Removing outdated pool transactions...";
 
-    std::unordered_set<Crypto::Hash> unionPoolHistory;
-    std::unordered_set<Crypto::Hash> ignored;
+    std::unordered_set<Crypto::FHash> unionPoolHistory;
+    std::unordered_set<Crypto::FHash> ignored;
     getPoolUnionAndIntersection(unionPoolHistory, ignored);
 
     GetPoolRequest request;
@@ -796,8 +796,8 @@ void BlockchainSynchronizer::startPoolSync()
 {
     m_logger(DEBUGGING) << "Starting pool synchronization...";
 
-    std::unordered_set<Crypto::Hash> unionPoolHistory;
-    std::unordered_set<Crypto::Hash> intersectedPoolHistory;
+    std::unordered_set<Crypto::FHash> unionPoolHistory;
+    std::unordered_set<Crypto::FHash> intersectedPoolHistory;
     getPoolUnionAndIntersection(unionPoolHistory, intersectedPoolHistory);
 
     GetPoolRequest unionRequest;

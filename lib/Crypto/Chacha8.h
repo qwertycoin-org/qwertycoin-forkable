@@ -59,9 +59,9 @@ inline void generateChacha8Key(Crypto::CnContext &context,
                                const std::string &password,
                                Chacha8Key &key)
 {
-    static_assert(sizeof(Chacha8Key) <= sizeof(Hash),
+    static_assert(sizeof(Chacha8Key) <= sizeof(FHash),
                   "Size of Hash must be at least that of Chacha8Key");
-    Hash pwdHash{};
+    FHash pwdHash{};
     cnSlowHash(context, password.data(), password.size(), pwdHash);
     memcpy(&key, &pwdHash, sizeof(key));
     memset(&pwdHash, 0, sizeof(pwdHash));

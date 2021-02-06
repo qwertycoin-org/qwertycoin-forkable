@@ -81,19 +81,19 @@ void getVariantValue(
     switch (static_cast<SerializationTag>(tag)) {
     case SerializationTag::Base: {
         BaseInputDetails v;
-        serializer(v, "data");
+        serializer(v, "uData");
         in = v;
         break;
     }
     case SerializationTag::Key: {
         KeyInputDetails v;
-        serializer(v, "data");
+        serializer(v, "uData");
         in = v;
         break;
     }
     case SerializationTag::Multisignature: {
         MultiSignatureInputDetails v;
-        serializer(v, "data");
+        serializer(v, "uData");
         in = v;
         break;
     }
@@ -148,7 +148,7 @@ void serialize(TransactionInputDetails &input, ISerializer &serializer)
         uint8_t tag = boost::apply_visitor(tagGetter, input);
         serializer.binary(&tag, sizeof(tag), "type");
 
-        VariantSerializer visitor(serializer, "data");
+        VariantSerializer visitor(serializer, "uData");
         boost::apply_visitor(visitor, input);
     } else {
         uint8_t tag;
@@ -186,7 +186,7 @@ void serialize(TransactionDetails &transaction, ISerializer &serializer)
     serializer(transaction.outputs, "outputs");
 
     if (serializer.type() == ISerializer::OUTPUT) {
-        std::vector<std::pair<size_t, Crypto::Signature>> signaturesForSerialization;
+        std::vector<std::pair<size_t, Crypto::FSignature>> signaturesForSerialization;
         signaturesForSerialization.reserve(transaction.signatures.size());
         size_t ctr = 0;
         for (const auto &signaturesV : transaction.signatures) {
@@ -203,7 +203,7 @@ void serialize(TransactionDetails &transaction, ISerializer &serializer)
         serializer(size, "signaturesSize");
         transaction.signatures.resize(size);
 
-        std::vector<std::pair<size_t, Crypto::Signature>> signaturesForSerialization;
+        std::vector<std::pair<size_t, Crypto::FSignature>> signaturesForSerialization;
         serializer(signaturesForSerialization, "signatures");
 
         for (const auto &signatureWithIndex : signaturesForSerialization) {

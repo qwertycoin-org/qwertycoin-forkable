@@ -41,11 +41,11 @@ public:
                         const ITransactionReader &tx,
                         const std::vector<TransactionOutputInformationIn> &transfers);
 
-    void deleteUnconfirmedTransaction(const Crypto::Hash& transactionHash);
+    void deleteUnconfirmedTransaction(const Crypto::FHash& transactionHash);
     void markTransactionConfirmed(const TransactionBlockInfo &block,
-                                  const Crypto::Hash &transactionHash,
+                                  const Crypto::FHash &transactionHash,
                                   const std::vector<uint32_t> &globalIndices);
-    void markTransactionSafe(const Crypto::Hash &transactionHash);
+    void markTransactionSafe(const Crypto::FHash &transactionHash);
 
     // ITransfersSubscription
     AccountPublicAddress getAddress() override;

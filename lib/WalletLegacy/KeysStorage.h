@@ -31,11 +31,11 @@ struct KeysStorage {
 
     uint64_t creationTimestamp;
 
-    Crypto::PublicKey spendPublicKey;
-    Crypto::SecretKey spendSecretKey;
+    Crypto::FPublicKey spendPublicKey;
+    Crypto::FSecretKey spendSecretKey;
 
-    Crypto::PublicKey viewPublicKey;
-    Crypto::SecretKey viewSecretKey;
+    Crypto::FPublicKey viewPublicKey;
+    Crypto::FSecretKey viewSecretKey;
 };
 
 } // namespace CryptoNote

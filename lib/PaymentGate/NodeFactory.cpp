@@ -64,7 +64,7 @@ public:
     }
 
     void getNewBlocks(
-        std::vector<Crypto::Hash> &&knownBlockIds,
+        std::vector<Crypto::FHash> &&knownBlockIds,
         std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
         uint32_t &startHeight,
         const Callback &callback) override
@@ -73,13 +73,13 @@ public:
         callback(std::error_code());
     }
 
-    void getTransactionOutsGlobalIndices(const Crypto::Hash &transactionHash,
+    void getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                          std::vector<uint32_t> &outsGlobalIndices,
                                          const Callback &callback) override
     {
     }
 
-    void queryBlocks(std::vector<Crypto::Hash> &&knownBlockIds,
+    void queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                      uint64_t timestamp,
                      std::vector<CryptoNote::BlockShortEntry> &newBlocks,
                      uint32_t &startHeight,
@@ -90,11 +90,11 @@ public:
     };
 
     void getPoolSymmetricDifference(
-        std::vector<Crypto::Hash> &&knownPoolTxIds,
-        Crypto::Hash knownBlockId,
+        std::vector<Crypto::FHash> &&knownPoolTxIds,
+        Crypto::FHash knownBlockId,
         bool &isBcActual,
         std::vector<std::unique_ptr<CryptoNote::ITransactionReader>> &newTxs,
-        std::vector<Crypto::Hash> &deletedTxIds,
+        std::vector<Crypto::FHash> &deletedTxIds,
         const Callback &callback) override
     {
         isBcActual = true;
@@ -105,7 +105,7 @@ public:
                    std::vector<std::vector<CryptoNote::BlockDetails>> &blocks,
                    const Callback &callback) override { }
 
-    void getBlocks(const std::vector<Crypto::Hash> &blockHashes,
+    void getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                    std::vector<CryptoNote::BlockDetails> &blocks,
                    const Callback &callback) override { }
 
@@ -116,7 +116,7 @@ public:
                    uint32_t &blocksNumberWithinTimestamps,
                    const Callback &callback) override { }
 
-    void getTransactions(const std::vector<Crypto::Hash> &transactionHashes,
+    void getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                          std::vector<CryptoNote::TransactionDetails> &transactions,
                          const Callback &callback) override { }
 
@@ -127,7 +127,7 @@ public:
                              uint64_t &transactionsNumberWithinTimestamps,
                              const Callback &callback) override { }
 
-    void getTransactionsByPaymentId(const Crypto::Hash &paymentId,
+    void getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                     std::vector<CryptoNote::TransactionDetails> &transactions,
                                     const Callback &callback) override { }
 

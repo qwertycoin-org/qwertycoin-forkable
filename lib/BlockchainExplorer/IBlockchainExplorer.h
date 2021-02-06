@@ -35,7 +35,7 @@ public:
 
     virtual bool getBlocks(const std::vector<uint32_t> &blockHeights,
                            std::vector<std::vector<BlockDetails>> &blocks) = 0;
-    virtual bool getBlocks(const std::vector<Crypto::Hash> &blockHashes,
+    virtual bool getBlocks(const std::vector<Crypto::FHash> &blockHashes,
                            std::vector<BlockDetails> &blocks) = 0;
     virtual bool getBlocks(uint64_t timestampBegin,
                            uint64_t timestampEnd,
@@ -45,19 +45,19 @@ public:
 
     virtual bool getBlockchainTop(BlockDetails &topBlock) = 0;
 
-    virtual bool getPoolState(const std::vector<Crypto::Hash> &knownPoolTransactionHashes,
-                              Crypto::Hash knownBlockchainTop,
+    virtual bool getPoolState(const std::vector<Crypto::FHash> &knownPoolTransactionHashes,
+                              Crypto::FHash knownBlockchainTop,
                               bool &isBlockchainActual,
                               std::vector<TransactionDetails> &newTransactions,
-                              std::vector<Crypto::Hash> &removedTransactions) = 0;
+                              std::vector<Crypto::FHash> &removedTransactions) = 0;
     virtual bool getPoolTransactions(uint64_t timestampBegin,
                                      uint64_t timestampEnd,
                                      uint32_t transactionsNumberLimit,
                                      std::vector<TransactionDetails> &transactions,
                                      uint64_t &transactionsNumberWithinTimestamps) = 0;
-    virtual bool getTransactions(const std::vector<Crypto::Hash> &transactionHashes,
+    virtual bool getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
                                  std::vector<TransactionDetails> &transactions) = 0;
-    virtual bool getTransactionsByPaymentId(const Crypto::Hash &paymentId,
+    virtual bool getTransactionsByPaymentId(const Crypto::FHash &paymentId,
                                             std::vector<TransactionDetails> &transactions) = 0;
 
     virtual uint64_t getRewardBlocksWindow() = 0;

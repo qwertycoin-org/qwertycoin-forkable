@@ -50,7 +50,7 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
     const std::string &password,
     bool saveDetailed,
     const std::string &cache,
-    const std::vector<Crypto::Hash> &safeTxes)
+    const std::vector<Crypto::FHash> &safeTxes)
 {
     // set serialization version global variable
     CryptoNote::WALLET_LEGACY_SERIALIZATION_VERSION = walletSerializationVersion;
@@ -70,7 +70,7 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
     if (walletSerializationVersion >= 3) {
         uint32_t consolidateHeight = transactionsCache.getConsolidateHeight();
         serializer(consolidateHeight, "consolidate_height");
-        Crypto::Hash consolidateTx = transactionsCache.getConsolidateTx();
+        Crypto::FHash consolidateTx = transactionsCache.getConsolidateTx();
         serializer(consolidateTx, "consolidate_tx_id");
         consolidateHeight = transactionsCache.getPrevConsolidateHeight();
         serializer(consolidateHeight, "prev_consolidate_height");
@@ -94,7 +94,7 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
     s.beginObject("wallet");
     s(version, "version");
     s(iv, "iv");
-    s(cipher, "data");
+    s(cipher, "uData");
     s.endObject();
 
     stream.flush();
@@ -134,7 +134,7 @@ Crypto::Chacha8Iv WalletLegacySerializer::encrypt(
 void WalletLegacySerializer::deserialize(std::istream &stream,
     const std::string &password,
     std::string &cache,
-    std::vector<Crypto::Hash> &safeTxes)
+    std::vector<Crypto::FHash> &safeTxes)
 {
     StdInputStream stdStream(stream);
     CryptoNote::BinaryInputStreamSerializer serializerEncrypted(stdStream);
@@ -150,7 +150,7 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
     serializerEncrypted(iv, "iv");
 
     std::string cipher;
-    serializerEncrypted(cipher, "data");
+    serializerEncrypted(cipher, "uData");
 
     serializerEncrypted.endObject();
 
@@ -189,7 +189,7 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
     if (version >= 3) {
         uint32_t consolidateHeight = 0;
         serializer(consolidateHeight, "consolidate_height");
-        Crypto::Hash consolidateTx;
+        Crypto::FHash consolidateTx;
         serializer(consolidateTx, "consolidate_tx_id");
         transactionsCache.setConsolidateHeight(consolidateHeight, consolidateTx);
         serializer(consolidateHeight, "prev_consolidate_height");
