@@ -23,10 +23,10 @@
 #include <string>
 #include <vector>
 #include <boost/optional.hpp>
-#include <CryptoNote.h>
+#include <QwertyNote.h>
 #include <ITransfersContainer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 const size_t WALLET_INVALID_TRANSACTION_ID = std::numeric_limits<size_t>::max();
 const size_t WALLET_INVALID_TRANSFER_ID = std::numeric_limits<size_t>::max();
@@ -239,4 +239,4 @@ public:
     virtual WalletEvent getEvent() = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

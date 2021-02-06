@@ -36,7 +36,7 @@
 #include <Serialization/SerializationOverloads.h>
 #include <ITransfersContainer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 struct TransactionOutputInformationIn;
 
@@ -87,7 +87,7 @@ struct TransactionOutputInformationEx : public TransactionOutputInformationIn
     SpentOutputDescriptor getSpentOutputDescriptor() const { return SpentOutputDescriptor(*this); }
     const Crypto::FHash& getTransactionHash() const { return transactionHash; }
 
-    void serialize(CryptoNote::ISerializer &s)
+    void serialize(QwertyNote::ISerializer &s)
     {
         s(reinterpret_cast<uint8_t &>(type), "type");
         s(amount, "");
@@ -152,7 +152,7 @@ struct SpentTransactionOutput : TransactionOutputInformationEx
 class TransfersContainer : public ITransfersContainer
 {
 public:
-    TransfersContainer(const CryptoNote::Currency &currency,
+    TransfersContainer(const QwertyNote::Currency &currency,
                        Logging::ILogger &logger,
                        size_t transactionSpendableAge,
                        size_t safeTransactionSpendableAge);
@@ -319,9 +319,9 @@ private:
     uint32_t m_currentHeight; // current height is needed to check if a transfer is unlocked
     size_t m_transactionSpendableAge;
     size_t m_safeTransactionSpendableAge;
-    const CryptoNote::Currency &m_currency;
+    const QwertyNote::Currency &m_currency;
     mutable std::mutex m_mutex;
     Logging::LoggerRef m_logger;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

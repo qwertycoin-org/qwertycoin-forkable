@@ -21,10 +21,10 @@
 #include <ostream>
 #include <string>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 void importLegacyKeys(const std::string &legacyKeysFilename,
                       const std::string &password,
                       std::ostream &destination);
 
-} // namespace CryptoNote
+} // namespace QwertyNote

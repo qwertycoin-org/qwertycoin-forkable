@@ -20,7 +20,7 @@
 #include <P2p/P2pContext.h>
 #include <P2p/P2pContextOwner.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 P2pContextOwner::P2pContextOwner(P2pContext *ctx, ContextList &contextList)
     : contextList(contextList)
@@ -54,4 +54,4 @@ P2pContext *P2pContextOwner::operator->()
     return &get();
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

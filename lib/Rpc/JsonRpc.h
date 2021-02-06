@@ -26,7 +26,7 @@
 #include <Serialization/ISerializer.h>
 #include <Serialization/SerializationTools.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class HttpClient;
 
@@ -240,7 +240,7 @@ bool invokeMethod(const JsonRpcRequest &jsReq, JsonRpcResponse &jsRes, Handler h
     Request req;
     Response res;
 
-    if (!std::is_same<Request, CryptoNote::EMPTY_STRUCT>::value && !jsReq.loadParams(req)) {
+    if (!std::is_same<Request, QwertyNote::EMPTY_STRUCT>::value && !jsReq.loadParams(req)) {
         throw JsonRpcError(JsonRpc::errInvalidParams);
     }
 
@@ -276,4 +276,4 @@ JsonMemberMethod makeMemberMethod(bool (Class::*handler)(const Params &, Result 
 
 } // namespace JsonRpc
 
-} // namespace CryptoNote
+} // namespace QwertyNote

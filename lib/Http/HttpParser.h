@@ -24,7 +24,7 @@
 #include <Http/HttpRequest.h>
 #include <Http/HttpResponse.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class HttpParser
 {
@@ -43,4 +43,4 @@ private:
     static size_t getBodyLen(const HttpRequest::Headers &headers);
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

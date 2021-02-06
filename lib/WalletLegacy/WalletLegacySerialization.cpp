@@ -26,9 +26,9 @@
 #include <WalletLegacy/WalletLegacySerializer.h>
 #include <WalletLegacy/WalletUnconfirmedTransactions.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
-void serialize(UnconfirmedTransferDetails &utd, CryptoNote::ISerializer &serializer)
+void serialize(UnconfirmedTransferDetails &utd, QwertyNote::ISerializer &serializer)
 {
     serializer(utd.tx, "transaction");
     serializer(utd.amount, "amount");
@@ -39,12 +39,12 @@ void serialize(UnconfirmedTransferDetails &utd, CryptoNote::ISerializer &seriali
     uint64_t txId = static_cast<uint64_t>(utd.transactionId);
     serializer(txId, "transaction_id");
     utd.transactionId = static_cast<size_t>(txId);
-    if (CryptoNote::WALLET_LEGACY_SERIALIZATION_VERSION >= 2) {
+    if (QwertyNote::WALLET_LEGACY_SERIALIZATION_VERSION >= 2) {
         serializer(utd.secretKey, "secret_key");
     }
 }
 
-void serialize(WalletLegacyTransaction &txi, CryptoNote::ISerializer &serializer)
+void serialize(WalletLegacyTransaction &txi, QwertyNote::ISerializer &serializer)
 {
     auto trId = static_cast<uint64_t>(txi.firstTransferId);
     serializer(trId, "first_transfer_id");
@@ -60,13 +60,13 @@ void serialize(WalletLegacyTransaction &txi, CryptoNote::ISerializer &serializer
     serializer(txi.hash, "hash");
     serializer(txi.isCoinbase, "is_coinbase");
 
-    CryptoNote::serializeBlockHeight(serializer, txi.blockHeight, "block_height");
+    QwertyNote::serializeBlockHeight(serializer, txi.blockHeight, "block_height");
 
     serializer(txi.timestamp, "timestamp");
     serializer(txi.unlockTime, "unlock_time");
     serializer(txi.extra, "extra");
 
-    if (CryptoNote::WALLET_LEGACY_SERIALIZATION_VERSION >= 2) {
+    if (QwertyNote::WALLET_LEGACY_SERIALIZATION_VERSION >= 2) {
         auto secretKeyRef = txi.secretKey.get();
         Crypto::FSecretKey secretKey = reinterpret_cast<const Crypto::FSecretKey &>(secretKeyRef);
         serializer(secretKey, "secret_key");
@@ -79,10 +79,10 @@ void serialize(WalletLegacyTransaction &txi, CryptoNote::ISerializer &serializer
     txi.sentTime = 0;
 }
 
-void serialize(WalletLegacyTransfer &tr, CryptoNote::ISerializer &serializer)
+void serialize(WalletLegacyTransfer &tr, QwertyNote::ISerializer &serializer)
 {
     serializer(tr.address, "address");
     serializer(tr.amount, "amount");
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

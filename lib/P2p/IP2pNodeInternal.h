@@ -21,7 +21,7 @@
 #include <list>
 #include <P2p/P2pProtocolDefinitions.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class P2pContext;
 
@@ -39,4 +39,4 @@ public:
     virtual void tryPing(P2pContext &ctx) = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

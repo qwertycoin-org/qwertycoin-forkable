@@ -28,7 +28,7 @@
 #include <INode.h>
 #include <ITransfersContainer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class WalletTransactionSender
 {
@@ -133,4 +133,4 @@ private:
     ITransfersContainer &m_transferDetails;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

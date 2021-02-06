@@ -21,7 +21,7 @@
 #include <Rpc/HttpClient.h>
 #include <Rpc/JsonRpc.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace JsonRpc {
 
@@ -96,4 +96,4 @@ void invokeJsonRpcCommand(HttpClient &httpClient,
 
 } // namespace JsonRpc
 
-} // namespace CryptoNote
+} // namespace QwertyNote

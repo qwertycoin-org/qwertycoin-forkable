@@ -22,7 +22,7 @@
 #include <Serialization/ISerializer.h>
 #include <Serialization/SerializationOverloads.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class BinaryInputStreamSerializer : public ISerializer
 {
@@ -65,4 +65,4 @@ private:
     Common::IInputStream &stream;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -22,6 +22,7 @@
 #include <sstream>
 #include <unordered_set>
 #include <boost/filesystem/operations.hpp>
+#include <QwertyNote.h>
 #include <Common/Util.h>
 #include <Crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
@@ -40,10 +41,9 @@
 #include <Wallet/LegacyKeysImporter.h>
 #include <Wallet/WalletErrors.h>
 #include <Wallet/WalletUtils.h>
-#include <CryptoNote.h>
 #include <ITransfersContainer.h>
 
-using namespace CryptoNote;
+using namespace QwertyNote;
 
 namespace PaymentService {
 
@@ -75,7 +75,8 @@ bool checkPaymentId(const std::string &paymentId)
 Crypto::FHash parsePaymentId(const std::string &paymentIdStr)
 {
     if (!checkPaymentId(paymentIdStr)) {
-        throw std::system_error(make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_PAYMENT_ID_FORMAT));
+        throw std::system_error(make_error_code(
+                QwertyNote::error::WalletServiceErrorCode::WRONG_PAYMENT_ID_FORMAT));
     }
 
     Crypto::FHash paymentId;
@@ -87,7 +88,7 @@ Crypto::FHash parsePaymentId(const std::string &paymentIdStr)
 
 bool getPaymentIdFromExtra(const std::string &binaryString, Crypto::FHash &paymentId)
 {
-    return CryptoNote::getPaymentIdFromTxExtra(Common::asBinaryArray(binaryString), paymentId);
+    return QwertyNote::getPaymentIdFromTxExtra(Common::asBinaryArray(binaryString), paymentId);
 }
 
 std::string getPaymentIdStringFromExtra(const std::string &binaryString)
@@ -118,7 +119,7 @@ struct TransactionsInBlockInfoFilter
         }
     }
 
-    bool checkTransaction(const CryptoNote::WalletTransactionWithTransfers &transaction) const
+    bool checkTransaction(const QwertyNote::WalletTransactionWithTransfers &transaction) const
     {
         if (havePaymentId) {
             Crypto::FHash transactionPaymentId;
@@ -136,7 +137,7 @@ struct TransactionsInBlockInfoFilter
         }
 
         bool haveAddress = false;
-        for (const CryptoNote::WalletTransfer &transfer: transaction.transfers) {
+        for (const QwertyNote::WalletTransfer &transfer: transaction.transfers) {
             if (addresses.find(transfer.address) != addresses.end()) {
                 haveAddress = true;
                 break;
@@ -156,8 +157,8 @@ namespace {
 void addPaymentIdToExtra(const std::string &paymentId, std::string &extra)
 {
     std::vector<uint8_t> extraVector;
-    if (!CryptoNote::createTxExtraWithPaymentId(paymentId, extraVector)) {
-        throw std::system_error(make_error_code(CryptoNote::error::BAD_PAYMENT_ID));
+    if (!QwertyNote::createTxExtraWithPaymentId(paymentId, extraVector)) {
+        throw std::system_error(make_error_code(QwertyNote::error::BAD_PAYMENT_ID));
     }
 
     std::copy(extraVector.begin(), extraVector.end(), std::back_inserter(extra));
@@ -170,7 +171,8 @@ void validatePaymentId(const std::string &paymentId, Logging::LoggerRef logger)
             << "Can't validate payment id: "
             << paymentId;
         throw std::system_error(
-            make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_PAYMENT_ID_FORMAT)
+            make_error_code(
+                QwertyNote::error::WalletServiceErrorCode::WRONG_PAYMENT_ID_FORMAT)
         );
     }
 }
@@ -182,25 +184,25 @@ Crypto::FHash parseHash(const std::string &hashString, Logging::LoggerRef logger
     if (!Common::podFromHex(hashString, hash)) {
         logger(Logging::WARNING,Logging::BRIGHT_YELLOW) << "Can't parse hash string " << hashString;
         throw std::system_error(
-            make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_HASH_FORMAT)
+            make_error_code(QwertyNote::error::WalletServiceErrorCode::WRONG_HASH_FORMAT)
         );
     }
 
     return hash;
 }
 
-std::vector<CryptoNote::TransactionsInBlockInfo> filterTransactions(
-    const std::vector<CryptoNote::TransactionsInBlockInfo> &blocks,
+std::vector<QwertyNote::TransactionsInBlockInfo> filterTransactions(
+    const std::vector<QwertyNote::TransactionsInBlockInfo> &blocks,
     const TransactionsInBlockInfoFilter &filter)
 {
-    std::vector<CryptoNote::TransactionsInBlockInfo> result;
+    std::vector<QwertyNote::TransactionsInBlockInfo> result;
 
     for (const auto &block : blocks) {
-        CryptoNote::TransactionsInBlockInfo item;
+        QwertyNote::TransactionsInBlockInfo item;
         item.blockHash = block.blockHash;
 
         for (const auto &transaction : block.transactions) {
-            if (transaction.transaction.state != CryptoNote::WalletTransactionState::DELETED
+            if (transaction.transaction.mState != QwertyNote::WalletTransactionState::DELETED
                 && filter.checkTransaction(transaction)) {
                 item.transactions.push_back(transaction);
             }
@@ -215,7 +217,7 @@ std::vector<CryptoNote::TransactionsInBlockInfo> filterTransactions(
 }
 
 PaymentService::TransactionRpcInfo convertTransactionWithTransfersToTransactionRpcInfo(
-    const CryptoNote::WalletTransactionWithTransfers &transactionWithTransfers)
+    const QwertyNote::WalletTransactionWithTransfers &transactionWithTransfers)
 {
     PaymentService::TransactionRpcInfo transactionInfo;
 
@@ -232,7 +234,7 @@ PaymentService::TransactionRpcInfo convertTransactionWithTransfersToTransactionR
     transactionInfo.paymentId = getPaymentIdStringFromExtra(
         transactionWithTransfers.transaction.extra);
 
-    for (const CryptoNote::WalletTransfer &transfer : transactionWithTransfers.transfers) {
+    for (const QwertyNote::WalletTransfer &transfer : transactionWithTransfers.transfers) {
         PaymentService::TransferRpcInfo rpcTransfer;
         rpcTransfer.address = transfer.address;
         rpcTransfer.amount = transfer.amount;
@@ -245,7 +247,7 @@ PaymentService::TransactionRpcInfo convertTransactionWithTransfersToTransactionR
 
 std::vector<PaymentService::TransactionsInBlockRpcInfo>
 convertTransactionsInBlockInfoToTransactionsInBlockRpcInfo(
-    const std::vector<CryptoNote::TransactionsInBlockInfo> &blocks)
+    const std::vector<QwertyNote::TransactionsInBlockInfo> &blocks)
 {
     std::vector<PaymentService::TransactionsInBlockRpcInfo> rpcBlocks;
     rpcBlocks.reserve(blocks.size());
@@ -253,7 +255,7 @@ convertTransactionsInBlockInfoToTransactionsInBlockRpcInfo(
         PaymentService::TransactionsInBlockRpcInfo rpcBlock;
         rpcBlock.blockHash = Common::podToHex(block.blockHash);
 
-        for (const CryptoNote::WalletTransactionWithTransfers &t : block.transactions) {
+        for (const QwertyNote::WalletTransactionWithTransfers &t : block.transactions) {
             auto transactionInfo = convertTransactionWithTransfersToTransactionRpcInfo(t);
             rpcBlock.transactions.push_back(std::move(transactionInfo));
         }
@@ -266,15 +268,15 @@ convertTransactionsInBlockInfoToTransactionsInBlockRpcInfo(
 
 std::vector<PaymentService::TransactionHashesInBlockRpcInfo>
 convertTransactionsInBlockInfoToTransactionHashesInBlockRpcInfo(
-    const std::vector<CryptoNote::TransactionsInBlockInfo> &blocks)
+    const std::vector<QwertyNote::TransactionsInBlockInfo> &blocks)
 {
     std::vector<PaymentService::TransactionHashesInBlockRpcInfo> transactionHashes;
     transactionHashes.reserve(blocks.size());
-    for (const CryptoNote::TransactionsInBlockInfo &block : blocks) {
+    for (const QwertyNote::TransactionsInBlockInfo &block : blocks) {
         PaymentService::TransactionHashesInBlockRpcInfo item;
         item.blockHash = Common::podToHex(block.blockHash);
 
-        for (const CryptoNote::WalletTransactionWithTransfers &transaction : block.transactions) {
+        for (const QwertyNote::WalletTransactionWithTransfers &transaction : block.transactions) {
             item.transactionHashes.emplace_back(Common::podToHex(transaction.transaction.hash));
         }
 
@@ -285,31 +287,31 @@ convertTransactionsInBlockInfoToTransactionHashesInBlockRpcInfo(
 }
 
 void validateMixin(const uint16_t &mixin,
-                   const CryptoNote::Currency &currency,
+                   const QwertyNote::Currency &currency,
                    Logging::LoggerRef logger)
 {
     if (mixin < currency.minMixin() && mixin != 0) {
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Mixin must be equal to or bigger than"
             << currency.minMixin();
-        throw std::system_error(make_error_code(CryptoNote::error::MIXIN_COUNT_TOO_SMALL));
+        throw std::system_error(make_error_code(QwertyNote::error::MIXIN_COUNT_TOO_SMALL));
     }
     if (mixin > currency.maxMixin()) {
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Mixin must be equal to or smaller than"
             << currency.maxMixin();
-        throw std::system_error(make_error_code(CryptoNote::error::MIXIN_COUNT_TOO_LARGE));
+        throw std::system_error(make_error_code(QwertyNote::error::MIXIN_COUNT_TOO_LARGE));
     }
 }
 
 void validateAddresses(const std::vector<std::string> &addresses,
-                       const CryptoNote::Currency &currency,
+                       const QwertyNote::Currency &currency,
                        Logging::LoggerRef logger)
 {
     for (const auto &address : addresses) {
-        if (!CryptoNote::validateAddress(address, currency)) {
+        if (!QwertyNote::validateAddress(address, currency)) {
             logger(Logging::WARNING,Logging::BRIGHT_YELLOW) << "Can't validate address " << address;
-            throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
+            throw std::system_error(make_error_code(QwertyNote::error::BAD_ADDRESS));
         }
     }
 }
@@ -318,7 +320,7 @@ std::string getValidatedTransactionExtraString(const std::string &extraString)
 {
     std::vector<uint8_t> binary;
     if (!Common::fromHex(extraString, binary)) {
-        throw std::system_error(make_error_code(CryptoNote::error::BAD_TRANSACTION_EXTRA));
+        throw std::system_error(make_error_code(QwertyNote::error::BAD_TRANSACTION_EXTRA));
     }
 
     return Common::asString(binary);
@@ -337,14 +339,14 @@ std::vector<std::string> collectDestinationAddresses(
     return result;
 }
 
-std::vector<CryptoNote::WalletOrder> convertWalletRpcOrdersToWalletOrders(
+std::vector<QwertyNote::WalletOrder> convertWalletRpcOrdersToWalletOrders(
     const std::vector<PaymentService::WalletRpcOrder> &orders)
 {
-    std::vector<CryptoNote::WalletOrder> result;
+    std::vector<QwertyNote::WalletOrder> result;
     result.reserve(orders.size());
 
     for (const auto &order : orders) {
-        result.emplace_back(CryptoNote::WalletOrder {order.address, order.amount});
+        result.emplace_back(QwertyNote::WalletOrder {order.address, order.amount});
     }
 
     return result;
@@ -352,18 +354,18 @@ std::vector<CryptoNote::WalletOrder> convertWalletRpcOrdersToWalletOrders(
 
 } // namespace
 
-void generateNewWallet(const CryptoNote::Currency &currency,
+void generateNewWallet(const QwertyNote::Currency &currency,
                        const WalletConfiguration &conf,
                        Logging::ILogger &logger,
                        System::Dispatcher &dispatcher)
 {
     Logging::LoggerRef log(logger, "generateNewWallet");
 
-    CryptoNote::INode *nodeStub = NodeFactory::createNodeStub();
-    std::unique_ptr<CryptoNote::INode> nodeGuard(nodeStub);
+    QwertyNote::INode *nodeStub = NodeFactory::createNodeStub();
+    std::unique_ptr<QwertyNote::INode> nodeGuard(nodeStub);
 
-    CryptoNote::IWallet *wallet = new CryptoNote::WalletGreen(dispatcher,currency,*nodeStub,logger);
-    std::unique_ptr<CryptoNote::IWallet> walletGuard(wallet);
+    QwertyNote::IWallet *wallet = new QwertyNote::WalletGreen(dispatcher,currency,*nodeStub,logger);
+    std::unique_ptr<QwertyNote::IWallet> walletGuard(wallet);
 
     std::string address;
 
@@ -372,10 +374,10 @@ void generateNewWallet(const CryptoNote::Currency &currency,
             log(Logging::INFO, Logging::BRIGHT_WHITE) << "Generating new deterministic wallet";
 
             Crypto::FSecretKey private_view_key;
-            CryptoNote::KeyPair spendKey;
+            QwertyNote::KeyPair spendKey;
 
             Crypto::generateKeys(spendKey.publicKey, spendKey.secretKey);
-            CryptoNote::AccountBase::generateViewFromSpend(spendKey.secretKey, private_view_key);
+            QwertyNote::AccountBase::generateViewFromSpend(spendKey.secretKey, private_view_key);
 
             wallet->initializeWithViewKey(conf.walletFile, conf.walletPassword, private_view_key);
             address = wallet->createAddress(spendKey.secretKey);
@@ -406,7 +408,7 @@ void generateNewWallet(const CryptoNote::Currency &currency,
             return;
         }
 
-        CryptoNote::AccountBase::generateViewFromSpend(private_spend_key, private_view_key);
+        QwertyNote::AccountBase::generateViewFromSpend(private_spend_key, private_view_key);
         wallet->initializeWithViewKey(conf.walletFile, conf.walletPassword, private_view_key);
         address = wallet->createAddress(private_spend_key);
         log(Logging::INFO, Logging::BRIGHT_WHITE) << "Imported wallet successfully.";
@@ -445,15 +447,14 @@ void generateNewWallet(const CryptoNote::Currency &currency,
         }
     }
 
-    wallet->save(CryptoNote::WalletSaveLevel::SAVE_KEYS_ONLY);
+    wallet->save(QwertyNote::WalletSaveLevel::SAVE_KEYS_ONLY);
     log(Logging::INFO, Logging::BRIGHT_WHITE) << "Wallet is saved";
 }
 
-WalletService::WalletService(const CryptoNote::Currency &currency,
+WalletService::WalletService(const QwertyNote::Currency &currency,
                              System::Dispatcher &sys,
-                             CryptoNote::INode &node,
-                             CryptoNote::IWallet &wallet,
-                             CryptoNote::IFusionManager &fusionManager,
+                             QwertyNote::INode &node, QwertyNote::IWallet &wallet,
+                             QwertyNote::IFusionManager &fusionManager,
                              const WalletConfiguration &conf,
                              Logging::ILogger &logger)
     : currency(currency),
@@ -521,7 +522,7 @@ std::error_code WalletService::saveWalletNoThrow()
         if (!inited) {
             logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
                 << "Save impossible: Wallet Service is not initialized";
-            return make_error_code(CryptoNote::error::NOT_INITIALIZED);
+            return make_error_code(QwertyNote::error::NOT_INITIALIZED);
         }
 
         saveWallet();
@@ -534,7 +535,7 @@ std::error_code WalletService::saveWalletNoThrow()
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while saving wallet: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -550,7 +551,7 @@ std::error_code WalletService::resetWallet()
         if (!inited) {
             logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
                 << "Reset impossible: Wallet Service is not initialized";
-            return make_error_code(CryptoNote::error::NOT_INITIALIZED);
+            return make_error_code(QwertyNote::error::NOT_INITIALIZED);
         }
 
         reset();
@@ -564,7 +565,7 @@ std::error_code WalletService::resetWallet()
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while resetting wallet: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -578,7 +579,7 @@ std::error_code WalletService::exportWallet(const std::string &fileName)
         if (!inited) {
             logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
                 << "Export impossible: Wallet Service is not initialized";
-            return make_error_code(CryptoNote::error::NOT_INITIALIZED);
+            return make_error_code(QwertyNote::error::NOT_INITIALIZED);
         }
 
         boost::filesystem::path walletPath(config.walletFile);
@@ -595,7 +596,7 @@ std::error_code WalletService::exportWallet(const std::string &fileName)
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while exporting wallet: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -611,7 +612,7 @@ std::error_code WalletService::replaceWithNewWallet(const std::string &viewSecre
             logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
                 << "Cannot restore view secret key: "
                 << viewSecretKeyText;
-            return make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
+            return make_error_code(QwertyNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
         }
 
         Crypto::FPublicKey viewPublicKey;
@@ -619,7 +620,7 @@ std::error_code WalletService::replaceWithNewWallet(const std::string &viewSecre
             logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
                 << "Cannot derive view public key, wrong secret key: "
                 << viewSecretKeyText;
-            return make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
+            return make_error_code(QwertyNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
         }
 
         replaceWithNewWallet(viewSecretKey);
@@ -633,7 +634,7 @@ std::error_code WalletService::replaceWithNewWallet(const std::string &viewSecre
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while replacing container: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -653,7 +654,7 @@ std::error_code WalletService::createAddress(const std::string &spendSecretKeyTe
             logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
                 << "Wrong key format: "
                 << spendSecretKeyText;
-            return make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
+            return make_error_code(QwertyNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
         }
 
         address = wallet.createAddress(secretKey, reset);
@@ -687,13 +688,13 @@ std::error_code WalletService::createAddressList(
             auto insertResult = unique.insert(keyText);
             if (!insertResult.second) {
                 logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Not unique key";
-                return make_error_code(CryptoNote::error::WalletServiceErrorCode::DUPLICATE_KEY);
+                return make_error_code(QwertyNote::error::WalletServiceErrorCode::DUPLICATE_KEY);
             }
 
             Crypto::FSecretKey key;
             if (!Common::podFromHex(keyText, key)) {
                 logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Wrong key format: " << keyText;
-                return make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
+                return make_error_code(QwertyNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
             }
 
             secretKeys.push_back(std::move(key));
@@ -745,7 +746,7 @@ std::error_code WalletService::createTrackingAddress(const std::string &spendPub
             logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
                 << "Wrong key format: "
                 << spendPublicKeyText;
-            return make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
+            return make_error_code(QwertyNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
         }
 
         address = wallet.createAddress(publicKey);
@@ -788,7 +789,7 @@ std::error_code WalletService::getSpendkeys(const std::string &address,
     try {
         System::EventLock lk(readyEvent);
 
-        CryptoNote::KeyPair key = wallet.getAddressSpendKey(address);
+        QwertyNote::KeyPair key = wallet.getAddressSpendKey(address);
 
         publicSpendKeyText = Common::podToHex(key.publicKey);
         secretSpendKeyText = Common::podToHex(key.secretKey);
@@ -877,7 +878,7 @@ std::error_code WalletService::getViewKey(std::string &viewSecretKey)
 {
     try {
         System::EventLock lk(readyEvent);
-        CryptoNote::KeyPair viewKey = wallet.getViewKey();
+        QwertyNote::KeyPair viewKey = wallet.getViewKey();
         viewSecretKey = Common::podToHex(viewKey.secretKey);
     } catch (std::system_error& x) {
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
@@ -894,12 +895,12 @@ std::error_code WalletService::getMnemonicSeed(const std::string &address,
 {
     try {
         System::EventLock lk(readyEvent);
-        CryptoNote::KeyPair key = wallet.getAddressSpendKey(address);
-        CryptoNote::KeyPair viewKey = wallet.getViewKey();
+        QwertyNote::KeyPair key = wallet.getAddressSpendKey(address);
+        QwertyNote::KeyPair viewKey = wallet.getViewKey();
 
         Crypto::FSecretKey deterministic_private_view_key;
 
-        CryptoNote::AccountBase::generateViewFromSpend(key.secretKey, deterministic_private_view_key);
+        QwertyNote::AccountBase::generateViewFromSpend(key.secretKey, deterministic_private_view_key);
 
         bool deterministic_private_keys = deterministic_private_view_key == viewKey.secretKey;
 
@@ -913,7 +914,7 @@ std::error_code WalletService::getMnemonicSeed(const std::string &address,
                 << "Your private keys are not deterministic "
                 << "and so a mnemonic seed cannot be generated!";
             return make_error_code(
-                CryptoNote::error::WalletServiceErrorCode::KEYS_NOT_DETERMINISTIC
+                    QwertyNote::error::WalletServiceErrorCode::KEYS_NOT_DETERMINISTIC
             );
         }
     } catch (std::system_error &x) {
@@ -954,7 +955,7 @@ std::error_code WalletService::getTransactionHashes(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting transactions: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -986,7 +987,7 @@ std::error_code WalletService::getTransactionHashes(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting transactions: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1030,7 +1031,7 @@ std::error_code WalletService::getTransactions(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting transactions: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1072,7 +1073,7 @@ std::error_code WalletService::getTransactions(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting transactions: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1092,7 +1093,7 @@ std::error_code WalletService::getTransaction(const std::string &transactionHash
                 << "Transaction "
                 << transactionHash
                 << " is deleted";
-            return make_error_code(CryptoNote::error::OBJECT_NOT_FOUND);
+            return make_error_code(QwertyNote::error::OBJECT_NOT_FOUND);
         }
 
         TransactionRpcInfo tempTrans = convertTransactionWithTransfersToTransactionRpcInfo(transactionWithTransfers);
@@ -1107,7 +1108,7 @@ std::error_code WalletService::getTransaction(const std::string &transactionHash
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting transaction: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1126,7 +1127,7 @@ std::error_code WalletService::getAddresses(std::vector<std::string> &addresses)
         }
     } catch (std::exception &e) {
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Can't get addresses: " << e.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1146,7 +1147,7 @@ std::error_code WalletService::sendTransaction(const SendTransaction::Request &r
         }
         validateMixin(request.anonymity, currency, logger);
 
-        CryptoNote::TransactionParameters sendParams;
+        QwertyNote::TransactionParameters sendParams;
         if (!request.paymentId.empty()) {
             addPaymentIdToExtra(request.paymentId, sendParams.extra);
         } else {
@@ -1175,7 +1176,7 @@ std::error_code WalletService::sendTransaction(const SendTransaction::Request &r
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while sending transaction: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1194,7 +1195,7 @@ std::error_code WalletService::createDelayedTransaction(
             validateAddresses({ request.changeAddress }, currency, logger);
         }
 
-        CryptoNote::TransactionParameters sendParams;
+        QwertyNote::TransactionParameters sendParams;
         if (!request.paymentId.empty()) {
             addPaymentIdToExtra(request.paymentId, sendParams.extra);
         } else {
@@ -1224,7 +1225,7 @@ std::error_code WalletService::createDelayedTransaction(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while creating delayed transaction: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1251,7 +1252,7 @@ std::error_code WalletService::getDelayedTransactionHashes(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting delayed transaction hashes: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1266,7 +1267,7 @@ std::error_code WalletService::deleteDelayedTransaction(const std::string &trans
 
         auto idIt = transactionIdIndex.find(transactionHash);
         if (idIt == transactionIdIndex.end()) {
-            return make_error_code(CryptoNote::error::WalletServiceErrorCode::OBJECT_NOT_FOUND);
+            return make_error_code(QwertyNote::error::WalletServiceErrorCode::OBJECT_NOT_FOUND);
         }
 
         size_t transactionId = idIt->second;
@@ -1285,7 +1286,7 @@ std::error_code WalletService::deleteDelayedTransaction(const std::string &trans
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while deleting delayed transaction hashes: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1300,7 +1301,7 @@ std::error_code WalletService::sendDelayedTransaction(const std::string &transac
 
         auto idIt = transactionIdIndex.find(transactionHash);
         if (idIt == transactionIdIndex.end()) {
-        return make_error_code(CryptoNote::error::WalletServiceErrorCode::OBJECT_NOT_FOUND);
+        return make_error_code(QwertyNote::error::WalletServiceErrorCode::OBJECT_NOT_FOUND);
         }
 
         size_t transactionId = idIt->second;
@@ -1316,7 +1317,7 @@ std::error_code WalletService::sendDelayedTransaction(const std::string &transac
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while sending delayed transaction hashes: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1349,7 +1350,7 @@ std::error_code WalletService::getUnconfirmedTransactionHashes(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting unconfirmed transaction hashes: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1383,7 +1384,7 @@ std::error_code WalletService::getStatus(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting status: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1399,7 +1400,7 @@ std::error_code WalletService::validateAddress(
     try {
         System::EventLock lk(readyEvent);
 
-        CryptoNote::AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
+        QwertyNote::AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
         if (currency.parseAccountAddressString(address, acc)) {
             isvalid = true;
             _address = currency.accountAddressAsString(acc);
@@ -1417,7 +1418,7 @@ std::error_code WalletService::validateAddress(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while validating address: "
             << x.what();
-        return make_error_code(CryptoNote::error::BAD_ADDRESS);
+        return make_error_code(QwertyNote::error::BAD_ADDRESS);
     }
 
     return std::error_code{};
@@ -1451,7 +1452,7 @@ std::error_code WalletService::sendFusionTransaction(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while sending fusion transaction: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1480,7 +1481,7 @@ std::error_code WalletService::estimateFusion(
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Failed to estimate number of fusion outputs: "
             << x.what();
-        return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
+        return make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR);
     }
 
     return std::error_code{};
@@ -1491,7 +1492,7 @@ void WalletService::refresh() {
         logger(Logging::DEBUGGING) << "Refresh is started";
         for (;;) {
             auto event = wallet.getEvent();
-            if (event.type == CryptoNote::TRANSACTION_CREATED) {
+            if (event.type == QwertyNote::TRANSACTION_CREATED) {
                 size_t transactionId = event.transactionCreated.transactionIndex;
                 transactionIdIndex.emplace(Common::podToHex(
                     wallet.getTransaction(transactionId).hash),
@@ -1512,7 +1513,7 @@ void WalletService::refresh() {
 
 void WalletService::reset()
 {
-    wallet.save(CryptoNote::WalletSaveLevel::SAVE_KEYS_ONLY);
+    wallet.save(QwertyNote::WalletSaveLevel::SAVE_KEYS_ONLY);
     wallet.stop();
     wallet.shutdown();
     inited = false;
@@ -1554,28 +1555,28 @@ void WalletService::replaceWithNewWallet(const Crypto::FSecretKey &viewSecretKey
     inited = true;
 }
 
-std::vector<CryptoNote::TransactionsInBlockInfo> WalletService::getTransactions(
+std::vector<QwertyNote::TransactionsInBlockInfo> WalletService::getTransactions(
     const Crypto::FHash &blockHash,
     size_t blockCount) const
 {
     auto result = wallet.getTransactions(blockHash, blockCount);
     if (result.empty()) {
         throw std::system_error(
-            make_error_code(CryptoNote::error::WalletServiceErrorCode::OBJECT_NOT_FOUND)
+            make_error_code(QwertyNote::error::WalletServiceErrorCode::OBJECT_NOT_FOUND)
         );
     }
 
     return result;
 }
 
-std::vector<CryptoNote::TransactionsInBlockInfo> WalletService::getTransactions(
+std::vector<QwertyNote::TransactionsInBlockInfo> WalletService::getTransactions(
     uint32_t firstBlockIndex,
     size_t blockCount) const
 {
     auto result = wallet.getTransactions(firstBlockIndex, blockCount);
     if (result.empty()) {
         throw std::system_error(
-            make_error_code(CryptoNote::error::WalletServiceErrorCode::OBJECT_NOT_FOUND)
+            make_error_code(QwertyNote::error::WalletServiceErrorCode::OBJECT_NOT_FOUND)
         );
     }
 

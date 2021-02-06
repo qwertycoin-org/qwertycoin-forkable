@@ -32,7 +32,7 @@
 
 using namespace Common;
 using namespace Crypto;
-using namespace CryptoNote;
+using namespace QwertyNote;
 using namespace Qwertycoin;
 
 namespace {
@@ -77,7 +77,7 @@ struct WalletTransactionDto
 {
     WalletTransactionDto() = default;
 
-    WalletTransactionDto(const CryptoNote::WalletTransaction &wallet)
+    WalletTransactionDto(const QwertyNote::WalletTransaction &wallet)
     {
         state = wallet.state;
         timestamp = wallet.timestamp;
@@ -93,7 +93,7 @@ struct WalletTransactionDto
         }
     }
 
-    CryptoNote::WalletTransactionState state;
+    QwertyNote::WalletTransactionState state;
     uint64_t timestamp;
     uint32_t blockHeight;
     FHash hash;
@@ -113,7 +113,7 @@ struct WalletTransferDto
     {
     }
 
-    WalletTransferDto(const CryptoNote::WalletTransfer &tr, uint32_t version)
+    WalletTransferDto(const QwertyNote::WalletTransfer &tr, uint32_t version)
         : WalletTransferDto(version)
     {
         address = tr.address;
@@ -127,7 +127,7 @@ struct WalletTransferDto
     uint32_t version;
 };
 
-void serialize(WalletRecordDto &value, CryptoNote::ISerializer &serializer)
+void serialize(WalletRecordDto &value, QwertyNote::ISerializer &serializer)
 {
     serializer(value.spendPublicKey, "spend_public_key");
     serializer(value.spendSecretKey, "spend_secret_key");
@@ -136,7 +136,7 @@ void serialize(WalletRecordDto &value, CryptoNote::ISerializer &serializer)
     serializer(value.creationTimestamp, "creation_timestamp");
 }
 
-void serialize(ObsoleteSpentOutputDto &value, CryptoNote::ISerializer &serializer)
+void serialize(ObsoleteSpentOutputDto &value, QwertyNote::ISerializer &serializer)
 {
     serializer(value.amount, "amount");
     serializer(value.transactionHash, "transaction_hash");
@@ -145,29 +145,29 @@ void serialize(ObsoleteSpentOutputDto &value, CryptoNote::ISerializer &serialize
     serializer(value.spendingTransactionHash, "spending_transaction_hash");
 }
 
-void serialize(ObsoleteChangeDto &value, CryptoNote::ISerializer &serializer)
+void serialize(ObsoleteChangeDto &value, QwertyNote::ISerializer &serializer)
 {
     serializer(value.txHash, "transaction_hash");
     serializer(value.amount, "amount");
 }
 
-void serialize(UnlockTransactionJobDto &value, CryptoNote::ISerializer &serializer)
+void serialize(UnlockTransactionJobDto &value, QwertyNote::ISerializer &serializer)
 {
     serializer(value.blockHeight, "block_height");
     serializer(value.transactionHash, "transaction_hash");
     serializer(value.walletIndex, "wallet_index");
 }
 
-void serialize(WalletTransactionDto &value, CryptoNote::ISerializer &serializer)
+void serialize(WalletTransactionDto &value, QwertyNote::ISerializer &serializer)
 {
-    typedef std::underlying_type<CryptoNote::WalletTransactionState>::type StateType;
+    typedef std::underlying_type<QwertyNote::WalletTransactionState>::type StateType;
 
     StateType state = static_cast<StateType>(value.state);
     serializer(state, "state");
-    value.state = static_cast<CryptoNote::WalletTransactionState>(state);
+    value.state = static_cast<QwertyNote::WalletTransactionState>(state);
 
     serializer(value.timestamp, "timestamp");
-    CryptoNote::serializeBlockHeight(serializer, value.blockHeight, "block_height");
+    QwertyNote::serializeBlockHeight(serializer, value.blockHeight, "block_height");
     serializer(value.hash, "hash");
     serializer(value.totalAmount, "total_amount");
     serializer(value.fee, "fee");
@@ -180,7 +180,7 @@ void serialize(WalletTransactionDto &value, CryptoNote::ISerializer &serializer)
     value.secretKey = secretKey;
 }
 
-void serialize(WalletTransferDto &value, CryptoNote::ISerializer &serializer)
+void serialize(WalletTransferDto &value, QwertyNote::ISerializer &serializer)
 {
     serializer(value.address, "address");
     serializer(value.amount, "amount");
@@ -193,14 +193,14 @@ void serialize(WalletTransferDto &value, CryptoNote::ISerializer &serializer)
 std::string readCipher(Common::IInputStream &source, const std::string &name)
 {
     std::string cipher;
-    CryptoNote::BinaryInputStreamSerializer s(source);
+    QwertyNote::BinaryInputStreamSerializer s(source);
     s(cipher, name);
 
     return cipher;
 }
 
 std::string decrypt(const std::string &cipher,
-                    CryptoNote::WalletSerializerV1::CryptoContext &cryptoContext)
+                    QwertyNote::WalletSerializerV1::CryptoContext &cryptoContext)
 {
     std::string plain;
     plain.resize(cipher.size());
@@ -214,14 +214,14 @@ template<typename Object>
 void deserialize(Object &obj, const std::string &name, const std::string &plain)
 {
     MemoryInputStream stream(plain.data(), plain.size());
-    CryptoNote::BinaryInputStreamSerializer s(stream);
+    QwertyNote::BinaryInputStreamSerializer s(stream);
     s(obj, Common::StringView(name));
 }
 
 template<typename Object>
 void deserializeEncrypted(Object &obj,
                           const std::string &name,
-                          CryptoNote::WalletSerializerV1::CryptoContext &cryptoContext,
+                          QwertyNote::WalletSerializerV1::CryptoContext &cryptoContext,
                           Common::IInputStream &source)
 {
     std::string cipher = readCipher(source, name);
@@ -230,9 +230,9 @@ void deserializeEncrypted(Object &obj,
     deserialize(obj, name, plain);
 }
 
-CryptoNote::WalletTransaction convert(const CryptoNote::WalletLegacyTransaction &tx)
+QwertyNote::WalletTransaction convert(const QwertyNote::WalletLegacyTransaction &tx)
 {
-    CryptoNote::WalletTransaction mtx;
+    QwertyNote::WalletTransaction mtx;
 
     mtx.state = CryptoNote::WalletTransactionState::SUCCEEDED;
     mtx.timestamp = tx.timestamp;
@@ -251,9 +251,9 @@ CryptoNote::WalletTransaction convert(const CryptoNote::WalletLegacyTransaction 
     return mtx;
 }
 
-CryptoNote::WalletTransfer convert(const CryptoNote::WalletLegacyTransfer &tr)
+QwertyNote::WalletTransfer convert(const QwertyNote::WalletLegacyTransfer &tr)
 {
-    CryptoNote::WalletTransfer mtr;
+    QwertyNote::WalletTransfer mtr;
 
     mtr.address = tr.address;
     mtr.amount = tr.amount;
@@ -263,7 +263,7 @@ CryptoNote::WalletTransfer convert(const CryptoNote::WalletLegacyTransfer &tr)
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 const uint32_t WalletSerializerV1::SERIALIZATION_VERSION = 5;
 
@@ -302,12 +302,12 @@ WalletSerializerV1::WalletSerializerV1(ITransfersObserver &transfersObserver,
 
 void WalletSerializerV1::load(const Crypto::Chacha8Key &key, Common::IInputStream &source)
 {
-    CryptoNote::BinaryInputStreamSerializer s(source);
+    QwertyNote::BinaryInputStreamSerializer s(source);
     s.beginObject("wallet");
 
     uint32_t version = loadVersion(source);
 
-    CryptoNote::WALLET_LEGACY_SERIALIZATION_VERSION = version;
+    QwertyNote::WALLET_LEGACY_SERIALIZATION_VERSION = version;
 
     if (version > SERIALIZATION_VERSION) {
         throw std::system_error(make_error_code(error::WRONG_VERSION));
@@ -379,7 +379,7 @@ void WalletSerializerV1::loadWalletV1(Common::IInputStream &source, const Crypto
 {
     CryptoContext cryptoContext;
 
-    CryptoNote::BinaryInputStreamSerializer encrypted(source);
+    QwertyNote::BinaryInputStreamSerializer encrypted(source);
 
     encrypted(cryptoContext.iv, "iv");
     cryptoContext.key = key;
@@ -390,7 +390,7 @@ void WalletSerializerV1::loadWalletV1(Common::IInputStream &source, const Crypto
     std::string plain = decrypt(cipher, cryptoContext);
 
     MemoryInputStream decryptedStream(plain.data(), plain.size());
-    CryptoNote::BinaryInputStreamSerializer serializer(decryptedStream);
+    QwertyNote::BinaryInputStreamSerializer serializer(decryptedStream);
 
     loadWalletV1Keys(serializer);
     checkKeys();
@@ -405,14 +405,14 @@ void WalletSerializerV1::loadWalletV1(Common::IInputStream &source, const Crypto
     }
 }
 
-void WalletSerializerV1::loadWalletV1Keys(CryptoNote::BinaryInputStreamSerializer &serializer)
+void WalletSerializerV1::loadWalletV1Keys(QwertyNote::BinaryInputStreamSerializer &serializer)
 {
-    CryptoNote::KeysStorage keys;
+    QwertyNote::KeysStorage keys;
 
     try {
         keys.serialize(serializer, "keys");
     } catch (const std::runtime_error &) {
-        throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
+        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
     }
 
     m_viewPublicKey = keys.viewPublicKey;
@@ -428,7 +428,7 @@ void WalletSerializerV1::loadWalletV1Keys(CryptoNote::BinaryInputStreamSerialize
     m_walletsContainer.get<RandomAccessIndex>().push_back(wallet);
 }
 
-void WalletSerializerV1::loadWalletV1Details(CryptoNote::BinaryInputStreamSerializer &serializer)
+void WalletSerializerV1::loadWalletV1Details(QwertyNote::BinaryInputStreamSerializer &serializer)
 {
     std::vector<WalletLegacyTransaction> txs;
     std::vector<WalletLegacyTransfer> trs;
@@ -441,7 +441,7 @@ void WalletSerializerV1::loadWalletV1Details(CryptoNote::BinaryInputStreamSerial
 
 uint32_t WalletSerializerV1::loadVersion(Common::IInputStream &source)
 {
-    CryptoNote::BinaryInputStreamSerializer s(source);
+    QwertyNote::BinaryInputStreamSerializer s(source);
 
     uint32_t version = std::numeric_limits<uint32_t>::max();
     s(version, "version");
@@ -451,7 +451,7 @@ uint32_t WalletSerializerV1::loadVersion(Common::IInputStream &source)
 
 void WalletSerializerV1::loadIv(Common::IInputStream &source, Crypto::Chacha8Iv &iv)
 {
-    CryptoNote::BinaryInputStreamSerializer s(source);
+    QwertyNote::BinaryInputStreamSerializer s(source);
     s.binary(static_cast<void *>(&iv.data), sizeof(iv.data), "chacha_iv");
 }
 
@@ -461,7 +461,7 @@ void WalletSerializerV1::loadKeys(Common::IInputStream &source, CryptoContext &c
         loadPublicKey(source, cryptoContext);
         loadSecretKey(source, cryptoContext);
     } catch (const std::runtime_error &) {
-        throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
+        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
     }
 }
 
@@ -540,7 +540,7 @@ void WalletSerializerV1::loadWallets(Common::IInputStream &source, CryptoContext
         wallet.creationTimestamp = static_cast<time_t>(dto.creationTimestamp);
 
         // NOTE: Dirty hack. Container field must be unique!
-        wallet.container = reinterpret_cast<CryptoNote::ITransfersContainer *>(i);
+        wallet.container = reinterpret_cast<QwertyNote::ITransfersContainer *>(i);
 
         index.push_back(wallet);
     }
@@ -794,4 +794,4 @@ void WalletSerializerV1::addWalletV1Details(const std::vector<WalletLegacyTransa
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

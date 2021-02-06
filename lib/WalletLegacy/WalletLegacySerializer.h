@@ -25,22 +25,21 @@
 #include <Crypto/Chacha8.h>
 #include <Crypto/Hash.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class AccountBase;
 class ISerializer;
 
-} // namespace CryptoNote
+} // namespace QwertyNote
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class WalletUserTransactionsCache;
 
 class WalletLegacySerializer
 {
 public:
-    WalletLegacySerializer(
-        CryptoNote::AccountBase &account,
+    WalletLegacySerializer(QwertyNote::AccountBase &account,
         WalletUserTransactionsCache &transactionsCache);
 
     void serialize(
@@ -56,8 +55,8 @@ public:
         std::vector<Crypto::FHash> & safeTxes);
 
 private:
-    void saveKeys(CryptoNote::ISerializer &serializer);
-    void loadKeys(CryptoNote::ISerializer &serializer);
+    void saveKeys(QwertyNote::ISerializer &serializer);
+    void loadKeys(QwertyNote::ISerializer &serializer);
 
     Crypto::Chacha8Iv encrypt(
         const std::string &plain,
@@ -69,11 +68,11 @@ private:
         Crypto::Chacha8Iv iv,
         const std::string &password);
 
-    CryptoNote::AccountBase &account;
+    QwertyNote::AccountBase &account;
     WalletUserTransactionsCache &transactionsCache;
     const uint32_t walletSerializationVersion;
 };
 
 extern uint32_t WALLET_LEGACY_SERIALIZATION_VERSION;
 
-} // namespace CryptoNote
+} // namespace QwertyNote

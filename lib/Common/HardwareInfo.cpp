@@ -55,7 +55,7 @@ static std::vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> cpuinfoBuffer()
     DWORD byte_count = 0;
     GetLogicalProcessorInformation(nullptr, &byte_count);
     buffer.resize(byte_count / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION));
-    GetLogicalProcessorInformation(buffer.data(), &byte_count);
+    GetLogicalProcessorInformation(buffer.uData(), &byte_count);
 
     return buffer;
 }

@@ -21,7 +21,7 @@
 #include <Common/JsonValue.h>
 #include <Serialization/ISerializer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class JsonInputValueSerializer : public ISerializer
 {
@@ -81,4 +81,4 @@ private:
     std::vector<size_t> m_idxs;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -20,7 +20,7 @@
 
 #include <sstream>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class IStreamSerializable {
 public:
@@ -28,4 +28,4 @@ public:
     virtual void load(std::istream &in) = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

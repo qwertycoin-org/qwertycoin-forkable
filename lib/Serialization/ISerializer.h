@@ -22,7 +22,7 @@
 #include <string>
 #include <Common/StringView.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class ISerializer
 {
@@ -97,4 +97,4 @@ bool ISerializer::operator()(size_t &value, Common::StringView name)
 
 #define KV_MEMBER(member) s(member, #member);
 
-} // namespace CryptoNote
+} // namespace QwertyNote

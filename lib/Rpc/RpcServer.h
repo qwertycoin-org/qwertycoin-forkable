@@ -37,7 +37,7 @@
 
 using namespace Qwertycoin;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class core;
 
@@ -267,7 +267,7 @@ private:
 
 private:
     static std::unordered_map<std::string, RpcHandler<HandlerFunction>> s_handlers;
-    CryptoNote::BlockchainExplorerDataBuilder blockchainExplorerDataBuilder;
+    QwertyNote::BlockchainExplorerDataBuilder blockchainExplorerDataBuilder;
     Logging::LoggerRef logger;
     core &m_core;
     NodeServer &m_p2p;
@@ -280,4 +280,4 @@ private:
     AccountPublicAddress m_fee_acc;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

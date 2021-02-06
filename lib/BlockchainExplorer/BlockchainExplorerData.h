@@ -24,10 +24,10 @@
 
 #include <boost/variant.hpp>
 
-#include <CryptoNote.h>
+#include <QwertyNote.h>
 #include <CryptoTypes.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 enum class TransactionRemoveReason : uint8_t
 {
@@ -160,4 +160,4 @@ struct BlockDetails
     std::vector<TransactionDetails> transactions;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

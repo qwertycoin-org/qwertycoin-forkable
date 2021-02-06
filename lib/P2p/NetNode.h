@@ -50,7 +50,7 @@ class TcpConnection;
 
 } // namespace System
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class ISerializer;
 class LevinProtocol;
@@ -152,7 +152,7 @@ public:
     static void init_options(boost::program_options::options_description &desc);
 
     NodeServer(System::Dispatcher &dispatcher,
-               CryptoNote::CryptoNoteProtocolHandler &payload_handler,
+               QwertyNote::CryptoNoteProtocolHandler &payload_handler,
                Logging::ILogger &log);
 
     bool run();
@@ -160,7 +160,7 @@ public:
     bool deinit();
     bool sendStopSignal();
     uint32_t get_this_peer_port(){ return m_listeningPort; }
-    CryptoNote::CryptoNoteProtocolHandler& get_payload_object();
+    QwertyNote::CryptoNoteProtocolHandler& get_payload_object();
 
     void serialize(ISerializer &s);
 
@@ -171,7 +171,7 @@ public:
     uint64_t get_connections_count() override;
     size_t get_outgoing_connections_count();
 
-    CryptoNote::PeerlistManager& getPeerlistManager() { return m_peerlist; }
+    QwertyNote::PeerlistManager& getPeerlistManager() { return m_peerlist; }
     bool ban_host(const uint32_t address_ip, time_t seconds = P2P_IP_BLOCKTIME) override;
     bool unban_host(const uint32_t address_ip) override;
     std::map<uint32_t, time_t> get_blocked_hosts() override { return m_blocked_hosts; };
@@ -214,7 +214,7 @@ private:
     bool store_config();
     bool check_trust(const proof_of_trust &tr);
 
-    bool handshake(CryptoNote::LevinProtocol &proto,
+    bool handshake(QwertyNote::LevinProtocol &proto,
                    P2pConnectionContext &context,
                    bool just_take_peerlist = false);
     bool timedSync();
@@ -232,7 +232,7 @@ private:
                              const CryptoNoteConnectionContext &context) override;
     void drop_connection(CryptoNoteConnectionContext &context, bool add_fail) override;
     void for_each_connection(
-        std::function<void(CryptoNote::CryptoNoteConnectionContext &, PeerIdType)> f) override;
+        std::function<void(QwertyNote::CryptoNoteConnectionContext &, PeerIdType)> f) override;
     void externalRelayNotifyToAll(int command,
                              const BinaryArray& data_buff,
                              const net_connection_id* excludeConnection) override;
@@ -342,4 +342,4 @@ private:
     mutable std::mutex mutex;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

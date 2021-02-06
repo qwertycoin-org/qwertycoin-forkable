@@ -22,7 +22,7 @@
 #include <WalletLegacy/KeysStorage.h>
 #include <WalletLegacy/WalletLegacySerialization.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 void KeysStorage::serialize(ISerializer &serializer, const std::string &name)
 {
@@ -39,4 +39,4 @@ void KeysStorage::serialize(ISerializer &serializer, const std::string &name)
     serializer.endObject();
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

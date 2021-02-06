@@ -29,6 +29,7 @@
 #include <ITransfersSynchronizer.h>
 
 namespace CryptoNote {
+namespace QwertyNote {
 
 struct CompleteBlock;
 
@@ -113,4 +114,4 @@ public:
     virtual void stop() = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -27,12 +27,10 @@ void throwIfNotGood(std::istream &stream)
 {
     if (!stream.good()) {
         if (stream.eof()) {
-            throw std::system_error(make_error_code(
-                CryptoNote::error::HttpParserErrorCodes::END_OF_STREAM
+            throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::END_OF_STREAM
             ));
         } else {
-            throw std::system_error(make_error_code(
-                CryptoNote::error::HttpParserErrorCodes::STREAM_NOT_GOOD
+            throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::STREAM_NOT_GOOD
             ));
         }
     }
@@ -40,21 +38,21 @@ void throwIfNotGood(std::istream &stream)
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 HttpResponse::HTTP_STATUS HttpParser::parseResponseStatusFromString(const std::string &status)
 {
   if (status == "200 OK" || status == "200 Ok") {
-      return CryptoNote::HttpResponse::STATUS_200;
+      return QwertyNote::HttpResponse::STATUS_200;
   } else if (status.substr(0, 4) == "401 ") {
-      return CryptoNote::HttpResponse::STATUS_401;
+      return QwertyNote::HttpResponse::STATUS_401;
   } else if (status == "404 Not Found") {
-      return CryptoNote::HttpResponse::STATUS_404;
+      return QwertyNote::HttpResponse::STATUS_404;
   } else if (status == "500 Internal Server Error") {
-      return CryptoNote::HttpResponse::STATUS_500;
+      return QwertyNote::HttpResponse::STATUS_500;
   } else {
       throw std::system_error(
-          make_error_code(CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL),
+          make_error_code(QwertyNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL),
           "Unknown HTTP status code is given"
       );
   }
@@ -142,8 +140,7 @@ void HttpParser::readWord(std::istream &stream, std::string &word)
     if (c == '\r') {
         stream.get(c);
         if (c != '\n') {
-            throw std::system_error(make_error_code(
-                CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
+            throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
             ));
         }
     }
@@ -176,8 +173,7 @@ bool HttpParser::readHeader(std::istream &stream, std::string &name, std::string
             }
 
             if (name.empty()) {
-                throw std::system_error(make_error_code(
-                    CryptoNote::error::HttpParserErrorCodes::EMPTY_HEADER
+                throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::EMPTY_HEADER
                 ));
             }
 
@@ -201,8 +197,7 @@ bool HttpParser::readHeader(std::istream &stream, std::string &name, std::string
 
     stream.get(c);
     if (c != '\n') {
-        throw std::system_error(make_error_code(
-            CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
+        throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
         ));
     }
 
@@ -212,8 +207,7 @@ bool HttpParser::readHeader(std::istream &stream, std::string &name, std::string
     if (c == '\r') {
         stream.get(c).get(c);
         if (c != '\n') {
-            throw std::system_error(make_error_code(
-                CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
+            throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
             ));
         }
 
@@ -246,4 +240,4 @@ size_t HttpParser::getBodyLen(const HttpRequest::Headers &headers)
     return 0;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

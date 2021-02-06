@@ -21,7 +21,7 @@
 #include <Common/PathTools.h>
 #include <WalletLegacy/WalletHelper.h>
 
-using namespace CryptoNote;
+using namespace QwertyNote;
 
 namespace {
 
@@ -33,12 +33,12 @@ void openOutputFileStream(const std::string &filename, std::ofstream &file)
     }
 }
 
-std::error_code walletSaveWrapper(CryptoNote::IWalletLegacy &wallet,
+std::error_code walletSaveWrapper(QwertyNote::IWalletLegacy &wallet,
                                   std::ofstream &file,
                                   bool saveDetailes,
                                   bool saveCache)
 {
-    CryptoNote::WalletHelper::SaveWalletResultObserver o;
+    QwertyNote::WalletHelper::SaveWalletResultObserver o;
 
     std::error_code e;
     try {
@@ -75,7 +75,7 @@ void WalletHelper::prepareFileNames(const std::string &file_path,
 }
 
 void WalletHelper::SendCompleteResultObserver::sendTransactionCompleted(
-    CryptoNote::TransactionId transactionId,
+        QwertyNote::TransactionId transactionId,
     std::error_code result)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -83,8 +83,7 @@ void WalletHelper::SendCompleteResultObserver::sendTransactionCompleted(
     m_condition.notify_one();
 }
 
-std::error_code WalletHelper::SendCompleteResultObserver::wait(
-    CryptoNote::TransactionId transactionId)
+std::error_code WalletHelper::SendCompleteResultObserver::wait(QwertyNote::TransactionId transactionId)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
 
@@ -102,8 +101,7 @@ std::error_code WalletHelper::SendCompleteResultObserver::wait(
 }
 
 WalletHelper::IWalletRemoveObserverGuard::IWalletRemoveObserverGuard(
-    CryptoNote::IWalletLegacy &wallet,
-    CryptoNote::IWalletLegacyObserver &observer)
+        QwertyNote::IWalletLegacy &wallet, QwertyNote::IWalletLegacyObserver &observer)
     : m_wallet(wallet),
       m_observer(observer),
       m_removed(false)
@@ -124,7 +122,7 @@ void WalletHelper::IWalletRemoveObserverGuard::removeObserver()
     m_removed = true;
 }
 
-bool WalletHelper::storeWallet(CryptoNote::IWalletLegacy &wallet, const std::string &walletFilename)
+bool WalletHelper::storeWallet(QwertyNote::IWalletLegacy &wallet, const std::string &walletFilename)
 {
     auto tempFile = boost::filesystem::unique_path(walletFilename + ".tmp.%%%%-%%%%");
 

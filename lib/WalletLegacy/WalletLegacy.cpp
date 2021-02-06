@@ -71,7 +71,7 @@ void throwNotDefined()
 class ContextCounterHolder
 {
 public:
-    ContextCounterHolder(CryptoNote::WalletAsyncContextCounter &shutdowner)
+    ContextCounterHolder(QwertyNote::WalletAsyncContextCounter &shutdowner)
         : m_shutdowner(shutdowner)
     {
     }
@@ -82,7 +82,7 @@ public:
     }
 
 private:
-    CryptoNote::WalletAsyncContextCounter &m_shutdowner;
+    QwertyNote::WalletAsyncContextCounter &m_shutdowner;
 };
 
 template <typename F>
@@ -92,7 +92,7 @@ void runAtomic(std::mutex &mutex, F f)
     f();
 }
 
-class InitWaiter : public CryptoNote::IWalletLegacyObserver
+class InitWaiter : public QwertyNote::IWalletLegacyObserver
 {
 public:
     InitWaiter() : future(promise.get_future()) {}
@@ -112,7 +112,7 @@ private:
 };
 
 
-class SaveWaiter : public CryptoNote::IWalletLegacyObserver
+class SaveWaiter : public QwertyNote::IWalletLegacyObserver
 {
 public:
     SaveWaiter() : future(promise.get_future()) {}
@@ -136,9 +136,9 @@ private:
 
 using namespace Logging;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
-class SyncStarter : public CryptoNote::IWalletLegacyObserver
+class SyncStarter : public QwertyNote::IWalletLegacyObserver
 {
 public:
     SyncStarter(BlockchainSynchronizer &sync) : m_sync(sync) {}
@@ -154,7 +154,7 @@ public:
     BlockchainSynchronizer &m_sync;
 };
 
-WalletLegacy::WalletLegacy(const CryptoNote::Currency &currency,
+WalletLegacy::WalletLegacy(const QwertyNote::Currency &currency,
                            INode &node,
                            Logging::ILogger &loggerGroup)
     : m_state(NOT_INITIALIZED),
@@ -371,7 +371,7 @@ void WalletLegacy::doLoad(std::istream &source)
         runAtomic(m_cacheMutex, [this]() { this->m_state = WalletLegacy::NOT_INITIALIZED; });
         m_observerManager.notify(
             &IWalletLegacyObserver::initCompleted,
-            make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR)
+            make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR)
         );
         return;
     }
@@ -476,7 +476,7 @@ void WalletLegacy::save(std::ostream &destination, bool saveDetailed, bool saveC
     if(m_isStopping) {
         m_observerManager.notify(
             &IWalletLegacyObserver::saveCompleted,
-            make_error_code(CryptoNote::error::OPERATION_CANCELLED)
+            make_error_code(QwertyNote::error::OPERATION_CANCELLED)
         );
         return;
     }
@@ -484,7 +484,7 @@ void WalletLegacy::save(std::ostream &destination, bool saveDetailed, bool saveC
     {
         std::unique_lock<std::mutex> lock(m_cacheMutex);
 
-        throwIf(m_state != INITIALIZED, CryptoNote::error::WRONG_STATE);
+        throwIf(m_state != INITIALIZED, QwertyNote::error::WRONG_STATE);
 
         m_state = SAVING;
     }
@@ -525,7 +525,7 @@ void WalletLegacy::doSave(std::ostream &destination, bool saveDetailed, bool sav
         runAtomic(m_cacheMutex, [this] () { this->m_state = WalletLegacy::INITIALIZED; });
         m_observerManager.notify(
             &IWalletLegacyObserver::saveCompleted,
-            make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR)
+            make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR)
         );
         return;
     }
@@ -542,7 +542,7 @@ std::error_code WalletLegacy::changePassword(
     throwIfNotInitialised();
 
     if (m_password.compare(oldPassword)) {
-        return make_error_code(CryptoNote::error::WRONG_PASSWORD);
+        return make_error_code(QwertyNote::error::WRONG_PASSWORD);
     }
 
     // we don't let the user to change the password while saving
@@ -581,7 +581,7 @@ std::string WalletLegacy::sign_message(const std::string &message)
 {
     Crypto::FHash hash;
     Crypto::cnFastHash(message.data(), message.size(), hash);
-    const CryptoNote::AccountKeys &keys = m_account.getAccountKeys();
+    const QwertyNote::AccountKeys &keys = m_account.getAccountKeys();
     Crypto::FSignature signature;
     Crypto::generateSignature(hash, keys.address.spendPublicKey, keys.spendSecretKey, signature);
 
@@ -593,7 +593,7 @@ std::string WalletLegacy::sign_message(const std::string &message)
 
 bool WalletLegacy::verify_message(
     const std::string &message,
-    const CryptoNote::AccountPublicAddress &address,
+    const QwertyNote::AccountPublicAddress &address,
     const std::string &signature)
 {
     const size_t header_len = strlen("SigV1");
@@ -726,7 +726,7 @@ std::list<TransactionOutputInformation> WalletLegacy::selectAllOldOutputs(uint32
     std::list<TransactionOutputInformation> result;
     for (const auto& toi: outputs) {
         TransactionId id = m_transactionsCache.findTransactionByHash(toi.transactionHash);
-        if (id == CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID)
+        if (id == QwertyNote::WALLET_LEGACY_INVALID_TRANSACTION_ID)
             continue;
         WalletLegacyTransaction& tx = m_transactionsCache.getTransaction(id);
         if(tx.blockHeight <= height)
@@ -1070,7 +1070,7 @@ void WalletLegacy::synchronizationCallback(WalletRequest::Callback callback, std
 
 std::error_code WalletLegacy::cancelTransaction(size_t transactionId)
 {
-    return make_error_code(CryptoNote::error::TX_CANCEL_IMPOSSIBLE);
+    return make_error_code(QwertyNote::error::TX_CANCEL_IMPOSSIBLE);
 }
 
 void WalletLegacy::synchronizationProgressUpdated(uint32_t current, uint32_t total)
@@ -1145,7 +1145,7 @@ void WalletLegacy::onTransactionDeleted(ITransfersSubscription *object, const FH
 void WalletLegacy::throwIfNotInitialised()
 {
     if (m_state == NOT_INITIALIZED || m_state == LOADING) {
-        throw std::system_error(make_error_code(CryptoNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
     }
     assert(m_transferDetails);
 }
@@ -1186,7 +1186,7 @@ void WalletLegacy::notifyIfBalanceChanged()
 void WalletLegacy::getAccountKeys(AccountKeys &keys)
 {
     if (m_state == NOT_INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
     }
 
     keys = m_account.getAccountKeys();
@@ -1258,10 +1258,9 @@ bool WalletLegacy::get_tx_key(Crypto::FHash &txid, Crypto::FSecretKey &txSecretK
 }
 
 bool WalletLegacy::getTxProof(
-    Crypto::Hash &txid,
+		Crypto::FHash &txid, QwertyNote::AccountPublicAddress &address,
 		Crypto::FSecretKey &tx_key,
-    Crypto::SecretKey &tx_key,
-    std::string &sig_str)
+		std::string &sig_str)
 {
     Crypto::FKeyImage p = *reinterpret_cast<Crypto::FKeyImage *>(&address.viewPublicKey);
     Crypto::FKeyImage k = *reinterpret_cast<Crypto::FKeyImage *>(&tx_key);
@@ -1297,7 +1296,7 @@ bool compareTransactionOutputInformationByAmount(
 
 std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::string &message)
 {
-    const CryptoNote::AccountKeys keys = m_account.getAccountKeys();
+    const QwertyNote::AccountKeys keys = m_account.getAccountKeys();
     Crypto::FSecretKey viewSecretKey = keys.viewSecretKey;
 
     if (keys.spendSecretKey == NULL_SECRET_KEY) {
@@ -1335,10 +1334,10 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
 
     // compute signature prefix hash
     std::string prefix_data = message;
-    prefix_data.append((const char *)&keys.address, sizeof(CryptoNote::AccountPublicAddress));
+    prefix_data.append((const char *)&keys.address, sizeof(QwertyNote::AccountPublicAddress));
 
     std::vector<Crypto::FKeyImage> kimages;
-    CryptoNote::KeyPair ephemeral;
+    QwertyNote::KeyPair ephemeral;
 
     for (size_t i = 0; i < selected_transfers.size(); ++i) {
         // have to repeat this to get key image as we don't store m_key_image
@@ -1347,7 +1346,7 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
 
         // derive ephemeral secret key
         Crypto::FKeyImage ki;
-        const bool r = CryptoNote::generate_key_image_helper(
+        const bool r = QwertyNote::generate_key_image_helper(
             m_account.getAccountKeys(),
             td.transactionPublicKey,
             td.outputInTransaction,
@@ -1396,9 +1395,9 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
 
         // derive ephemeral secret key
         Crypto::FKeyImage ki;
-        CryptoNote::KeyPair ephemeral;
+        QwertyNote::KeyPair ephemeral;
 
-        const bool r = CryptoNote::generate_key_image_helper(
+        const bool r = QwertyNote::generate_key_image_helper(
             m_account.getAccountKeys(),
             td.transactionPublicKey,
             td.outputInTransaction,
@@ -1438,4 +1437,4 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
     return ret;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

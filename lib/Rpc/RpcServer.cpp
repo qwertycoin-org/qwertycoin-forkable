@@ -51,7 +51,7 @@ using namespace Crypto;
 using namespace Common;
 using namespace Logging;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace {
 
@@ -749,12 +749,12 @@ bool RpcServer::masternodeCheckIncomingTx(const BinaryArray &tx_blob)
         return true;
     }
 
-    CryptoNote::TransactionPrefix transaction = *static_cast<const TransactionPrefix *>(&tx);
+    QwertyNote::TransactionPrefix transaction = *static_cast<const TransactionPrefix *>(&tx);
 
     std::vector<uint32_t> out;
     uint64_t amount;
 
-    if (!CryptoNote::findOutputsToAccount(transaction, m_fee_acc, m_view_key, out, amount)) {
+    if (!QwertyNote::findOutputsToAccount(transaction, m_fee_acc, m_view_key, out, amount)) {
         logger(INFO) << "Could not find outputs to masternode fee address";
         return false;
     }
@@ -928,7 +928,7 @@ bool RpcServer::onGetPoolChanges(const COMMAND_RPC_GET_POOL_CHANGES::request &re
                                  COMMAND_RPC_GET_POOL_CHANGES::response &rsp)
 {
     rsp.status = CORE_RPC_STATUS_OK;
-    std::vector<CryptoNote::Transaction> addedTransactions;
+    std::vector<QwertyNote::Transaction> addedTransactions;
     rsp.isTailBlockActual = m_core.getPoolChanges(req.tailBlockId, req.knownTxsIds,
                                                   addedTransactions, rsp.deletedTxsIds);
     for (auto &tx : addedTransactions) {
@@ -1311,7 +1311,7 @@ bool RpcServer::onGetSupply(const COMMAND_HTTP::request &req, COMMAND_HTTP::resp
 bool RpcServer::onGetPaymentId(const COMMAND_HTTP::request &req, COMMAND_HTTP::response &res)
 {
     Crypto::FHash result {};
-    Random::randomBytes(32, result.data);
+    Random::randomBytes(32, result.uData);
     res = Common::podToHex(result);
 
     return true;
@@ -1455,7 +1455,7 @@ bool RpcServer::onGetTransactions(const COMMAND_RPC_GET_TRANSACTIONS::request &r
             res.status = "Failed to parse hex representation of transaction hash";
             return true;
         }
-        if (b.size() != sizeof(Hash)) {
+        if (b.size() != sizeof(FHash)) {
             res.status = "Failed, size of data mismatch";
         }
         vh.push_back(*reinterpret_cast<const FHash *>(b.data()));
@@ -2054,7 +2054,7 @@ bool RpcServer::onBlockJson(const COMMAND_RPC_GET_BLOCK_DETAILS::request &req,
 
     uint64_t prevBlockGeneratedCoins = 0;
     uint32_t previousBlockHeight = 0;
-    uint64_t blockTarget = CryptoNote::parameters::DIFFICULTY_TARGET;
+    uint64_t blockTarget = QwertyNote::parameters::DIFFICULTY_TARGET;
 
     if (res.block.height > 0) {
         if (!m_core.getAlreadyGeneratedCoins(blk.previousBlockHash, prevBlockGeneratedCoins)) {
@@ -2062,7 +2062,7 @@ bool RpcServer::onBlockJson(const COMMAND_RPC_GET_BLOCK_DETAILS::request &req,
         }
     }
 
-    if (res.block.height > CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
+    if (res.block.height > QwertyNote::parameters::UPGRADE_HEIGHT_V1) {
         m_core.getBlockHeight(blk.previousBlockHash, previousBlockHeight);
         blockTarget = blk.timestamp - m_core.getBlockTimestamp(previousBlockHeight);
     }
@@ -2071,7 +2071,7 @@ bool RpcServer::onBlockJson(const COMMAND_RPC_GET_BLOCK_DETAILS::request &req,
     uint64_t currentReward = 0;
     int64_t emissionChange = 0;
     size_t blockGrantedFullRewardZone =
-            CryptoNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
+            QwertyNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
     res.block.effectiveSizeMedian = std::max(res.block.sizeMedian, blockGrantedFullRewardZone);
 
     if (!m_core.getBlockReward(res.block.major_version, res.block.sizeMedian, 0,
@@ -2196,7 +2196,7 @@ bool RpcServer::onTransactionJson(const COMMAND_RPC_GET_TRANSACTION_DETAILS::req
     res.txDetails.mixin = mixin;
 
     Crypto::FHash paymentId;
-    if (CryptoNote::getPaymentIdFromTxExtra(res.tx.extra, paymentId)) {
+    if (QwertyNote::getPaymentIdFromTxExtra(res.tx.extra, paymentId)) {
         res.txDetails.paymentId = Common::podToHex(paymentId);
     } else {
         res.txDetails.paymentId = "";
@@ -2204,18 +2204,18 @@ bool RpcServer::onTransactionJson(const COMMAND_RPC_GET_TRANSACTION_DETAILS::req
 
     res.txDetails.extra.raw = res.tx.extra;
 
-    std::vector<CryptoNote::TransactionExtraField> txExtraFields;
+    std::vector<QwertyNote::TransactionExtraField> txExtraFields;
     parseTransactionExtra(res.tx.extra, txExtraFields);
-    for (const CryptoNote::TransactionExtraField &field : txExtraFields) {
-        if (typeid(CryptoNote::TransactionExtraPadding) == field.type()) {
+    for (const QwertyNote::TransactionExtraField &field : txExtraFields) {
+        if (typeid(QwertyNote::TransactionExtraPadding) == field.type()) {
             res.txDetails.extra.padding.push_back(
-                    std::move(boost::get<CryptoNote::TransactionExtraPadding>(field).size));
-        } else if (typeid(CryptoNote::TransactionExtraPublicKey) == field.type()) {
+                    std::move(boost::get<QwertyNote::TransactionExtraPadding>(field).size));
+        } else if (typeid(QwertyNote::TransactionExtraPublicKey) == field.type()) {
             res.txDetails.extra.publicKey = getTransactionPublicKeyFromExtra(res.tx.extra);
-        } else if (typeid(CryptoNote::TransactionExtraNonce) == field.type()) {
+        } else if (typeid(QwertyNote::TransactionExtraNonce) == field.type()) {
             res.txDetails.extra.nonce.push_back(Common::toHex(
-                    boost::get<CryptoNote::TransactionExtraNonce>(field).nonce.data(),
-                    boost::get<CryptoNote::TransactionExtraNonce>(field).nonce.size()));
+                    boost::get<QwertyNote::TransactionExtraNonce>(field).nonce.data(),
+                    boost::get<QwertyNote::TransactionExtraNonce>(field).nonce.size()));
         }
     }
 
@@ -2251,7 +2251,7 @@ bool RpcServer::onMempoolJson(const COMMAND_RPC_GET_MEM_POOL::request &req,
                               COMMAND_RPC_GET_MEM_POOL::response &res)
 {
     auto pool = m_core.getMemoryPool();
-    for (const CryptoNote::tx_memory_pool::TransactionDetails txd : pool) {
+    for (const QwertyNote::tx_memory_pool::TransactionDetails txd : pool) {
         MEMPOOL_TRANSACTION_RESPONSE mempool_transaction;
         uint64_t amount_out = getOutputAmount(txd.tx);
 
@@ -2324,7 +2324,7 @@ bool RpcServer::onGetTransactionsPoolShort(
 {
     auto pool = m_core.getMemoryPool();
 
-    for (const CryptoNote::tx_memory_pool::TransactionDetails txD : pool) {
+    for (const QwertyNote::tx_memory_pool::TransactionDetails txD : pool) {
         TRANSACTION_POOL_RESPONSE memPoolTransaction;
 
         memPoolTransaction.hash = Common::podToHex(txD.id);
@@ -2599,7 +2599,7 @@ bool RpcServer::onGetBlockTemplate(const COMMAND_RPC_GET_BLOCK_TEMPLATE::request
     }
 
     Block b = boost::value_initialized<Block>();
-    CryptoNote::BinaryArray blob_reserve;
+    QwertyNote::BinaryArray blob_reserve;
     blob_reserve.resize(req.reserve_size, 0);
     if (!m_core.get_block_template(b, acc, res.difficulty, res.height, blob_reserve)) {
         logger(ERROR) << "Failed to create block template";
@@ -2608,7 +2608,7 @@ bool RpcServer::onGetBlockTemplate(const COMMAND_RPC_GET_BLOCK_TEMPLATE::request
     }
 
     BinaryArray block_blob = toBinaryArray(b);
-    PublicKey tx_pub_key = CryptoNote::getTransactionPublicKeyFromExtra(b.baseTransaction.extra);
+    FPublicKey tx_pub_key = QwertyNote::getTransactionPublicKeyFromExtra(b.baseTransaction.extra);
     if (tx_pub_key == NULL_PUBLIC_KEY) {
         logger(ERROR) << "Failed to find tx pub key in coinbase extra";
         throw JsonRpc::JsonRpcError {
@@ -2812,7 +2812,7 @@ bool RpcServer::onCheckTxKey(const COMMAND_RPC_CHECK_TX_KEY::request &req,
     }
 
     // parse address
-    CryptoNote::AccountPublicAddress address;
+    QwertyNote::AccountPublicAddress address;
     if (!m_core.currency().parseAccountAddressString(req.address, address)) {
         throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_WRONG_PARAM,
                                       "Failed to parse address " + req.address + '.' };
@@ -2841,7 +2841,7 @@ bool RpcServer::onCheckTxKey(const COMMAND_RPC_CHECK_TX_KEY::request &req,
         throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_WRONG_PARAM,
                                       "Couldn't find transaction with hash: " + req.txid + '.' };
     }
-    CryptoNote::TransactionPrefix transaction = *static_cast<const TransactionPrefix *>(&tx);
+    QwertyNote::TransactionPrefix transaction = *static_cast<const TransactionPrefix *>(&tx);
 
     // obtain key derivation
     Crypto::FKeyDerivation derivation;
@@ -2890,7 +2890,7 @@ bool RpcServer::onCheckTxWithViewKey(const COMMAND_RPC_CHECK_TX_WITH_PRIVATE_VIE
     }
 
     // parse address
-    CryptoNote::AccountPublicAddress address;
+    QwertyNote::AccountPublicAddress address;
     if (!m_core.currency().parseAccountAddressString(req.address, address)) {
         throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_WRONG_PARAM,
                                       "Failed to parse address " + req.address + '.' };
@@ -2920,7 +2920,7 @@ bool RpcServer::onCheckTxWithViewKey(const COMMAND_RPC_CHECK_TX_WITH_PRIVATE_VIE
         throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_WRONG_PARAM,
                                       "Couldn't find transaction with hash: " + req.txid + '.' };
     }
-    CryptoNote::TransactionPrefix transaction = *static_cast<const TransactionPrefix *>(&tx);
+    QwertyNote::TransactionPrefix transaction = *static_cast<const TransactionPrefix *>(&tx);
 
     // get tx pub key
     Crypto::FPublicKey txPubKey = getTransactionPublicKeyFromExtra(transaction.extra);
@@ -2978,7 +2978,7 @@ bool RpcServer::onCheckTxProof(const COMMAND_RPC_CHECK_TX_PROOF::request &req,
     }
 
     // parse address
-    CryptoNote::AccountPublicAddress address;
+    QwertyNote::AccountPublicAddress address;
     if (!m_core.currency().parseAccountAddressString(req.dest_address, address)) {
         throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_WRONG_PARAM,
                                       "Failed to parse address " + req.dest_address + '.' };
@@ -3028,7 +3028,7 @@ bool RpcServer::onCheckTxProof(const COMMAND_RPC_CHECK_TX_PROOF::request &req,
         throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_WRONG_PARAM,
                                       "transaction wasn't found. Hash = " + req.tx_id + '.' };
     }
-    CryptoNote::TransactionPrefix transaction = *static_cast<const TransactionPrefix *>(&tx);
+    QwertyNote::TransactionPrefix transaction = *static_cast<const TransactionPrefix *>(&tx);
 
     Crypto::FPublicKey R = getTransactionPublicKeyFromExtra(transaction.extra);
     if (R == NULL_PUBLIC_KEY) {
@@ -3089,7 +3089,7 @@ bool RpcServer::onCheckReserveProof(const COMMAND_RPC_CHECK_RESERVE_PROOF::reque
                                     COMMAND_RPC_CHECK_RESERVE_PROOF::response &res)
 {
     // parse address
-    CryptoNote::AccountPublicAddress address;
+    QwertyNote::AccountPublicAddress address;
     if (!m_core.currency().parseAccountAddressString(req.address, address)) {
         throw JsonRpc::JsonRpcError { CORE_RPC_ERROR_CODE_WRONG_PARAM,
                                       "Failed to parse address " + req.address + '.' };
@@ -3148,7 +3148,7 @@ bool RpcServer::onCheckReserveProof(const COMMAND_RPC_CHECK_RESERVE_PROOF::reque
     for (size_t i = 0; i < proofs.size(); ++i) {
         const RESERVE_PROOF_ENTRY &proof = proofs[i];
 
-        CryptoNote::TransactionPrefix tx =
+        QwertyNote::TransactionPrefix tx =
                 *static_cast<const TransactionPrefix *>(&transactions[i]);
 
         if (proof.index_in_tx >= tx.outputs.size()) {
@@ -3358,4 +3358,4 @@ bool RpcServer::onGetDifficultyStat(const COMMAND_RPC_GET_DIFFICULTY_STAT::reque
     return true;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -23,12 +23,12 @@
 #include <Transfers/IObservableImpl.h>
 #include <ITransfersSynchronizer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class TransfersSubscription : public IObservableImpl <ITransfersObserver, ITransfersSubscription>
 {
 public:
-    TransfersSubscription(const CryptoNote::Currency &currency,
+    TransfersSubscription(const QwertyNote::Currency &currency,
                           Logging::ILogger &logger,
                           const AccountSubscription &sub);
 
@@ -57,4 +57,4 @@ private:
     AccountSubscription subscription;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

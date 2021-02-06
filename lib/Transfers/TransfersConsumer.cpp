@@ -41,7 +41,7 @@ std::mutex seen_mutex;
 
 namespace {
 
-using namespace CryptoNote;
+using namespace QwertyNote;
 
 void checkOutputKey(
     const FKeyDerivation &derivation,
@@ -99,7 +99,7 @@ void findMyOutputs(
     }
 }
 
-std::vector<Crypto::Hash> getBlockHashes(const CryptoNote::CompleteBlock *blocks, size_t count)
+std::vector<Crypto::FHash> getBlockHashes(const QwertyNote::CompleteBlock *blocks, size_t count)
 {
     std::vector<Crypto::FHash> result;
     result.reserve(count);
@@ -113,10 +113,10 @@ std::vector<Crypto::Hash> getBlockHashes(const CryptoNote::CompleteBlock *blocks
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 TransfersConsumer::TransfersConsumer(
-    const CryptoNote::Currency &currency,
+    const QwertyNote::Currency &currency,
     INode &node,
     Logging::ILogger &logger,
     const FSecretKey &viewSecret)
@@ -482,8 +482,8 @@ std::error_code TransfersConsumer::createTransfers(
             KeyOutput out;
             tx.getOutput(idx, out, amount);
 
-            CryptoNote::KeyPair in_ephemeral;
-            CryptoNote::generate_key_image_helper(
+            QwertyNote::KeyPair in_ephemeral;
+            QwertyNote::generate_key_image_helper(
                 account,
                 txPubKey,
                 idx,
@@ -693,4 +693,4 @@ std::error_code TransfersConsumer::getGlobalIndices(
     return f.get();
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

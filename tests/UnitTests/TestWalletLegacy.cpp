@@ -25,10 +25,10 @@
 #include "EventWaiter.h"
 #include "INode.h"
 #include "WalletLegacy/WalletLegacy.h"
-#include "WalletLegacy/WalletHelper.h"
+#include <QwertyNote.h>
 #include "CryptoNoteCore/Account.h"
 #include "CryptoNoteCore/Currency.h"
-#include "CryptoNote.h"
+
 
 #include "INodeStubs.h"
 #include "TestBlockchainGenerator.h"

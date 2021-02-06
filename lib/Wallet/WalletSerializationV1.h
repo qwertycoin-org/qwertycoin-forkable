@@ -25,7 +25,7 @@
 #include <Wallet/WalletIndices.h>
 #include <WalletLegacy/IWalletLegacy.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class WalletSerializerV1
 {
@@ -83,8 +83,8 @@ private:
     void loadTransactions(Common::IInputStream &source, CryptoContext &cryptoContext);
     void loadTransfers(Common::IInputStream &source, CryptoContext &cryptoContext, uint32_t version);
 
-    void loadWalletV1Keys(CryptoNote::BinaryInputStreamSerializer &serializer);
-    void loadWalletV1Details(CryptoNote::BinaryInputStreamSerializer &serializer);
+    void loadWalletV1Keys(QwertyNote::BinaryInputStreamSerializer &serializer);
+    void loadWalletV1Details(QwertyNote::BinaryInputStreamSerializer &serializer);
     void addWalletV1Details(
         const std::vector<WalletLegacyTransaction> &txs,
         const std::vector<WalletLegacyTransfer> &trs);
@@ -107,4 +107,4 @@ private:
     uint32_t m_transactionSoftLockTime;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

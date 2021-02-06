@@ -18,7 +18,7 @@
 
 #include <Http/HttpRequest.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 const std::string &HttpRequest::getMethod() const
 {
@@ -80,4 +80,4 @@ std::ostream& HttpRequest::printHttpRequest(std::ostream &os) const
     return os;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

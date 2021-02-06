@@ -21,7 +21,7 @@
 #include <chrono>
 #include <P2p/NetNodeConfig.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class P2pNodeConfig : public NetNodeConfig
 {
@@ -60,4 +60,4 @@ private:
     size_t peerListGetTryCount;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

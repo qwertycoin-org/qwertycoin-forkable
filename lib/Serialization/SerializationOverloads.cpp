@@ -20,7 +20,7 @@
 #include <stdexcept>
 #include <Serialization/SerializationOverloads.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 void serializeBlockHeight(ISerializer &s, uint32_t &blockHeight, Common::StringView name)
 {
@@ -46,4 +46,4 @@ void serializeGlobalOutputIndex(ISerializer &s,uint32_t& globalOutputIndex,Commo
     serializeBlockHeight(s, globalOutputIndex, name);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -24,7 +24,7 @@
 #include <P2p/P2pContextOwner.h>
 #include <P2p/P2pInterfaces.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class P2pContext;
 
@@ -54,4 +54,4 @@ private:
     IP2pNodeInternal &m_node;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

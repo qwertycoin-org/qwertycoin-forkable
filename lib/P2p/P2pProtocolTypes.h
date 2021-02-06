@@ -24,7 +24,7 @@
 #include <Common/StringTools.h>
 #include <Android.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 typedef boost::uuids::uuid uuid;
 typedef boost::uuids::uuid net_connection_id;
@@ -79,4 +79,4 @@ inline uint32_t networkToHost(uint32_t n)
     return hostToNetwork(n); // the same
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

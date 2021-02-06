@@ -25,7 +25,7 @@
 
 using namespace Common;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 SynchronizationState::ShortHistory SynchronizationState::getShortHistory(uint32_t localHeight) const
 {
@@ -120,18 +120,18 @@ const std::vector<Crypto::FHash> &SynchronizationState::getKnownBlockHashes() co
 void SynchronizationState::save(std::ostream &os)
 {
     StdOutputStream stream(os);
-    CryptoNote::BinaryOutputStreamSerializer s(stream);
+    QwertyNote::BinaryOutputStreamSerializer s(stream);
     serialize(s, "state");
 }
 
 void SynchronizationState::load(std::istream &in)
 {
     StdInputStream stream(in);
-    CryptoNote::BinaryInputStreamSerializer s(stream);
+    QwertyNote::BinaryInputStreamSerializer s(stream);
     serialize(s, "state");
 }
 
-CryptoNote::ISerializer &SynchronizationState::serialize(CryptoNote::ISerializer &s,
+QwertyNote::ISerializer &SynchronizationState::serialize(QwertyNote::ISerializer &s,
                                                          const std::string &name)
 {
     s.beginObject(name);
@@ -141,4 +141,4 @@ CryptoNote::ISerializer &SynchronizationState::serialize(CryptoNote::ISerializer
     return s;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

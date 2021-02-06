@@ -29,16 +29,17 @@
 #include <CryptoNoteProtocol/ICryptoNoteProtocolObserver.h>
 #include <INode.h>
 
-namespace CryptoNote {
+#include <QwertyNoteCore/ICore.h>
 
+namespace QwertyNote {
 class core;
 
 class InProcessNode : public INode,
-                      public CryptoNote::ICryptoNoteProtocolObserver,
-                      public CryptoNote::ICoreObserver
+                      public QwertyNote::IQwertyNoteProtocolObserver,
+                      public QwertyNote::ICoreObserver
 {
 public:
-    InProcessNode(CryptoNote::ICore &core, CryptoNote::ICryptoNoteProtocolQuery &protocol);
+    InProcessNode(QwertyNote::ICore &core, QwertyNote::IQwertyNoteProtocolQuery &protocol);
     InProcessNode(const InProcessNode &) = delete;
     InProcessNode(InProcessNode &&) = delete;
     ~InProcessNode() override;
@@ -61,7 +62,7 @@ public:
     uint32_t getGRBHeight() const override;
 
     void getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
-                      std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
+                      std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                       uint32_t &startHeight,
                       const Callback &callback) override;
     void getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
@@ -72,7 +73,7 @@ public:
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result,
         const Callback &callback) override;
-    void relayTransaction(const CryptoNote::Transaction &transaction,
+    void relayTransaction(const QwertyNote::Transaction &transaction,
                           const Callback &callback) override;
     void queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                      uint64_t timestamp,
@@ -129,11 +130,11 @@ private:
     void updateLastLocalBlockHeaderInfo();
     void resetLastLocalBlockHeaderInfo();
     void getNewBlocksAsync(std::vector<Crypto::FHash> &knownBlockIds,
-                           std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
+                           std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                            uint32_t &startHeight,
                            const Callback &callback);
     std::error_code doGetNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
-                                   std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
+                                   std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                                    uint32_t &startHeight);
 
     void getTransactionOutsGlobalIndicesAsync(const Crypto::FHash &transactionHash,
@@ -152,8 +153,8 @@ private:
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result);
 
-    void relayTransactionAsync(const CryptoNote::Transaction &transaction, const Callback &callback);
-    std::error_code doRelayTransaction(const CryptoNote::Transaction &transaction);
+    void relayTransactionAsync(const QwertyNote::Transaction &transaction, const Callback &callback);
+    std::error_code doRelayTransaction(const QwertyNote::Transaction &transaction);
 
     void queryBlocksLiteAsync(std::vector<Crypto::FHash> &knownBlockIds,
                               uint64_t timestamp,
@@ -236,8 +237,8 @@ private:
     };
 
     State state;
-    CryptoNote::ICore &core;
-    CryptoNote::ICryptoNoteProtocolQuery &protocol;
+    QwertyNote::ICore &core;
+    QwertyNote::IQwertyNoteProtocolQuery &protocol;
     Tools::ObserverManager<INodeObserver> observerManager;
     BlockHeaderInfo lastLocalBlockHeaderInfo;
 
@@ -250,4 +251,4 @@ private:
     mutable std::mutex mutex;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

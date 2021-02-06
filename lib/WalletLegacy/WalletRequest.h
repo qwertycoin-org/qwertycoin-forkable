@@ -26,7 +26,7 @@
 #include <WalletLegacy/WalletSendTransactionContext.h>
 #include <INode.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class WalletRequest
 {
@@ -83,7 +83,7 @@ private:
 class WalletRelayTransactionRequest: public WalletRequest
 {
 public:
-    WalletRelayTransactionRequest(const CryptoNote::Transaction &tx, Callback cb)
+    WalletRelayTransactionRequest(const QwertyNote::Transaction &tx, Callback cb)
         : m_tx(tx), m_cb(cb)
     {
     };
@@ -98,8 +98,8 @@ public:
     }
 
 private:
-    CryptoNote::Transaction m_tx;
+    QwertyNote::Transaction m_tx;
     Callback m_cb;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

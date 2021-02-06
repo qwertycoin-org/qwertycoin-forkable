@@ -31,7 +31,7 @@
 #include <System/TcpConnection.h>
 #include <System/Timer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class P2pContext
 {
@@ -109,4 +109,4 @@ P2pContext::Message makeRequest(uint32_t command, const BinaryArray &data);
 
 std::ostream &operator<<(std::ostream &s, const P2pContext &conn);
 
-} // namespace CryptoNote
+} // namespace QwertyNote

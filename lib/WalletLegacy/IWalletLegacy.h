@@ -27,17 +27,18 @@
 #include <string>
 #include <system_error>
 #include <boost/optional.hpp>
+#include <QwertyNote.h>
 #include <Crypto/Crypto.h>
 #include <CryptoNoteCore/CryptoNoteBasic.h>
 #include <Global/Constants.h>
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
-#include <CryptoNote.h>
+
 #include <CryptoTypes.h>
 #include <ITransfersContainer.h>
 
 using namespace Qwertycoin;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 typedef size_t TransactionId;
 typedef size_t TransferId;
@@ -160,10 +161,9 @@ public:
     virtual std::vector<Payments> getTransactionsByPaymentIds(
         const std::vector<PaymentId> &paymentIds) const = 0;
     virtual bool getTxProof(
-        Crypto::Hash &txid,
+			Crypto::FHash &txid, QwertyNote::AccountPublicAddress &address,
 			Crypto::FSecretKey &tx_key,
-        Crypto::SecretKey &tx_key,
-        std::string &sig_str) = 0;
+			std::string &sig_str) = 0;
     virtual std::string getReserveProof(const uint64_t &reserve, const std::string &message) = 0;
     virtual Crypto::FSecretKey getTxKey(Crypto::FHash &txid) = 0;
     virtual bool get_tx_key(Crypto::FHash &txid, Crypto::FSecretKey &txSecretKey) = 0;
@@ -211,7 +211,7 @@ public:
     virtual std::string sign_message(const std::string &data) = 0;
     virtual bool verify_message(
         const std::string &data,
-        const CryptoNote::AccountPublicAddress &address,
+        const QwertyNote::AccountPublicAddress &address,
         const std::string &signature) = 0;
 
     virtual bool isTrackingWallet() = 0;

@@ -24,7 +24,7 @@
 #include <vector>
 #include <Common/IOutputStream.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class MemoryStream: public Common::IOutputStream
 {
@@ -68,4 +68,4 @@ private:
     std::vector<uint8_t> m_buffer;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

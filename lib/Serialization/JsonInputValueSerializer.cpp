@@ -22,7 +22,7 @@
 #include <Serialization/JsonInputValueSerializer.h>
 
 using Common::JsonValue;
-using namespace CryptoNote;
+using namespace QwertyNote;
 
 JsonInputValueSerializer::JsonInputValueSerializer(const Common::JsonValue &value)
 {

@@ -22,7 +22,7 @@
 #include <BlockchainExplorer/BlockchainExplorerData.h>
 #include <Serialization/ISerializer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 void serialize(TransactionOutputDetails &output, ISerializer &serializer);
 void serialize(TransactionOutputReferenceDetails &outputReference, ISerializer &serializer);
@@ -38,4 +38,4 @@ void serialize(TransactionDetails &transaction, ISerializer &serializer);
 
 void serialize(BlockDetails &block, ISerializer &serializer);
 
-} // namespace CryptoNote
+} // namespace QwertyNote

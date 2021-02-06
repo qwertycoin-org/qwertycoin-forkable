@@ -22,7 +22,7 @@
 #include <mutex>
 #include <stdint.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class WalletAsyncContextCounter
 {
@@ -44,4 +44,4 @@ private:
     std::mutex m_mutex;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

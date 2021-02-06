@@ -20,7 +20,7 @@
 
 #include <BlockchainExplorer/BlockchainExplorerData.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class IBlockchainObserver
 {
@@ -35,4 +35,4 @@ public:
                              const std::vector<RemovedTransactionDetails> &removedTransactions) {}
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

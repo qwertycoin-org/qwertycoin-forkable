@@ -25,7 +25,7 @@
 #include <Common/StringTools.h>
 #include <Crypto/Hash.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 struct CryptoNoteConnectionContext
 {
@@ -76,12 +76,12 @@ inline std::string get_protocol_state_string(CryptoNoteConnectionContext::state 
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote
 
 namespace std {
 
 inline std::ostream &operator<<(std::ostream &s,
-                                const CryptoNote::CryptoNoteConnectionContext &context)
+                                const QwertyNote::CryptoNoteConnectionContext &context)
 {
     return s
         << "["

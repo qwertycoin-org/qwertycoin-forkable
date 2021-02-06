@@ -29,7 +29,7 @@
 #include <System/TcpConnection.h>
 #include <System/TcpListener.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class HttpServer
 {
@@ -60,4 +60,4 @@ private:
     std::string m_credentials;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

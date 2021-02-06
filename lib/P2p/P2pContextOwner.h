@@ -21,7 +21,7 @@
 #include <list>
 #include <memory>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class P2pContext;
 
@@ -43,4 +43,4 @@ private:
     ContextList::iterator contextIterator;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

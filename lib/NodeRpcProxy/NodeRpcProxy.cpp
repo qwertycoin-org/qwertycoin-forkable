@@ -46,7 +46,7 @@ using namespace Common;
 using namespace System;
 using namespace Qwertycoin;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace {
 
@@ -72,7 +72,7 @@ NodeRpcProxy::NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort)
       m_peerCount(0),
       m_networkHeight(0),
 	  m_nodeHeight(0),
-	  m_minimalFee(CryptoNote::parameters::MINIMUM_FEE)
+	  m_minimalFee(QwertyNote::parameters::MINIMUM_FEE)
 {
     resetInternalState();
 }
@@ -245,8 +245,8 @@ bool NodeRpcProxy::updatePoolStatus()
 
 void NodeRpcProxy::updateBlockchainStatus()
 {
-    CryptoNote::COMMAND_RPC_GET_LAST_BLOCK_HEADER::request req = AUTO_VAL_INIT(req);
-    CryptoNote::COMMAND_RPC_GET_LAST_BLOCK_HEADER::response rsp = AUTO_VAL_INIT(rsp);
+    QwertyNote::COMMAND_RPC_GET_LAST_BLOCK_HEADER::request req = AUTO_VAL_INIT(req);
+    QwertyNote::COMMAND_RPC_GET_LAST_BLOCK_HEADER::response rsp = AUTO_VAL_INIT(rsp);
 
     std::error_code ec = jsonRpcCommand("getlastblockheader", req, rsp);
 
@@ -279,8 +279,8 @@ void NodeRpcProxy::updateBlockchainStatus()
         }
     }
 
-    CryptoNote::COMMAND_RPC_GET_INFO::request getInfoReq = AUTO_VAL_INIT(getInfoReq);
-    CryptoNote::COMMAND_RPC_GET_INFO::response getInfoResp = AUTO_VAL_INIT(getInfoResp);
+    QwertyNote::COMMAND_RPC_GET_INFO::request getInfoReq = AUTO_VAL_INIT(getInfoReq);
+    QwertyNote::COMMAND_RPC_GET_INFO::response getInfoResp = AUTO_VAL_INIT(getInfoResp);
 
     ec = jsonCommand("/getinfo", getInfoReq, getInfoResp);
     if (!ec) {
@@ -348,12 +348,12 @@ bool NodeRpcProxy::removeObserver(INodeObserver *observer)
     return m_observerManager.remove(observer);
 }
 
-bool NodeRpcProxy::addObserver(CryptoNote::INodeRpcProxyObserver *observer)
+bool NodeRpcProxy::addObserver(QwertyNote::INodeRpcProxyObserver *observer)
 {
     return m_rpcProxyObserverManager.add(observer);
 }
 
-bool NodeRpcProxy::removeObserver(CryptoNote::INodeRpcProxyObserver *observer)
+bool NodeRpcProxy::removeObserver(QwertyNote::INodeRpcProxyObserver *observer)
 {
     return m_rpcProxyObserverManager.remove(observer);
 }
@@ -416,7 +416,7 @@ uint32_t NodeRpcProxy::getNodeHeight() const
     return m_nodeHeight.load(std::memory_order_relaxed);
 }
 
-void NodeRpcProxy::relayTransaction(const CryptoNote::Transaction &transaction,
+void NodeRpcProxy::relayTransaction(const QwertyNote::Transaction &transaction,
                                     const Callback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -452,7 +452,7 @@ void NodeRpcProxy::getRandomOutsByAmounts(
 }
 
 void NodeRpcProxy::getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
-                                std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
+                                std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                                 uint32_t &startHeight,
                                 const Callback &callback)
 {
@@ -664,7 +664,7 @@ void NodeRpcProxy::isSynchronized(bool &syncStatus, const Callback &callback)
     callback(std::error_code{});
 }
 
-std::error_code NodeRpcProxy::doRelayTransaction(const CryptoNote::Transaction &transaction)
+std::error_code NodeRpcProxy::doRelayTransaction(const QwertyNote::Transaction &transaction)
 {
     COMMAND_RPC_SEND_RAW_TX::request req;
     COMMAND_RPC_SEND_RAW_TX::response rsp;
@@ -695,11 +695,11 @@ std::error_code NodeRpcProxy::doGetRandomOutsByAmounts(
 
 std::error_code NodeRpcProxy::doGetNewBlocks(
     std::vector<Crypto::FHash> &knownBlockIds,
-    std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
+    std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
     uint32_t &startHeight)
 {
-    CryptoNote::COMMAND_RPC_GET_BLOCKS_FAST::request req = AUTO_VAL_INIT(req);
-    CryptoNote::COMMAND_RPC_GET_BLOCKS_FAST::response rsp = AUTO_VAL_INIT(rsp);
+    QwertyNote::COMMAND_RPC_GET_BLOCKS_FAST::request req = AUTO_VAL_INIT(req);
+    QwertyNote::COMMAND_RPC_GET_BLOCKS_FAST::response rsp = AUTO_VAL_INIT(rsp);
 
     req.block_ids = std::move(knownBlockIds);
 
@@ -716,8 +716,8 @@ std::error_code NodeRpcProxy::doGetTransactionOutsGlobalIndices(
     const Crypto::FHash &transactionHash,
     std::vector<uint32_t> &outsGlobalIndices)
 {
-    CryptoNote::COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::request req = AUTO_VAL_INIT(req);
-    CryptoNote::COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::response rsp = AUTO_VAL_INIT(rsp);
+    QwertyNote::COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::request req = AUTO_VAL_INIT(req);
+    QwertyNote::COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::response rsp = AUTO_VAL_INIT(rsp);
 
     req.txid = transactionHash;
 
@@ -737,8 +737,8 @@ std::error_code NodeRpcProxy::doQueryBlocksLite(const std::vector<Crypto::FHash>
                                                 std::vector<CryptoNote::BlockShortEntry> &newBlocks,
                                                 uint32_t &startHeight)
 {
-    CryptoNote::COMMAND_RPC_QUERY_BLOCKS_LITE::request req = AUTO_VAL_INIT(req);
-    CryptoNote::COMMAND_RPC_QUERY_BLOCKS_LITE::response rsp = AUTO_VAL_INIT(rsp);
+    QwertyNote::COMMAND_RPC_QUERY_BLOCKS_LITE::request req = AUTO_VAL_INIT(req);
+    QwertyNote::COMMAND_RPC_QUERY_BLOCKS_LITE::response rsp = AUTO_VAL_INIT(rsp);
 
     req.blockIds = knownBlockIds;
     req.timestamp = timestamp;
@@ -783,8 +783,8 @@ std::error_code NodeRpcProxy::doGetPoolSymmetricDifference(
     std::vector<std::unique_ptr<ITransactionReader>> &newTxs,
     std::vector<Crypto::FHash> &deletedTxIds)
 {
-    CryptoNote::COMMAND_RPC_GET_POOL_CHANGES_LITE::request req = AUTO_VAL_INIT(req);
-    CryptoNote::COMMAND_RPC_GET_POOL_CHANGES_LITE::response rsp = AUTO_VAL_INIT(rsp);
+    QwertyNote::COMMAND_RPC_GET_POOL_CHANGES_LITE::request req = AUTO_VAL_INIT(req);
+    QwertyNote::COMMAND_RPC_GET_POOL_CHANGES_LITE::response rsp = AUTO_VAL_INIT(rsp);
 
     req.tailBlockId = knownBlockId;
     req.knownTxsIds = knownPoolTxIds;
@@ -947,4 +947,4 @@ std::error_code NodeRpcProxy::jsonRpcCommand(const std::string &method,
     return ec;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

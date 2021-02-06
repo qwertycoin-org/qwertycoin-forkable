@@ -24,7 +24,7 @@
 
 #pragma once
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace {
 
@@ -39,4 +39,4 @@ boost::uuids::uuid u = gen(network_1 + network_2);
 
 const static boost::uuids::uuid QWERTYCOIN_NETWORK = u;
 
-} // namespace CryptoNote
+} // namespace QwertyNote

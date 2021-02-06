@@ -22,7 +22,7 @@
 #include <Common/JsonValue.h>
 #include <Serialization/ISerializer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class JsonOutputStreamSerializer : public ISerializer
 {
@@ -70,4 +70,4 @@ private:
     std::vector<Common::JsonValue *> chain;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

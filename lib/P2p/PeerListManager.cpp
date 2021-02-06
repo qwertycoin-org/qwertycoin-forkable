@@ -22,9 +22,9 @@
 #include <Serialization/SerializationOverloads.h>
 #include <System/Ipv4Address.h>
 
-using namespace CryptoNote;
+using namespace QwertyNote;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 template <typename T, typename Indexes>
 bool serialize(boost::multi_index_container<T, Indexes> &value,
@@ -53,7 +53,7 @@ void serialize(PeerlistEntry &pe, ISerializer &s)
     s(pe.last_seen, "last_seen");
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote
 
 PeerlistManager::Peerlist::Peerlist(peers_indexed &peers, size_t maxSize)
     : m_peers(peers),
@@ -105,8 +105,8 @@ void PeerlistManager::Peerlist::trim()
 }
 
 PeerlistManager::PeerlistManager()
-    : m_whitePeerlist(m_peers_white, CryptoNote::P2P_LOCAL_WHITE_PEERLIST_LIMIT),
-      m_grayPeerlist(m_peers_gray, CryptoNote::P2P_LOCAL_GRAY_PEERLIST_LIMIT)
+    : m_whitePeerlist(m_peers_white, QwertyNote::P2P_LOCAL_WHITE_PEERLIST_LIMIT),
+      m_grayPeerlist(m_peers_gray, QwertyNote::P2P_LOCAL_GRAY_PEERLIST_LIMIT)
 {
 }
 

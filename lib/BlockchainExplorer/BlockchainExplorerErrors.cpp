@@ -18,7 +18,7 @@
 
 #include <BlockchainExplorer/BlockchainExplorerErrors.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace error {
 
@@ -52,4 +52,4 @@ std::error_condition BlockchainExplorerErrorCategory::default_error_condition(in
 
 } //namespace error
 
-} //namespace CryptoNote
+} //namespace QwertyNote

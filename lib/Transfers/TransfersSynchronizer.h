@@ -29,7 +29,7 @@
 #include <Transfers/TypeHelpers.h>
 #include <ITransfersSynchronizer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class Currency;
 class TransfersConsumer;
@@ -50,7 +50,7 @@ class TransfersSynchronizer : public ITransfersSynchronizer, public IBlockchainC
     > SubscribersContainer;
 
 public:
-    TransfersSynchronizer(const CryptoNote::Currency &currency,
+    TransfersSynchronizer(const QwertyNote::Currency &currency,
                          Logging::ILogger &logger,
                          IBlockchainSynchronizer &sync,
                          INode &node);
@@ -107,7 +107,7 @@ private:
     SubscribersContainer m_subscribers;
     IBlockchainSynchronizer &m_sync;
     INode &m_node;
-    const CryptoNote::Currency &m_currency;
+    const QwertyNote::Currency &m_currency;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

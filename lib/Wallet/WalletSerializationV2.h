@@ -24,7 +24,7 @@
 #include <Transfers/TransfersSynchronizer.h>
 #include <Wallet/WalletIndices.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class WalletSerializerV2
 {
@@ -55,20 +55,20 @@ public:
     static const uint8_t SERIALIZATION_VERSION = 6;
 
 private:
-    void loadKeyListAndBalances(CryptoNote::ISerializer &serializer, bool saveCache);
-    void saveKeyListAndBalances(CryptoNote::ISerializer &serializer, bool saveCache);
+    void loadKeyListAndBalances(QwertyNote::ISerializer &serializer, bool saveCache);
+    void saveKeyListAndBalances(QwertyNote::ISerializer &serializer, bool saveCache);
 
-    void loadTransactions(CryptoNote::ISerializer &serializer);
-    void saveTransactions(CryptoNote::ISerializer &serializer);
+    void loadTransactions(QwertyNote::ISerializer &serializer);
+    void saveTransactions(QwertyNote::ISerializer &serializer);
 
-    void loadTransfers(CryptoNote::ISerializer &serializer);
-    void saveTransfers(CryptoNote::ISerializer &serializer);
+    void loadTransfers(QwertyNote::ISerializer &serializer);
+    void saveTransfers(QwertyNote::ISerializer &serializer);
 
-    void loadTransfersSynchronizer(CryptoNote::ISerializer &serializer);
-    void saveTransfersSynchronizer(CryptoNote::ISerializer &serializer);
+    void loadTransfersSynchronizer(QwertyNote::ISerializer &serializer);
+    void saveTransfersSynchronizer(QwertyNote::ISerializer &serializer);
 
-    void loadUnlockTransactionsJobs(CryptoNote::ISerializer &serializer);
-    void saveUnlockTransactionsJobs(CryptoNote::ISerializer &serializer);
+    void loadUnlockTransactionsJobs(QwertyNote::ISerializer &serializer);
+    void saveUnlockTransactionsJobs(QwertyNote::ISerializer &serializer);
 
 private:
     ITransfersObserver &m_transfersObserver;
@@ -87,4 +87,4 @@ private:
     std::unordered_set<Crypto::FPublicKey> m_deletedKeys;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

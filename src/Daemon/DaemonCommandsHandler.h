@@ -28,23 +28,21 @@
 #include <Logging/LoggerManager.h>
 #include <Rpc/RpcServer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class core;
 class NodeServer;
 class ICryptoNoteProtocolQuery;
 
-} // namespace CryptoNote
+} // namespace QwertyNote
 
 class DaemonCommandsHandler
 {
 public:
-    DaemonCommandsHandler(
-        CryptoNote::core &core,
-        CryptoNote::NodeServer &srv,
+    DaemonCommandsHandler(QwertyNote::core &core, QwertyNote::NodeServer &srv,
         Logging::LoggerManager &log,
-        const CryptoNote::ICryptoNoteProtocolQuery &protocol,
-        CryptoNote::RpcServer *prpc_server
+        const QwertyNote::IQwertyNoteProtocolQuery &protocol,
+                          QwertyNote::RpcServer *prpc_server
     );
 
     bool start_handling()
@@ -94,10 +92,10 @@ private:
 
 private:
     Common::ConsoleHandler m_consoleHandler;
-    CryptoNote::core &m_core;
-    CryptoNote::NodeServer &m_srv;
+    QwertyNote::core &m_core;
+    QwertyNote::NodeServer &m_srv;
     Logging::LoggerRef logger;
     Logging::LoggerManager &m_logManager;
     const CryptoNote::ICryptoNoteProtocolQuery &protocolQuery;
-    CryptoNote::RpcServer *m_prpc_server;
+    QwertyNote::RpcServer *m_prpc_server;
 };

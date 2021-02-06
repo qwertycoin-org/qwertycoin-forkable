@@ -24,11 +24,11 @@
 #include <Crypto/Hash.h>
 #include <WalletLegacy/IWalletLegacy.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace WalletHelper {
 
-class SaveWalletResultObserver : public CryptoNote::IWalletLegacyObserver
+class SaveWalletResultObserver : public QwertyNote::IWalletLegacyObserver
 {
 public:
     void saveCompleted(std::error_code result) override
@@ -39,7 +39,7 @@ public:
     std::promise<std::error_code> saveResult;
 };
 
-class InitWalletResultObserver : public CryptoNote::IWalletLegacyObserver
+class InitWalletResultObserver : public QwertyNote::IWalletLegacyObserver
 {
 public:
     void initCompleted(std::error_code result) override
@@ -50,38 +50,38 @@ public:
     std::promise<std::error_code> initResult;
 };
 
-class SendCompleteResultObserver : public CryptoNote::IWalletLegacyObserver
+class SendCompleteResultObserver : public QwertyNote::IWalletLegacyObserver
 {
 public:
-    void sendTransactionCompleted(CryptoNote::TransactionId transactionId,
+    void sendTransactionCompleted(QwertyNote::TransactionId transactionId,
                                   std::error_code result) override;
-    std::error_code wait(CryptoNote::TransactionId transactionId);
+    std::error_code wait(QwertyNote::TransactionId transactionId);
 
 private:
     std::mutex m_mutex;
     std::condition_variable m_condition;
-    std::map<CryptoNote::TransactionId, std::error_code> m_finishedTransactions;
+    std::map<QwertyNote::TransactionId, std::error_code> m_finishedTransactions;
     std::error_code m_result;
 };
 
 class IWalletRemoveObserverGuard
 {
 public:
-  IWalletRemoveObserverGuard(CryptoNote::IWalletLegacy &wallet,
-                             CryptoNote::IWalletLegacyObserver &observer);
+  IWalletRemoveObserverGuard(QwertyNote::IWalletLegacy &wallet,
+                               QwertyNote::IWalletLegacyObserver &observer);
   ~IWalletRemoveObserverGuard();
 
   void removeObserver();
 
 private:
-    CryptoNote::IWalletLegacy &m_wallet;
-    CryptoNote::IWalletLegacyObserver &m_observer;
+    QwertyNote::IWalletLegacy &m_wallet;
+    QwertyNote::IWalletLegacyObserver &m_observer;
     bool m_removed;
 };
 
 void prepareFileNames(const std::string &file_path,std::string &keys_file,std::string &wallet_file);
-bool storeWallet(CryptoNote::IWalletLegacy &wallet, const std::string &walletFilename);
+bool storeWallet(QwertyNote::IWalletLegacy &wallet, const std::string &walletFilename);
 
 } // namespace WalletHelper
 
-} // namespace CryptoNote
+} // namespace QwertyNote

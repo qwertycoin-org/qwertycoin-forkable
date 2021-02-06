@@ -21,9 +21,9 @@
 
 using namespace Crypto;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
-TransfersSubscription::TransfersSubscription(const CryptoNote::Currency &currency,
+TransfersSubscription::TransfersSubscription(const QwertyNote::Currency &currency,
                                              Logging::ILogger &logger,
                                              const AccountSubscription &sub)
     : logger(logger, "TransfersSubscription"),
@@ -111,4 +111,4 @@ void TransfersSubscription::markTransactionSafe(const FHash &transactionHash)
     m_observerManager.notify(&ITransfersObserver::onTransactionUpdated, this, transactionHash);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -24,9 +24,9 @@
 #include <Wallet/WalletErrors.h>
 #include <WalletLegacy/IWalletLegacy.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
-inline void throwIf(bool expr, CryptoNote::error::WalletErrorCodes ec)
+inline void throwIf(bool expr, QwertyNote::error::WalletErrorCodes ec)
 {
     if (expr) {
         throw std::system_error(make_error_code(ec));
@@ -48,4 +48,4 @@ inline std::ostream &operator<<(std::ostream &ostr, const Crypto::FHash &hash)
     return ostr;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

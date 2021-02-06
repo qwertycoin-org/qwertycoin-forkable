@@ -24,7 +24,7 @@
 #include <Transfers/CommonTypes.h>
 #include <IStreamSerializable.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class SynchronizationState : public IStreamSerializable
 {
@@ -57,10 +57,10 @@ public:
     void load(std::istream &in) override;
 
     // serialization
-    CryptoNote::ISerializer &serialize(CryptoNote::ISerializer &s, const std::string &name);
+    QwertyNote::ISerializer &serialize(QwertyNote::ISerializer &s, const std::string &name);
 
 private:
     std::vector<Crypto::FHash> m_blockchain;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

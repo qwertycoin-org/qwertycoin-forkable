@@ -60,8 +60,8 @@ bool ConfigurationManager::init(int argc, char** argv)
     Configuration::initOptions(confGeneralOptions);
 
     po::options_description netNodeOptions("Local Node Options");
-    CryptoNote::NetNodeConfig::initOptions(netNodeOptions);
-    CryptoNote::CoreConfig::initOptions(netNodeOptions);
+    QwertyNote::NetNodeConfig::initOptions(netNodeOptions);
+    QwertyNote::CoreConfig::initOptions(netNodeOptions);
 
     po::options_description remoteNodeOptions("Remote Node Options");
     RpcNodeConfiguration::initOptions(remoteNodeOptions);

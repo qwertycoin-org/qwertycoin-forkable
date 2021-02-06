@@ -20,7 +20,7 @@
 #include <P2p/P2pNodeConfig.h>
 #include <P2p/P2pNetworks.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace {
 
@@ -142,4 +142,4 @@ void P2pNodeConfig::setPeerListGetTryCount(size_t count)
     peerListGetTryCount = count;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

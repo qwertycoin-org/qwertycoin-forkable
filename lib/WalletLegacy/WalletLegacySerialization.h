@@ -23,7 +23,7 @@
 #include <string>
 #include <WalletLegacy/IWalletLegacy.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class ISerializer;
 
@@ -35,4 +35,4 @@ void serialize(UnconfirmedTransferDetails &utd, ISerializer &serializer);
 void serialize(WalletLegacyTransaction &txi, ISerializer &serializer);
 void serialize(WalletLegacyTransfer &tr, ISerializer &serializer);
 
-} // namespace CryptoNote
+} // namespace QwertyNote

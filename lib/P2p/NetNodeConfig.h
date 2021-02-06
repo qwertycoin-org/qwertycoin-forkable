@@ -24,7 +24,7 @@
 #include <boost/program_options.hpp>
 #include <P2p/P2pProtocolTypes.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class NetNodeConfig
 {
@@ -78,4 +78,4 @@ private:
     bool testnet;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <Crypto/Crypto.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class ISerializer;
 
@@ -38,4 +38,4 @@ struct KeysStorage {
     Crypto::FSecretKey viewSecretKey;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

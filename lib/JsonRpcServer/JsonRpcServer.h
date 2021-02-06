@@ -39,7 +39,7 @@ class TcpConnection;
 
 } // namespace System
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class HttpResponse;
 class HttpRequest;
@@ -68,8 +68,8 @@ protected:
     virtual void processJsonRpcRequest(const Common::JsonValue &req, Common::JsonValue &resp) = 0;
 
 private:
-    void processRequest(const CryptoNote::HttpRequest &request,
-                        CryptoNote::HttpResponse &response) override;
+    void processRequest(const QwertyNote::HttpRequest &request,
+                        QwertyNote::HttpResponse &response) override;
 
 private:
     System::Dispatcher &system;
@@ -77,4 +77,4 @@ private:
     Logging::LoggerRef logger;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

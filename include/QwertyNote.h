@@ -19,13 +19,16 @@
 #pragma once
 
 #include <vector>
+
 #include <boost/variant.hpp>
+
 #include <Android.h>
 #include <CryptoTypes.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
-struct BaseInput {
+struct BaseInput
+{
   uint32_t blockIndex;
 };
 
@@ -33,10 +36,11 @@ struct KeyInput
 {
     uint64_t amount;
     std::vector<uint32_t> outputIndexes;
-    Crypto::KeyImage keyImage;
+    Crypto::FKeyImage keyImage;
 };
 
-struct MultiSignatureInput {
+struct MultiSignatureInput
+{
     uint64_t amount;
     uint8_t signatureCount;
     uint32_t outputIndex;
@@ -44,11 +48,12 @@ struct MultiSignatureInput {
 
 struct KeyOutput
 {
-    Crypto::PublicKey key;
+    Crypto::FPublicKey key;
 };
 
-struct MultiSignatureOutput {
-    std::vector<Crypto::PublicKey> keys;
+struct MultiSignatureOutput
+{
+    std::vector<Crypto::FPublicKey> keys;
     uint8_t requiredSignatureCount;
 };
 
@@ -73,18 +78,18 @@ struct TransactionPrefix
 
 struct Transaction : public TransactionPrefix
 {
-    std::vector<std::vector<Crypto::Signature>> signatures;
+    std::vector<std::vector<Crypto::FSignature>> signatures;
 };
 
 struct ParentBlock
 {
     uint8_t majorVersion;
     uint8_t minorVersion;
-    Crypto::Hash previousBlockHash;
+    Crypto::FHash previousBlockHash;
     uint16_t transactionCount;
-    std::vector<Crypto::Hash> baseTransactionBranch;
+    std::vector<Crypto::FHash> baseTransactionBranch;
     Transaction baseTransaction;
-    std::vector<Crypto::Hash> blockchainBranch;
+    std::vector<Crypto::FHash> blockchainBranch;
 };
 
 struct BlockHeader
@@ -93,35 +98,35 @@ struct BlockHeader
     uint8_t minorVersion;
     uint32_t nonce;
     uint64_t timestamp;
-    Crypto::Hash previousBlockHash;
+    Crypto::FHash previousBlockHash;
 };
 
 struct Block : public BlockHeader
 {
     ParentBlock parentBlock;
     Transaction baseTransaction;
-    std::vector<Crypto::Hash> transactionHashes;
+    std::vector<Crypto::FHash> transactionHashes;
 };
 
 struct AccountPublicAddress
 {
-    Crypto::PublicKey spendPublicKey;
-    Crypto::PublicKey viewPublicKey;
+    Crypto::FPublicKey spendPublicKey;
+    Crypto::FPublicKey viewPublicKey;
 };
 
 struct AccountKeys
 {
     AccountPublicAddress address;
-    Crypto::SecretKey spendSecretKey;
-    Crypto::SecretKey viewSecretKey;
+    Crypto::FSecretKey spendSecretKey;
+    Crypto::FSecretKey viewSecretKey;
 };
 
 struct KeyPair
 {
-    Crypto::PublicKey publicKey;
-    Crypto::SecretKey secretKey;
+    Crypto::FPublicKey publicKey;
+    Crypto::FSecretKey secretKey;
 };
 
 using BinaryArray = std::vector<uint8_t>;
 
-} // namespace CryptoNote
+} // namespace QwertyNote

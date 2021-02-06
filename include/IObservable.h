@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 template <typename T>
 class IObservable
@@ -28,4 +28,4 @@ public:
     virtual void removeObserver(T *observer) = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

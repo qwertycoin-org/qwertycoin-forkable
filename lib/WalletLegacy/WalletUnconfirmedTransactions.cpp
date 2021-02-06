@@ -25,7 +25,7 @@
 
 using namespace Crypto;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 inline TransactionOutputId getOutputId(const TransactionOutputInformation &out)
 {
@@ -176,4 +176,4 @@ std::vector<TransactionId> WalletUnconfirmedTransactions::deleteOutdatedTransact
     return deletedTransactions;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

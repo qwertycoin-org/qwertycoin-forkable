@@ -29,7 +29,7 @@
 #include <WalletLegacy/WalletUtils.h>
 
 using namespace Crypto;
-using namespace CryptoNote;
+using namespace QwertyNote;
 
 namespace {
 
@@ -108,7 +108,7 @@ std::shared_ptr<WalletLegacyEvent> makeCompleteEvent(
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 WalletTransactionSender::WalletTransactionSender(
     const Currency &currency,
@@ -157,7 +157,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendRequest(
     uint64_t ttl,
     const std::string &sender)
 {
-    using namespace CryptoNote;
+    using namespace QwertyNote;
 
     throwIf(transfers.empty(), error::ZERO_DESTINATION);
     validateTransfersAddresses(transfers);
@@ -212,7 +212,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendDustRequest(
     uint64_t mixIn,
     uint64_t unlockTimestamp)
 {
-    using namespace CryptoNote;
+    using namespace QwertyNote;
 
     throwIf(transfers.empty(), error::ZERO_DESTINATION);
     validateTransfersAddresses(transfers);
@@ -255,7 +255,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendFusionRequest(
     uint64_t mixIn,
     uint64_t unlockTimestamp)
 {
-    using namespace CryptoNote;
+    using namespace QwertyNote;
 
     throwIf(transfers.empty(), error::ZERO_DESTINATION);
     validateTransfersAddresses(transfers);
@@ -735,4 +735,4 @@ uint64_t WalletTransactionSender::selectDustTransfersToSend(
     return foundMoney;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

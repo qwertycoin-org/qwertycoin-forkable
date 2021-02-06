@@ -20,7 +20,7 @@
 
 #include <boost/program_options.hpp>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class RpcServerConfig
 {
@@ -35,4 +35,4 @@ public:
     uint16_t bindPort;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

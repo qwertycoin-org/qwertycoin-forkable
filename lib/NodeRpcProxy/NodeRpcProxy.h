@@ -37,7 +37,7 @@ class Event;
 
 } // namespace System
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class HttpClient;
 
@@ -49,7 +49,7 @@ public:
     virtual void connectionStatusUpdated(bool connected) {}
 };
 
-class NodeRpcProxy : public CryptoNote::INode
+class NodeRpcProxy : public QwertyNote::INode
 {
     enum State
     {
@@ -65,11 +65,11 @@ public:
     void init(const Callback &callback) override;
     bool shutdown() override;
 
-    bool addObserver(CryptoNote::INodeObserver *observer) override;
-    bool removeObserver(CryptoNote::INodeObserver *observer) override;
+    bool addObserver(QwertyNote::INodeObserver *observer) override;
+    bool removeObserver(QwertyNote::INodeObserver *observer) override;
 
-    virtual bool addObserver(CryptoNote::INodeRpcProxyObserver *observer);
-    virtual bool removeObserver(CryptoNote::INodeRpcProxyObserver *observer);
+    virtual bool addObserver(QwertyNote::INodeRpcProxyObserver *observer);
+    virtual bool removeObserver(QwertyNote::INodeRpcProxyObserver *observer);
 
     size_t getPeerCount() const override;
     uint32_t getLastLocalBlockHeight() const override;
@@ -82,7 +82,7 @@ public:
     BlockHeaderInfo getLastLocalBlockHeaderInfo() const override;
     uint32_t getGRBHeight() const override;
 
-    void relayTransaction(const CryptoNote::Transaction &transaction,
+    void relayTransaction(const QwertyNote::Transaction &transaction,
                           const Callback &callback) override;
     void getRandomOutsByAmounts(
         std::vector<uint64_t> &&amounts,
@@ -90,7 +90,7 @@ public:
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result,
         const Callback &callback) override;
     void getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
-                      std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
+                      std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                       uint32_t &startHeight,
                       const Callback &callback) override;
     void getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
@@ -156,19 +156,19 @@ private:
     void updatePoolState(const std::vector<std::unique_ptr<ITransactionReader>> &addedTxs,
                          const std::vector<Crypto::FHash> &deletedTxsIds);
 
-    std::error_code doRelayTransaction(const CryptoNote::Transaction &transaction);
+    std::error_code doRelayTransaction(const QwertyNote::Transaction &transaction);
     std::error_code doGetRandomOutsByAmounts(
         std::vector<uint64_t> &amounts,
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result);
     std::error_code doGetNewBlocks(std::vector<Crypto::FHash> &knownBlockIds,
-                                   std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
+                                   std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                                    uint32_t &startHeight);
     std::error_code doGetTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                                       std::vector<uint32_t> &outsGlobalIndices);
     std::error_code doQueryBlocksLite(const std::vector<Crypto::FHash> &knownBlockIds,
                                       uint64_t timestamp,
-                                      std::vector<CryptoNote::BlockShortEntry> &newBlocks,
+                                      std::vector<QwertyNote::FBlockShortEntry> &newBlocks,
                                       uint32_t &startHeight);
     std::error_code doGetPoolSymmetricDifference(std::vector<Crypto::FHash> &&knownPoolTxIds,
                                                  Crypto::FHash knownBlockId,
@@ -194,8 +194,8 @@ private:
     std::thread m_workerThread;
     System::Dispatcher *m_dispatcher = nullptr;
     System::ContextGroup *m_context_group = nullptr;
-    Tools::ObserverManager<CryptoNote::INodeObserver> m_observerManager;
-    Tools::ObserverManager<CryptoNote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
+    Tools::ObserverManager<QwertyNote::INodeObserver> m_observerManager;
+    Tools::ObserverManager<QwertyNote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
 
     unsigned int m_rpcTimeout;
     HttpClient *m_httpClient = nullptr;
@@ -218,4 +218,4 @@ private:
     bool m_connected;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

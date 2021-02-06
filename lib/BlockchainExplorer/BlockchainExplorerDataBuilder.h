@@ -24,7 +24,7 @@
 
 #include <CryptoNoteProtocol/ICryptoNoteProtocolQuery.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class BlockchainExplorerDataBuilder
 {
@@ -53,4 +53,4 @@ private:
     ICryptoNoteProtocolQuery &m_protocol; // Not used, but why we have it here?
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

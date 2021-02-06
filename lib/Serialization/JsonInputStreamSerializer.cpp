@@ -20,7 +20,7 @@
 #include <exception>
 #include <Serialization/JsonInputStreamSerializer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace {
 
@@ -40,4 +40,4 @@ JsonInputStreamSerializer::JsonInputStreamSerializer(std::istream &stream)
 {
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

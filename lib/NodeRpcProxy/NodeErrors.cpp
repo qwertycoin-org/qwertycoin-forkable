@@ -18,7 +18,7 @@
 
 #include <NodeRpcProxy/NodeErrors.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace error {
 
@@ -26,4 +26,4 @@ NodeErrorCategory NodeErrorCategory::INSTANCE;
 
 } // namespace error
 
-} // namespace CryptoNote
+} // namespace QwertyNote

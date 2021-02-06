@@ -34,8 +34,8 @@ public:
 
     bool startInprocess;
     Configuration gateConfiguration;
-    CryptoNote::NetNodeConfig netNodeConfig;
-    CryptoNote::CoreConfig coreConfig;
+    QwertyNote::NetNodeConfig netNodeConfig;
+    QwertyNote::CoreConfig coreConfig;
     RpcNodeConfiguration remoteNodeConfig;
 };
 

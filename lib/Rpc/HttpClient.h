@@ -27,7 +27,7 @@
 #include <System/TcpConnection.h>
 #include <System/TcpStream.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class ConnectException : public std::runtime_error
 {
@@ -152,4 +152,4 @@ void invokeBinaryCommand(HttpClient &cli,
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -18,7 +18,7 @@
 
 #include <PaymentGate/WalletServiceErrorCategory.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace error {
 
@@ -26,4 +26,4 @@ WalletServiceErrorCategory WalletServiceErrorCategory::INSTANCE;
 
 } // namespace error
 
-} // namespace CryptoNote
+} // namespace QwertyNote

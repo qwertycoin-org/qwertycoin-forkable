@@ -34,11 +34,11 @@
 
 using namespace Common;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 uint32_t WALLET_LEGACY_SERIALIZATION_VERSION = 3;
 
-WalletLegacySerializer::WalletLegacySerializer(CryptoNote::AccountBase &account,
+WalletLegacySerializer::WalletLegacySerializer(QwertyNote::AccountBase &account,
                                                WalletUserTransactionsCache &transactionsCache)
     : account(account),
       transactionsCache(transactionsCache),
@@ -53,11 +53,11 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
     const std::vector<Crypto::FHash> &safeTxes)
 {
     // set serialization version global variable
-    CryptoNote::WALLET_LEGACY_SERIALIZATION_VERSION = walletSerializationVersion;
+    QwertyNote::WALLET_LEGACY_SERIALIZATION_VERSION = walletSerializationVersion;
 
     std::stringstream plainArchive;
     StdOutputStream plainStream(plainArchive);
-    CryptoNote::BinaryOutputStreamSerializer serializer(plainStream);
+    QwertyNote::BinaryOutputStreamSerializer serializer(plainStream);
     saveKeys(serializer);
 
     serializer(saveDetailed, "has_details");
@@ -90,7 +90,7 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
 
     uint32_t version = walletSerializationVersion;
     StdOutputStream output(stream);
-    CryptoNote::BinaryOutputStreamSerializer s(output);
+    QwertyNote::BinaryOutputStreamSerializer s(output);
     s.beginObject("wallet");
     s(version, "version");
     s(iv, "iv");
@@ -100,10 +100,10 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
     stream.flush();
 }
 
-void WalletLegacySerializer::saveKeys(CryptoNote::ISerializer &serializer)
+void WalletLegacySerializer::saveKeys(QwertyNote::ISerializer &serializer)
 {
-    CryptoNote::KeysStorage keys;
-    CryptoNote::AccountKeys acc = account.getAccountKeys();
+    QwertyNote::KeysStorage keys;
+    QwertyNote::AccountKeys acc = account.getAccountKeys();
 
     keys.creationTimestamp = account.get_createtime();
     keys.spendPublicKey = acc.address.spendPublicKey;
@@ -137,14 +137,14 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
     std::vector<Crypto::FHash> &safeTxes)
 {
     StdInputStream stdStream(stream);
-    CryptoNote::BinaryInputStreamSerializer serializerEncrypted(stdStream);
+    QwertyNote::BinaryInputStreamSerializer serializerEncrypted(stdStream);
 
     serializerEncrypted.beginObject("wallet");
 
     uint32_t version;
     serializerEncrypted(version, "version");
     // set serialization version global variable
-    CryptoNote::WALLET_LEGACY_SERIALIZATION_VERSION = version;
+    QwertyNote::WALLET_LEGACY_SERIALIZATION_VERSION = version;
 
     Crypto::Chacha8Iv iv;
     serializerEncrypted(iv, "iv");
@@ -158,7 +158,7 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
     decrypt(cipher, plain, iv, password);
 
     MemoryInputStream decryptedStream(plain.data(), plain.size());
-    CryptoNote::BinaryInputStreamSerializer serializer(decryptedStream);
+    QwertyNote::BinaryInputStreamSerializer serializer(decryptedStream);
 
     loadKeys(serializer);
     throwIfKeysMissmatch(
@@ -173,7 +173,7 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
         );
     } else {
         if (!Crypto::checkKey(account.getAccountKeys().address.spendPublicKey)) {
-            throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
+            throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
         }
     }
 
@@ -220,17 +220,17 @@ void WalletLegacySerializer::decrypt(
     Crypto::chacha8(cipher.data(), cipher.size(), key, iv, &plain[0]);
 }
 
-void WalletLegacySerializer::loadKeys(CryptoNote::ISerializer &serializer)
+void WalletLegacySerializer::loadKeys(QwertyNote::ISerializer &serializer)
 {
-    CryptoNote::KeysStorage keys;
+    QwertyNote::KeysStorage keys;
 
     try {
         keys.serialize(serializer, "keys");
     } catch (const std::runtime_error &) {
-        throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
+        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
     }
 
-    CryptoNote::AccountKeys acc;
+    QwertyNote::AccountKeys acc;
     acc.address.spendPublicKey = keys.spendPublicKey;
     acc.spendSecretKey = keys.spendSecretKey;
     acc.address.viewPublicKey = keys.viewPublicKey;
@@ -240,4 +240,4 @@ void WalletLegacySerializer::loadKeys(CryptoNote::ISerializer &serializer)
     account.set_createtime(keys.creationTimestamp);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

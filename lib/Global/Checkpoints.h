@@ -20,7 +20,7 @@
 #include <cstddef>
 #include <initializer_list>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 struct CheckpointData
 {
@@ -32,4 +32,4 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {
     // Add your first Checkpoints here :)
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

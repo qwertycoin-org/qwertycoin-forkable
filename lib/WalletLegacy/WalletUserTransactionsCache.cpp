@@ -31,7 +31,7 @@
 
 using namespace Crypto;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 WalletUserTransactionsCache::WalletUserTransactionsCache(uint64_t mempoolTxLiveTime)
     : m_unconfirmedTransactions(mempoolTxLiveTime),
@@ -42,9 +42,9 @@ WalletUserTransactionsCache::WalletUserTransactionsCache(uint64_t mempoolTxLiveT
 {
 }
 
-bool WalletUserTransactionsCache::serialize(CryptoNote::ISerializer &s)
+bool WalletUserTransactionsCache::serialize(QwertyNote::ISerializer &s)
 {
-    if (s.type() == CryptoNote::ISerializer::INPUT) {
+    if (s.type() == QwertyNote::ISerializer::INPUT) {
         s(m_transactions, "transactions");
         s(m_transfers, "transfers");
         s(m_unconfirmedTransactions, "unconfirmed");
@@ -197,7 +197,7 @@ TransactionId WalletUserTransactionsCache::addNewTransaction(
 
 void WalletUserTransactionsCache::updateTransaction(
     TransactionId transactionId,
-    const CryptoNote::Transaction &tx,
+    const QwertyNote::Transaction &tx,
     uint64_t amount,
     const std::list<TransactionOutputInformation> &usedOutputs,
     Crypto::FSecretKey &tx_key)
@@ -230,7 +230,7 @@ std::shared_ptr<WalletLegacyEvent> WalletUserTransactionsCache::onTransactionUpd
 {
     std::shared_ptr<WalletLegacyEvent> event;
 
-    TransactionId id = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
+    TransactionId id = QwertyNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
 
     if (!m_unconfirmedTransactions.findTransactionId(txInfo.transactionHash, id)) {
         id = findTransactionByHash(txInfo.transactionHash);
@@ -240,7 +240,7 @@ std::shared_ptr<WalletLegacyEvent> WalletUserTransactionsCache::onTransactionUpd
 
     bool isCoinbase = txInfo.totalAmountIn == 0;
 
-    if (id == CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID) {
+    if (id == QwertyNote::WALLET_LEGACY_INVALID_TRANSACTION_ID) {
         WalletLegacyTransaction transaction;
         transaction.firstTransferId = WALLET_LEGACY_INVALID_TRANSFER_ID;
         transaction.transferCount = 0;
@@ -274,7 +274,7 @@ std::shared_ptr<WalletLegacyEvent> WalletUserTransactionsCache::onTransactionUpd
 std::shared_ptr<WalletLegacyEvent> WalletUserTransactionsCache::onTransactionDeleted(
     const FHash &transactionHash)
 {
-    TransactionId id = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
+    TransactionId id = QwertyNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
     if (m_unconfirmedTransactions.findTransactionId(transactionHash, id)) {
         m_unconfirmedTransactions.erase(transactionHash);
         //LOG_ERROR("Unconfirmed transaction is deleted: id = "<<id<<", hash = "<< transactionHash);
@@ -284,7 +284,7 @@ std::shared_ptr<WalletLegacyEvent> WalletUserTransactionsCache::onTransactionDel
     }
 
     std::shared_ptr<WalletLegacyEvent> event;
-    if (id != CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID) {
+    if (id != QwertyNote::WALLET_LEGACY_INVALID_TRANSACTION_ID) {
         WalletLegacyTransaction &tr = getTransaction(id);
         std::vector<uint8_t> extra(tr.extra.begin(), tr.extra.end());
         PaymentId paymentId;
@@ -400,7 +400,7 @@ TransactionId WalletUserTransactionsCache::findTransactionByHash(const FHash &ha
     );
 
     if (it == m_transactions.end()) {
-        return CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
+        return QwertyNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
     }
 
     return std::distance(m_transactions.begin(), it);
@@ -504,4 +504,4 @@ std::vector<TransactionId> WalletUserTransactionsCache::deleteOutdatedTransactio
     return deletedTransactions;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

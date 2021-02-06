@@ -52,7 +52,7 @@
 
 using namespace Common;
 using namespace Logging;
-using namespace CryptoNote;
+using namespace QwertyNote;
 
 namespace {
 
@@ -88,7 +88,7 @@ void addPortMapping(Logging::LoggerRef &logger, uint32_t port)
                                     portString.str().c_str(),
                                     portString.str().c_str(),
                                     lanAddress,
-                                    CryptoNote::CRYPTONOTE_NAME,
+                                    QwertyNote::CRYPTONOTE_NAME,
                                     "TCP",
                                     nullptr,
                                     "0") != 0) {
@@ -117,7 +117,7 @@ bool parse_peer_from_string(NetworkAddress &pe, const std::string &node_addr)
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace {
 
@@ -129,7 +129,7 @@ const CommandLine::ArgDescriptor<std::string> arg_p2p_bind_ip = {
 const CommandLine::ArgDescriptor<std::string> arg_p2p_bind_port = {
     "p2p-bind-port",
     "Port for p2p network protocol",
-    std::to_string(CryptoNote::P2P_DEFAULT_PORT)
+    std::to_string(QwertyNote::P2P_DEFAULT_PORT)
 };
 const CommandLine::ArgDescriptor<uint32_t> arg_p2p_external_port = {
     "p2p-external-port",
@@ -278,7 +278,7 @@ int invokeAdaptor(const BinaryArray &reqBuf,
 }
 
 NodeServer::NodeServer(System::Dispatcher &dispatcher,
-                       CryptoNote::CryptoNoteProtocolHandler &payload_handler,
+                       QwertyNote::CryptoNoteProtocolHandler &payload_handler,
                        Logging::ILogger &log)
     : m_dispatcher(dispatcher),
       m_workingContextGroup(dispatcher),
@@ -379,7 +379,7 @@ bool NodeServer::init_config()
             if (!p2p_data.fail()) {
                 StdInputStream inputStream(p2p_data);
                 BinaryInputStreamSerializer a(inputStream);
-                CryptoNote::serialize(*this, a);
+                QwertyNote::serialize(*this, a);
                 loaded = true;
             }
         } catch (const std::exception &e) {
@@ -619,7 +619,7 @@ bool NodeServer::append_net_address(std::vector<NetworkAddress> &nodes, const st
 bool NodeServer::init(const NetNodeConfig &config)
 {
     if (!config.getTestnet()) {
-        for (auto seed : CryptoNote::SEED_NODES) {
+        for (auto seed : QwertyNote::SEED_NODES) {
             append_net_address(m_seed_nodes, seed);
         }
     } else {
@@ -657,7 +657,7 @@ bool NodeServer::init(const NetNodeConfig &config)
 
     // configure self
     // m_net_server.get_config_object().m_pcommands_handler = this;
-    // m_net_server.get_config_object().m_invoke_timeout = CryptoNote::P2P_DEFAULT_INVOKE_TIMEOUT;
+    // m_net_server.get_config_object().m_invoke_timeout = QwertyNote::P2P_DEFAULT_INVOKE_TIMEOUT;
 
     logger(INFO) << "Network: " << m_network_id;
 
@@ -678,7 +678,7 @@ bool NodeServer::init(const NetNodeConfig &config)
     return true;
 }
 
-CryptoNote::CryptoNoteProtocolHandler& NodeServer::get_payload_object()
+QwertyNote::CryptoNoteProtocolHandler& NodeServer::get_payload_object()
 {
     return m_payload_handler;
 }
@@ -732,7 +732,7 @@ bool NodeServer::store_config()
 
         StdOutputStream stream(p2p_data);
         BinaryOutputStreamSerializer a(stream);
-        CryptoNote::serialize(*this, a);
+        QwertyNote::serialize(*this, a);
 
         return true;
     } catch (const std::exception &e) {
@@ -755,7 +755,7 @@ bool NodeServer::sendStopSignal()
     return true;
 }
 
-bool NodeServer::handshake(CryptoNote::LevinProtocol &proto,
+bool NodeServer::handshake(QwertyNote::LevinProtocol &proto,
                            P2pConnectionContext &context,
                            bool just_take_peerlist)
 {
@@ -791,7 +791,7 @@ bool NodeServer::handshake(CryptoNote::LevinProtocol &proto,
         }
     }
 
-    if (rsp.node_data.version < CryptoNote::P2P_MINIMUM_VERSION) {
+    if (rsp.node_data.version < QwertyNote::P2P_MINIMUM_VERSION) {
         logger(Logging::DEBUGGING,BRIGHT_RED)
             << context
             << "COMMAND_HANDSHAKE Failed, peer is wrong version! ("
@@ -799,11 +799,11 @@ bool NodeServer::handshake(CryptoNote::LevinProtocol &proto,
             << "), closing connection.";
         ban_host(context.m_remote_ip);
         return false;
-    } else if ((rsp.node_data.version - CryptoNote::P2P_CURRENT_VERSION) >= CryptoNote::P2P_UPGRADE_WINDOW) {
+    } else if ((rsp.node_data.version - QwertyNote::P2P_CURRENT_VERSION) >= QwertyNote::P2P_UPGRADE_WINDOW) {
         logger(Logging::WARNING)
             << context
             << "COMMAND_HANDSHAKE Warning, your software may be out of date. Please visit: "
-            << CryptoNote::LATEST_VERSION_URL
+            << QwertyNote::LATEST_VERSION_URL
             << " for the latest version.";
     }
 
@@ -975,7 +975,7 @@ bool NodeServer::try_to_connect_and_handshake_with_new_peer(const NetworkAddress
 
         try {
             System::Context<bool> handshakeContext(m_dispatcher, [&] {
-                CryptoNote::LevinProtocol proto(ctx.connection);
+                QwertyNote::LevinProtocol proto(ctx.connection);
                 return handshake(proto, ctx, just_take_peerlist);
             });
 
@@ -1255,7 +1255,7 @@ bool NodeServer::handle_remote_peerlist(const std::list<PeerlistEntry> &peerlist
 
 bool NodeServer::get_local_node_data(basic_node_data &node_data)
 {
-    node_data.version = CryptoNote::P2P_CURRENT_VERSION;
+    node_data.version = QwertyNote::P2P_CURRENT_VERSION;
     time_t local_time;
     time(&local_time);
     node_data.local_time = local_time;
@@ -1306,7 +1306,7 @@ bool NodeServer::check_trust(const proof_of_trust &tr)
     }
 
     Crypto::FPublicKey pk;
-    Common::podFromHex(CryptoNote::P2P_STAT_TRUSTED_PUB_KEY, pk);
+    Common::podFromHex(QwertyNote::P2P_STAT_TRUSTED_PUB_KEY, pk);
     Crypto::FHash h = get_proof_of_trust_hash(tr);
     if (!Crypto::checkSignature(h, pk, tr.sign)) {
         logger(ERROR) << "check_trust failed: sign check failed";
@@ -1507,7 +1507,7 @@ int NodeServer::handle_handshake(int command,
         return 1;
     }
 
-    if (arg.node_data.version < CryptoNote::P2P_MINIMUM_VERSION) {
+    if (arg.node_data.version < QwertyNote::P2P_MINIMUM_VERSION) {
         logger(Logging::DEBUGGING)
             << context
             << "UNSUPPORTED NETWORK AGENT VERSION CONNECTED! version="
@@ -1515,11 +1515,11 @@ int NodeServer::handle_handshake(int command,
         context.m_state = CryptoNoteConnectionContext::state_shutdown;
 		ban_host(context.m_remote_ip);
         return 1;
-    } else if (arg.node_data.version > CryptoNote::P2P_CURRENT_VERSION) {
+    } else if (arg.node_data.version > QwertyNote::P2P_CURRENT_VERSION) {
         logger(Logging::WARNING)
             << context
             << "Our software may be out of date. Please visit: "
-            << CryptoNote::LATEST_VERSION_URL
+            << QwertyNote::LATEST_VERSION_URL
             << " for the latest version.";
     }
 
@@ -1897,4 +1897,4 @@ void NodeServer::writeHandler(P2pConnectionContext &ctx)
     logger(DEBUGGING) << ctx << "writeHandler finished";
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -35,7 +35,7 @@ namespace {
 
 struct keys_file_data
 {
-    void serialize(CryptoNote::ISerializer &s)
+    void serialize(QwertyNote::ISerializer &s)
     {
         s(iv, "iv");
         s(account_data, "account_data");
@@ -47,21 +47,21 @@ struct keys_file_data
 
 void loadKeysFromFile(const std::string &filename,
                       const std::string &password,
-                      CryptoNote::AccountBase &account)
+                      QwertyNote::AccountBase &account)
 {
     keys_file_data keys_file_data;
     std::string buf;
 
     if (!Common::loadFileToString(filename, buf)) {
         throw std::system_error(
-            make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR),
+            make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR),
             "failed to load \"" + filename + '\"'
         );
     }
 
-    if (!CryptoNote::fromBinaryArray(keys_file_data, Common::asBinaryArray(buf))) {
+    if (!QwertyNote::fromBinaryArray(keys_file_data, Common::asBinaryArray(buf))) {
         throw std::system_error(
-            make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR),
+            make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR),
             "failed to deserialize \"" + filename + '\"'
         );
     }
@@ -77,33 +77,33 @@ void loadKeysFromFile(const std::string &filename,
             keys_file_data.iv,
             &account_data[0]);
 
-    if (!CryptoNote::loadFromBinaryKeyValue(account, account_data)) {
-        throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
+    if (!QwertyNote::loadFromBinaryKeyValue(account, account_data)) {
+        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
     }
 
-    const CryptoNote::AccountKeys& keys = account.getAccountKeys();
-    CryptoNote::throwIfKeysMissmatch(keys.viewSecretKey, keys.address.viewPublicKey);
-    CryptoNote::throwIfKeysMissmatch(keys.spendSecretKey, keys.address.spendPublicKey);
+    const QwertyNote::AccountKeys& keys = account.getAccountKeys();
+    QwertyNote::throwIfKeysMissmatch(keys.viewSecretKey, keys.address.viewPublicKey);
+    QwertyNote::throwIfKeysMissmatch(keys.spendSecretKey, keys.address.spendPublicKey);
 }
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 void importLegacyKeys(const std::string &legacyKeysFilename,
                       const std::string &password,
                       std::ostream &destination)
 {
-    CryptoNote::AccountBase account;
+    QwertyNote::AccountBase account;
 
     loadKeysFromFile(legacyKeysFilename, password, account);
 
-    CryptoNote::WalletUserTransactionsCache transactionsCache;
+    QwertyNote::WalletUserTransactionsCache transactionsCache;
     std::string cache;
 
-    CryptoNote::WalletLegacySerializer importer(account, transactionsCache);
+    QwertyNote::WalletLegacySerializer importer(account, transactionsCache);
     std::vector<Crypto::FHash> safeTxes;
     importer.serialize(destination, password, false, cache, safeTxes);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

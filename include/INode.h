@@ -29,7 +29,7 @@
 #include <CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h>
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class INodeObserver
 {
@@ -61,7 +61,7 @@ struct TransactionShortInfo {
 struct BlockShortEntry {
     Crypto::FHash blockHash;
     bool hasBlock;
-    CryptoNote::Block block;
+    QwertyNote::Block block;
     std::vector<TransactionShortInfo> txsShortInfo;
 };
 
@@ -106,11 +106,11 @@ public:
     virtual void relayTransaction(const Transaction &transaction, const Callback &callback) = 0;
     virtual void getRandomOutsByAmounts(
             std::vector<uint64_t> &&amounts, uint64_t outsCount,
-            std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>
+            std::vector<QwertyNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>
                     &result,
             const Callback &callback) = 0;
     virtual void getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
-                              std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
+                              std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
                               uint32_t &startHeight, const Callback &callback) = 0;
     virtual void getTransactionOutsGlobalIndices(const Crypto::FHash &transactionHash,
                                                  std::vector<uint32_t> &outsGlobalIndices,
@@ -148,4 +148,4 @@ public:
     virtual void isSynchronized(bool &syncStatus, const Callback &callback) = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

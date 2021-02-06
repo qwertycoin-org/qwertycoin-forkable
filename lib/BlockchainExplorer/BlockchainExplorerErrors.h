@@ -21,7 +21,7 @@
 #include <string>
 #include <system_error>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace error {
 
@@ -49,11 +49,11 @@ public:
 
 } //namespace error
 
-} //namespace CryptoNote
+} //namespace QwertyNote
 
-inline std::error_code make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes e)
+inline std::error_code make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes e)
 {
-    using namespace CryptoNote;
+    using namespace QwertyNote;
 
     return std::error_code{static_cast<int>(e), error::BlockchainExplorerErrorCategory::INSTANCE};
 }

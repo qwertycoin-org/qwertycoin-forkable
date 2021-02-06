@@ -18,7 +18,7 @@
 
 #include <Http/HttpParserErrorCodes.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace error {
 
@@ -26,4 +26,4 @@ HttpParserErrorCategory HttpParserErrorCategory::INSTANCE;
 
 } // namespace error
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -20,7 +20,7 @@
 
 #include <BlockchainExplorer/IBlockchainObserver.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class IBlockchainExplorer
 {
@@ -66,4 +66,4 @@ public:
     virtual bool isSynchronized() = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

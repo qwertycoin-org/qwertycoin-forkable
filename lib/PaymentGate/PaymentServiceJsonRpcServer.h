@@ -30,7 +30,7 @@ namespace PaymentService {
 
 class WalletService;
 
-class PaymentServiceJsonRpcServer : public CryptoNote::JsonRpcServer
+class PaymentServiceJsonRpcServer : public QwertyNote::JsonRpcServer
 {
     typedef std::function<void (const Common::JsonValue &jsonRpcParams,
                                 Common::JsonValue &jsonResponse)> HandlerFunction;
@@ -58,7 +58,7 @@ private:
             ResponseType response;
 
             try {
-                CryptoNote::JsonInputValueSerializer inputSerializer(
+                QwertyNote::JsonInputValueSerializer inputSerializer(
                     const_cast<Common::JsonValue &>(jsonRpcParams)
                 );
                 serialize(request, inputSerializer);
@@ -73,7 +73,7 @@ private:
                 return;
             }
 
-            CryptoNote::JsonOutputStreamSerializer outputSerializer;
+            QwertyNote::JsonOutputStreamSerializer outputSerializer;
             serialize(response, outputSerializer);
             fillJsonResponse(outputSerializer.getValue(), jsonResponse);
         };

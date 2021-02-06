@@ -27,7 +27,7 @@
 #include <Serialization/SerializationOverloads.h>
 #include "version.h"
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 inline bool serialize(uuid &v, const Common::StringView &name, ISerializer &s)
 {
@@ -316,4 +316,4 @@ struct COMMAND_REQUEST_PEER_ID
 
 #endif
 
-} // namespace CryptoNote
+} // namespace QwertyNote

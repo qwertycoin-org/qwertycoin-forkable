@@ -25,7 +25,7 @@
 
 using namespace System;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 P2pContext::Message::Message(P2pMessage &&msg, Type messageType, uint32_t returnCode)
     : messageType(messageType),
@@ -201,4 +201,4 @@ std::ostream &operator <<(std::ostream &s, const P2pContext &conn)
     return s << "[" << conn.getRemoteAddress() << "]";
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -25,7 +25,7 @@
 #include <WalletLegacy/WalletUnconfirmedTransactions.h>
 #include <ITransfersContainer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class ISerializer;
 
@@ -37,7 +37,7 @@ class WalletUserTransactionsCache
 public:
     explicit WalletUserTransactionsCache(uint64_t mempoolTxLiveTime = 60 * 60 * 24);
 
-    bool serialize(CryptoNote::ISerializer &serializer);
+    bool serialize(QwertyNote::ISerializer &serializer);
 
     uint64_t unconfirmedTransactionsAmount() const;
     uint64_t unconfrimedOutsAmount() const;
@@ -61,7 +61,7 @@ public:
 
     void updateTransaction(
         TransactionId transactionId,
-        const CryptoNote::Transaction &tx,
+        const QwertyNote::Transaction &tx,
         uint64_t amount,
         const std::list<TransactionOutputInformation> &usedOutputs,
         Crypto::FSecretKey &tx_key);
@@ -145,4 +145,4 @@ private:
     Crypto::FHash m_prevConsolidateTx;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

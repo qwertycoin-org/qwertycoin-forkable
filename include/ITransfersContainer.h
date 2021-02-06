@@ -26,7 +26,8 @@
 #include <IObservable.h>
 #include <IStreamSerializable.h>
 
-namespace CryptoNote {
+#include <Crypto/Hash.h>
+namespace QwertyNote {
 
 const uint32_t UNCONFIRMED_TRANSACTION_GLOBAL_OUTPUT_INDEX = std::numeric_limits<uint32_t>::max();
 
@@ -127,4 +128,4 @@ public:
     virtual void getSafeTransactions(std::vector<Crypto::FHash> &transactions) const = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

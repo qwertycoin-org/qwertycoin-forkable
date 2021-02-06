@@ -36,6 +36,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <vector>
+#include <QwertyNote.h>
 #include <Common/ObserverManager.h>
 #include <CryptoNoteCore/TransactionExtra.h>
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
@@ -49,10 +50,9 @@
 #include <WalletLegacy/WalletTransactionSender.h>
 #include <WalletLegacy/WalletUserTransactionsCache.h>
 #include <WalletLegacy/WalletUnconfirmedTransactions.h>
-#include <CryptoNote.h>
 #include <INode.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class SyncStarter;
 
@@ -67,7 +67,7 @@ class WalletLegacy : public IWalletLegacy, IBlockchainSynchronizerObserver, ITra
     };
 
 public:
-    WalletLegacy(const CryptoNote::Currency &currency, INode &node, Logging::ILogger &loggerGroup);
+    WalletLegacy(const QwertyNote::Currency &currency, INode &node, Logging::ILogger &loggerGroup);
     ~WalletLegacy() override;
 
     void addObserver(IWalletLegacyObserver *observer) override;
@@ -111,10 +111,9 @@ public:
     bool getTransfer(TransferId transferId, WalletLegacyTransfer &transfer) override;
     std::vector<Payments> getTransactionsByPaymentIds(const std::vector<PaymentId> &paymentIds) const override;
     bool getTxProof(
-        Crypto::Hash &txid,
+			Crypto::FHash &txid, QwertyNote::AccountPublicAddress &address,
 			Crypto::FSecretKey &tx_key,
-        Crypto::SecretKey &tx_key,
-        std::string &sig_str) override;
+			std::string &sig_str) override;
     std::string getReserveProof(const uint64_t &reserve, const std::string &message) override;
     Crypto::FSecretKey getTxKey(Crypto::FHash &txid) override;
     bool get_tx_key(Crypto::FHash &txid, Crypto::FSecretKey &txSecretKey) override;
@@ -162,7 +161,7 @@ public:
 
     std::string sign_message(const std::string &data) override;
     bool verify_message(const std::string &data,
-                        const CryptoNote::AccountPublicAddress &address,
+                        const QwertyNote::AccountPublicAddress &address,
                         const std::string &signature) override;
 
     bool isTrackingWallet() override;
@@ -201,9 +200,9 @@ private:
 private:
     WalletState m_state;
     std::mutex m_cacheMutex;
-    CryptoNote::AccountBase m_account;
+    QwertyNote::AccountBase m_account;
     std::string m_password;
-    const CryptoNote::Currency &m_currency;
+    const QwertyNote::Currency &m_currency;
     INode &m_node;
     Logging::ILogger &m_loggerGroup;
     bool m_isStopping;
@@ -220,9 +219,9 @@ private:
     std::unique_ptr<WalletTransactionSender> m_sender;
 
     WalletAsyncContextCounter m_asyncContextCounter;
-    Tools::ObserverManager<CryptoNote::IWalletLegacyObserver> m_observerManager;
+    Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> m_observerManager;
 
     std::unique_ptr<SyncStarter> m_onInitSyncStarter;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

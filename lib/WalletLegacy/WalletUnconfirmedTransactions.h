@@ -28,20 +28,20 @@
 #include <WalletLegacy/IWalletLegacy.h>
 #include <ITransfersContainer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class ISerializer;
 
 typedef std::pair<Crypto::PublicKey, size_t> TransactionOutputId;
 
-} // namespace CryptoNote
+} // namespace QwertyNote
 
 namespace std {
 
 template<>
-struct hash<CryptoNote::TransactionOutputId>
+struct hash<QwertyNote::TransactionOutputId>
 {
-    size_t operator()(const CryptoNote::TransactionOutputId &_v) const
+    size_t operator()(const QwertyNote::TransactionOutputId &_v) const
     {
         return hash<Crypto::FPublicKey>()(_v.first) ^ _v.second;
     }
@@ -49,7 +49,7 @@ struct hash<CryptoNote::TransactionOutputId>
 
 } // namespace std
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 struct UnconfirmedTransferDetails
 {
@@ -60,7 +60,7 @@ struct UnconfirmedTransferDetails
     {
     }
 
-    CryptoNote::Transaction tx;
+    QwertyNote::Transaction tx;
     uint64_t amount;
     uint64_t outsAmount;
     time_t sentTime;
@@ -83,11 +83,11 @@ class WalletUnconfirmedTransactions
 public:
     explicit WalletUnconfirmedTransactions(uint64_t uncofirmedTransactionsLiveTime);
 
-    bool serialize(CryptoNote::ISerializer &s);
+    bool serialize(QwertyNote::ISerializer &s);
 
     bool findTransactionId(const Crypto::FHash &hash, TransactionId &id);
     void erase(const Crypto::FHash &hash);
-    void add(const CryptoNote::Transaction &tx,
+    void add(const QwertyNote::Transaction &tx,
              TransactionId transactionId,
              uint64_t amount,
              const std::list<TransactionOutputInformation> &usedOutputs,
@@ -111,4 +111,4 @@ private:
     uint64_t m_uncofirmedTransactionsLiveTime;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

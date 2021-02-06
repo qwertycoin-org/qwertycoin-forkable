@@ -23,7 +23,7 @@
 
 using namespace Common;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 ISerializer::SerializerType BinaryOutputStreamSerializer::type() const
 {
@@ -139,4 +139,4 @@ void BinaryOutputStreamSerializer::checkedWrite(const char *buf, size_t size)
     write(stream, buf, size);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

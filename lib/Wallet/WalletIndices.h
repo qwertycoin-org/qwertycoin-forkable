@@ -31,7 +31,7 @@
 #include <Wallet/IWallet.h>
 #include <ITransfersContainer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 const uint64_t ACCOUNT_CREATE_TIME_ACCURACY = 60 * 60 * 24;
 
@@ -39,7 +39,7 @@ struct WalletRecord
 {
     Crypto::FPublicKey spendPublicKey;
     Crypto::FSecretKey spendSecretKey;
-    CryptoNote::ITransfersContainer *container = nullptr;
+    QwertyNote::ITransfersContainer *container = nullptr;
     uint64_t pendingBalance = 0;
     uint64_t actualBalance = 0;
     time_t creationTimestamp;
@@ -78,7 +78,7 @@ typedef boost::multi_index_container <
         >,
         boost::multi_index::hashed_unique <
             boost::multi_index::tag <TransfersContainerIndex>,
-            BOOST_MULTI_INDEX_MEMBER(WalletRecord, CryptoNote::ITransfersContainer *, container)
+            BOOST_MULTI_INDEX_MEMBER(WalletRecord, QwertyNote::ITransfersContainer *, container)
         >
     >
 > WalletsContainer;
@@ -86,7 +86,7 @@ typedef boost::multi_index_container <
 struct UnlockTransactionJob
 {
     uint32_t blockHeight;
-    CryptoNote::ITransfersContainer *container;
+    QwertyNote::ITransfersContainer *container;
     Crypto::FHash transactionHash;
 };
 
@@ -105,34 +105,32 @@ typedef boost::multi_index_container <
 > UnlockTransactionJobs;
 
 typedef boost::multi_index_container <
-    CryptoNote::WalletTransaction,
+        QwertyNote::WalletTransaction,
     boost::multi_index::indexed_by <
         boost::multi_index::random_access <
             boost::multi_index::tag <RandomAccessIndex>
         >,
         boost::multi_index::hashed_unique <
             boost::multi_index::tag <TransactionIndex>,
-            boost::multi_index::member <
+            boost::multi_index::member <QwertyNote::WalletTransaction,
                 Crypto::FHash,
-                Crypto::Hash,
-                &CryptoNote::WalletTransaction::hash
+                &QwertyNote::WalletTransaction::hash
             >
         >,
         boost::multi_index::ordered_non_unique <
             boost::multi_index::tag <BlockHeightIndex>,
-            boost::multi_index::member<
-                CryptoNote::WalletTransaction,
+            boost::multi_index::member<QwertyNote::WalletTransaction,
                 uint32_t,
-                &CryptoNote::WalletTransaction::blockHeight
+                &QwertyNote::WalletTransaction::blockHeight
             >
         >
     >
 > WalletTransactions;
 
 typedef Common::FileMappedVector<EncryptedWalletRecord> ContainerStorage;
-typedef std::pair<size_t, CryptoNote::WalletTransfer> TransactionTransferPair;
+typedef std::pair<size_t, QwertyNote::WalletTransfer> TransactionTransferPair;
 typedef std::vector<TransactionTransferPair> WalletTransfers;
-typedef std::map<size_t, CryptoNote::Transaction> UncommitedTransactions;
+typedef std::map<size_t, QwertyNote::Transaction> UncommitedTransactions;
 
 typedef boost::multi_index_container<
     Crypto::FHash,
@@ -147,4 +145,4 @@ typedef boost::multi_index_container<
     >
 > BlockHashesContainer;
 
-} // namespace CryptoNote
+} // namespace QwertyNote

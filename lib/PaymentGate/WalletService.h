@@ -35,11 +35,11 @@
 #undef ERROR // TODO: workaround for windows build. Fix it!
 #include <Logging/LoggerRef.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class IFusionManager;
 
-} // namespace CryptoNote
+} // namespace QwertyNote
 
 namespace PaymentService {
 
@@ -53,7 +53,7 @@ struct WalletConfiguration
     bool generateDeterministic;
 };
 
-void generateNewWallet(const CryptoNote::Currency &currency,
+void generateNewWallet(const QwertyNote::Currency &currency,
                        const WalletConfiguration &conf,
                        Logging::ILogger &logger,
                        System::Dispatcher &dispatcher);
@@ -63,11 +63,10 @@ struct TransactionsInBlockInfoFilter;
 class WalletService
 {
 public:
-    WalletService(const CryptoNote::Currency &currency,
+    WalletService(const QwertyNote::Currency &currency,
                   System::Dispatcher &sys,
-                  CryptoNote::INode &node,
-                  CryptoNote::IWallet &wallet,
-                  CryptoNote::IFusionManager &fusionManager,
+                  QwertyNote::INode &node, QwertyNote::IWallet &wallet,
+                  QwertyNote::IFusionManager &fusionManager,
                   const WalletConfiguration &conf,
                   Logging::ILogger &logger);
 
@@ -181,11 +180,11 @@ private:
     void loadWallet();
     void loadTransactionIdIndex();
 
-    void replaceWithNewWallet(const Crypto::SecretKey &viewSecretKey);
+    void replaceWithNewWallet(const Crypto::FSecretKey &viewSecretKey);
 
-    std::vector<CryptoNote::TransactionsInBlockInfo> getTransactions(const Crypto::Hash &blockHash,
+    std::vector<QwertyNote::TransactionsInBlockInfo> getTransactions(const Crypto::FHash &blockHash,
                                                                      size_t blockCount) const;
-    std::vector<CryptoNote::TransactionsInBlockInfo> getTransactions(uint32_t firstBlockIndex,
+    std::vector<QwertyNote::TransactionsInBlockInfo> getTransactions(uint32_t firstBlockIndex,
                                                                      size_t blockCount) const;
 
     std::vector<TransactionHashesInBlockRpcInfo> getRpcTransactionHashes(
@@ -207,10 +206,10 @@ private:
         const TransactionsInBlockInfoFilter &filter) const;
 
 private:
-    const CryptoNote::Currency &currency;
-    CryptoNote::IWallet &wallet;
-    CryptoNote::IFusionManager &fusionManager;
-    CryptoNote::INode &node;
+    const QwertyNote::Currency &currency;
+    QwertyNote::IWallet &wallet;
+    QwertyNote::IFusionManager &fusionManager;
+    QwertyNote::INode &node;
     const WalletConfiguration &config;
     bool inited;
     Logging::LoggerRef logger;

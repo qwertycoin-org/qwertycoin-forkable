@@ -29,12 +29,12 @@
 using namespace Common;
 using namespace Crypto;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 const uint32_t TRANSFERS_STORAGE_ARCHIVE_VERSION = 0;
 
 TransfersSynchronizer::TransfersSynchronizer(
-    const CryptoNote::Currency &currency,
+    const QwertyNote::Currency &currency,
     Logging::ILogger &logger,
     IBlockchainSynchronizer &sync,
     INode &node)
@@ -239,7 +239,7 @@ void TransfersSynchronizer::save(std::ostream &os)
     m_sync.save(os);
 
     StdOutputStream stream(os);
-    CryptoNote::BinaryOutputStreamSerializer s(stream);
+    QwertyNote::BinaryOutputStreamSerializer s(stream);
     s(const_cast<uint32_t&>(TRANSFERS_STORAGE_ARCHIVE_VERSION), "version");
 
     size_t subscriptionCount = m_consumers.size();
@@ -308,7 +308,7 @@ void TransfersSynchronizer::load(std::istream &is)
     m_sync.load(is);
 
     StdInputStream inputStream(is);
-    CryptoNote::BinaryInputStreamSerializer s(inputStream);
+    QwertyNote::BinaryInputStreamSerializer s(inputStream);
     uint32_t version = 0;
 
     s(version, "version");
@@ -436,4 +436,4 @@ TransfersSynchronizer::findSubscriberForConsumer(IBlockchainConsumer *consumer) 
     return m_subscribers.end();
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

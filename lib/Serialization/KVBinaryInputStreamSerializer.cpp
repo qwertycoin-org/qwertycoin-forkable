@@ -16,7 +16,7 @@
 #include <Serialization/KVBinaryInputStreamSerializer.h>
 
 using namespace Common;
-using namespace CryptoNote;
+using namespace QwertyNote;
 
 namespace {
 

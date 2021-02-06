@@ -29,7 +29,7 @@
 #include <INode.h>
 #include <IStreamSerializable.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class BlockchainSynchronizer : public IObservableImpl<
                                    IBlockchainSynchronizerObserver,
@@ -163,4 +163,4 @@ private:
     std::condition_variable m_hasWork;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

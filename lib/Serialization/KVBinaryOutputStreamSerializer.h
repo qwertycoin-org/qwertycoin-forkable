@@ -23,7 +23,7 @@
 #include <Serialization/ISerializer.h>
 #include <Serialization/MemoryStream.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class KVBinaryOutputStreamSerializer : public ISerializer
 {
@@ -107,4 +107,4 @@ private:
     std::vector<Level> m_stack;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

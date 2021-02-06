@@ -101,7 +101,7 @@
 #include <netdb.h>
 #endif // defined(WIN32)
 
-using namespace CryptoNote;
+using namespace QwertyNote;
 using namespace Logging;
 using namespace Qwertycoin;
 using Common::JsonValue;
@@ -308,10 +308,10 @@ private:
 
 struct TransferCommand
 {
-    const CryptoNote::Currency &m_currency;
-    const CryptoNote::NodeRpcProxy &m_node;
+    const QwertyNote::Currency &m_currency;
+    const QwertyNote::NodeRpcProxy &m_node;
     size_t fake_outs_count;
-    std::vector<CryptoNote::WalletLegacyTransfer> dsts;
+    std::vector<QwertyNote::WalletLegacyTransfer> dsts;
     std::vector<uint8_t> extra;
     uint64_t fee;
     std::vector<std::string> messages;
@@ -321,7 +321,7 @@ struct TransferCommand
     std::map<std::string, std::vector<WalletLegacyTransfer>> aliases;
 #endif
 
-    TransferCommand(const CryptoNote::Currency& currency, const CryptoNote::NodeRpcProxy& node)
+    TransferCommand(const QwertyNote::Currency& currency, const QwertyNote::NodeRpcProxy& node)
         : m_currency(currency),
           m_node(node),
           fake_outs_count(0),
@@ -391,14 +391,14 @@ struct TransferCommand
                     }
                 } else {
                     WalletLegacyTransfer destination;
-                    CryptoNote::TransactionDestinationEntry de;
+                    QwertyNote::TransactionDestinationEntry de;
 #ifndef __ANDROID__
                     std::string aliasUrl;
 #endif
 
                     if (!m_currency.parseAccountAddressString(arg, de.addr)) {
                         Crypto::FHash paymentId;
-                        if (CryptoNote::parsePaymentId(arg, paymentId)) {
+                        if (QwertyNote::parsePaymentId(arg, paymentId)) {
                             logger(ERROR, BRIGHT_RED)
                                 << "Invalid payment ID usage. "
                                 << "Please, use -p <payment_id>. "
@@ -449,10 +449,10 @@ struct TransferCommand
                     if (!remote_fee_address.empty()) {
                         destination.address = remote_fee_address;
                         int64_t remote_node_fee = static_cast<int64_t>(
-                            de.amount * (CryptoNote::parameters::REMOTE_NODE_FEE_FACTOR / 100)
+                            de.amount * (QwertyNote::parameters::REMOTE_NODE_FEE_FACTOR / 100)
                         );
-                        if (remote_node_fee > CryptoNote::parameters::MAX_REMOTE_NODE_FEE) {
-                            remote_node_fee = CryptoNote::parameters::MAX_REMOTE_NODE_FEE;
+                        if (remote_node_fee > QwertyNote::parameters::MAX_REMOTE_NODE_FEE) {
+                            remote_node_fee = QwertyNote::parameters::MAX_REMOTE_NODE_FEE;
                         }
                         destination.amount = remote_node_fee;
                         dsts.push_back(destination);
@@ -535,7 +535,7 @@ struct TransferCommand
                   }
               } else {
                   WalletLegacyTransfer destination;
-                  CryptoNote::TransactionDestinationEntry de;
+                  QwertyNote::TransactionDestinationEntry de;
 
 #ifndef __ANDROID__
 
@@ -546,7 +546,7 @@ struct TransferCommand
                   if (!m_currency.parseAccountAddressString(arg, de.addr)) {
                       Crypto::FHash paymentID;
 
-                      if (CryptoNote::parsePaymentId(arg, paymentID)) {
+                      if (QwertyNote::parsePaymentId(arg, paymentID)) {
                           logger(ERROR, BRIGHT_RED) << "Invalid payment ID usage.";
                       } else {
 
@@ -587,10 +587,10 @@ struct TransferCommand
                   if (!remote_fee_address.empty()) {
                       destination.address = remote_fee_address;
                       int64_t remote_node_fee = static_cast<int64_t>(
-                          de.amount * (CryptoNote::parameters::REMOTE_NODE_FEE_FACTOR / 100)
+                          de.amount * (QwertyNote::parameters::REMOTE_NODE_FEE_FACTOR / 100)
                       );
-                      if (remote_node_fee > CryptoNote::parameters::MAX_REMOTE_NODE_FEE)
-                          remote_node_fee = CryptoNote::parameters::MAX_REMOTE_NODE_FEE;
+                      if (remote_node_fee > QwertyNote::parameters::MAX_REMOTE_NODE_FEE)
+                          remote_node_fee = QwertyNote::parameters::MAX_REMOTE_NODE_FEE;
                       destination.amount = remote_node_fee;
                       dsts.push_back(destination);
                   }
@@ -690,7 +690,7 @@ std::string tryToOpenWalletOrLoadKeysOrThrow(
         if (initError) { // bad password, or legacy format
             if (keysExists) {
                 std::stringstream ss;
-                CryptoNote::importLegacyKeys(keys_file, password, ss);
+                QwertyNote::importLegacyKeys(keys_file, password, ss);
                 boost::filesystem::rename(keys_file, keys_file + ".back");
                 boost::filesystem::rename(walletFileName, walletFileName + ".back");
 
@@ -702,7 +702,7 @@ std::string tryToOpenWalletOrLoadKeysOrThrow(
                 logger(INFO) << "Storing wallet...";
 
                 try {
-                    CryptoNote::WalletHelper::storeWallet(*wallet, walletFileName);
+                    QwertyNote::WalletHelper::storeWallet(*wallet, walletFileName);
                 } catch (std::exception &e) {
                     logger(ERROR, BRIGHT_RED) << "Failed to store wallet: " << e.what();
                     throw std::runtime_error("error saving wallet file '" + walletFileName + "'");
@@ -721,7 +721,7 @@ std::string tryToOpenWalletOrLoadKeysOrThrow(
         }
     } else if (keysExists) { // wallet not exists but keys presented
         std::stringstream ss;
-        CryptoNote::importLegacyKeys(keys_file, password, ss);
+        QwertyNote::importLegacyKeys(keys_file, password, ss);
         boost::filesystem::rename(keys_file, keys_file + ".back");
 
         WalletHelper::InitWalletResultObserver initObserver;
@@ -739,7 +739,7 @@ std::string tryToOpenWalletOrLoadKeysOrThrow(
         logger(INFO) << "Storing wallet...";
 
         try {
-            CryptoNote::WalletHelper::storeWallet(*wallet, walletFileName);
+            QwertyNote::WalletHelper::storeWallet(*wallet, walletFileName);
         } catch(std::exception &e) {
             logger(ERROR, BRIGHT_RED) << "Failed to store wallet: " << e.what();
             throw std::runtime_error("error saving wallet file '" + walletFileName + "'");
@@ -1040,7 +1040,7 @@ bool simple_wallet::exit(const std::vector<std::string> &args)
 
 simple_wallet::simple_wallet(
     System::Dispatcher &dispatcher,
-    const CryptoNote::Currency &currency,
+    const QwertyNote::Currency &currency,
     Logging::LoggerManager &log)
     : m_dispatcher(dispatcher),
       m_daemon_port(0),
@@ -1297,7 +1297,7 @@ bool simple_wallet::get_tx_proof(const std::vector<std::string> &args)
     }
 
     const std::string address_string = args[1];
-    CryptoNote::AccountPublicAddress address;
+    QwertyNote::AccountPublicAddress address;
     if (!m_currency.parseAccountAddressString(address_string, address)) {
         fail_msg_writer() << "Failed to parse address " << address_string;
         return true;
@@ -1912,7 +1912,7 @@ bool simple_wallet::gen_wallet(
         }
 
         try {
-            CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+            QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
         } catch (std::exception &e) {
             fail_msg_writer() << "failed to save new wallet: " << e.what();
             throw;
@@ -1978,7 +1978,7 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
         }
 
         try {
-            CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+            QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
             // create wallet backup file
             boost::filesystem::copy_file(
                 m_wallet_file,
@@ -2064,7 +2064,7 @@ bool simple_wallet::new_wallet(
         }
 
         try {
-            CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+            QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
         } catch (std::exception &e) {
             fail_msg_writer() << "failed to save new wallet: " << e.what();
             throw;
@@ -2114,7 +2114,7 @@ bool simple_wallet::new_wallet(
         }
 
         try {
-            CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+            QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
         } catch (std::exception &e) {
             fail_msg_writer() << "failed to save new wallet: " << e.what();
             throw;
@@ -2168,7 +2168,7 @@ bool simple_wallet::new_tracking_wallet(
         }
 
         try {
-            CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+            QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
         } catch (std::exception &e) {
             fail_msg_writer() << "failed to save new wallet: " << e.what();
             throw;
@@ -2202,7 +2202,7 @@ bool simple_wallet::new_tracking_wallet(
 bool simple_wallet::close_wallet()
 {
     try {
-        CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+        QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
     } catch (const std::exception &e) {
         fail_msg_writer() << e.what();
         return false;
@@ -2217,7 +2217,7 @@ bool simple_wallet::close_wallet()
 bool simple_wallet::save(const std::vector<std::string> &args)
 {
     try {
-        CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+        QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
         success_msg_writer() << "Wallet data saved";
     } catch (const std::exception &e) {
         fail_msg_writer() << e.what();
@@ -2390,7 +2390,7 @@ void simple_wallet::connectionStatusUpdated(bool connected)
     }
 }
 
-void simple_wallet::externalTransactionCreated(CryptoNote::TransactionId transactionId)
+void simple_wallet::externalTransactionCreated(QwertyNote::TransactionId transactionId)
 {
     WalletLegacyTransaction txInfo;
     m_wallet->getTransaction(transactionId, txInfo);
@@ -2627,7 +2627,7 @@ bool simple_wallet::show_payments(const std::vector<std::string> &args)
             std::back_inserter(paymentIds),
             [](const std::string &arg) {
             PaymentId paymentId;
-            if (!CryptoNote::parsePaymentId(arg, paymentId)) {
+            if (!QwertyNote::parsePaymentId(arg, paymentId)) {
                 throw std::runtime_error(
                     "payment ID has invalid format: \""
                     + arg
@@ -2807,15 +2807,14 @@ bool simple_wallet::transfer(const std::vector<std::string> &args)
 
         logger(INFO) << "Senderaddress: " << sender;
 
-
-        CryptoNote::WalletHelper::SendCompleteResultObserver sent;
+        QwertyNote::WalletHelper::SendCompleteResultObserver sent;
 
         std::string extraString;
         std::copy(cmd.extra.begin(), cmd.extra.end(), std::back_inserter(extraString));
 
         WalletHelper::IWalletRemoveObserverGuard removeGuard(*m_wallet, sent);
 
-        CryptoNote::TransactionId tx = m_wallet->sendTransaction(
+        QwertyNote::TransactionId tx = m_wallet->sendTransaction(
             cmd.dsts,
             cmd.fee,
             extraString,
@@ -2838,14 +2837,14 @@ bool simple_wallet::transfer(const std::vector<std::string> &args)
             return true;
         }
 
-        CryptoNote::WalletLegacyTransaction txInfo;
+        QwertyNote::WalletLegacyTransaction txInfo;
         m_wallet->getTransaction(tx, txInfo);
         success_msg_writer(true)
             << "Money successfully sent, transaction id: " << Common::podToHex(txInfo.hash)
             << ", key: " << Common::podToHex(txInfo.secretKey);
 
         try {
-            CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+            QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
         } catch (const std::exception &e) {
             fail_msg_writer() << e.what();
             return true;
@@ -2942,14 +2941,14 @@ bool simple_wallet::sendMsg(const std::vector<std::string> &args)
             sender = m_wallet->getAddress();
         }
 
-        CryptoNote::WalletHelper::SendCompleteResultObserver sent;
+        QwertyNote::WalletHelper::SendCompleteResultObserver sent;
 
         std::string extraString;
         std::copy(cmd.extra.begin(), cmd.extra.end(), std::back_inserter(extraString));
 
         WalletHelper::IWalletRemoveObserverGuard removeGuard(*m_wallet, sent);
 
-        CryptoNote::TransactionId tx = m_wallet->sendTransaction(
+        QwertyNote::TransactionId tx = m_wallet->sendTransaction(
             cmd.dsts,
             cmd.fee,
             extraString,
@@ -2972,7 +2971,7 @@ bool simple_wallet::sendMsg(const std::vector<std::string> &args)
             return true;
         }
 
-        CryptoNote::WalletLegacyTransaction txInfo;
+        QwertyNote::WalletLegacyTransaction txInfo;
         m_wallet->getTransaction(tx, txInfo);
         success_msg_writer(true)
             << "Message successfully sent, transaction id: " << Common::podToHex(txInfo.hash)
@@ -2998,7 +2997,7 @@ bool simple_wallet::sweep_dust(const std::vector<std::string> &args)
     try {
         WalletLegacyTransfer destination;
         destination.address = m_wallet->getAddress();
-        CryptoNote::TransactionDestinationEntry de;
+        QwertyNote::TransactionDestinationEntry de;
         if (0 == args.size()) {
             destination.amount = m_wallet->dustBalance();
         } else {
@@ -3010,14 +3009,14 @@ bool simple_wallet::sweep_dust(const std::vector<std::string> &args)
             destination.amount = de.amount;
         }
 
-        CryptoNote::WalletHelper::SendCompleteResultObserver sent;
+        QwertyNote::WalletHelper::SendCompleteResultObserver sent;
         std::string extraString;
 
         WalletHelper::IWalletRemoveObserverGuard removeGuard(*m_wallet, sent);
 
         std::vector<WalletLegacyTransfer> transfers;
         transfers.push_back(destination);
-        CryptoNote::TransactionId tx = m_wallet->sendDustTransaction(
+        QwertyNote::TransactionId tx = m_wallet->sendDustTransaction(
             transfers,
             getMinimalFee(),
             extraString,
@@ -3037,14 +3036,14 @@ bool simple_wallet::sweep_dust(const std::vector<std::string> &args)
             return true;
         }
 
-        CryptoNote::WalletLegacyTransaction txInfo;
+        QwertyNote::WalletLegacyTransaction txInfo;
         m_wallet->getTransaction(tx, txInfo);
         success_msg_writer(true)
             << "Money successfully sent, transaction "
             << Common::podToHex(txInfo.hash);
 
         try {
-            CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+            QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
         } catch (const std::exception &e) {
             fail_msg_writer() << e.what();
             return true;
@@ -3164,12 +3163,12 @@ bool simple_wallet::optimize(const std::vector<std::string> &args)
     }
 
     try {
-        CryptoNote::WalletHelper::SendCompleteResultObserver sent;
+        QwertyNote::WalletHelper::SendCompleteResultObserver sent;
         std::string extraString;
 
         WalletHelper::IWalletRemoveObserverGuard removeGuard(*m_wallet, sent);
 
-        CryptoNote::TransactionId tx = m_wallet->sendFusionTransaction(
+        QwertyNote::TransactionId tx = m_wallet->sendFusionTransaction(
             fusionInputs,
             0,
             extraString,
@@ -3189,7 +3188,7 @@ bool simple_wallet::optimize(const std::vector<std::string> &args)
             return true;
         }
 
-        CryptoNote::WalletLegacyTransaction txInfo;
+        QwertyNote::WalletLegacyTransaction txInfo;
         m_wallet->getTransaction(tx, txInfo);
         success_msg_writer(true)
             << "Fusion transaction successfully sent, hash: "
@@ -3198,7 +3197,7 @@ bool simple_wallet::optimize(const std::vector<std::string> &args)
         m_wallet->markTransactionSafe(txInfo.hash);
 
         try {
-            CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+            QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
         } catch (const std::exception &e) {
             fail_msg_writer() << e.what();
             return true;
@@ -3230,7 +3229,7 @@ bool simple_wallet::consolidate(const std::vector<std::string> &args)
     }
 
     bool synchronized = false;
-    CryptoNote::NodeRpcProxy::Callback cb = [](std::error_code){};
+    QwertyNote::NodeRpcProxy::Callback cb = [](std::error_code){};
     m_node->isSynchronized(synchronized, cb);
     if (!synchronized) {
         fail_msg_writer() << "Node is not synchronized. Try to consolidate it later.";
@@ -3318,7 +3317,7 @@ bool simple_wallet::consolidate(const std::vector<std::string> &args)
         transferInputs.insert(transferInputs.begin(), oldInputs.begin(), to_send_end);
         oldInputs.erase(oldInputs.begin(), to_send_end);
         try {
-            CryptoNote::WalletHelper::SendCompleteResultObserver sent;
+            QwertyNote::WalletHelper::SendCompleteResultObserver sent;
             std::string extraString;
 
             WalletHelper::IWalletRemoveObserverGuard removeGuard(*m_wallet, sent);
@@ -3327,9 +3326,9 @@ bool simple_wallet::consolidate(const std::vector<std::string> &args)
 
             logger(DEBUGGING, BRIGHT_CYAN) << "Consolidate: feePerByte: " << feePerByte;
 
-            CryptoNote::TransactionId tx = m_wallet->sendFusionTransaction(
+            QwertyNote::TransactionId tx = m_wallet->sendFusionTransaction(
                 transferInputs,
-                // CryptoNote::parameters::MINIMUM_FEE,
+                // QwertyNote::parameters::MINIMUM_FEE,
                 feePerByte,
                 extraString,
                 mixIn,
@@ -3348,7 +3347,7 @@ bool simple_wallet::consolidate(const std::vector<std::string> &args)
                 return true;
             }
 
-            CryptoNote::WalletLegacyTransaction txInfo;
+            QwertyNote::WalletLegacyTransaction txInfo;
             m_wallet->getTransaction(tx, txInfo);
             success_msg_writer(true)
                 << "Fusion transaction successfully sent, hash: "
@@ -3367,7 +3366,7 @@ bool simple_wallet::consolidate(const std::vector<std::string> &args)
         }
     }
     try {
-        CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
+        QwertyNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
     } catch (const std::exception &e) {
         fail_msg_writer() << e.what();
         return true;
@@ -3438,7 +3437,7 @@ bool simple_wallet::verify_message(const std::vector<std::string> &args)
     std::string message = args[0];
     std::string address_string = args[1];
     std::string signature = args[2];
-    CryptoNote::AccountPublicAddress address;
+    QwertyNote::AccountPublicAddress address;
     if (!m_currency.parseAccountAddressString(address_string, address)) {
         fail_msg_writer() << "failed to parse address " << address_string;
         return true;
@@ -3531,8 +3530,8 @@ int main(int argc, char *argv[])
         po::store(CommandLine::parseCommandLine(argc, argv, desc_general, true), vm);
 
         if (CommandLine::getArg(vm, CommandLine::argHelp)) {
-            CryptoNote::Currency tmp_currency = CryptoNote::CurrencyBuilder(logManager).currency();
-            CryptoNote::simple_wallet tmp_wallet(dispatcher, tmp_currency, logManager);
+            QwertyNote::Currency tmp_currency = QwertyNote::CurrencyBuilder(logManager).currency();
+            QwertyNote::simple_wallet tmp_wallet(dispatcher, tmp_currency, logManager);
 
             std::cout << CRYPTONOTE_NAME << " wallet v" << PROJECT_VERSION_LONG << std::endl;
             std::cout << "Usage: simplewallet [--wallet-file=<file>|--generate-new-wallet=<file>] [--daemon-address=<host>:<port>] [<COMMAND>]";
@@ -3597,7 +3596,7 @@ int main(int argc, char *argv[])
         << getProjectCLIHeader() << std::endl;
 
     auto builder = CommandLine::getArg(vm, arg_testnet);
-    auto currency = CryptoNote::CurrencyBuilder(logManager).testnet(builder).currency();
+    auto currency = QwertyNote::CurrencyBuilder(logManager).testnet(builder).currency();
 
     if (CommandLine::hasArg(vm, Tools::wallet_rpc_server::arg_rpc_bind_port)) {
         // runs wallet with rpc interface
@@ -3690,7 +3689,7 @@ int main(int argc, char *argv[])
 
         try {
             logger(INFO) << "Storing wallet...";
-            CryptoNote::WalletHelper::storeWallet(*wallet, walletFileName);
+            QwertyNote::WalletHelper::storeWallet(*wallet, walletFileName);
             logger(INFO, BRIGHT_GREEN) << "Stored ok";
         } catch (const std::exception &e) {
             logger(ERROR, BRIGHT_RED) << "Failed to store wallet: " << e.what();
@@ -3698,7 +3697,7 @@ int main(int argc, char *argv[])
         }
     } else {
         // runs wallet with console interface
-        CryptoNote::simple_wallet wal(dispatcher, currency, logManager);
+        QwertyNote::simple_wallet wal(dispatcher, currency, logManager);
 
         if (!wal.init(vm)) {
             logger(ERROR, BRIGHT_RED) << "Failed to initialize wallet";

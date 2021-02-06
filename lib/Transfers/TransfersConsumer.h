@@ -29,7 +29,7 @@
 #include <Transfers/TypeHelpers.h>
 #include <ITransfersSynchronizer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class INode;
 
@@ -42,7 +42,7 @@ class TransfersConsumer: public IObservableImpl<IBlockchainConsumerObserver, IBl
     };
 
 public:
-    TransfersConsumer(const CryptoNote::Currency &currency,
+    TransfersConsumer(const QwertyNote::Currency &currency,
                       INode &node,
                       Logging::ILogger &logger,
                       const Crypto::FSecretKey &viewSecret);
@@ -119,8 +119,8 @@ private:
     std::unordered_set<Crypto::FHash> m_poolTxs;
 
     INode &m_node;
-    const CryptoNote::Currency &m_currency;
+    const QwertyNote::Currency &m_currency;
     Logging::LoggerRef m_logger;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

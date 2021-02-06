@@ -21,7 +21,7 @@
 #include <Rpc/RpcServerConfig.h>
 #include <Android.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace {
 
@@ -64,4 +64,4 @@ std::string RpcServerConfig::getBindAddress() const
     return bindIp + ":" + std::to_string(bindPort);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

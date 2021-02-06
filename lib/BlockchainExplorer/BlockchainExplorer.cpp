@@ -31,7 +31,7 @@
 using namespace Logging;
 using namespace Crypto;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class ContextCounterHolder
 {
@@ -180,7 +180,8 @@ void BlockchainExplorer::init()
 {
     if (state.load() != NOT_INITIALIZED) {
         logger(ERROR) << "Init called on already initialized BlockchainExplorer.";
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::ALREADY_INITIALIZED));
+        throw std::system_error(make_error_code(
+                QwertyNote::error::BlockchainExplorerErrorCodes::ALREADY_INITIALIZED));
     }
 
     if (node.addObserver(this)) {
@@ -188,7 +189,7 @@ void BlockchainExplorer::init()
     } else {
         logger(ERROR) << "Can't add observer to node.";
         state.store(NOT_INITIALIZED);
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+        throw std::system_error(make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
     }
 
     if (getBlockchainTop(knownBlockchainTop)) {
@@ -196,7 +197,7 @@ void BlockchainExplorer::init()
     } else {
         logger(ERROR) << "Can't get blockchain top.";
         state.store(NOT_INITIALIZED);
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+        throw std::system_error(make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
     }
 }
 
@@ -204,7 +205,7 @@ void BlockchainExplorer::shutdown()
 {
     if (state.load() != INITIALIZED) {
         logger(ERROR) << "Shutdown called on not initialized BlockchainExplorer.";
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     node.removeObserver(this);
@@ -215,7 +216,7 @@ void BlockchainExplorer::shutdown()
 bool BlockchainExplorer::addObserver(IBlockchainObserver *observer)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     observersCounter.fetch_add(1);
@@ -226,7 +227,7 @@ bool BlockchainExplorer::addObserver(IBlockchainObserver *observer)
 bool BlockchainExplorer::removeObserver(IBlockchainObserver *observer)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     if (observersCounter.load() != 0) {
@@ -241,7 +242,7 @@ bool BlockchainExplorer::getBlocks(const std::vector<uint32_t> &blockHeights,
 {
     if (state.load() != INITIALIZED) {
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get blocks by height request came.";
@@ -277,7 +278,7 @@ bool BlockchainExplorer::getBlocks(const std::vector<FHash> &blockHashes,
 {
     if (state.load() != INITIALIZED) {
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get blocks by Hash request came.";
@@ -316,7 +317,7 @@ bool BlockchainExplorer::getBlocks(uint64_t timestampBegin,
 {
     if (state.load() != INITIALIZED) {
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get blocks by timestamp request came.";
@@ -355,7 +356,7 @@ bool BlockchainExplorer::getBlockchainTop(BlockDetails &topBlock)
 {
     if (state.load() != INITIALIZED) {
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get blockchain top request came.";
@@ -368,7 +369,7 @@ bool BlockchainExplorer::getBlockchainTop(BlockDetails &topBlock)
     if (!getBlocks(heights, blocks)) {
         logger(ERROR) << "Can't get blockchain top.";
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
     }
 
     assert(blocks.size() == heights.size() && blocks.size() == 1);
@@ -388,7 +389,7 @@ bool BlockchainExplorer::getBlockchainTop(BlockDetails &topBlock)
             << lastHeightCopy
             << " are orphaned.";
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
     }
 
     return true;
@@ -402,7 +403,7 @@ bool BlockchainExplorer::getPoolState(const std::vector<FHash> &knownPoolTransac
 {
     if (state.load() != INITIALIZED) {
         throw std::system_error(
-            make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED)
+            make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED)
         );
     }
 
@@ -447,7 +448,7 @@ bool BlockchainExplorer::getPoolTransactions(uint64_t timestampBegin,
                                              uint64_t &transactionsNumberWithinTimestamps)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get transactions by timestamp request came.";
@@ -478,7 +479,7 @@ bool BlockchainExplorer::getTransactions(const std::vector<FHash> &transactionHa
 {
     if (state.load() != INITIALIZED) {
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get transactions by Hash request came.";
@@ -511,7 +512,7 @@ bool BlockchainExplorer::getTransactionsByPaymentId(const FHash &paymentId,
                                                     std::vector<TransactionDetails> &transactions)
 {
     if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Get transactions by payment id request came.";
@@ -538,7 +539,7 @@ uint64_t BlockchainExplorer::getRewardBlocksWindow()
 {
     if (state.load() != INITIALIZED) {
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     return parameters::CRYPTONOTE_REWARD_BLOCKS_WINDOW;
@@ -548,7 +549,7 @@ uint64_t BlockchainExplorer::getFullRewardMaxBlockSize(uint8_t majorVersion)
 {
     if (state.load() != INITIALIZED) {
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     return parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
@@ -558,7 +559,7 @@ bool BlockchainExplorer::isSynchronized()
 {
     if (state.load() != INITIALIZED) {
         throw std::system_error(
-                make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+                make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
     }
 
     logger(DEBUGGING) << "Synchronization status request came.";
@@ -882,4 +883,4 @@ void BlockchainExplorer::poolUpdateEndHandler()
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

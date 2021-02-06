@@ -24,7 +24,7 @@
 #include <Serialization/BlockchainExplorerDataSerialization.h>
 #include <Serialization/SerializationOverloads.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 enum class SerializationTag : uint8_t
 {
@@ -39,17 +39,17 @@ namespace {
 
 struct BinaryVariantTagGetter : boost::static_visitor<uint8_t>
 {
-    uint8_t operator()(const CryptoNote::BaseInputDetails)
+    uint8_t operator()(const QwertyNote::BaseInputDetails)
     {
         return static_cast<uint8_t>(SerializationTag::Base);
     }
 
-    uint8_t operator()(const CryptoNote::KeyInputDetails)
+    uint8_t operator()(const QwertyNote::KeyInputDetails)
     {
         return static_cast<uint8_t>(SerializationTag::Key);
     }
 
-    uint8_t operator()(const CryptoNote::MultiSignatureInputDetails)
+    uint8_t operator()(const QwertyNote::MultiSignatureInputDetails)
     {
         return static_cast<uint8_t>(SerializationTag::Multisignature);
     }
@@ -57,7 +57,7 @@ struct BinaryVariantTagGetter : boost::static_visitor<uint8_t>
 
 struct VariantSerializer : boost::static_visitor<>
 {
-    VariantSerializer(CryptoNote::ISerializer &serializer, const std::string &name)
+    VariantSerializer(QwertyNote::ISerializer &serializer, const std::string &name)
         : s(serializer),
           name(name)
     {
@@ -69,12 +69,12 @@ struct VariantSerializer : boost::static_visitor<>
         s(param, name);
     }
 
-    CryptoNote::ISerializer &s;
+    QwertyNote::ISerializer &s;
     const std::string name;
 };
 
 void getVariantValue(
-    CryptoNote::ISerializer &serializer,
+        QwertyNote::ISerializer &serializer,
     uint8_t tag,
     boost::variant<BaseInputDetails, KeyInputDetails, MultiSignatureInputDetails> in)
 {
@@ -103,7 +103,7 @@ void getVariantValue(
 }
 
 template <typename T>
-bool serializePod(T &v, Common::StringView name, CryptoNote::ISerializer &serializer)
+bool serializePod(T &v, Common::StringView name, QwertyNote::ISerializer &serializer)
 {
     return serializer.binary(&v, sizeof(v), name);
 }
@@ -239,4 +239,4 @@ void serialize(BlockDetails &block, ISerializer &serializer)
     serializer(block.transactions, "transactions");
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

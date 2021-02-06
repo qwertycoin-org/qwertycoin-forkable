@@ -120,7 +120,7 @@ WalletConfiguration PaymentGateService::getWalletConfig() const
     };
 }
 
-const CryptoNote::Currency PaymentGateService::getCurrency()
+const QwertyNote::Currency PaymentGateService::getCurrency()
 {
     return currencyBuilder.currency();
 }
@@ -176,14 +176,14 @@ void PaymentGateService::runInProcess(Logging::LoggerRef &log)
 
     log(Logging::INFO) << "Starting Payment Gate with local node";
 
-    CryptoNote::Currency currency = currencyBuilder.currency();
-    CryptoNote::core core(currency, nullptr, logger, false);
+    QwertyNote::Currency currency = currencyBuilder.currency();
+    QwertyNote::core core(currency, nullptr, logger, false);
 
-    CryptoNote::CryptoNoteProtocolHandler protocol(currency, *dispatcher, core, nullptr, logger);
-    CryptoNote::NodeServer p2pNode(*dispatcher, protocol, logger);
-    CryptoNote::RpcServer rpcServer(*dispatcher, logger, core, p2pNode, protocol);
-    CryptoNote::Checkpoints checkpoints(logger);
-    for (const auto &cp : CryptoNote::CHECKPOINTS) {
+    QwertyNote::CryptoNoteProtocolHandler protocol(currency, *dispatcher, core, nullptr, logger);
+    QwertyNote::NodeServer p2pNode(*dispatcher, protocol, logger);
+    QwertyNote::RpcServer rpcServer(*dispatcher, logger, core, p2pNode, protocol);
+    QwertyNote::Checkpoints checkpoints(logger);
+    for (const auto &cp : QwertyNote::CHECKPOINTS) {
         checkpoints.add_checkpoint(cp.height, cp.blockId);
     }
 #ifndef __ANDROID__
@@ -202,13 +202,13 @@ void PaymentGateService::runInProcess(Logging::LoggerRef &log)
     }
 
     log(Logging::INFO) << "initializing core";
-    CryptoNote::MinerConfig emptyMiner;
+    QwertyNote::MinerConfig emptyMiner;
     core.init(config.coreConfig, emptyMiner, true);
 
     std::promise<std::error_code> initPromise;
     auto initFuture = initPromise.get_future();
 
-    std::unique_ptr<CryptoNote::INode> node(new CryptoNote::InProcessNode(core, protocol));
+    std::unique_ptr<QwertyNote::INode> node(new QwertyNote::InProcessNode(core, protocol));
 
     node->init([&initPromise, &log](std::error_code ec) {
         if (ec) {
@@ -258,9 +258,9 @@ void PaymentGateService::runInProcess(Logging::LoggerRef &log)
 void PaymentGateService::runRpcProxy(Logging::LoggerRef &log)
 {
     log(Logging::INFO) << "Starting Payment Gate with remote node";
-    CryptoNote::Currency currency = currencyBuilder.currency();
+    QwertyNote::Currency currency = currencyBuilder.currency();
 
-    std::unique_ptr<CryptoNote::INode> node(
+    std::unique_ptr<QwertyNote::INode> node(
         PaymentService::NodeFactory::createNode(
             config.remoteNodeConfig.daemonHost,
             config.remoteNodeConfig.daemonPort
@@ -271,16 +271,16 @@ void PaymentGateService::runRpcProxy(Logging::LoggerRef &log)
 }
 
 void PaymentGateService::runWalletService(
-    const CryptoNote::Currency &currency,
-    CryptoNote::INode &node)
+    const QwertyNote::Currency &currency,
+                                          QwertyNote::INode &node)
 {
     PaymentService::WalletConfiguration walletConfiguration{
         config.gateConfiguration.containerFile,
         config.gateConfiguration.containerPassword
     };
 
-    std::unique_ptr<CryptoNote::WalletGreen> wallet(
-        new CryptoNote::WalletGreen(*dispatcher, currency, node, logger)
+    std::unique_ptr<QwertyNote::WalletGreen> wallet(
+        new QwertyNote::WalletGreen(*dispatcher, currency, node, logger)
     );
 
     service = new PaymentService::WalletService(

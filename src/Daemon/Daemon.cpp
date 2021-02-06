@@ -47,7 +47,7 @@
 #endif
 
 using Common::JsonValue;
-using namespace CryptoNote;
+using namespace QwertyNote;
 using namespace Logging;
 using namespace Qwertycoin;
 
@@ -58,7 +58,7 @@ namespace {
 const CommandLine::ArgDescriptor<std::string> arg_config_file = {
     "config-file",
     "Specify configuration file",
-    std::string(CryptoNote::CRYPTONOTE_NAME) + ".conf"
+    std::string(QwertyNote::CRYPTONOTE_NAME) + ".conf"
 };
 
 const CommandLine::ArgDescriptor<bool> arg_os_version = {
@@ -161,8 +161,9 @@ bool command_line_preprocessor(const boost::program_options::variables_map &vm, 
 
 void print_genesis_tx_hex(const po::variables_map &vm, LoggerManager &logManager)
 {
-    CryptoNote::Transaction tx = CryptoNote::CurrencyBuilder(logManager).generateGenesisTransaction();
-    std::string tx_hex = Common::toHex(CryptoNote::toBinaryArray(tx));
+    QwertyNote::Transaction tx =
+            QwertyNote::CurrencyBuilder(logManager).generateGenesisTransaction();
+    std::string tx_hex = Common::toHex(QwertyNote::toBinaryArray(tx));
     std::cout
         << getProjectCLIHeader() << std::endl
         << std::endl
@@ -195,7 +196,7 @@ bool command_line_preprocessor(const boost::program_options::variables_map &vm, 
     bool exit = false;
 
     if (CommandLine::getArg(vm, CommandLine::argVersion)) {
-        std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL;
+        std::cout << QwertyNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL;
         exit = true;
     }
 
@@ -259,7 +260,7 @@ int main(int argc, char *argv[])
             po::store(po::parse_command_line(argc, argv, desc_options), vm);
 
             if (CommandLine::getArg(vm, CommandLine::argHelp)) {
-                std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL
+                std::cout << QwertyNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL
                           << ENDL;
                 std::cout << desc_options << std::endl;
                 return false;
@@ -334,7 +335,7 @@ int main(int argc, char *argv[])
         }
 
         // create objects and link them
-        CryptoNote::CurrencyBuilder currencyBuilder(logManager);
+        QwertyNote::CurrencyBuilder currencyBuilder(logManager);
         currencyBuilder.testnet(testnet_mode);
         if (fixed_difficulty) {
             currencyBuilder.fix_difficulty(fixed_difficulty);
@@ -344,11 +345,11 @@ int main(int argc, char *argv[])
         } catch (std::exception &) {
             std::cout
                 << "GENESIS_COINBASE_TX_HEX constant has an incorrect value. Please launch: "
-                << CryptoNote::CRYPTONOTE_NAME << "d --" << arg_print_genesis_tx.name;
+                << QwertyNote::CRYPTONOTE_NAME << "d --" << arg_print_genesis_tx.name;
             return 1;
         }
-        CryptoNote::Currency currency = currencyBuilder.currency();
-        CryptoNote::core ccore(
+        QwertyNote::Currency currency = currencyBuilder.currency();
+        QwertyNote::core ccore(
             currency,
             nullptr,
             logManager,
@@ -357,8 +358,8 @@ int main(int argc, char *argv[])
 
         bool disable_checkpoints = CommandLine::getArg(vm, arg_disable_checkpoints);
         if (!disable_checkpoints) {
-            CryptoNote::Checkpoints checkpoints(logManager);
-            for (const auto &cp : CryptoNote::CHECKPOINTS) {
+            QwertyNote::Checkpoints checkpoints(logManager);
+            for (const auto &cp : QwertyNote::CHECKPOINTS) {
                 checkpoints.add_checkpoint(cp.height, cp.blockId);
             }
 
@@ -404,9 +405,9 @@ int main(int argc, char *argv[])
 
         System::Dispatcher dispatcher;
 
-        CryptoNote::CryptoNoteProtocolHandler cprotocol(currency, dispatcher, ccore, 0, logManager);
-        CryptoNote::NodeServer p2psrv(dispatcher, cprotocol, logManager);
-        CryptoNote::RpcServer rpcServer(dispatcher, logManager, ccore, p2psrv, cprotocol);
+        QwertyNote::CryptoNoteProtocolHandler cprotocol(currency, dispatcher, ccore, 0, logManager);
+        QwertyNote::NodeServer p2psrv(dispatcher, cprotocol, logManager);
+        QwertyNote::RpcServer rpcServer(dispatcher, logManager, ccore, p2psrv, cprotocol);
 
         cprotocol.set_p2p_endpoint(&p2psrv);
         ccore.set_cryptonote_protocol(&cprotocol);

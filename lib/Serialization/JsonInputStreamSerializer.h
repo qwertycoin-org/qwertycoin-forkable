@@ -24,7 +24,7 @@
 #include <Common/JsonValue.h>
 #include <Serialization/JsonInputValueSerializer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class JsonInputStreamSerializer : public JsonInputValueSerializer
 {
@@ -33,4 +33,4 @@ public:
     ~JsonInputStreamSerializer() override = default;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

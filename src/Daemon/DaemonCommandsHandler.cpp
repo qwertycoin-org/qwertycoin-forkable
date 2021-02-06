@@ -38,18 +38,16 @@ namespace {
 template <typename T>
 static bool print_as_json(const T &obj)
 {
-    std::cout << CryptoNote::storeToJson(obj) << ENDL;
+    std::cout << QwertyNote::storeToJson(obj) << ENDL;
     return true;
 }
 
 } // namespace
 
-DaemonCommandsHandler::DaemonCommandsHandler(
-    CryptoNote::core &core,
-    CryptoNote::NodeServer &srv,
+DaemonCommandsHandler::DaemonCommandsHandler(QwertyNote::core &core, QwertyNote::NodeServer &srv,
     Logging::LoggerManager &log,
-    const CryptoNote::ICryptoNoteProtocolQuery &protocol,
-    CryptoNote::RpcServer *prpc_server)
+    const QwertyNote::IQwertyNoteProtocolQuery &protocol,
+                                             QwertyNote::RpcServer *prpc_server)
     : m_core(core),
       m_srv(srv),
       logger(log, "daemon"),
@@ -199,7 +197,7 @@ DaemonCommandsHandler::DaemonCommandsHandler(
 std::string DaemonCommandsHandler::get_commands_str()
 {
     std::stringstream ss;
-    ss << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL;
+    ss << QwertyNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL;
     ss << "Commands: " << ENDL;
     std::string usage = m_consoleHandler.getUsage();
     boost::replace_all(usage, "\n", "\n  ");
@@ -272,7 +270,7 @@ bool DaemonCommandsHandler::status(const std::vector<std::string> &args)
     uint8_t majorVersion = m_core.getBlockMajorVersionForHeight(height);
     bool synced = ((uint32_t)height == (uint32_t)last_known_block_index);
     uint64_t difficulty = m_core.getNextBlockDifficulty(synced ? time(nullptr) : 0);
-    uint64_t hashrate = (uint32_t)round(difficulty / CryptoNote::parameters::DIFFICULTY_TARGET);
+    uint64_t hashrate = (uint32_t)round(difficulty / QwertyNote::parameters::DIFFICULTY_TARGET);
     uint64_t alt_block_count = m_core.getAlternativeBlocksCount();
 
     std::cout
@@ -308,7 +306,7 @@ bool DaemonCommandsHandler::generate_blocks(const std::vector<std::string> &args
         return true;
     }
 
-    CryptoNote::AccountPublicAddress adr;
+    QwertyNote::AccountPublicAddress adr;
     if (!m_core.currency().parseAccountAddressString(args.front(), adr)) {
         std::cout << "target account address has wrong format" << std::endl;
         return true;
@@ -465,7 +463,7 @@ bool DaemonCommandsHandler::set_log(const std::vector<std::string> &args)
 
 bool DaemonCommandsHandler::print_block_by_height(uint32_t height)
 {
-    std::list<CryptoNote::Block> blocks;
+    std::list<QwertyNote::Block> blocks;
     m_core.get_blocks(height, 1, blocks);
 
     if (1 == blocks.size()) {
@@ -494,7 +492,7 @@ bool DaemonCommandsHandler::print_block_by_hash(const std::string &arg)
 
     std::list<Crypto::FHash> block_ids;
     block_ids.push_back(block_hash);
-    std::list<CryptoNote::Block> blocks;
+    std::list<QwertyNote::Block> blocks;
     std::list<Crypto::FHash> missed_ids;
     m_core.get_blocks(block_ids, blocks, missed_ids);
 
@@ -541,7 +539,7 @@ bool DaemonCommandsHandler::print_tx(const std::vector<std::string> &args)
 
     std::vector<Crypto::FHash> tx_ids;
     tx_ids.push_back(tx_hash);
-    std::list<CryptoNote::Transaction> txs;
+    std::list<QwertyNote::Transaction> txs;
     std::list<Crypto::FHash> missed_ids;
     m_core.getTransactions(tx_ids, txs, missed_ids, true);
 
@@ -589,12 +587,11 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
     uint64_t avg_solve_time;
     uint64_t stddev_solve_time;
     uint32_t outliers_num;
-    CryptoNote::difficulty_type avg_diff;
-    CryptoNote::difficulty_type min_diff;
-    CryptoNote::difficulty_type max_diff;
+    QwertyNote::difficulty_type avg_diff;
+    QwertyNote::difficulty_type min_diff;
+    QwertyNote::difficulty_type max_diff;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::hour,
+                height, QwertyNote::IMinerHandler::stat_period::hour,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -614,8 +611,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << "max difficulty: " << max_diff
             << std::endl;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::day,
+                height, QwertyNote::IMinerHandler::stat_period::day,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -635,8 +631,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << "max difficulty: " << max_diff
             << std::endl;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::week,
+                height, QwertyNote::IMinerHandler::stat_period::week,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -656,8 +651,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << "max difficulty: " << max_diff
             << std::endl;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::month,
+                height, QwertyNote::IMinerHandler::stat_period::month,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -677,8 +671,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << "max difficulty: " << max_diff
             << std::endl;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::halfyear,
+                height, QwertyNote::IMinerHandler::stat_period::halfyear,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -698,8 +691,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << "max difficulty: " << max_diff
             << std::endl;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::year,
+                height, QwertyNote::IMinerHandler::stat_period::year,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -722,8 +714,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
 
     block_num = 30;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::by_block_number,
+                height, QwertyNote::IMinerHandler::stat_period::by_block_number,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -744,8 +735,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << std::endl;
     block_num = 720;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::by_block_number,
+                height, QwertyNote::IMinerHandler::stat_period::by_block_number,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -766,8 +756,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << std::endl;
     block_num = 5040;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::by_block_number,
+                height, QwertyNote::IMinerHandler::stat_period::by_block_number,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -788,8 +777,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << std::endl;
     block_num = 21900;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::by_block_number,
+                height, QwertyNote::IMinerHandler::stat_period::by_block_number,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -810,8 +798,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << std::endl;
     block_num = 131400;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::by_block_number,
+                height, QwertyNote::IMinerHandler::stat_period::by_block_number,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -832,8 +819,7 @@ bool DaemonCommandsHandler::print_diff_stat(const std::vector<std::string> &args
             << std::endl;
     block_num = 262800;
     if (m_core.get_difficulty_stat(
-                height,
-                CryptoNote::IMinerHandler::stat_period::by_block_number,
+                height, QwertyNote::IMinerHandler::stat_period::by_block_number,
                 block_num,
                 avg_solve_time,
                 stddev_solve_time,
@@ -875,7 +861,7 @@ bool DaemonCommandsHandler::start_mining(const std::vector<std::string> &args)
         return true;
     }
 
-    CryptoNote::AccountPublicAddress adr;
+    QwertyNote::AccountPublicAddress adr;
     if (!m_core.currency().parseAccountAddressString(args.front(), adr)) {
         std::cout << "target account address has wrong format" << std::endl;
         return true;

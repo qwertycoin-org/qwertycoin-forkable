@@ -36,7 +36,7 @@
 #include <System/TcpStream.h>
 #include <System/Ipv4Address.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 JsonRpcServer::JsonRpcServer(System::Dispatcher &sys,
                              System::Event &stopEvent,
@@ -58,8 +58,8 @@ void JsonRpcServer::start(const std::string &bindAddress,
     HttpServer::stop();
 }
 
-void JsonRpcServer::processRequest(const CryptoNote::HttpRequest &req,
-                                   CryptoNote::HttpResponse &resp)
+void JsonRpcServer::processRequest(const QwertyNote::HttpRequest &req,
+                                   QwertyNote::HttpResponse &resp)
 {
     try {
         logger(Logging::TRACE) << "HTTP request came: \n" << req;
@@ -74,7 +74,7 @@ void JsonRpcServer::processRequest(const CryptoNote::HttpRequest &req,
             } catch (std::runtime_error &) {
                 logger(Logging::DEBUGGING) << "Couldn't parse request: \"" << req.getBody() << "\"";
                 makeJsonParsingErrorResponse(jsonRpcResponse);
-                resp.setStatus(CryptoNote::HttpResponse::STATUS_200);
+                resp.setStatus(QwertyNote::HttpResponse::STATUS_200);
                 resp.setBody(jsonRpcResponse.toString());
                 return;
             }
@@ -84,16 +84,16 @@ void JsonRpcServer::processRequest(const CryptoNote::HttpRequest &req,
             std::ostringstream jsonOutputStream;
             jsonOutputStream << jsonRpcResponse;
 
-            resp.setStatus(CryptoNote::HttpResponse::STATUS_200);
+            resp.setStatus(QwertyNote::HttpResponse::STATUS_200);
             resp.setBody(jsonOutputStream.str());
         } else {
             logger(Logging::WARNING) << "Requested url \"" << req.getUrl() << "\" is not found";
-            resp.setStatus(CryptoNote::HttpResponse::STATUS_404);
+            resp.setStatus(QwertyNote::HttpResponse::STATUS_404);
             return;
         }
     } catch (std::exception &e) {
         logger(Logging::WARNING) << "Error while processing http request: " << e.what();
-        resp.setStatus(CryptoNote::HttpResponse::STATUS_500);
+        resp.setStatus(QwertyNote::HttpResponse::STATUS_500);
     }
 }
 
@@ -116,7 +116,7 @@ void JsonRpcServer::makeErrorResponse(const std::error_code &ec, Common::JsonVal
 
     JsonValue code;
     // application specific error code
-    code = static_cast<int64_t>(CryptoNote::JsonRpc::errParseError);
+    code = static_cast<int64_t>(QwertyNote::JsonRpc::errParseError);
 
     JsonValue message;
     message = ec.message();
@@ -167,7 +167,7 @@ void JsonRpcServer::makeMethodNotFoundResponse(Common::JsonValue &resp)
 
     JsonValue code;
     // ambiguous declaration of JsonValue::operator= (between int and JsonValue)
-    code = static_cast<int64_t>(CryptoNote::JsonRpc::errMethodNotFound);
+    code = static_cast<int64_t>(QwertyNote::JsonRpc::errMethodNotFound);
 
     JsonValue message;
     message = "Method not found";
@@ -194,7 +194,7 @@ void JsonRpcServer::makeJsonParsingErrorResponse(Common::JsonValue &resp)
     JsonValue error(JsonValue::OBJECT);
     JsonValue code;
     // ambiguous declaration of JsonValue::operator= (between int and JsonValue)
-    code = static_cast<int64_t>(CryptoNote::JsonRpc::errParseError);
+    code = static_cast<int64_t>(QwertyNote::JsonRpc::errParseError);
 
     JsonValue message = "Parse error";
 
@@ -204,4 +204,4 @@ void JsonRpcServer::makeJsonParsingErrorResponse(Common::JsonValue &resp)
     resp.insert("error", error);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

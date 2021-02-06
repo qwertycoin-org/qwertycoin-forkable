@@ -24,7 +24,7 @@
 
 using namespace System;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 P2pConnectionProxy::P2pConnectionProxy(P2pContextOwner &&ctx, IP2pNodeInternal &node)
     : m_contextOwner(std::move(ctx)),
@@ -193,4 +193,4 @@ void P2pConnectionProxy::handleTimedSync(const LevinProtocol::Command &cmd)
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

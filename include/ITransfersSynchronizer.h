@@ -24,8 +24,9 @@
 #include <IStreamSerializable.h>
 #include <ITransfersContainer.h>
 
-namespace CryptoNote {
+#include <QwertyNoteCore/ITransaction.h>
 
+namespace QwertyNote {
 struct SynchronizationStart
 {
     uint64_t timestamp;
@@ -107,4 +108,4 @@ public:
     virtual std::vector<Crypto::FHash>getViewKeyKnownBlocks(const Crypto::FPublicKey&publicViewKey)=0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

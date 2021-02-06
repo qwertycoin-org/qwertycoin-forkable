@@ -42,7 +42,7 @@ struct WalletTransactionDtoV2
 {
     WalletTransactionDtoV2() = default;
 
-    WalletTransactionDtoV2(const CryptoNote::WalletTransaction &wallet)
+    WalletTransactionDtoV2(const QwertyNote::WalletTransaction &wallet)
     {
         state = wallet.state;
         timestamp = wallet.timestamp;
@@ -59,7 +59,7 @@ struct WalletTransactionDtoV2
         }
     }
 
-    CryptoNote::WalletTransactionState state;
+    QwertyNote::WalletTransactionState state;
     uint64_t timestamp;
     uint32_t blockHeight;
     FHash hash;
@@ -77,7 +77,7 @@ struct WalletTransferDtoV2
 {
     WalletTransferDtoV2() = default;
 
-    WalletTransferDtoV2(const CryptoNote::WalletTransfer &tr)
+    WalletTransferDtoV2(const QwertyNote::WalletTransfer &tr)
     {
         address = tr.address;
         amount = tr.amount;
@@ -89,23 +89,23 @@ struct WalletTransferDtoV2
     uint8_t type;
 };
 
-void serialize(UnlockTransactionJobDtoV2 &value, CryptoNote::ISerializer &serializer)
+void serialize(UnlockTransactionJobDtoV2 &value, QwertyNote::ISerializer &serializer)
 {
     serializer(value.blockHeight, "blockHeight");
     serializer(value.transactionHash, "transactionHash");
     serializer(value.walletSpendPublicKey, "walletSpendPublicKey");
 }
 
-void serialize(WalletTransactionDtoV2 &value, CryptoNote::ISerializer &serializer)
+void serialize(WalletTransactionDtoV2 &value, QwertyNote::ISerializer &serializer)
 {
-    typedef std::underlying_type<CryptoNote::WalletTransactionState>::type StateType;
+    typedef std::underlying_type<QwertyNote::WalletTransactionState>::type StateType;
 
     StateType state = static_cast<StateType>(value.state);
     serializer(state, "state");
-    value.state = static_cast<CryptoNote::WalletTransactionState>(state);
+    value.state = static_cast<QwertyNote::WalletTransactionState>(state);
 
     serializer(value.timestamp, "timestamp");
-    CryptoNote::serializeBlockHeight(serializer, value.blockHeight, "blockHeight");
+    QwertyNote::serializeBlockHeight(serializer, value.blockHeight, "blockHeight");
     serializer(value.hash, "hash");
     serializer(value.totalAmount, "totalAmount");
     serializer(value.fee, "fee");
@@ -119,7 +119,7 @@ void serialize(WalletTransactionDtoV2 &value, CryptoNote::ISerializer &serialize
     value.secretKey = secretKey;
 }
 
-void serialize(WalletTransferDtoV2 &value, CryptoNote::ISerializer &serializer)
+void serialize(WalletTransferDtoV2 &value, QwertyNote::ISerializer &serializer)
 {
     serializer(value.address, "address");
     serializer(value.amount, "amount");
@@ -128,7 +128,7 @@ void serialize(WalletTransferDtoV2 &value, CryptoNote::ISerializer &serializer)
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 WalletSerializerV2::WalletSerializerV2(ITransfersObserver &transfersObserver,
                                        Crypto::FPublicKey &viewPublicKey,
@@ -159,7 +159,7 @@ WalletSerializerV2::WalletSerializerV2(ITransfersObserver &transfersObserver,
 
 void WalletSerializerV2::load(Common::IInputStream &source, uint8_t version)
 {
-    CryptoNote::BinaryInputStreamSerializer s(source);
+    QwertyNote::BinaryInputStreamSerializer s(source);
 
     uint8_t saveLevelValue;
     s(saveLevelValue, "saveLevel");
@@ -184,7 +184,7 @@ void WalletSerializerV2::load(Common::IInputStream &source, uint8_t version)
 
 void WalletSerializerV2::save(Common::IOutputStream &destination, WalletSaveLevel saveLevel)
 {
-    CryptoNote::BinaryOutputStreamSerializer s(destination);
+    QwertyNote::BinaryOutputStreamSerializer s(destination);
 
     uint8_t saveLevelValue = static_cast<uint8_t>(saveLevel);
     s(saveLevelValue, "saveLevel");
@@ -216,7 +216,7 @@ std::unordered_set<Crypto::FPublicKey> &WalletSerializerV2::deletedKeys()
     return m_deletedKeys;
 }
 
-void WalletSerializerV2::loadKeyListAndBalances(CryptoNote::ISerializer &serializer, bool saveCache)
+void WalletSerializerV2::loadKeyListAndBalances(QwertyNote::ISerializer &serializer, bool saveCache)
 {
     size_t walletCount;
     serializer(walletCount, "walletCount");
@@ -261,7 +261,7 @@ void WalletSerializerV2::loadKeyListAndBalances(CryptoNote::ISerializer &seriali
     }
 }
 
-void WalletSerializerV2::saveKeyListAndBalances(CryptoNote::ISerializer &serializer, bool saveCache)
+void WalletSerializerV2::saveKeyListAndBalances(QwertyNote::ISerializer &serializer, bool saveCache)
 {
     auto walletCount = m_walletsContainer.get<RandomAccessIndex>().size();
     serializer(walletCount, "walletCount");
@@ -275,7 +275,7 @@ void WalletSerializerV2::saveKeyListAndBalances(CryptoNote::ISerializer &seriali
     }
 }
 
-void WalletSerializerV2::loadTransactions(CryptoNote::ISerializer &serializer)
+void WalletSerializerV2::loadTransactions(QwertyNote::ISerializer &serializer)
 {
     uint64_t count = 0;
     serializer(count, "transactionCount");
@@ -305,7 +305,7 @@ void WalletSerializerV2::loadTransactions(CryptoNote::ISerializer &serializer)
     }
 }
 
-void WalletSerializerV2::saveTransactions(CryptoNote::ISerializer &serializer)
+void WalletSerializerV2::saveTransactions(QwertyNote::ISerializer &serializer)
 {
     uint64_t count = m_transactions.size();
     serializer(count, "transactionCount");
@@ -316,7 +316,7 @@ void WalletSerializerV2::saveTransactions(CryptoNote::ISerializer &serializer)
     }
 }
 
-void WalletSerializerV2::loadTransfers(CryptoNote::ISerializer &serializer)
+void WalletSerializerV2::loadTransfers(QwertyNote::ISerializer &serializer)
 {
     uint64_t count = 0;
     serializer(count, "transferCount");
@@ -341,7 +341,7 @@ void WalletSerializerV2::loadTransfers(CryptoNote::ISerializer &serializer)
     }
 }
 
-void WalletSerializerV2::saveTransfers(CryptoNote::ISerializer &serializer)
+void WalletSerializerV2::saveTransfers(QwertyNote::ISerializer &serializer)
 {
     uint64_t count = m_transfers.size();
     serializer(count, "transferCount");
@@ -356,7 +356,7 @@ void WalletSerializerV2::saveTransfers(CryptoNote::ISerializer &serializer)
     }
 }
 
-void WalletSerializerV2::loadTransfersSynchronizer(CryptoNote::ISerializer &serializer)
+void WalletSerializerV2::loadTransfersSynchronizer(QwertyNote::ISerializer &serializer)
 {
     std::string transfersSynchronizerData;
     serializer(transfersSynchronizerData, "transfersSynchronizer");
@@ -365,7 +365,7 @@ void WalletSerializerV2::loadTransfersSynchronizer(CryptoNote::ISerializer &seri
     m_synchronizer.load(stream);
 }
 
-void WalletSerializerV2::saveTransfersSynchronizer(CryptoNote::ISerializer &serializer)
+void WalletSerializerV2::saveTransfersSynchronizer(QwertyNote::ISerializer &serializer)
 {
     std::stringstream stream;
     m_synchronizer.save(stream);
@@ -375,7 +375,7 @@ void WalletSerializerV2::saveTransfersSynchronizer(CryptoNote::ISerializer &seri
     serializer(transfersSynchronizerData, "transfersSynchronizer");
 }
 
-void WalletSerializerV2::loadUnlockTransactionsJobs(CryptoNote::ISerializer &serializer)
+void WalletSerializerV2::loadUnlockTransactionsJobs(QwertyNote::ISerializer &serializer)
 {
     auto &index = m_unlockTransactions.get<TransactionHashIndex>();
     auto &walletsIndex = m_walletsContainer.get<KeysIndex>();
@@ -399,7 +399,7 @@ void WalletSerializerV2::loadUnlockTransactionsJobs(CryptoNote::ISerializer &ser
     }
 }
 
-void WalletSerializerV2::saveUnlockTransactionsJobs(CryptoNote::ISerializer &serializer)
+void WalletSerializerV2::saveUnlockTransactionsJobs(QwertyNote::ISerializer &serializer)
 {
     auto &index = m_unlockTransactions.get<TransactionHashIndex>();
     auto &wallets = m_walletsContainer.get<TransfersContainerIndex>();
@@ -423,4 +423,4 @@ void WalletSerializerV2::saveUnlockTransactionsJobs(CryptoNote::ISerializer &ser
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

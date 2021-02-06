@@ -18,7 +18,7 @@
 
 #include <Wallet/WalletErrors.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace error {
 
@@ -26,4 +26,4 @@ WalletErrorCategory WalletErrorCategory::INSTANCE;
 
 } // namespace error
 
-} // namespace CryptoNote
+} // namespace QwertyNote

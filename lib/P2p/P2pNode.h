@@ -34,7 +34,7 @@
 #include <System/Timer.h>
 #include <IStreamSerializable.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class P2pContext;
 class P2pConnectionProxy;
@@ -114,4 +114,4 @@ private:
     std::deque<std::unique_ptr<IP2pConnection>> m_connectionQueue;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

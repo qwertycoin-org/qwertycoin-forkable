@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <utility>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class IFusionManager
 {
@@ -45,4 +45,4 @@ public:
         const std::vector<std::string> &sourceAddresses = {}) const = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -24,7 +24,7 @@
 #include <Global/CryptoNoteConfig.h>
 #include <P2p/NetNodeConfig.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace {
 
@@ -158,7 +158,7 @@ bool NetNodeConfig::init(const boost::program_options::variables_map &vm)
     exclusiveVersion = CommandLine::getArg(vm, arg_p2p_exclusive_version);
   }
 
-    p2pStateFilename = CryptoNote::parameters::P2P_NET_DATA_FILENAME;
+    p2pStateFilename = QwertyNote::parameters::P2P_NET_DATA_FILENAME;
 
     if (CommandLine::hasArg(vm, arg_p2p_add_peer)) {
         std::vector<std::string> perrs = CommandLine::getArg(vm, arg_p2p_add_peer);
@@ -330,4 +330,4 @@ void NetNodeConfig::setExclusiveVersion(std::string& nodeVersion) {
   exclusiveVersion = nodeVersion;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

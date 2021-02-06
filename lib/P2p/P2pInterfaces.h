@@ -20,9 +20,9 @@
 
 #include <cstdint>
 #include <memory>
-#include <CryptoNote.h>
+#include <QwertyNote.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 struct P2pMessage
 {
@@ -47,4 +47,4 @@ public:
     virtual void stop() = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

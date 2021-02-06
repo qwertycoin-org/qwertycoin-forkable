@@ -22,7 +22,7 @@
 #include <System/TcpConnector.h>
 #include <Rpc/HttpClient.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 HttpClient::HttpClient(System::Dispatcher &dispatcher, const std::string &address, uint16_t port)
     : m_dispatcher(dispatcher),
@@ -97,4 +97,4 @@ ConnectException::ConnectException(const std::string &whatArg)
 {
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

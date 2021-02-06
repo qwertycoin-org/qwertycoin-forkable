@@ -32,9 +32,9 @@ using namespace Crypto;
 using namespace Logging;
 using namespace Qwertycoin;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
-void serialize(TransactionInformation &ti, CryptoNote::ISerializer &s)
+void serialize(TransactionInformation &ti, QwertyNote::ISerializer &s)
 {
     s(ti.transactionHash, "");
     s(ti.publicKey, "");
@@ -990,7 +990,7 @@ void TransfersContainer::save(std::ostream &os)
 {
     std::lock_guard<std::mutex> lk(m_mutex);
     StdOutputStream stream(os);
-    CryptoNote::BinaryOutputStreamSerializer s(stream);
+    QwertyNote::BinaryOutputStreamSerializer s(stream);
 
     s(const_cast<uint32_t &>(TRANSFERS_CONTAINER_STORAGE_VERSION), "version");
 
@@ -1021,7 +1021,7 @@ void TransfersContainer::load(std::istream &in)
 {
     std::lock_guard<std::mutex> lk(m_mutex);
     StdInputStream stream(in);
-    CryptoNote::BinaryInputStreamSerializer s(stream);
+    QwertyNote::BinaryInputStreamSerializer s(stream);
 
     uint32_t version = 0;
     s(version, "version");
@@ -1228,4 +1228,4 @@ bool TransfersContainer::isIncluded(TransactionTypes::OutputType type,uint32_t s
         ((flags & state) != 0);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

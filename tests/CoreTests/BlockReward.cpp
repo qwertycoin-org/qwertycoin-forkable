@@ -20,7 +20,7 @@
 #include "CryptoNoteCore/CryptoNoteTools.h"
 #include <Common/Math.h>
 
-using namespace CryptoNote;
+using namespace QwertyNote;
 
 namespace
 {

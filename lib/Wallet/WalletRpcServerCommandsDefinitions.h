@@ -33,12 +33,12 @@ namespace Tools {
 
 namespace wallet_rpc {
 
-using CryptoNote::ISerializer;
+using QwertyNote::ISerializer;
 
 // command: get_balance
 struct COMMAND_RPC_GET_BALANCE
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT request;
 
     struct response
     {
@@ -96,7 +96,7 @@ struct COMMAND_RPC_TRANSFER
         }
 
         std::list<transfer_destination> destinations;
-        uint64_t fee = CryptoNote::parameters::MINIMUM_FEE;
+        uint64_t fee = QwertyNote::parameters::MINIMUM_FEE;
         uint64_t mixin = 0;
         uint64_t unlock_time = 0;
         std::string payment_id;
@@ -120,7 +120,7 @@ struct COMMAND_RPC_TRANSFER
 // command: store
 struct COMMAND_RPC_STORE
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT request;
 
     struct response
     {
@@ -136,8 +136,8 @@ struct COMMAND_RPC_STORE
 // command: stop_wallet
 struct COMMAND_RPC_STOP
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
-    typedef CryptoNote::EMPTY_STRUCT response;
+    typedef QwertyNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT response;
 };
 
 // command: get_payments
@@ -258,7 +258,7 @@ struct Transfer
 
 struct COMMAND_RPC_GET_TRANSFERS
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT request;
 
     struct response
     {
@@ -299,7 +299,7 @@ struct COMMAND_RPC_GET_TRANSACTION
 
 struct COMMAND_RPC_GET_HEIGHT
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT request;
 
     struct response
     {
@@ -315,15 +315,15 @@ struct COMMAND_RPC_GET_HEIGHT
 // command: reset
 struct COMMAND_RPC_RESCAN
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
-    typedef CryptoNote::EMPTY_STRUCT response;
+    typedef QwertyNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT response;
 };
 
 // command: purge
 struct COMMAND_RPC_PURGE
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
-    typedef CryptoNote::EMPTY_STRUCT response;
+    typedef QwertyNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT response;
 };
 
 // command: query_key
@@ -353,7 +353,7 @@ struct COMMAND_RPC_QUERY_KEY
 // command: get_address
 struct COMMAND_RPC_GET_ADDRESS
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT request;
 
     struct response
     {
@@ -369,7 +369,7 @@ struct COMMAND_RPC_GET_ADDRESS
 // command: paymentid
 struct COMMAND_RPC_GEN_PAYMENT_ID
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT request;
 
     struct response
     {
@@ -483,7 +483,7 @@ struct COMMAND_RPC_CHANGE_PASSWORD
 
 struct COMMAND_RPC_GET_OUTPUTS
 {
-    typedef CryptoNote::EMPTY_STRUCT request;
+    typedef QwertyNote::EMPTY_STRUCT request;
 
     struct response
     {

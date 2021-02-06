@@ -22,7 +22,7 @@
 #include <Common/VectorOutputStream.h>
 #include <Serialization/KVBinaryInputStreamSerializer.h>
 #include <Serialization/KVBinaryOutputStreamSerializer.h>
-#include <CryptoNote.h>
+#include <QwertyNote.h>
 
 namespace System {
 
@@ -30,7 +30,7 @@ class TcpConnection;
 
 } // namespace System
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 enum class LevinError : int32_t
 {
@@ -123,4 +123,4 @@ private:
     System::TcpConnection &m_conn;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

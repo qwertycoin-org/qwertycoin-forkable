@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <memory>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class IInputStream
 {
@@ -35,4 +35,4 @@ public:
     virtual void write(const char *data, size_t size) = 0;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

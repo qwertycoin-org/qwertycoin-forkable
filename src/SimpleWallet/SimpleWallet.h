@@ -60,14 +60,14 @@ Tools::PasswordContainer pwd_container;
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
-class simple_wallet : public CryptoNote::INodeObserver,
-                      public CryptoNote::IWalletLegacyObserver,
-                      public CryptoNote::INodeRpcProxyObserver
+class simple_wallet : public QwertyNote::INodeObserver,
+                      public QwertyNote::IWalletLegacyObserver,
+                      public QwertyNote::INodeRpcProxyObserver
 {
 public:
-    simple_wallet(System::Dispatcher &dispatcher, const CryptoNote::Currency &currency,
+    simple_wallet(System::Dispatcher &dispatcher, const QwertyNote::Currency &currency,
                   Logging::LoggerManager &log);
 
     bool init(const boost::program_options::variables_map &vm);
@@ -79,7 +79,7 @@ public:
     std::string get_commands_str();
     std::string getFeeAddress();
 
-    const CryptoNote::Currency &currency() const { return m_currency; }
+    const QwertyNote::Currency &currency() const { return m_currency; }
 
 private:
     Logging::LoggerMessage success_msg_writer(bool color = false)
@@ -151,7 +151,7 @@ private:
 
     // IWalletLegacyObserver
     void initCompleted(std::error_code result) override;
-    void externalTransactionCreated(CryptoNote::TransactionId transactionId) override;
+    void externalTransactionCreated(QwertyNote::TransactionId transactionId) override;
     void synchronizationCompleted(std::error_code result) override;
     void synchronizationProgressUpdated(uint32_t current, uint32_t total) override;
 
@@ -163,7 +163,7 @@ private:
     class refresh_progress_reporter_t
     {
     public:
-        explicit refresh_progress_reporter_t(CryptoNote::simple_wallet &simple_wallet)
+        explicit refresh_progress_reporter_t(QwertyNote::simple_wallet &simple_wallet)
             : m_simple_wallet(simple_wallet),
               m_blockchain_height(0),
               m_blockchain_height_update_time(),
@@ -196,7 +196,7 @@ private:
         }
 
     private:
-        CryptoNote::simple_wallet &m_simple_wallet;
+        QwertyNote::simple_wallet &m_simple_wallet;
         uint64_t m_blockchain_height;
         std::chrono::system_clock::time_point m_blockchain_height_update_time;
         std::chrono::system_clock::time_point m_print_time;
@@ -221,13 +221,13 @@ private:
     std::unique_ptr<std::promise<std::error_code>> m_initResultPromise;
 
     Common::ConsoleHandler m_consoleHandler;
-    const CryptoNote::Currency &m_currency;
+    const QwertyNote::Currency &m_currency;
     Logging::LoggerManager &m_logManager;
     System::Dispatcher &m_dispatcher;
     Logging::LoggerRef logger;
 
-    std::unique_ptr<CryptoNote::NodeRpcProxy> m_node;
-    std::unique_ptr<CryptoNote::IWalletLegacy> m_wallet;
+    std::unique_ptr<QwertyNote::NodeRpcProxy> m_node;
+    std::unique_ptr<QwertyNote::IWalletLegacy> m_wallet;
     refresh_progress_reporter_t m_refresh_progress_reporter;
 
     bool m_walletSynchronized;
@@ -236,4 +236,4 @@ private:
     std::condition_variable m_walletSynchronizedCV;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -43,7 +43,7 @@ Configuration::Configuration()
     printAddresses = false;
     logLevel = Logging::INFO;
     bindAddress = "";
-    bindPort = CryptoNote::SERVICE_DEFAULT_PORT;
+    bindPort = QwertyNote::SERVICE_DEFAULT_PORT;
     m_rpcUser = "";
     m_rpcPassword = "";
     secretViewKey = "";
@@ -60,7 +60,7 @@ void Configuration::initOptions(boost::program_options::options_description &des
             "payment service bind address"
         )(
             "bind-port",
-            po::value<uint16_t>()->default_value(CryptoNote::SERVICE_DEFAULT_PORT),
+            po::value<uint16_t>()->default_value(QwertyNote::SERVICE_DEFAULT_PORT),
             "payment service bind port"
         )(
             "rpc-user",

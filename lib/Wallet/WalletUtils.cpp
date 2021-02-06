@@ -19,9 +19,9 @@
 #include <Crypto/Crypto.h>
 #include <Wallet/WalletErrors.h>
 #include <Wallet/WalletUtils.h>
-#include <CryptoNote.h>
+#include <QwertyNote.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 void throwIfKeysMissmatch(const Crypto::FSecretKey &secretKey,
                           const Crypto::FPublicKey &expectedPublicKey,
@@ -30,32 +30,32 @@ void throwIfKeysMissmatch(const Crypto::FSecretKey &secretKey,
     Crypto::FPublicKey pub;
     bool r = Crypto::secretKeyToPublicKey(secretKey, pub);
     if (!r || expectedPublicKey != pub) {
-        throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD), message);
+        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD), message);
     }
 }
 
-bool validateAddress(const std::string &address, const CryptoNote::Currency &currency)
+bool validateAddress(const std::string &address, const QwertyNote::Currency &currency)
 {
-    CryptoNote::AccountPublicAddress ignore;
+    QwertyNote::AccountPublicAddress ignore;
     return currency.parseAccountAddressString(address, ignore);
 }
 
-std::ostream &operator<<(std::ostream &os, CryptoNote::WalletTransactionState state)
+std::ostream &operator<<(std::ostream &os, QwertyNote::WalletTransactionState state)
 {
     switch (state) {
-    case CryptoNote::WalletTransactionState::SUCCEEDED:
+    case QwertyNote::WalletTransactionState::SUCCEEDED:
         os << "SUCCEEDED";
         break;
-    case CryptoNote::WalletTransactionState::FAILED:
+    case QwertyNote::WalletTransactionState::FAILED:
         os << "FAILED";
         break;
-    case CryptoNote::WalletTransactionState::CANCELLED:
+    case QwertyNote::WalletTransactionState::CANCELLED:
         os << "CANCELLED";
         break;
-    case CryptoNote::WalletTransactionState::CREATED:
+    case QwertyNote::WalletTransactionState::CREATED:
         os << "CREATED";
         break;
-    case CryptoNote::WalletTransactionState::DELETED:
+    case QwertyNote::WalletTransactionState::DELETED:
         os << "DELETED";
         break;
     default:
@@ -65,16 +65,16 @@ std::ostream &operator<<(std::ostream &os, CryptoNote::WalletTransactionState st
     return os << " (" << static_cast<int>(state) << ')';
 }
 
-std::ostream &operator<<(std::ostream &os, CryptoNote::WalletTransferType type)
+std::ostream &operator<<(std::ostream &os, QwertyNote::WalletTransferType type)
 {
     switch (type) {
-    case CryptoNote::WalletTransferType::USUAL:
+    case QwertyNote::WalletTransferType::USUAL:
         os << "USUAL";
         break;
-    case CryptoNote::WalletTransferType::DONATION:
+    case QwertyNote::WalletTransferType::DONATION:
         os << "DONATION";
         break;
-    case CryptoNote::WalletTransferType::CHANGE:
+    case QwertyNote::WalletTransferType::CHANGE:
         os << "CHANGE";
         break;
     default:
@@ -84,13 +84,13 @@ std::ostream &operator<<(std::ostream &os, CryptoNote::WalletTransferType type)
     return os << " (" << static_cast<int>(type) << ')';
 }
 
-std::ostream &operator<<(std::ostream &os, CryptoNote::WalletGreen::WalletState state)
+std::ostream &operator<<(std::ostream &os, QwertyNote::WalletGreen::WalletState state)
 {
     switch (state) {
-    case CryptoNote::WalletGreen::WalletState::INITIALIZED:
+    case QwertyNote::WalletGreen::WalletState::INITIALIZED:
         os << "INITIALIZED";
         break;
-    case CryptoNote::WalletGreen::WalletState::NOT_INITIALIZED:
+    case QwertyNote::WalletGreen::WalletState::NOT_INITIALIZED:
         os << "NOT_INITIALIZED";
         break;
     default:
@@ -100,16 +100,16 @@ std::ostream &operator<<(std::ostream &os, CryptoNote::WalletGreen::WalletState 
     return os << " (" << static_cast<int>(state) << ')';
 }
 
-std::ostream &operator<<(std::ostream &os, CryptoNote::WalletGreen::WalletTrackingMode mode)
+std::ostream &operator<<(std::ostream &os, QwertyNote::WalletGreen::WalletTrackingMode mode)
 {
     switch (mode) {
-    case CryptoNote::WalletGreen::WalletTrackingMode::TRACKING:
+    case QwertyNote::WalletGreen::WalletTrackingMode::TRACKING:
         os << "TRACKING";
         break;
-    case CryptoNote::WalletGreen::WalletTrackingMode::NOT_TRACKING:
+    case QwertyNote::WalletGreen::WalletTrackingMode::NOT_TRACKING:
         os << "NOT_TRACKING";
         break;
-    case CryptoNote::WalletGreen::WalletTrackingMode::NO_ADDRESSES:
+    case QwertyNote::WalletGreen::WalletTrackingMode::NO_ADDRESSES:
         os << "NO_ADDRESSES";
         break;
     default:
@@ -119,7 +119,7 @@ std::ostream &operator<<(std::ostream &os, CryptoNote::WalletGreen::WalletTracki
     return os << " (" << static_cast<int>(mode) << ')';
 }
 
-TransferListFormatter::TransferListFormatter(const CryptoNote::Currency &currency,
+TransferListFormatter::TransferListFormatter(const QwertyNote::Currency &currency,
                                              const WalletGreen::TransfersRange &range)
     : m_currency(currency),
       m_range(range)
@@ -142,8 +142,8 @@ std::ostream& operator<<(std::ostream &os, const TransferListFormatter &formatte
 }
 
 WalletOrderListFormatter::WalletOrderListFormatter(
-    const CryptoNote::Currency &currency,
-    const std::vector<CryptoNote::WalletOrder> &walletOrderList)
+    const QwertyNote::Currency &currency,
+    const std::vector<QwertyNote::WalletOrder> &walletOrderList)
     : m_currency(currency),
       m_walletOrderList(walletOrderList)
 {
@@ -174,4 +174,4 @@ std::ostream &operator<<(std::ostream &os, const WalletOrderListFormatter &forma
     return os;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

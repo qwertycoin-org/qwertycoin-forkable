@@ -16,7 +16,7 @@
 
 using namespace Common;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace {
 
@@ -150,4 +150,4 @@ void BinaryInputStreamSerializer::checkedRead(char *buf, size_t size)
     read(stream, buf, size);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

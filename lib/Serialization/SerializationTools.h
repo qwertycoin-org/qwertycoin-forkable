@@ -49,7 +49,7 @@ inline uint64_t getValueAs<uint64_t>(const JsonValue &js)
 
 } // namespace Common
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 template <typename T>
 Common::JsonValue storeToJsonValue(const T &v)
@@ -161,4 +161,4 @@ bool loadFromBinaryKeyValue(T &v, const std::string &buf)
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

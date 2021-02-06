@@ -23,9 +23,9 @@
 #include <Common/VectorOutputStream.h>
 #include <Serialization/BinaryInputStreamSerializer.h>
 #include <Serialization/BinaryOutputStreamSerializer.h>
-#include <CryptoNote.h>
+#include <QwertyNote.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 template <typename T>
 BinaryArray storeToBinary(const T &obj)
@@ -59,7 +59,7 @@ bool storeToBinaryFile(const T &obj, const std::string &filename)
 
         Common::StdOutputStream stream(dataFile);
         BinaryOutputStreamSerializer out(stream);
-        CryptoNote::serialize(const_cast<T &>(obj), out);
+        QwertyNote::serialize(const_cast<T &>(obj), out);
 
         if (dataFile.fail()) {
             return false;
@@ -93,4 +93,4 @@ bool loadFromBinaryFile(T &obj, const std::string &filename)
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

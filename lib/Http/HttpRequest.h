@@ -23,7 +23,7 @@
 #include <string>
 #include <Android.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class HttpRequest
 {
@@ -57,4 +57,4 @@ inline std::ostream &operator<<(std::ostream &os, const HttpRequest &resp)
     return resp.printHttpRequest(os);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

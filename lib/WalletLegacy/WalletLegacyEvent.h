@@ -21,15 +21,14 @@
 #include <Common/ObserverManager.h>
 #include <WalletLegacy/IWalletLegacy.h>
 
-namespace CryptoNote
-{
+namespace QwertyNote {
 
 class WalletLegacyEvent
 {
 public:
     virtual ~WalletLegacyEvent() = default;
 
-    virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver> &observer) = 0;
+    virtual void notify(Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> &observer) = 0;
 };
 
 class WalletTransactionUpdatedEvent : public WalletLegacyEvent
@@ -38,7 +37,7 @@ public:
     explicit WalletTransactionUpdatedEvent(TransactionId transactionId) : m_id(transactionId) {};
     ~WalletTransactionUpdatedEvent() override = default;
 
-    void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver> &observer) override
+    void notify(Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> &observer) override
     {
         observer.notify(&IWalletLegacyObserver::transactionUpdated, m_id);
     }
@@ -57,7 +56,7 @@ public:
     };
     ~WalletSendTransactionCompletedEvent() override = default;
 
-    void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver> &observer) override
+    void notify(Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> &observer) override
     {
         observer.notify(&IWalletLegacyObserver::sendTransactionCompleted, m_id, m_error);
     }
@@ -76,7 +75,7 @@ public:
     };
     ~WalletExternalTransactionCreatedEvent() override = default;
 
-    void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver> &observer) override
+    void notify(Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> &observer) override
     {
         observer.notify(&IWalletLegacyObserver::externalTransactionCreated, m_id);
     }
@@ -95,7 +94,7 @@ public:
     };
     ~WalletSynchronizationProgressUpdatedEvent() override = default;
 
-    void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver> &observer) override
+    void notify(Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> &observer) override
     {
         observer.notify(&IWalletLegacyObserver::synchronizationProgressUpdated, m_current, m_total);
     }
@@ -114,7 +113,7 @@ public:
     };
     ~WalletSynchronizationCompletedEvent() override = default;
 
-    void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver> &observer) override
+    void notify(Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> &observer) override
     {
         observer.notify(&IWalletLegacyObserver::synchronizationCompleted, m_ec);
     }
@@ -129,7 +128,7 @@ public:
     explicit WalletActualBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {};
     ~WalletActualBalanceUpdatedEvent() override = default;
 
-    void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver> &observer) override
+    void notify(Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> &observer) override
     {
         observer.notify(&IWalletLegacyObserver::actualBalanceUpdated, m_balance);
     }
@@ -144,7 +143,7 @@ public:
     explicit WalletPendingBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {};
     ~WalletPendingBalanceUpdatedEvent() override = default;
 
-    void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver> &observer) override
+    void notify(Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> &observer) override
     {
         observer.notify(&IWalletLegacyObserver::pendingBalanceUpdated, m_balance);
     }
@@ -153,4 +152,4 @@ private:
     uint64_t m_balance;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

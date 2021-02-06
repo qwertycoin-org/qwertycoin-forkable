@@ -35,7 +35,7 @@ namespace {
 
 const int RETRY_TIMEOUT = 5;
 
-std::ostream &operator<<(std::ostream &os, const CryptoNote::IBlockchainConsumer *consumer)
+std::ostream &operator<<(std::ostream &os, const QwertyNote::IBlockchainConsumer *consumer)
 {
     return os
         << "0x"
@@ -51,7 +51,7 @@ class TransactionReaderListFormatter
 {
 public:
     explicit TransactionReaderListFormatter(
-        const std::vector<std::unique_ptr<CryptoNote::ITransactionReader>> &transactionList)
+        const std::vector<std::unique_ptr<QwertyNote::ITransactionReader>> &transactionList)
         : m_transactionList(transactionList)
     {
     }
@@ -78,12 +78,12 @@ public:
     }
 
 private:
-    const std::vector<std::unique_ptr<CryptoNote::ITransactionReader>> &m_transactionList;
+    const std::vector<std::unique_ptr<QwertyNote::ITransactionReader>> &m_transactionList;
 };
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 BlockchainSynchronizer::BlockchainSynchronizer(
     INode &node,
@@ -966,4 +966,4 @@ SynchronizationState *BlockchainSynchronizer::getConsumerSynchronizationState(
     return it->second.get();
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

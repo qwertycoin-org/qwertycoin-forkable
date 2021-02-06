@@ -23,49 +23,49 @@
 
 namespace PaymentService {
 
-void Save::Request::serialize(CryptoNote::ISerializer &serializer)
+void Save::Request::serialize(QwertyNote::ISerializer &serializer)
 {
 }
 
-void Save::Response::serialize(CryptoNote::ISerializer &serializer)
+void Save::Response::serialize(QwertyNote::ISerializer &serializer)
 {
 }
 
-void Reset::Request::serialize(CryptoNote::ISerializer &serializer)
-{
-    serializer(viewSecretKey, "viewSecretKey");
-}
-
-void Reset::Response::serialize(CryptoNote::ISerializer &serializer)
-{
-}
-
-void GetViewKey::Request::serialize(CryptoNote::ISerializer &serializer)
-{
-}
-
-void GetViewKey::Response::serialize(CryptoNote::ISerializer &serializer)
+void Reset::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(viewSecretKey, "viewSecretKey");
 }
 
-void GetMnemonicSeed::Request::serialize(CryptoNote::ISerializer &serializer)
+void Reset::Response::serialize(QwertyNote::ISerializer &serializer)
+{
+}
+
+void GetViewKey::Request::serialize(QwertyNote::ISerializer &serializer)
+{
+}
+
+void GetViewKey::Response::serialize(QwertyNote::ISerializer &serializer)
+{
+    serializer(viewSecretKey, "viewSecretKey");
+}
+
+void GetMnemonicSeed::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     if (!serializer(address, "address")) {
         throw RequestSerializationError();
     }
 }
 
-void GetMnemonicSeed::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetMnemonicSeed::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(mnemonicSeed, "mnemonicSeed");
 }
 
-void GetStatus::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetStatus::Request::serialize(QwertyNote::ISerializer &serializer)
 {
 }
 
-void GetStatus::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetStatus::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(blockCount, "blockCount");
     serializer(knownBlockCount, "knownBlockCount");
@@ -75,12 +75,12 @@ void GetStatus::Response::serialize(CryptoNote::ISerializer &serializer)
     serializer(minimalFee, "minimalFee");
 }
 
-void ValidateAddress::Request::serialize(CryptoNote::ISerializer &serializer)
+void ValidateAddress::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(address, "address");
 }
 
-void ValidateAddress::Response::serialize(CryptoNote::ISerializer &serializer)
+void ValidateAddress::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(isvalid, "isvalid");
     serializer(address, "address");
@@ -88,16 +88,16 @@ void ValidateAddress::Response::serialize(CryptoNote::ISerializer &serializer)
     serializer(viewPublicKey, "viewPublicKey");
 }
 
-void GetAddresses::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetAddresses::Request::serialize(QwertyNote::ISerializer &serializer)
 {
 }
 
-void GetAddresses::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetAddresses::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(addresses, "addresses");
 }
 
-void CreateAddress::Request::serialize(CryptoNote::ISerializer &serializer)
+void CreateAddress::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     bool hasSecretKey = serializer(spendSecretKey, "spendSecretKey");
     bool hasPublicKey = serializer(spendPublicKey, "spendPublicKey");
@@ -111,47 +111,47 @@ void CreateAddress::Request::serialize(CryptoNote::ISerializer &serializer)
     }
 }
 
-void CreateAddress::Response::serialize(CryptoNote::ISerializer &serializer)
+void CreateAddress::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(address, "address");
 }
 
-void DeleteAddress::Request::serialize(CryptoNote::ISerializer &serializer)
+void DeleteAddress::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     if (!serializer(address, "address")) {
         throw RequestSerializationError();
     }
 }
 
-void DeleteAddress::Response::serialize(CryptoNote::ISerializer &serializer)
+void DeleteAddress::Response::serialize(QwertyNote::ISerializer &serializer)
 {
 }
 
-void GetSpendKeys::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetSpendKeys::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     if (!serializer(address, "address")) {
         throw RequestSerializationError();
     }
 }
 
-void GetSpendKeys::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetSpendKeys::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(spendSecretKey, "spendSecretKey");
     serializer(spendPublicKey, "spendPublicKey");
 }
 
-void GetBalance::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetBalance::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(address, "address");
 }
 
-void GetBalance::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetBalance::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(availableBalance, "availableBalance");
     serializer(lockedAmount, "lockedAmount");
 }
 
-void GetBlockHashes::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetBlockHashes::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     bool r = serializer(firstBlockIndex, "firstBlockIndex");
     r &= serializer(blockCount, "blockCount");
@@ -161,18 +161,18 @@ void GetBlockHashes::Request::serialize(CryptoNote::ISerializer &serializer)
     }
 }
 
-void GetBlockHashes::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetBlockHashes::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(blockHashes, "blockHashes");
 }
 
-void TransactionHashesInBlockRpcInfo::serialize(CryptoNote::ISerializer &serializer)
+void TransactionHashesInBlockRpcInfo::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(blockHash, "blockHash");
     serializer(transactionHashes, "transactionHashes");
 }
 
-void GetTransactionHashes::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetTransactionHashes::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(addresses, "addresses");
 
@@ -187,19 +187,19 @@ void GetTransactionHashes::Request::serialize(CryptoNote::ISerializer &serialize
     serializer(paymentId, "paymentId");
 }
 
-void GetTransactionHashes::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetTransactionHashes::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(items, "items");
 }
 
-void TransferRpcInfo::serialize(CryptoNote::ISerializer &serializer)
+void TransferRpcInfo::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(type, "type");
     serializer(address, "address");
     serializer(amount, "amount");
 }
 
-void TransactionRpcInfo::serialize(CryptoNote::ISerializer &serializer)
+void TransactionRpcInfo::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(state, "state");
     serializer(transactionHash, "transactionHash");
@@ -215,25 +215,25 @@ void TransactionRpcInfo::serialize(CryptoNote::ISerializer &serializer)
     serializer(paymentId, "paymentId");
 }
 
-void GetTransaction::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetTransaction::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     if (!serializer(transactionHash, "transactionHash")) {
         throw RequestSerializationError();
     }
 }
 
-void GetTransaction::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetTransaction::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(transaction, "transaction");
 }
 
-void TransactionsInBlockRpcInfo::serialize(CryptoNote::ISerializer &serializer)
+void TransactionsInBlockRpcInfo::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(blockHash, "blockHash");
     serializer(transactions, "transactions");
 }
 
-void GetTransactions::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetTransactions::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(addresses, "addresses");
 
@@ -248,22 +248,22 @@ void GetTransactions::Request::serialize(CryptoNote::ISerializer &serializer)
     serializer(paymentId, "paymentId");
 }
 
-void GetTransactions::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetTransactions::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(items, "items");
 }
 
-void GetUnconfirmedTransactionHashes::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetUnconfirmedTransactionHashes::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(addresses, "addresses");
 }
 
-void GetUnconfirmedTransactionHashes::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetUnconfirmedTransactionHashes::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(transactionHashes, "transactionHashes");
 }
 
-void WalletRpcOrder::serialize(CryptoNote::ISerializer &serializer)
+void WalletRpcOrder::serialize(QwertyNote::ISerializer &serializer)
 {
     bool r = serializer(address, "address");
     r &= serializer(amount, "amount");
@@ -273,7 +273,7 @@ void WalletRpcOrder::serialize(CryptoNote::ISerializer &serializer)
     }
 }
 
-void SendTransaction::Request::serialize(CryptoNote::ISerializer &serializer)
+void SendTransaction::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(sourceAddresses, "addresses");
 
@@ -301,13 +301,13 @@ void SendTransaction::Request::serialize(CryptoNote::ISerializer &serializer)
     serializer(unlockTime, "unlockTime");
 }
 
-void SendTransaction::Response::serialize(CryptoNote::ISerializer &serializer)
+void SendTransaction::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(transactionHash, "transactionHash");
     serializer(transactionSecretKey, "transactionSecretKey");
 }
 
-void CreateDelayedTransaction::Request::serialize(CryptoNote::ISerializer &serializer)
+void CreateDelayedTransaction::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(addresses, "addresses");
 
@@ -335,43 +335,43 @@ void CreateDelayedTransaction::Request::serialize(CryptoNote::ISerializer &seria
     serializer(unlockTime, "unlockTime");
 }
 
-void CreateDelayedTransaction::Response::serialize(CryptoNote::ISerializer &serializer)
+void CreateDelayedTransaction::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(transactionHash, "transactionHash");
 }
 
-void GetDelayedTransactionHashes::Request::serialize(CryptoNote::ISerializer &serializer)
+void GetDelayedTransactionHashes::Request::serialize(QwertyNote::ISerializer &serializer)
 {
 }
 
-void GetDelayedTransactionHashes::Response::serialize(CryptoNote::ISerializer &serializer)
+void GetDelayedTransactionHashes::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(transactionHashes, "transactionHashes");
 }
 
-void DeleteDelayedTransaction::Request::serialize(CryptoNote::ISerializer &serializer)
+void DeleteDelayedTransaction::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     if (!serializer(transactionHash, "transactionHash")) {
         throw RequestSerializationError();
     }
 }
 
-void DeleteDelayedTransaction::Response::serialize(CryptoNote::ISerializer &serializer)
+void DeleteDelayedTransaction::Response::serialize(QwertyNote::ISerializer &serializer)
 {
 }
 
-void SendDelayedTransaction::Request::serialize(CryptoNote::ISerializer &serializer)
+void SendDelayedTransaction::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     if (!serializer(transactionHash, "transactionHash")) {
         throw RequestSerializationError();
     }
 }
 
-void SendDelayedTransaction::Response::serialize(CryptoNote::ISerializer &serializer)
+void SendDelayedTransaction::Response::serialize(QwertyNote::ISerializer &serializer)
 {
 }
 
-void SendFusionTransaction::Request::serialize(CryptoNote::ISerializer &serializer)
+void SendFusionTransaction::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     if (!serializer(threshold, "threshold")) {
         throw RequestSerializationError();
@@ -385,12 +385,12 @@ void SendFusionTransaction::Request::serialize(CryptoNote::ISerializer &serializ
     serializer(destinationAddress, "destinationAddress");
 }
 
-void SendFusionTransaction::Response::serialize(CryptoNote::ISerializer &serializer)
+void SendFusionTransaction::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(transactionHash, "transactionHash");
 }
 
-void EstimateFusion::Request::serialize(CryptoNote::ISerializer &serializer)
+void EstimateFusion::Request::serialize(QwertyNote::ISerializer &serializer)
 {
     if (!serializer(threshold, "threshold")) {
         throw RequestSerializationError();
@@ -399,7 +399,7 @@ void EstimateFusion::Request::serialize(CryptoNote::ISerializer &serializer)
     serializer(addresses, "addresses");
 }
 
-void EstimateFusion::Response::serialize(CryptoNote::ISerializer &serializer)
+void EstimateFusion::Response::serialize(QwertyNote::ISerializer &serializer)
 {
     serializer(fusionReadyCount, "fusionReadyCount");
     serializer(totalOutputCount, "totalOutputCount");

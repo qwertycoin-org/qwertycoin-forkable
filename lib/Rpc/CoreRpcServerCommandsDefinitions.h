@@ -28,7 +28,7 @@
 #include <Serialization/BlockchainExplorerDataSerialization.h>
 #include <Serialization/SerializationOverloads.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 #define CORE_RPC_STATUS_OK "OK"
 #define CORE_RPC_STATUS_BUSY "BUSY"
@@ -1640,4 +1640,4 @@ struct COMMAND_RPC_RESOLVE_OPEN_ALIAS {
     };
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

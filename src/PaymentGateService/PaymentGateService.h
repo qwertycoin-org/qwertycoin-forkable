@@ -38,7 +38,7 @@ public:
         return config;
     }
     PaymentService::WalletConfiguration getWalletConfig() const;
-    const CryptoNote::Currency getCurrency();
+    const QwertyNote::Currency getCurrency();
 
     void run();
     void stop();
@@ -52,14 +52,14 @@ private:
     void runInProcess(Logging::LoggerRef &log);
     void runRpcProxy(Logging::LoggerRef &log);
 
-    void runWalletService(const CryptoNote::Currency &currency, CryptoNote::INode &node);
+    void runWalletService(const QwertyNote::Currency &currency, QwertyNote::INode &node);
 
 private:
     System::Dispatcher *dispatcher;
     System::Event *stopEvent;
     PaymentService::ConfigurationManager config;
     PaymentService::WalletService *service;
-    CryptoNote::CurrencyBuilder currencyBuilder;
+    QwertyNote::CurrencyBuilder currencyBuilder;
     Logging::LoggerGroup logger;
     std::ofstream fileStream;
     Logging::StreamLogger fileLogger;

@@ -23,7 +23,7 @@
 #include <Serialization/KVBinaryOutputStreamSerializer.h>
 
 using namespace Common;
-using namespace CryptoNote;
+using namespace QwertyNote;
 
 namespace {
 
@@ -74,7 +74,7 @@ size_t writeArraySize(IOutputStream &s, size_t val)
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 KVBinaryOutputStreamSerializer::KVBinaryOutputStreamSerializer()
 {
@@ -293,4 +293,4 @@ MemoryStream& KVBinaryOutputStreamSerializer::stream()
     return m_objectsStack.back();
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

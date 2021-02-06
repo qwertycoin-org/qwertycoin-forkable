@@ -30,9 +30,9 @@ using namespace Logging;
 
 namespace {
 
-void fillUnauthorizedResponse(CryptoNote::HttpResponse &response)
+void fillUnauthorizedResponse(QwertyNote::HttpResponse &response)
 {
-    response.setStatus(CryptoNote::HttpResponse::STATUS_401);
+    response.setStatus(QwertyNote::HttpResponse::STATUS_401);
     response.addHeader("WWW-Authenticate", "Basic realm=\"RPC\"");
     response.addHeader("Content-Type", "text/plain");
     response.setBody("Authorization required");
@@ -40,7 +40,7 @@ void fillUnauthorizedResponse(CryptoNote::HttpResponse &response)
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 HttpServer::HttpServer(System::Dispatcher &dispatcher, Logging::ILogger &log)
     : m_dispatcher(dispatcher),
@@ -173,4 +173,4 @@ size_t HttpServer::get_connections_count() const
     return m_connections.size();
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

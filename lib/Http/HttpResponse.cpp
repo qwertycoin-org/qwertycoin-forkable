@@ -22,30 +22,30 @@
 
 namespace {
 
-const char *getStatusString(CryptoNote::HttpResponse::HTTP_STATUS status)
+const char *getStatusString(QwertyNote::HttpResponse::HTTP_STATUS status)
 {
     switch (status) {
-    case CryptoNote::HttpResponse::STATUS_200:
+    case QwertyNote::HttpResponse::STATUS_200:
         return "200 OK";
-    case CryptoNote::HttpResponse::STATUS_401:
+    case QwertyNote::HttpResponse::STATUS_401:
         return "401 Unauthorized";
-    case CryptoNote::HttpResponse::STATUS_404:
+    case QwertyNote::HttpResponse::STATUS_404:
         return "404 Not Found";
-    case CryptoNote::HttpResponse::STATUS_500:
+    case QwertyNote::HttpResponse::STATUS_500:
         return "500 Internal Server Error";
     default:
         throw std::runtime_error("Unknown HTTP status code is given");
     }
 }
 
-const char *getErrorBody(CryptoNote::HttpResponse::HTTP_STATUS status)
+const char *getErrorBody(QwertyNote::HttpResponse::HTTP_STATUS status)
 {
     switch (status) {
-    case CryptoNote::HttpResponse::STATUS_401:
+    case QwertyNote::HttpResponse::STATUS_401:
         return "Authorization required\n";
-    case CryptoNote::HttpResponse::STATUS_404:
+    case QwertyNote::HttpResponse::STATUS_404:
         return "Requested url is not found\n";
-    case CryptoNote::HttpResponse::STATUS_500:
+    case QwertyNote::HttpResponse::STATUS_500:
         return "Internal server error is occurred\n";
     default:
         throw std::runtime_error("Error body for given status is not available");
@@ -54,12 +54,12 @@ const char *getErrorBody(CryptoNote::HttpResponse::HTTP_STATUS status)
 
 } // namespace
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 HttpResponse::HttpResponse()
 {
     status = STATUS_200;
-    headers["Server"] = "CryptoNote-based HTTP server";
+    headers["Server"] = "QwertyNote-based HTTP server";
     headers["Access-Control-Allow-Origin"] = "*";
 }
 
@@ -102,4 +102,4 @@ std::ostream &HttpResponse::printHttpResponse(std::ostream &os) const
     return os;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

@@ -20,7 +20,7 @@
 
 #include <Common/ObserverManager.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 template <typename Observer, typename Base>
 class IObservableImpl : public Base
@@ -40,4 +40,4 @@ protected:
     Tools::ObserverManager<Observer> m_observerManager;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

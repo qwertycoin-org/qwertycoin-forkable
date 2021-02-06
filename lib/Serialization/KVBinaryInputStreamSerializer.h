@@ -22,7 +22,7 @@
 #include <Serialization/ISerializer.h>
 #include <Serialization/JsonInputValueSerializer.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class KVBinaryInputStreamSerializer : public JsonInputValueSerializer
 {
@@ -33,4 +33,4 @@ public:
     bool binary(std::string &value, Common::StringView name) override;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

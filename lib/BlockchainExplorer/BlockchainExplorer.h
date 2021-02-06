@@ -33,7 +33,7 @@
 
 #include <Wallet/WalletAsyncContextCounter.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class BlockchainExplorer : public IBlockchainExplorer, public INodeObserver
 {
@@ -134,4 +134,4 @@ private:
     PoolUpdateGuard poolUpdateGuard;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

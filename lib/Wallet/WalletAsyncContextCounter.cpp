@@ -18,7 +18,7 @@
 
 #include <Wallet/WalletAsyncContextCounter.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 void WalletAsyncContextCounter::addAsyncContext()
 {
@@ -43,4 +43,4 @@ void WalletAsyncContextCounter::waitAsyncContextsFinish()
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

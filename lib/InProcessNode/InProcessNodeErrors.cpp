@@ -18,7 +18,7 @@
 
 #include <InProcessNode/InProcessNodeErrors.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 namespace error {
 
@@ -26,4 +26,4 @@ InProcessNodeErrorCategory InProcessNodeErrorCategory::INSTANCE;
 
 } // namespace error
 
-} // namespace CryptoNote
+} // namespace QwertyNote

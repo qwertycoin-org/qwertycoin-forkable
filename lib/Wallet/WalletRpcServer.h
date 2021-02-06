@@ -32,15 +32,14 @@
 
 namespace Tools {
 
-class wallet_rpc_server : CryptoNote::HttpServer
+class wallet_rpc_server : QwertyNote::HttpServer
 {
 public:
 	wallet_rpc_server(
 		System::Dispatcher &dispatcher,
 		Logging::ILogger &log,
-		CryptoNote::IWalletLegacy &w,
-		CryptoNote::INode &n,
-		CryptoNote::Currency &currency,
+                      QwertyNote::IWalletLegacy &w, QwertyNote::INode &n,
+                      QwertyNote::Currency &currency,
 		const std::string &walletFilename);
 
 	static const CommandLine::ArgDescriptor<uint16_t> arg_rpc_bind_port;
@@ -56,8 +55,8 @@ public:
 
 private:
     virtual void processRequest(
-        const CryptoNote::HttpRequest &request,
-        CryptoNote::HttpResponse &response) override;
+        const QwertyNote::HttpRequest &request,
+                                QwertyNote::HttpResponse &response) override;
 
 	// json_rpc
 	bool on_getbalance(
@@ -134,14 +133,14 @@ private:
 
 private:
 	Logging::LoggerRef logger;
-	CryptoNote::IWalletLegacy &m_wallet;
-	CryptoNote::INode &m_node;
+        QwertyNote::IWalletLegacy &m_wallet;
+        QwertyNote::INode &m_node;
 
 	uint16_t m_port;
 	std::string m_bind_ip;
 	std::string m_rpcUser;
 	std::string m_rpcPassword;
-	CryptoNote::Currency &m_currency;
+        QwertyNote::Currency &m_currency;
 	const std::string m_walletFilename;
 
 	System::Dispatcher &m_dispatcher;

@@ -23,13 +23,13 @@
 
 namespace PaymentService {
 
-class NodeRpcStub: public CryptoNote::INode
+class NodeRpcStub: public QwertyNote::INode
 {
 public:
     ~NodeRpcStub() override = default;
 
-    bool addObserver(CryptoNote::INodeObserver *observer) override { return true; }
-    bool removeObserver(CryptoNote::INodeObserver *observer) override { return true; }
+    bool addObserver(QwertyNote::INodeObserver *observer) override { return true; }
+    bool removeObserver(QwertyNote::INodeObserver *observer) override { return true; }
 
     void init(const Callback &callback) override { }
     bool shutdown() override { return true; }
@@ -45,11 +45,11 @@ public:
 
     CryptoNote::BlockHeaderInfo getLastLocalBlockHeaderInfo() const override
     {
-        return CryptoNote::BlockHeaderInfo{};
+        return QwertyNote::FBlockHeaderInfo{};
     }
     uint32_t getGRBHeight() const override { return 0; };
 
-    void relayTransaction(const CryptoNote::Transaction &transaction,
+    void relayTransaction(const QwertyNote::Transaction &transaction,
                           const Callback &callback) override
     {
         callback(std::error_code());
@@ -58,14 +58,14 @@ public:
     void getRandomOutsByAmounts(
         std::vector<uint64_t> &&amounts,
         uint64_t outsCount,
-        std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>&result,
+        std::vector<QwertyNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>&result,
         const Callback &callback) override
     {
     }
 
     void getNewBlocks(
         std::vector<Crypto::FHash> &&knownBlockIds,
-        std::vector<CryptoNote::BlockCompleteEntry> &newBlocks,
+        std::vector<QwertyNote::BlockCompleteEntry> &newBlocks,
         uint32_t &startHeight,
         const Callback &callback) override
     {
@@ -81,7 +81,7 @@ public:
 
     void queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                      uint64_t timestamp,
-                     std::vector<CryptoNote::BlockShortEntry> &newBlocks,
+                     std::vector<QwertyNote::FBlockShortEntry> &newBlocks,
                      uint32_t &startHeight,
                      const Callback &callback) override
     {
@@ -93,7 +93,7 @@ public:
         std::vector<Crypto::FHash> &&knownPoolTxIds,
         Crypto::FHash knownBlockId,
         bool &isBcActual,
-        std::vector<std::unique_ptr<CryptoNote::ITransactionReader>> &newTxs,
+        std::vector<std::unique_ptr<QwertyNote::ITransactionReader>> &newTxs,
         std::vector<Crypto::FHash> &deletedTxIds,
         const Callback &callback) override
     {
@@ -102,38 +102,38 @@ public:
     }
 
     void getBlocks(const std::vector<uint32_t> &blockHeights,
-                   std::vector<std::vector<CryptoNote::BlockDetails>> &blocks,
+                   std::vector<std::vector<QwertyNote::BlockDetails>> &blocks,
                    const Callback &callback) override { }
 
     void getBlocks(const std::vector<Crypto::FHash> &blockHashes,
-                   std::vector<CryptoNote::BlockDetails> &blocks,
+                   std::vector<QwertyNote::BlockDetails> &blocks,
                    const Callback &callback) override { }
 
     void getBlocks(uint64_t timestampBegin,
                    uint64_t timestampEnd,
                    uint32_t blocksNumberLimit,
-                   std::vector<CryptoNote::BlockDetails> &blocks,
+                   std::vector<QwertyNote::BlockDetails> &blocks,
                    uint32_t &blocksNumberWithinTimestamps,
                    const Callback &callback) override { }
 
     void getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
-                         std::vector<CryptoNote::TransactionDetails> &transactions,
+                         std::vector<QwertyNote::TransactionDetails> &transactions,
                          const Callback &callback) override { }
 
     void getPoolTransactions(uint64_t timestampBegin,
                              uint64_t timestampEnd,
                              uint32_t transactionsNumberLimit,
-                             std::vector<CryptoNote::TransactionDetails> &transactions,
+                             std::vector<QwertyNote::TransactionDetails> &transactions,
                              uint64_t &transactionsNumberWithinTimestamps,
                              const Callback &callback) override { }
 
     void getTransactionsByPaymentId(const Crypto::FHash &paymentId,
-                                    std::vector<CryptoNote::TransactionDetails> &transactions,
+                                    std::vector<QwertyNote::TransactionDetails> &transactions,
                                     const Callback &callback) override { }
 
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                               uint32_t gindex,
-                                              CryptoNote::MultiSignatureOutput &out,
+                                              QwertyNote::MultiSignatureOutput &out,
                                               const Callback &callback) override { }
 
     void isSynchronized(bool &syncStatus, const Callback &callback) override { }
@@ -165,9 +165,9 @@ private:
     std::future<std::error_code> initFuture;
 };
 
-CryptoNote::INode *NodeFactory::createNode(const std::string &daemonAddress, uint16_t daemonPort)
+QwertyNote::INode *NodeFactory::createNode(const std::string &daemonAddress, uint16_t daemonPort)
 {
-    std::unique_ptr<CryptoNote::INode> node(new CryptoNote::NodeRpcProxy(daemonAddress,daemonPort));
+    std::unique_ptr<QwertyNote::INode> node(new QwertyNote::NodeRpcProxy(daemonAddress,daemonPort));
 
     NodeInitObserver initObserver;
     node->init(std::bind(&NodeInitObserver::initCompleted, &initObserver, std::placeholders::_1));
@@ -176,7 +176,7 @@ CryptoNote::INode *NodeFactory::createNode(const std::string &daemonAddress, uin
     return node.release();
 }
 
-CryptoNote::INode *NodeFactory::createNodeStub()
+QwertyNote::INode *NodeFactory::createNodeStub()
 {
     return new NodeRpcStub();
 }

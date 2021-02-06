@@ -22,9 +22,9 @@
 #include <Serialization/JsonOutputStreamSerializer.h>
 
 using Common::JsonValue;
-using namespace CryptoNote;
+using namespace QwertyNote;
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 std::ostream &operator<<(std::ostream &out, const JsonOutputStreamSerializer &enumerator)
 {
@@ -33,7 +33,7 @@ std::ostream &operator<<(std::ostream &out, const JsonOutputStreamSerializer &en
     return out;
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote
 
 namespace {
 

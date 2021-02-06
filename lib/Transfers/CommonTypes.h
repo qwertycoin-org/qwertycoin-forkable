@@ -26,6 +26,7 @@
 #include <INode.h>
 
 namespace CryptoNote {
+namespace QwertyNote {
 
 struct BlockchainInterval
 {
@@ -36,9 +37,9 @@ struct BlockchainInterval
 struct CompleteBlock
 {
     Crypto::FHash blockHash;
-    boost::optional<CryptoNote::Block> block;
+    boost::optional<QwertyNote::Block> block;
     // first transaction is always coinbase
     std::list<std::shared_ptr<ITransactionReader>> transactions;
 };
 
-} // namespace CryptoNote
+} // namespace QwertyNote

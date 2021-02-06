@@ -29,7 +29,7 @@
 
 #include <Global/CryptoNoteConfig.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 BlockchainExplorerDataBuilder::BlockchainExplorerDataBuilder(ICore &core,
                                                              ICryptoNoteProtocolQuery &protocol)
@@ -85,7 +85,7 @@ bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block,
     blockDetails.sizeMedian = median(blocksSizes);
 
     size_t blockGrantedFullRewardZone =
-            CryptoNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
+            QwertyNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
     blockDetails.effectiveSizeMedian =
             std::max(blockDetails.sizeMedian, (uint64_t)blockGrantedFullRewardZone);
 
@@ -111,7 +111,7 @@ bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block,
 
     uint64_t prevBlockGeneratedCoins = 0;
     uint32_t previousBlockHeight = 0;
-    uint64_t blockTarget = CryptoNote::parameters::DIFFICULTY_TARGET;
+    uint64_t blockTarget = QwertyNote::parameters::DIFFICULTY_TARGET;
 
     if (blockDetails.height > 0) {
         if (!m_core.getAlreadyGeneratedCoins(block.previousBlockHash, prevBlockGeneratedCoins)) {
@@ -119,7 +119,7 @@ bool BlockchainExplorerDataBuilder::fillBlockDetails(const Block &block,
         }
     }
 
-    if (blockDetails.height > CryptoNote::parameters::UPGRADE_HEIGHT_V1) {
+    if (blockDetails.height > QwertyNote::parameters::UPGRADE_HEIGHT_V1) {
         m_core.getBlockHeight(block.previousBlockHash, previousBlockHeight);
         blockTarget = block.timestamp - m_core.getBlockTimestamp(previousBlockHeight);
     }
@@ -406,4 +406,4 @@ size_t BlockchainExplorerDataBuilder::median(std::vector<size_t> &v)
     }
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote

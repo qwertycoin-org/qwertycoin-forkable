@@ -25,7 +25,7 @@
 #include <map>
 #include <Android.h>
 
-namespace CryptoNote {
+namespace QwertyNote {
 
 class HttpResponse
 {
@@ -63,4 +63,4 @@ inline std::ostream &operator<<(std::ostream &os, const HttpResponse &resp)
     return resp.printHttpResponse(os);
 }
 
-} // namespace CryptoNote
+} // namespace QwertyNote
