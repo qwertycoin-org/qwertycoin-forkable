@@ -67,11 +67,15 @@ struct FSignature {
 
 #pragma pack(pop)
 
-static_assert(sizeof(FEllipticCurvePoint) == 32 && sizeof(FEllipticCurveScalar) == 32,
+static_assert(sizeof(FEllipticCurvePoint) == 32
+			  && sizeof(FEllipticCurveScalar) == 32,
               "Invalid structure size");
 
-static_assert(sizeof(FHash) == 32 && sizeof(FPublicKey) == 32 && sizeof(FSecretKey) == 32
-			  && sizeof(FKeyDerivation) == 32 && sizeof(FKeyImage) == 32
+static_assert(sizeof(FHash) == 32
+			  && sizeof(FPublicKey) == 32
+			  && sizeof(FSecretKey) == 32
+			  && sizeof(FKeyDerivation) == 32
+			  && sizeof(FKeyImage) == 32
 			  && sizeof(FSignature) == 64,
               "Invalid structure size");
 
