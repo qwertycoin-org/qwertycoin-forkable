@@ -21,11 +21,11 @@
 namespace QwertyNote {
 
 template <typename T>
-class IObservable
+class TObservable
 {
 public:
-    virtual void addObserver(T *observer) = 0;
-    virtual void removeObserver(T *observer) = 0;
+    virtual void addObserver(T *sObserver) = 0;
+    virtual void removeObserver(T *sObserver) = 0;
 };
 
 } // namespace QwertyNote
