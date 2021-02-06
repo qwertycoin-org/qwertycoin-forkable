@@ -77,6 +77,7 @@
 
 - In public header files, always use this form to include QwertyNote headers: (e.g. `#include <Crypto/Crypto.h>`).
 - In source files, include system headers first, then generic, then specialized headers. Separate the categories with empty lines.
+- Don't use the old <xxx.h> system headers, always use the newer <cxxx> system headers
 ```cpp
 // System headers
 #include <cassert>
@@ -212,8 +213,22 @@ class QNameOfAnotherClass : public IAdditionalClass,
                            public IAnotherAdditionalClass
 {
 public:
-    QNameOfAnotherClass (std::string someString);
+    QNameOfAnotherClass (uint8_t uSomeInt)
+        : uData(uSomeInt);
     ~QNameOfAnotherClass () override = default;
+
+    int fooBar (bool bIsBar) {
+        if (uData < 1) {
+            return 0;
+        } else if (bIsBar) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
+private:
+    uint8_t uData;
 }; // NameOfAnotherClass
 
 
@@ -227,11 +242,38 @@ struct FNameOfStruct {
 
 // Enum
 enum ENameOfEnum {
-	
 };
+
+// Loops (For, While)
+for (int i = 0; i < 100; i++) {
+}
+```
+
+Here a little example why we should use always braces:
+```cpp
+// Wrong example
+// This compiles and does what you want, but can lead to confusing
+// errors if close attention is not paid.
+for (int i = 0; i < 42; i++) 
+    std::cout << i << std::endl;
+
+// The std::cout is not part of the loop in this case even though it appears to be
+int sum = 0;
+for (int i = 0; i < 42; i++)
+    sum++;
+    std::cout << i << std::endl;
+
+
+// Correct example
+int sum = 0;
+for (int i = 0; i < 42; i++) {
+    sum++;
+    std::cout << i << std::endl;
+}
 ```
 
 ### <a name="comments"></a> Comments
+Source Code should always be under version control. Keeping old code in comments is unnecessary.
 - Start comments always with an uppercase letter
 - Start comments always with an empty space 
 ```cpp
@@ -244,6 +286,7 @@ enum ENameOfEnum {
 
 ```
 - We add comments after a closing Namespace or Class
+- Comment blocks should use `//`, not `/* */`. Using `//` makes is easier to comment out a block while debugging or testing.
 ```cpp
 // Wrong
 namespace NameOfNamespace {
@@ -252,4 +295,11 @@ namespace NameOfNamespace {
 // Correct
 namespace NameOfNamespace {
 } // NameOfNamespace
+
+// This function does something
+int fooBar ()
+{
+}
 ```
+
+
