@@ -16,13 +16,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/Currency.h"
-
 #include <Common/Math.h>
+
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/Currency.h>
 
 #include "Chaingen.h"
 

@@ -19,12 +19,15 @@
 
 #include <Crypto/Crypto.h>
 #include <Crypto/Random.h>
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/TransactionApi.h>
+
 #include <Logging/LoggerGroup.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/TransactionApi.h>
+
 #include <WalletLegacy/WalletTransactionSender.h>
 #include <WalletLegacy/WalletUtils.h>
 

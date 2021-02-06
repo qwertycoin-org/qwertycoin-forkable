@@ -17,10 +17,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <CryptoNoteCore/CryptoNoteSerialization.h>
 #include <Global/Constants.h>
+
+#include <QwertyNoteCore/CryptoNoteSerialization.h>
+
 #include <Serialization/ISerializer.h>
 #include <Serialization/SerializationOverloads.h>
+
 #include <WalletLegacy/IWalletLegacy.h>
 #include <WalletLegacy/WalletLegacySerialization.h>
 #include <WalletLegacy/WalletLegacySerializer.h>

@@ -21,13 +21,17 @@
 #include <cstdint>
 #include <unordered_map>
 
-#include "Common/ObserverManager.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/ICore.h"
-#include "CryptoNoteCore/ICoreObserver.h"
-#include "CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h"
-#include <Global/CryptoNoteConfig.h>
-#include "Rpc/CoreRpcServerCommandsDefinitions.h"
+#include <Common/ObserverManager.h>
+
+#include <Global/QwertyNoteConfig.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/ICore.h>
+#include <QwertyNoteCore/ICoreObserver.h>
+
+#include <QwertyNoteProtocol/CryptoNoteProtocolDefinitions.h>
+
+#include <Rpc/CoreRpcServerCommandsDefinitions.h>
 
 class ICoreStub : public CryptoNote::ICore
 {

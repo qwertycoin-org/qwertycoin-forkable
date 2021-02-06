@@ -19,14 +19,16 @@
 
 #pragma once
 
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/Currency.h>
+#include <INode.h>
+#include <ITransfersContainer.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/Currency.h>
+
 #include <WalletLegacy/WalletSendTransactionContext.h>
 #include <WalletLegacy/WalletUserTransactionsCache.h>
 #include <WalletLegacy/WalletUnconfirmedTransactions.h>
 #include <WalletLegacy/WalletRequest.h>
-#include <INode.h>
-#include <ITransfersContainer.h>
 
 namespace QwertyNote {
 

@@ -23,24 +23,31 @@
 #include <string>
 #include <future>
 #include <unordered_map>
+
+#include <version.h>
+
 #include <BlockchainExplorer/BlockchainExplorerData.h>
+
 #include <Common/StringTools.h>
 #include <Common/Base58.h>
 #include <Common/HardwareInfo.h>
 #include <Common/Math.h>
-#include <CryptoNoteCore/TransactionUtils.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/Core.h>
-#include <CryptoNoteCore/IBlock.h>
-#include <CryptoNoteCore/Miner.h>
-#include <CryptoNoteCore/TransactionExtra.h>
-#include <CryptoNoteProtocol/ICryptoNoteProtocolQuery.h>
+
 #include <P2p/NetNode.h>
+
+#include <QwertyNoteCore/TransactionUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/Core.h>
+#include <QwertyNoteCore/IBlock.h>
+#include <QwertyNoteCore/Miner.h>
+#include <QwertyNoteCore/TransactionExtra.h>
+
+#include <QwertyNoteProtocol/IQwertyNoteProtocolQuery.h>
+
 #include <Rpc/CoreRpcServerErrorCodes.h>
 #include <Rpc/JsonRpc.h>
 #include <Rpc/RpcServer.h>
-#include <version.h>
 
 #undef ERROR // TODO: WTF!?
 
@@ -277,7 +284,7 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
         };
 
 RpcServer::RpcServer(System::Dispatcher &dispatcher, Logging::ILogger &log, core &core,
-                     NodeServer &p2p, ICryptoNoteProtocolQuery &protocolQuery)
+					 NodeServer &p2p, IQwertyNoteProtocolQuery &protocolQuery)
     : HttpServer(dispatcher, log),
       logger(log, "RpcServer"),
       m_core(core),
@@ -3124,7 +3131,7 @@ bool RpcServer::onCheckReserveProof(const COMMAND_RPC_CHECK_RESERVE_PROOF::reque
 
     // compute signature prefix hash
     std::string prefix_data = req.message;
-    prefix_data.append((const char *)&address, sizeof(CryptoNote::AccountPublicAddress));
+    prefix_data.append((const char *)&address, sizeof(QwertyNote::AccountPublicAddress));
     for (size_t i = 0; i < proofs.size(); ++i) {
         prefix_data.append((const char *)&proofs[i].key_image, sizeof(Crypto::FPublicKey));
     }

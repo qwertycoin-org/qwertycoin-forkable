@@ -16,19 +16,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
-
 #include <thread>
 #include <iostream>
 
-#include "System/ContextGroup.h"
-#include "System/Dispatcher.h"
-#include "System/Event.h"
+#include <gtest/gtest.h>
 
-#include "CryptoNoteCore/MessageQueue.h"
-#include "CryptoNoteCore/BlockchainMessages.h"
-#include "CryptoNoteCore/IntrusiveLinkedList.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
+#include <QwertyNoteCore/MessageQueue.h>
+#include <QwertyNoteCore/BlockchainMessages.h>
+#include <QwertyNoteCore/IntrusiveLinkedList.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+
+#include <System/ContextGroup.h>
+#include <System/Dispatcher.h>
+#include <System/Event.h>
 
 using namespace CryptoNote;
 

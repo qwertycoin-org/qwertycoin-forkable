@@ -16,33 +16,36 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
-
 #include <chrono>
 #include <fstream>
 #include <numeric>
 #include <system_error>
 #include <tuple>
 
-#include "Common/StringTools.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/TransactionApi.h"
-#include "CryptoNoteCore/TransactionApiExtra.h"
-#include "INodeStubs.h"
-#include "TestBlockchainGenerator.h"
-#include "TransactionApiHelpers.h"
+#include <gtest/gtest.h>
+
+#include <Common/StringTools.h>
+
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/TransactionApi.h>
+#include <QwertyNoteCore/TransactionApiExtra.h>
+
 #include <Logging/ConsoleLogger.h>
-#include "Wallet/WalletErrors.h"
-#include "Wallet/WalletGreen.h"
-#include "Wallet/WalletSerializationV2.h"
-#include "Wallet/WalletUtils.h"
-#include "WalletLegacy/WalletUserTransactionsCache.h"
-#include "WalletLegacy/WalletLegacySerializer.h"
+
 #include <System/Dispatcher.h>
 #include <System/Timer.h>
 #include <System/Context.h>
 
+#include <Wallet/WalletErrors.h>
+#include <Wallet/WalletGreen.h>
+#include <Wallet/WalletSerializationV2.h>
+#include <Wallet/WalletUtils.h>
+#include <WalletLegacy/WalletUserTransactionsCache.h>
+#include <WalletLegacy/WalletLegacySerializer.h>
+
+#include "INodeStubs.h"
 #include "TransactionApiHelpers.h"
+#include "TestBlockchainGenerator.h"
 
 using namespace Crypto;
 using namespace Common;

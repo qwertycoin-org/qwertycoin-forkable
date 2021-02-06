@@ -20,15 +20,15 @@
 
 #include <cstdint>
 
-#include "CryptoNoteProtocol/ICryptoNoteProtocolObserver.h"
-#include "CryptoNoteProtocol/ICryptoNoteProtocolQuery.h"
+#include "QwertyNoteProtocol/IQwertyNoteProtocolObserver.h"
+#include "QwertyNoteProtocol/ICryptoNoteProtocolQuery.h"
 
-class ICryptoNoteProtocolQueryStub: public CryptoNote::ICryptoNoteProtocolQuery {
+class ICryptoNoteProtocolQueryStub: public CryptoNote::IQwertyNoteProtocolQuery {
 public:
   ICryptoNoteProtocolQueryStub() : peers(0), observedHeight(0), synchronized(false) {}
 
-  virtual bool addObserver(CryptoNote::ICryptoNoteProtocolObserver* observer) override;
-  virtual bool removeObserver(CryptoNote::ICryptoNoteProtocolObserver* observer) override;
+  virtual bool addObserver(CryptoNote::IQwertyNoteProtocolObserver* observer) override;
+  virtual bool removeObserver(CryptoNote::IQwertyNoteProtocolObserver* observer) override;
   virtual uint32_t getObservedHeight() const override;
   virtual size_t getPeerCount() const override;
   virtual bool isSynchronized() const override;

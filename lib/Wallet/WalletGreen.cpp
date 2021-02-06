@@ -28,6 +28,7 @@
 #include <set>
 #include <tuple>
 #include <utility>
+
 #include <Common/ScopeExit.h>
 #include <Common/ShuffleGenerator.h>
 #include <Common/StdInputStream.h>
@@ -35,19 +36,25 @@
 #include <Common/StreamTools.h>
 #include <Common/StringOutputStream.h>
 #include <Common/StringTools.h>
+
 #include <Crypto/Crypto.h>
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/Currency.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/CryptoNoteSerialization.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/ITransaction.h>
-#include <CryptoNoteCore/TransactionApi.h>
+
 #include <Global/Constants.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteSerialization.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/ITransaction.h>
+#include <QwertyNoteCore/TransactionApi.h>
+
 #include <System/EventLock.h>
 #include <System/RemoteContext.h>
+
 #include <Transfers/TransfersContainer.h>
+
 #include <Wallet/WalletErrors.h>
 #include <Wallet/WalletGreen.h>
 #include <Wallet/WalletSerializationV1.h>

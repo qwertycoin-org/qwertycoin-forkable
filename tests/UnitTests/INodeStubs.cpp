@@ -16,12 +16,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "INodeStubs.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/TransactionApi.h"
-#include "Wallet/WalletErrors.h"
-
 #include <functional>
 #include <thread>
 #include <iterator>
@@ -30,9 +24,18 @@
 
 #include <system_error>
 
-#include "crypto/Crypto.h"
+#include <INodeStubs.h>
 
-#include "BlockchainExplorer/BlockchainExplorerDataBuilder.h"
+#include <BlockchainExplorer/BlockchainExplorerDataBuilder.h>
+
+#include <Crypto/Crypto.h>
+
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/TransactionApi.h>
+
+#include <Wallet/WalletErrors.h>
+
 
 using namespace CryptoNote;
 using namespace Common;

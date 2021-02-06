@@ -16,13 +16,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "ICoreStub.h"
+#include <Global/Constants.h>
 
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/IBlock.h"
-#include "CryptoNoteCore/VerificationContext.h"
-#include "Global/Constants.h"
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/IBlock.h>
+#include <QwertyNoteCore/VerificationContext.h>
+
+#include "ICoreStub.h"
 
 using namespace Qwertycoin;
 

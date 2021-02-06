@@ -16,10 +16,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
-#include "CryptoNoteCore/Checkpoints.h"
 #include <Logging/LoggerGroup.h>
+
+#include <QwertyNoteCore/Checkpoints.h>
 
 using namespace CryptoNote;
 

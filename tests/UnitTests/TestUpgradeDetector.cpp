@@ -18,12 +18,12 @@
 
 #include <vector>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/UpgradeDetector.h"
+#include <Logging/ConsoleLogger.h>
 
-#include "Logging/ConsoleLogger.h"
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/UpgradeDetector.h>
 
 namespace {
   using CryptoNote::BLOCK_MAJOR_VERSION_1;

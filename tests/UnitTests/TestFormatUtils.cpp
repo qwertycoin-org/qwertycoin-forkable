@@ -16,19 +16,20 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
-
 #include <vector>
 
-#include "Common/Util.h"
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/TransactionExtra.h"
-#include "Common/StringTools.h"
+#include <gtest/gtest.h>
+
+#include <Common/Util.h>
+#include <Common/StringTools.h>
 
 #include <Logging/LoggerGroup.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/TransactionExtra.h>
 
 using namespace Qwertycoin;
 

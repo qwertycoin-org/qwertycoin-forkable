@@ -18,10 +18,12 @@
 
 #pragma once
 
-#include <CryptoNoteCore/CoreConfig.h>
+#include <PaymentGateService/PaymentServiceConfiguration.h>
+#include <PaymentGateService/RpcNodeConfiguration.h>
+
+#include <QwertyNoteCore/CoreConfig.h>
+
 #include <P2p/NetNodeConfig.h>
-#include "PaymentServiceConfiguration.h"
-#include "RpcNodeConfiguration.h"
 
 namespace PaymentService {
 

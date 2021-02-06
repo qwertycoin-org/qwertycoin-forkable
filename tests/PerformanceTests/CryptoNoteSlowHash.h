@@ -18,9 +18,11 @@
 
 #pragma once
 
-#include "Common/StringTools.h"
-#include "crypto/Crypto.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
+#include <Common/StringTools.h>
+
+#include <Crypto/Crypto.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
 
 class test_cn_slow_hash {
 public:

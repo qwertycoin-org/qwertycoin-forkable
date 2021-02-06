@@ -16,23 +16,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
-
 #include <future>
 #include <chrono>
 #include <array>
 
-#include "EventWaiter.h"
-#include "INode.h"
-#include "WalletLegacy/WalletLegacy.h"
-#include <QwertyNote.h>
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/Currency.h"
+#include <gtest/gtest.h>
 
+#include <INode.h>
+#include <QwertyNote.h>
+
+#include <Logging/ConsoleLogger.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/Currency.h>
+
+#include <WalletLegacy/WalletLegacy.h>
+#include <WalletLegacy/WalletHelper.h>
 
 #include "INodeStubs.h"
 #include "TestBlockchainGenerator.h"
-#include <Logging/ConsoleLogger.h>
+#include "EventWaiter.h"
 
 using namespace Qwertycoin;
 

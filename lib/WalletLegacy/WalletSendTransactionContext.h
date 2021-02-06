@@ -21,11 +21,15 @@
 
 #include <list>
 #include <vector>
-#include <CryptoNoteCore/CryptoNoteBasic.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <Global/Constants.h>
-#include <WalletLegacy/IWalletLegacy.h>
+
 #include <ITransfersContainer.h>
+
+#include <Global/Constants.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+
+#include <WalletLegacy/IWalletLegacy.h>
 
 namespace QwertyNote {
 

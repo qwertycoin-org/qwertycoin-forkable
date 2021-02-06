@@ -21,8 +21,8 @@
 #include <time.h>
 #include <unordered_set>
 
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
 
 
 #include "../PerformanceTests/MultiTransactionTestBase.h"

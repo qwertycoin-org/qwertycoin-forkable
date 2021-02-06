@@ -18,13 +18,16 @@
 
 #pragma once
 
-#include <Crypto/Crypto.h>
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/ITransaction.h>
-#include <Transfers/TransfersContainer.h>
 #include <CryptoTypes.h>
+
+#include <Crypto/Crypto.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/ITransaction.h>
+
+#include <Transfers/TransfersContainer.h>
 
 namespace {
 

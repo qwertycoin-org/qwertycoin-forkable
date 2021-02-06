@@ -23,12 +23,13 @@
 #include <vector>
 #include <unordered_map>
 
-#include "crypto/hash.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/Difficulty.h"
+#include <Crypto/Hash.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/Difficulty.h>
 
 
 class test_generator

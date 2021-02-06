@@ -25,9 +25,12 @@
 #include <boost/serialization/map.hpp>
 #include <boost/foreach.hpp>
 #include <boost/serialization/is_bitwise_serializable.hpp>
-#include "CryptoNoteCore/CryptoNoteBasic.h"
+
+#include <Crypto/Crypto.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+
 #include "UnorderedContainersBoostSerialization.h"
-#include "crypto/Crypto.h"
 
 //namespace CryptoNote {
 namespace boost

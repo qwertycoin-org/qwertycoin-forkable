@@ -19,18 +19,25 @@
 #include <atomic>
 #include <system_error>
 #include <thread>
+
 #include <Common/StringTools.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/TransactionApi.h>
+
 #include <Global/Constants.h>
+
 #include <Http/HttpRequest.h>
 #include <Http/HttpResponse.h>
+
 #include <NodeRpcProxy/NodeErrors.h>
 #include <NodeRpcProxy/NodeRpcProxy.h>
+
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/TransactionApi.h>
+
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
 #include <Rpc/HttpClient.h>
 #include <Rpc/JsonRpc.h>
+
 #include <System/ContextGroup.h>
 #include <System/Dispatcher.h>
 #include <System/Event.h>
@@ -734,7 +741,7 @@ std::error_code NodeRpcProxy::doGetTransactionOutsGlobalIndices(
 
 std::error_code NodeRpcProxy::doQueryBlocksLite(const std::vector<Crypto::FHash> &knownBlockIds,
                                                 uint64_t timestamp,
-                                                std::vector<CryptoNote::BlockShortEntry> &newBlocks,
+                                                std::vector<QwertyNote::FBlockShortEntry> &newBlocks,
                                                 uint32_t &startHeight)
 {
     QwertyNote::COMMAND_RPC_QUERY_BLOCKS_LITE::request req = AUTO_VAL_INIT(req);

@@ -20,15 +20,21 @@
 
 #include <future>
 #include <numeric>
+
+#include <INode.h>
+
 #include <Common/BlockingQueue.h>
 #include <Common/StringTools.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/TransactionApi.h>
+
 #include <Global/Constants.h>
+
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/TransactionApi.h>
+
 #include <Transfers/CommonTypes.h>
 #include <Transfers/TransfersConsumer.h>
+
 #include <Wallet/IWallet.h>
-#include <INode.h>
 
 using namespace Crypto;
 using namespace Logging;

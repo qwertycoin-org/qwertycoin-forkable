@@ -23,10 +23,10 @@
 #include <BlockchainExplorer/BlockchainExplorer.h>
 #include <BlockchainExplorer/BlockchainExplorerErrors.h>
 
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/ITransaction.h>
+#include <Global/QwertyNoteConfig.h>
 
-#include <Global/CryptoNoteConfig.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/ITransaction.h>
 
 using namespace Logging;
 using namespace Crypto;

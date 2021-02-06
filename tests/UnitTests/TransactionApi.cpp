@@ -21,10 +21,12 @@
 #include <numeric>
 #include <random>
 
-#include "CryptoNoteCore/TransactionApi.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h" // TODO: delete
-#include "CryptoNoteCore/Account.h"
-#include "crypto/Crypto.h"
+#include <Crypto/Crypto.h>
+
+#include <QwertyNoteCore/TransactionApi.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h> // TODO: delete
+#include <QwertyNoteCore/Account.h>
+
 #include "TransactionApiHelpers.h"
 
 using namespace CryptoNote;

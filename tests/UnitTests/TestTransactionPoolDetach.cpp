@@ -16,24 +16,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
-
-#include "EventWaiter.h"
-#include "Logging/ConsoleLogger.h"
-#include "Transfers/BlockchainSynchronizer.h"
-#include "Transfers/TransfersSynchronizer.h"
-
-#include "INodeStubs.h"
-#include "TestBlockchainGenerator.h"
-#include "TransactionApiHelpers.h"
-#include "CryptoNoteCore/TransactionApi.h"
-
-#include "WalletLegacy/WalletLegacy.h"
+#include <future>
+#include <algorithm>
 
 #include <boost/scoped_array.hpp>
 
-#include <future>
-#include <algorithm>
+#include <gtest/gtest.h>
+
+#include <Logging/ConsoleLogger.h>
+
+#include <QwertyNoteCore/TransactionApi.h>
+
+#include <Transfers/BlockchainSynchronizer.h>
+#include <Transfers/TransfersSynchronizer.h>
+
+#include <WalletLegacy/WalletLegacy.h>
+
+#include "EventWaiter.h"
+#include "INodeStubs.h"
+#include "TestBlockchainGenerator.h"
+#include "TransactionApiHelpers.h"
 
 using namespace CryptoNote;
 

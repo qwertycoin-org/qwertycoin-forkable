@@ -22,18 +22,26 @@
 
 #include <fstream>
 #include <memory>
+
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/hashed_index.hpp>
-#include <CryptoNoteCore/Currency.h>
+
+#include <INode.h>
+
+#include <Logging/LoggerRef.h>
+
 #include <PaymentGate/PaymentServiceJsonRpcMessages.h>
+
+#include <QwertyNoteCore/Currency.h>
+
 #include <System/ContextGroup.h>
 #include <System/Dispatcher.h>
 #include <System/Event.h>
+
 #include <Wallet/IWallet.h>
-#include <INode.h>
+
 #undef ERROR // TODO: workaround for windows build. Fix it!
-#include <Logging/LoggerRef.h>
 
 namespace QwertyNote {
 

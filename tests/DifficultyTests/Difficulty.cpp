@@ -24,12 +24,15 @@
 #include <algorithm>
 #include <numeric>
 
-#include <Global/CryptoNoteConfig.h>
 #include <Common/Math.h>
-#include "CryptoNoteCore/Difficulty.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/Blockchain.h"
-#include "Logging/ConsoleLogger.h"
+
+#include <Global/QwertyNoteConfig.h>
+
+#include <Logging/ConsoleLogger.h>
+
+#include <QwertyNoteCore/Difficulty.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/Blockchain.h>
 
 // copy solve times and difficulties from excel file
 std::vector<uint64_t> precalc_solve_times_V6(

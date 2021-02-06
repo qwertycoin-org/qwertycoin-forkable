@@ -17,31 +17,40 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <assert.h>
+#include <cassert>
 #include <future>
 #include <sstream>
 #include <unordered_set>
+
 #include <boost/filesystem/operations.hpp>
+
 #include <QwertyNote.h>
+#include <ITransfersContainer.h>
+
 #include <Common/Util.h>
+
 #include <Crypto/Crypto.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/TransactionExtra.h>
-#include <CryptoNoteCore/Account.h>
+
 #include <Mnemonics/electrum-words.cpp>
+
 #include <PaymentGate/NodeFactory.h>
 #include <PaymentGate/PaymentServiceJsonRpcMessages.h>
 #include <PaymentGate/WalletService.h>
 #include <PaymentGate/WalletServiceErrorCategory.h>
+
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/TransactionExtra.h>
+#include <QwertyNoteCore/Account.h>
+
 #include <System/EventLock.h>
 #include <System/InterruptedException.h>
 #include <System/Timer.h>
+
 #include <Wallet/WalletGreen.h>
 #include <Wallet/LegacyKeysImporter.h>
 #include <Wallet/WalletErrors.h>
 #include <Wallet/WalletUtils.h>
-#include <ITransfersContainer.h>
 
 using namespace QwertyNote;
 

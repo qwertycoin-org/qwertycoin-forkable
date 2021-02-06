@@ -16,13 +16,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "TestGenerator.h"
-
 #include <Common/Math.h>
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/Miner.h"
-#include "CryptoNoteCore/TransactionExtra.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/Miner.h>
+#include <QwertyNoteCore/TransactionExtra.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+
+#include "TestGenerator.h"
 
 using namespace std;
 using namespace CryptoNote;

@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <iostream>
 #include <boost/program_options.hpp>
-#include <Global/CryptoNoteConfig.h>
+#include <Global/QwertyNoteConfig.h>
 #include <Logging/ILogger.h>
 #include <SimpleWallet/PasswordContainer.cpp>
 #include "PaymentServiceConfiguration.h"

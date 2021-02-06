@@ -36,13 +36,19 @@
 #include <mutex>
 #include <unordered_map>
 #include <vector>
+
 #include <QwertyNote.h>
+#include <INode.h>
+
 #include <Common/ObserverManager.h>
-#include <CryptoNoteCore/TransactionExtra.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/Currency.h>
+
+#include <QwertyNoteCore/TransactionExtra.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/Currency.h>
+
 #include <Transfers/BlockchainSynchronizer.h>
 #include <Transfers/TransfersSynchronizer.h>
+
 #include <Wallet/WalletAsyncContextCounter.h>
 #include <Wallet/WalletErrors.h>
 #include <WalletLegacy/IWalletLegacy.h>
@@ -50,7 +56,6 @@
 #include <WalletLegacy/WalletTransactionSender.h>
 #include <WalletLegacy/WalletUserTransactionsCache.h>
 #include <WalletLegacy/WalletUnconfirmedTransactions.h>
-#include <INode.h>
 
 namespace QwertyNote {
 

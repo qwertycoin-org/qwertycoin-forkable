@@ -18,14 +18,18 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdexcept>
+
 #include <Common/MemoryInputStream.h>
 #include <Common/StdInputStream.h>
 #include <Common/StdOutputStream.h>
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/CryptoNoteSerialization.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/CryptoNoteSerialization.h>
+
 #include <Serialization/BinaryOutputStreamSerializer.h>
 #include <Serialization/BinaryInputStreamSerializer.h>
 #include <Serialization/SerializationOverloads.h>
+
 #include <Wallet/WalletErrors.h>
 #include <Wallet/WalletUtils.h>
 #include <WalletLegacy/KeysStorage.h>

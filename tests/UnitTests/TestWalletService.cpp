@@ -22,17 +22,21 @@
 #include <queue>
 #include <system_error>
 
-#include <Wallet/IWallet.h>
+#include <Logging/LoggerGroup.h>
+#include <Logging/ConsoleLogger.h>
 
-#include "CryptoNoteCore/Currency.h"
-#include "Logging/LoggerGroup.h"
-#include "Logging/ConsoleLogger.h"
+#include <QwertyNoteCore/Currency.h>
+
+#include <PaymentGate/WalletService.h>
+#include <PaymentGate/WalletServiceErrorCategory.h>
+
 #include <System/Event.h>
-#include "PaymentGate/WalletService.h"
-#include "PaymentGate/WalletServiceErrorCategory.h"
+
+#include <Wallet/IFusionManager.h>
+#include <Wallet/IWallet.h>
+#include <Wallet/WalletErrors.h>
+
 #include "INodeStubs.h"
-#include "Wallet/IFusionManager.h"
-#include "Wallet/WalletErrors.h"
 
 using namespace CryptoNote;
 using namespace PaymentService;

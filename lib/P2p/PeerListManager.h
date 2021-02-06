@@ -23,7 +23,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
-#include <Global/CryptoNoteConfig.h>
+#include <Global/QwertyNoteConfig.h>
 #include <P2p/P2pProtocolTypes.h>
 
 namespace QwertyNote {

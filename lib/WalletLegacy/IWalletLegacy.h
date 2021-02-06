@@ -26,15 +26,21 @@
 #include <ostream>
 #include <string>
 #include <system_error>
-#include <boost/optional.hpp>
-#include <QwertyNote.h>
-#include <Crypto/Crypto.h>
-#include <CryptoNoteCore/CryptoNoteBasic.h>
-#include <Global/Constants.h>
-#include <Rpc/CoreRpcServerCommandsDefinitions.h>
 
+#include <boost/optional.hpp>
+
+#include <QwertyNote.h>
 #include <CryptoTypes.h>
 #include <ITransfersContainer.h>
+
+#include <Crypto/Crypto.h>
+
+#include <Global/Constants.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+
+#include <Rpc/CoreRpcServerCommandsDefinitions.h>
+
 
 using namespace Qwertycoin;
 

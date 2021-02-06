@@ -45,7 +45,9 @@
 #include <sstream>
 #include <string>
 #include <thread>
+
 #include <boost/bind.hpp>
+
 #if defined __linux__ && !defined __ANDROID__
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #endif
@@ -57,7 +59,12 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/utility/value_init.hpp>
+
+#include <ITransfersContainer.h>
+#include <version.h>
+
 #include <Breakpad/Breakpad.h>
+
 #include <Common/CommandLine.h>
 #include <Common/SignalHandler.h>
 #include <Common/StringTools.h>
@@ -65,21 +72,28 @@
 #include <Common/PathTools.h>
 #include <Common/DnsTools.h>
 #include <Common/Util.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteProtocol/CryptoNoteProtocolHandler.h>
+
 #include <Global/Constants.h>
+
 #include <Logging/LoggerManager.h>
+
 #include <Mnemonics/electrum-words.h>
+
 #include <NodeRpcProxy/NodeRpcProxy.h>
+
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+
+#include <QwertyNoteProtocol/CryptoNoteProtocolHandler.h>
+
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
 #include <Rpc/HttpClient.h>
+
 #include <Wallet/WalletRpcServer.h>
 #include <WalletLegacy/WalletLegacy.h>
 #include <Wallet/LegacyKeysImporter.h>
 #include <WalletLegacy/WalletHelper.h>
-#include <ITransfersContainer.h>
-#include <version.h>
-#include "SimpleWallet.h"
+
+#include <SimpleWallet/SimpleWallet.h>
 
 #if defined(WIN32)
 #include <winsock2.h>
@@ -1723,8 +1737,7 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
         }
 
         if (Tools::Base58::decodeAddr(private_key_string, addressPrefix, data)
-            && addressPrefix == parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX
-            && data.size() == sizeof(keys)) {
+            && addressPrefix == parameters::ADDRESS_BASE58_PREFIX && data.size() == sizeof(keys)) {
             std::memcpy(&keys, data.data(), sizeof(keys));
         }
 
@@ -2444,7 +2457,7 @@ bool simple_wallet::export_keys(const std::vector<std::string> &args)
     std::cout
         << "Private keys: "
         << Tools::Base58::encodeAddr(
-                         parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+                         parameters::ADDRESS_BASE58_PREFIX,
                          std::string(reinterpret_cast<char *>(&keys), sizeof(keys)))
         << std::endl;
 

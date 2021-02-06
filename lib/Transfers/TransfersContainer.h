@@ -21,20 +21,27 @@
 #include <cstdint>
 #include <mutex>
 #include <unordered_map>
+
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/ordered_index.hpp>
+
+#include <ITransfersContainer.h>
+
 #include <Crypto/Crypto.h>
-#include <CryptoNoteCore/CryptoNoteBasic.h>
-#include <CryptoNoteCore/CryptoNoteSerialization.h>
-#include <CryptoNoteCore/Currency.h>
-#include <CryptoNoteCore/ITransaction.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/CryptoNoteSerialization.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/ITransaction.h>
+
 #include <Logging/LoggerRef.h>
+
 #include <Serialization/ISerializer.h>
 #include <Serialization/SerializationOverloads.h>
-#include <ITransfersContainer.h>
+
 
 namespace QwertyNote {
 

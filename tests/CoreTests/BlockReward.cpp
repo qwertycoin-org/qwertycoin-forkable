@@ -17,7 +17,7 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "BlockReward.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
+#include <QwertyNoteCore/CryptoNoteTools.h>
 #include <Common/Math.h>
 
 using namespace QwertyNote;

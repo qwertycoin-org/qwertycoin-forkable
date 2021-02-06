@@ -18,11 +18,12 @@
 
 #pragma once
 
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-
 #include <Logging/LoggerGroup.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+
 
 class single_tx_test_base
 {

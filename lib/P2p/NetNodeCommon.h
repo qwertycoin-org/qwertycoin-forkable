@@ -22,7 +22,7 @@
 #pragma once
 
 #include <QwertyNote.h>
-#include <Global/CryptoNoteConfig.h>
+#include <Global/QwertyNoteConfig.h>
 #include <P2p/P2pProtocolTypes.h>
 
 namespace QwertyNote {

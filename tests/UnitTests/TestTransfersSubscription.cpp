@@ -16,14 +16,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
 #include <tuple>
 
-#include "CryptoNoteCore/TransactionApi.h"
-#include "Logging/ConsoleLogger.h"
-#include "Transfers/TransfersSubscription.h"
-#include "Transfers/TypeHelpers.h"
-#include "ITransfersContainer.h"
+#include <gtest/gtest.h>
+
+#include <ITransfersContainer.h>
+
+#include <QwertyNoteCore/TransactionApi.h>
+
+#include <Logging/ConsoleLogger.h>
+
+#include <Transfers/TypeHelpers.h>
+#include <Transfers/TransfersSubscription.h>
 
 #include "TransactionApiHelpers.h"
 #include "TransfersObserver.h"

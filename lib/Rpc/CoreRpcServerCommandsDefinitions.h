@@ -21,10 +21,14 @@
 #pragma once
 
 #include <BlockchainExplorer/BlockchainExplorerData.h>
+
 #include <Crypto/Hash.h>
-#include <CryptoNoteCore/CryptoNoteBasic.h>
-#include <CryptoNoteCore/Difficulty.h>
-#include <CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/Difficulty.h>
+
+#include <QwertyNoteProtocol/CryptoNoteProtocolDefinitions.h>
+
 #include <Serialization/BlockchainExplorerDataSerialization.h>
 #include <Serialization/SerializationOverloads.h>
 

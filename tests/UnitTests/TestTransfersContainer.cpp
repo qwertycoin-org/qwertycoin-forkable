@@ -16,16 +16,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
-#include "WalletLegacy/IWalletLegacy.h"
+#include <Crypto/Crypto.h>
 
-#include "crypto/Crypto.h"
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/TransactionApi.h"
-#include "Logging/ConsoleLogger.h"
-#include "Transfers/TransfersContainer.h"
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/TransactionApi.h>
+
+#include <Logging/ConsoleLogger.h>
+
+#include <Transfers/TransfersContainer.h>
+
+#include <WalletLegacy/IWalletLegacy.h>
 
 #include "TransactionApiHelpers.h"
 

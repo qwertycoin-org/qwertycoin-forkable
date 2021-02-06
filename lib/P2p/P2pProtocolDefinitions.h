@@ -18,14 +18,19 @@
 
 #pragma once
 
+#include <version.h>
+
 #include <Crypto/Crypto.h>
-#include <CryptoNoteCore/CryptoNoteStatInfo.h>
-#include <CryptoNoteCore/CryptoNoteSerialization.h>
-#include <Global/CryptoNoteConfig.h>
+
+#include <Global/QwertyNoteConfig.h>
+
 #include <P2p/P2pProtocolTypes.h>
+
+#include <QwertyNoteCore/CryptoNoteStatInfo.h>
+#include <QwertyNoteCore/CryptoNoteSerialization.h>
+
 #include <Serialization/ISerializer.h>
 #include <Serialization/SerializationOverloads.h>
-#include "version.h"
 
 namespace QwertyNote {
 

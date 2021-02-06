@@ -20,11 +20,14 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_set>
+
 #include <Common/StreamTools.h>
 #include <Common/StringTools.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/TransactionApi.h>
+
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/TransactionApi.h>
+
 #include <Transfers/BlockchainSynchronizer.h>
 
 using namespace Common;

@@ -19,19 +19,25 @@
 #pragma once
 
 #include <thread>
+
 #include <boost/asio.hpp>
-#include <BlockchainExplorer/BlockchainExplorerDataBuilder.h>
-#include <Common/ObserverManager.h>
-#include <CryptoNoteCore/ICore.h>
-#include <CryptoNoteCore/ICoreObserver.h>
-#include <CryptoNoteCore/ITransaction.h>
-#include <CryptoNoteProtocol/ICryptoNoteProtocolQuery.h>
-#include <CryptoNoteProtocol/ICryptoNoteProtocolObserver.h>
+
 #include <INode.h>
 
+#include <BlockchainExplorer/BlockchainExplorerDataBuilder.h>
+
+#include <Common/ObserverManager.h>
+
 #include <QwertyNoteCore/ICore.h>
+#include <QwertyNoteCore/ICoreObserver.h>
+#include <QwertyNoteCore/ITransaction.h>
+
+#include <QwertyNoteProtocol/IQwertyNoteProtocolQuery.h>
+#include <QwertyNoteProtocol/IQwertyNoteProtocolObserver.h>
+
 
 namespace QwertyNote {
+
 class core;
 
 class InProcessNode : public INode,

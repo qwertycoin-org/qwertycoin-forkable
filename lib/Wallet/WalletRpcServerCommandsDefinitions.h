@@ -19,11 +19,17 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
-#include <CryptoNoteCore/CryptoNoteBasic.h>
-#include <CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h>
+
 #include <Crypto/Hash.h>
-#include <Global/CryptoNoteConfig.h>
+
+#include <Global/QwertyNoteConfig.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+
+#include <QwertyNoteProtocol/CryptoNoteProtocolDefinitions.h>
+
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
+
 #include <Wallet/WalletRpcServerErrorCodes.h>
 
 #define WALLET_RPC_STATUS_OK "OK"

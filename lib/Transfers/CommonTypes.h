@@ -22,10 +22,11 @@
 #include <cstdint>
 #include <memory>
 #include <boost/optional.hpp>
-#include <CryptoNoteCore/ITransaction.h>
+
 #include <INode.h>
 
-namespace CryptoNote {
+#include <QwertyNoteCore/ITransaction.h>
+
 namespace QwertyNote {
 
 struct BlockchainInterval

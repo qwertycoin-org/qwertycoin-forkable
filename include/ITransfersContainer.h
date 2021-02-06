@@ -21,12 +21,14 @@
 #include <cstdint>
 #include <limits>
 #include <vector>
-#include <Crypto/Hash.h>
-#include <CryptoNoteCore/ITransaction.h>
+
 #include <IObservable.h>
 #include <IStreamSerializable.h>
 
 #include <Crypto/Hash.h>
+
+#include <QwertyNoteCore/ITransaction.h>
+
 namespace QwertyNote {
 
 const uint32_t UNCONFIRMED_TRANSACTION_GLOBAL_OUTPUT_INDEX = std::numeric_limits<uint32_t>::max();
@@ -43,7 +45,6 @@ struct TransactionInformation
     std::vector<uint8_t> extra;
     Crypto::FHash paymentId;
 };
-
 
 struct TransactionOutputInformation
 {

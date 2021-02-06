@@ -16,12 +16,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
-
 #include <cstdint>
 #include <vector>
 
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
+#include <gtest/gtest.h>
+
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
 
 #define VEC_FROM_ARR(vec)                                               \
   std::vector<uint64_t> vec;                                            \

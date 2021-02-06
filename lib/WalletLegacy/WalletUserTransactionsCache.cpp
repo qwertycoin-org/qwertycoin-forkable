@@ -18,12 +18,18 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
+
 #include <boost/utility/value_init.hpp>
-#include <CryptoNoteCore/TransactionExtra.h>
+
 #include <Global/Constants.h>
+
+#include <QwertyNoteCore/TransactionExtra.h>
+
 #include <Serialization/ISerializer.h>
 #include <Serialization/SerializationOverloads.h>
+
 #include <Wallet/WalletErrors.h>
+
 #include <WalletLegacy/IWalletLegacy.h>
 #include <WalletLegacy/WalletLegacySerialization.h>
 #include <WalletLegacy/WalletUserTransactionsCache.h>

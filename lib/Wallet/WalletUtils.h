@@ -19,7 +19,9 @@
 #pragma once
 
 #include <string>
-#include <CryptoNoteCore/Currency.h>
+
+#include <QwertyNoteCore/Currency.h>
+
 #include <Wallet/IWallet.h>
 #include <Wallet/WalletGreen.h>
 

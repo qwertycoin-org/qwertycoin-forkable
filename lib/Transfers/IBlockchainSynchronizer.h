@@ -22,13 +22,16 @@
 #include <future>
 #include <system_error>
 #include <unordered_set>
-#include <Crypto/Crypto.h>
-#include <CryptoNoteCore/CryptoNoteBasic.h>
+
 #include <IObservable.h>
 #include <IStreamSerializable.h>
 #include <ITransfersSynchronizer.h>
 
-namespace CryptoNote {
+#include <Crypto/Crypto.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+
+
 namespace QwertyNote {
 
 struct CompleteBlock;

@@ -36,21 +36,30 @@
 #include <future>
 #include <memory>
 #include <mutex>
+
 #include <boost/program_options/variables_map.hpp>
+
+#include <Android.h>
+
 #include <Common/ConsoleHandler.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/Currency.h>
-#include <CryptoNoteCore/TransactionExtra.h>
+
 #include <Logging/LoggerRef.h>
 #include <Logging/LoggerManager.h>
+
 #include <NodeRpcProxy/NodeRpcProxy.h>
+
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/TransactionExtra.h>
+
 #include <System/Dispatcher.h>
 #include <System/Ipv4Address.h>
+
 #include <WalletLegacy/IWalletLegacy.h>
 #include <WalletLegacy/WalletHelper.h>
 #include <WalletLegacy/WalletLegacy.h>
-#include <Android.h>
-#include "PasswordContainer.h"
+
+#include <SimpleWallet/PasswordContainer.h>
 
 std::string remote_fee_address;
 

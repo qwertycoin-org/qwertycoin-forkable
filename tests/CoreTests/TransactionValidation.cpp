@@ -16,9 +16,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <QwertyNoteCore/CryptoNoteTools.h>
+
 #include "TransactionValidation.h"
 #include "TestGenerator.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
 
 using namespace CryptoNote;
 

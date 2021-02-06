@@ -20,7 +20,7 @@
 
 #include <chrono>
 #include <vector>
-#include <Global/CryptoNoteConfig.h>
+#include <Global/QwertyNoteConfig.h>
 #include <P2p/LevinProtocol.h>
 #include <P2p/P2pInterfaces.h>
 #include <P2p/P2pProtocolDefinitions.h>

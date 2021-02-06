@@ -24,7 +24,7 @@
 
 #include <Common/Util.h>
 
-#include <Global/CryptoNoteConfig.h>
+#include <Global/QwertyNoteConfig.h>
 
 #ifdef _WIN32
 #include <windows.h>

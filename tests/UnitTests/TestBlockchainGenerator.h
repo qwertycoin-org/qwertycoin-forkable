@@ -21,11 +21,13 @@
 #include <vector>
 #include <unordered_map>
 
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/BlockchainIndices.h"
-#include "crypto/hash.h"
+#include <Crypto/Hash.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/BlockchainIndices.h>
+
 
 #include "../TestGenerator/TestGenerator.h"
 

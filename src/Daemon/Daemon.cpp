@@ -21,26 +21,38 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+
+#include <Breakpad/Breakpad.h>
+
 #include <Common/SignalHandler.h>
 #include <Common/StringTools.h>
 #include <Common/PathTools.h>
+
 #include <Crypto/Hash.h>
-#include <Breakpad/Breakpad.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/Core.h>
-#include <CryptoNoteCore/CoreConfig.h>
-#include <CryptoNoteCore/Currency.h>
-#include <CryptoNoteCore/MinerConfig.h>
-#include <CryptoNoteProtocol/CryptoNoteProtocolHandler.h>
-#include <CryptoNoteProtocol/ICryptoNoteProtocolQuery.h>
+
+
 #include <Global/Checkpoints.h>
+
 #include <Logging/LoggerManager.h>
+
 #include <P2p/NetNode.h>
 #include <P2p/NetNodeConfig.h>
+
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/Core.h>
+#include <QwertyNoteCore/CoreConfig.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/MinerConfig.h>
+
+#include <QwertyNoteProtocol/CryptoNoteProtocolHandler.h>
+#include <QwertyNoteProtocol/IQwertyNoteProtocolQuery.h>
+
 #include <Rpc/RpcServer.h>
 #include <Rpc/RpcServerConfig.h>
+
 #include <version.h>
-#include "DaemonCommandsHandler.h"
+
+#include <Daemon/DaemonCommandsHandler.h>
 
 #if defined(WIN32)
 #include <crtdbg.h>

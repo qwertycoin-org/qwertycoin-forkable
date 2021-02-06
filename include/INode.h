@@ -22,11 +22,16 @@
 #include <functional>
 #include <system_error>
 #include <vector>
+
 #include <BlockchainExplorer/BlockchainExplorerData.h>
+
 #include <Crypto/Crypto.h>
-#include <CryptoNoteCore/CryptoNoteBasic.h>
-#include <CryptoNoteCore/ITransaction.h>
-#include <CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/ITransaction.h>
+
+#include <QwertyNoteProtocol/CryptoNoteProtocolDefinitions.h>
+
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
 
 namespace QwertyNote {

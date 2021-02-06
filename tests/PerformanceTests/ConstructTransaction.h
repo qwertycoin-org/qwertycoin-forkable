@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
 
 #include "MultiTransactionTestBase.h"
 

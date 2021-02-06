@@ -18,9 +18,12 @@
 
 #include <Common/StdInputStream.h>
 #include <Common/StdOutputStream.h>
-#include <CryptoNoteCore/CryptoNoteSerialization.h>
+
+#include <QwertyNoteCore/CryptoNoteSerialization.h>
+
 #include <Serialization/BinaryInputStreamSerializer.h>
 #include <Serialization/BinaryOutputStreamSerializer.h>
+
 #include <Transfers/SynchronizationState.h>
 
 using namespace Common;

@@ -17,7 +17,9 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Common/StringTools.h>
-#include <CryptoNoteCore/TransactionPool.h>
+
+#include <QwertyNoteCore/TransactionPool.h>
+
 #include <Rpc/HttpClient.h>
 #include <Rpc/JsonRpc.h>
 

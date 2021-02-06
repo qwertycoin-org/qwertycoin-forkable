@@ -16,9 +16,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <QwertyNoteCore/TransactionExtra.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+
 #include "TransactionBuilder.h"
-#include "CryptoNoteCore/TransactionExtra.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
 
 using namespace CryptoNote;
 using namespace Crypto;

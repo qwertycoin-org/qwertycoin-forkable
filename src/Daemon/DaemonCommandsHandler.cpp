@@ -20,18 +20,25 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <ctime>
 #include <math.h>
-#include <boost/format.hpp>
-#include <P2p/NetNode.h>
-#include <Common/ColouredMsg.h>
-#include <CryptoNoteCore/Miner.h>
-#include <CryptoNoteCore/Core.h>
-#include <CryptoNoteProtocol/CryptoNoteProtocolHandler.h>
-#include <Serialization/SerializationTools.h>
+
 #include <version.h>
-#include "DaemonCommandsHandler.h"
+
+#include <boost/format.hpp>
+
+#include <Common/ColouredMsg.h>
+
+#include <P2p/NetNode.h>
+
+#include <QwertyNoteCore/Miner.h>
+#include <QwertyNoteCore/Core.h>
+
+#include <QwertyNoteProtocol/CryptoNoteProtocolHandler.h>
+
+#include <Serialization/SerializationTools.h>
+
+#include <Daemon/DaemonCommandsHandler.h>
 
 namespace {
 

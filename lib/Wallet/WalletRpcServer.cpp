@@ -20,21 +20,29 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <list>
+
 #include <boost/algorithm/string/predicate.hpp>
+
+#include <ITransfersContainer.h>
+
 #include <Crypto/Hash.h>
+
 #include <Common/Base58.h>
 #include <Common/CommandLine.h>
 #include <Common/StringTools.h>
 #include <Common/Util.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/Account.h>
+
 #include <Global/Constants.h>
+
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/Account.h>
+
 #include <Rpc/JsonRpc.h>
+
 #include <Wallet/WalletRpcServer.h>
 #include <WalletLegacy/WalletHelper.h>
 #include <WalletLegacy/WalletLegacy.h>
-#include <ITransfersContainer.h>
 
 using namespace QwertyNote;
 using namespace Logging;
@@ -563,7 +571,7 @@ bool wallet_rpc_server::on_query_key(
         AccountKeys keys;
         m_wallet.getAccountKeys(keys);
         res.key = Tools::Base58::encodeAddr(
-                parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+                parameters::ADDRESS_BASE58_PREFIX,
                 std::string(reinterpret_cast<char *>(&keys), sizeof(keys)));
     }
 

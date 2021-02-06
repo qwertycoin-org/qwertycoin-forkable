@@ -23,18 +23,17 @@
 
 #include <Common/StringTools.h>
 
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/TransactionExtra.h>
+#include <Global/QwertyNoteConfig.h>
 
-#include <Global/CryptoNoteConfig.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/TransactionExtra.h>
 
 namespace QwertyNote {
 
 BlockchainExplorerDataBuilder::BlockchainExplorerDataBuilder(ICore &core,
-                                                             ICryptoNoteProtocolQuery &protocol)
-    : m_core(core),
-      m_protocol(protocol)
+															 IQwertyNoteProtocolQuery &protocol)
+    : mCore(core), mProtocol(protocol)
 {
 }
 

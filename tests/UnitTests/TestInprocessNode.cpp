@@ -16,22 +16,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
 
 #include <system_error>
 
 #include <boost/range/combine.hpp>
+
+#include <gtest/gtest.h>
+
+#include <Common/StringTools.h>
+
+#include <Logging/FileLogger.h>
+
+#include <QwertyNoteCore/TransactionApi.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/VerificationContext.h>
 
 #include "EventWaiter.h"
 #include "ICoreStub.h"
 #include "ICryptoNoteProtocolQueryStub.h"
 #include "InProcessNode/InProcessNode.h"
 #include "TestBlockchainGenerator.h"
-#include "Logging/FileLogger.h"
-#include "CryptoNoteCore/TransactionApi.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/VerificationContext.h"
-#include "Common/StringTools.h"
 
 using namespace Crypto;
 using namespace CryptoNote;

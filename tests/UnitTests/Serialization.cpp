@@ -63,8 +63,8 @@ TEST(BinarySerializer, uint16) {
 //#include <iostream>
 //#include <vector>
 //#include <boost/foreach.hpp>
-//#include "CryptoNoteCore/CryptoNoteBasic.h"
-//#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
+//#include "QwertyNoteCore/CryptoNoteBasic.h"
+//#include "QwertyNoteCore/CryptoNoteBasicImpl.h"
 //#include "Serialization/serialization.h"
 //#include "Serialization/binary_archive.h"
 //#include "Serialization/json_archive.h"

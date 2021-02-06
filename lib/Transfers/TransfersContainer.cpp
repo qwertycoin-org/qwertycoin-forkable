@@ -18,13 +18,18 @@
 
 #include <Common/StdInputStream.h>
 #include <Common/StdOutputStream.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
+
 #include <Global/Constants.h>
+
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+
 #include <Serialization/BinaryInputStreamSerializer.h>
 #include <Serialization/BinaryOutputStreamSerializer.h>
 #include <Serialization/SerializationOverloads.h>
+
 #include <Transfers/TransfersContainer.h>
+
 #include <WalletLegacy/IWalletLegacy.h>
 
 using namespace Common;

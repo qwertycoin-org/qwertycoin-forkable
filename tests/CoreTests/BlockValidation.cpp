@@ -17,10 +17,12 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Common/Math.h>
+#include <Common/StringTools.h>
+
+#include <QwertyNoteCore/CryptoNoteTools.h>
+
 #include "BlockValidation.h"
 #include "TestGenerator.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "Common/StringTools.h"
 
 using namespace Common;
 using namespace Crypto;

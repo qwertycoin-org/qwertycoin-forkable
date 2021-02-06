@@ -22,12 +22,15 @@
 #include <unordered_map>
 #include <limits>
 
-#include "INode.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "TestBlockchainGenerator.h"
-#include "Common/ObserverManager.h"
-#include "Wallet/WalletAsyncContextCounter.h"
+#include <INode.h>
 
+#include <Common/ObserverManager.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+
+#include <Wallet/WalletAsyncContextCounter.h>
+
+#include <TestBlockchainGenerator.h>
 
 class INodeDummyStub : public CryptoNote::INode
 {

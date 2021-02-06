@@ -21,7 +21,7 @@
 
 #include <queue>
 #include <unordered_map>
-#include <Global/CryptoNoteConfig.h>
+#include <Global/QwertyNoteConfig.h>
 #include <Logging/LoggerRef.h>
 #include <System/Dispatcher.h>
 #include <System/Event.h>
@@ -44,7 +44,7 @@ public:
                 const Currency &currency,
                 INode &node,
                 Logging::ILogger &logger,
-                uint32_t transactionSoftLockTime = parameters::CRYPTONOTE_TX_SPENDABLE_AGE);
+                uint32_t transactionSoftLockTime = parameters::TX_SPENDABLE_AGE);
     ~WalletGreen() override;
 
     void initialize(const std::string &path, const std::string &password) override;

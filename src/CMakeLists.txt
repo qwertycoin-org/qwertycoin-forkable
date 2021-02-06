@@ -34,7 +34,7 @@ set(QwertycoinTools_Daemon_LIBS
     Boost::filesystem
     QwertycoinFramework::Breakpad
     QwertycoinFramework::Common
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
     QwertycoinFramework::Global
     QwertycoinFramework::Logging
     QwertycoinFramework::P2p
@@ -74,7 +74,7 @@ set(QwertycoinTools_PaymentGateService_LIBS
     Boost::program_options
     QwertycoinFramework::Breakpad
     QwertycoinFramework::Common
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
     QwertycoinFramework::Global
     QwertycoinFramework::InProcessNode
     QwertycoinFramework::Logging

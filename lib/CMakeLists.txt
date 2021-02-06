@@ -42,8 +42,7 @@ set(QwertycoinFramework_LIBS
     QwertycoinFramework_Breakpad
     QwertycoinFramework_Common
     QwertycoinFramework_Crypto
-    QwertycoinFramework_CryptoNoteCore
-    QwertycoinFramework_CryptoNoteProtocol
+    QwertycoinFramework_QwertyNoteProtocol
     QwertycoinFramework_Global
     QwertycoinFramework_Http
     QwertycoinFramework_InProcessNode
@@ -53,6 +52,7 @@ set(QwertycoinFramework_LIBS
     QwertycoinFramework_NodeRpcProxy
     QwertycoinFramework_P2p
     QwertycoinFramework_PaymentGate
+    QwertycoinFramework_QwertyNoteCore
     QwertycoinFramework_Rpc
     QwertycoinFramework_Serialization
     QwertycoinFramework_System
@@ -247,73 +247,73 @@ elseif(PPC64LE)
     message(STATUS "[QwertycoinFramework::Crypto] AES support disabled.")
 endif()
 
-# QwertycoinFramework::CryptoNoteCore
+# QwertycoinFramework::QwertyNoteCore
 
-set(QwertycoinFramework_CryptoNoteCore_SOURCES
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Account.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Account.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/BlockIndex.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/BlockIndex.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Blockchain.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Blockchain.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/BlockchainIndices.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/BlockchainIndices.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/BlockchainMessages.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/BlockchainMessages.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Checkpoints.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Checkpoints.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Core.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Core.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CoreConfig.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CoreConfig.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteBasic.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteBasic.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteBasicImpl.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteBasicImpl.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteFormatUtils.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteFormatUtils.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteSerialization.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteSerialization.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteStatInfo.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteTools.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/CryptoNoteTools.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Currency.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Currency.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Difficulty.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Difficulty.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/IBlock.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/IBlockchainStorageObserver.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/ICore.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/ICoreObserver.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/IMinerHandler.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/ITimeProvider.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/ITransaction.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/ITransactionValidator.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/ITxPoolObserver.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/IntrusiveLinkedList.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/MessageQueue.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Miner.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Miner.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/MinerConfig.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/MinerConfig.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/OnceInInterval.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/SwappedMap.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/SwappedVector.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/Transaction.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/TransactionApi.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/TransactionApiExtra.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/TransactionExtra.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/TransactionExtra.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/TransactionPool.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/TransactionPool.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/TransactionPrefixImpl.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/TransactionUtils.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/TransactionUtils.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/UpgradeDetector.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteCore/VerificationContext.h"
+set(QwertycoinFramework_QwertyNoteCore_SOURCES
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Account.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Account.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/BlockIndex.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/BlockIndex.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Blockchain.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Blockchain.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/BlockchainIndices.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/BlockchainIndices.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/BlockchainMessages.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/BlockchainMessages.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Checkpoints.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Checkpoints.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Core.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Core.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CoreConfig.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CoreConfig.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteBasic.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteBasic.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteBasicImpl.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteBasicImpl.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteFormatUtils.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteFormatUtils.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteSerialization.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteSerialization.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteStatInfo.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteTools.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/CryptoNoteTools.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Currency.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Currency.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Difficulty.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Difficulty.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/IBlock.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/IBlockchainStorageObserver.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/ICore.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/ICoreObserver.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/IMinerHandler.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/ITimeProvider.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/ITransaction.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/ITransactionValidator.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/ITxPoolObserver.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/IntrusiveLinkedList.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/MessageQueue.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Miner.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Miner.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/MinerConfig.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/MinerConfig.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/OnceInInterval.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/SwappedMap.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/SwappedVector.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/Transaction.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/TransactionApi.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/TransactionApiExtra.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/TransactionExtra.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/TransactionExtra.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/TransactionPool.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/TransactionPool.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/TransactionPrefixImpl.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/TransactionUtils.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/TransactionUtils.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/UpgradeDetector.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteCore/VerificationContext.h"
 )
 
-set(QwertycoinFramework_CryptoNoteCore_LIBS
+set(QwertycoinFramework_QwertyNoteCore_LIBS
     Boost::filesystem
     Boost::program_options
     sparsehash::sparsehash
@@ -325,30 +325,30 @@ set(QwertycoinFramework_CryptoNoteCore_LIBS
     QwertycoinFramework::Serialization
 )
 
-add_library(QwertycoinFramework_CryptoNoteCore STATIC ${QwertycoinFramework_CryptoNoteCore_SOURCES})
-add_library(QwertycoinFramework::CryptoNoteCore ALIAS QwertycoinFramework_CryptoNoteCore)
-target_include_directories(QwertycoinFramework_CryptoNoteCore PRIVATE ${QwertycoinFramework_INCLUDE_DIRS})
-target_link_libraries(QwertycoinFramework_CryptoNoteCore PRIVATE ${QwertycoinFramework_CryptoNoteCore_LIBS})
+add_library(QwertycoinFramework_QwertyNoteCore STATIC ${QwertycoinFramework_QwertyNoteCore_SOURCES})
+add_library(QwertycoinFramework::QwertyNoteCore ALIAS QwertycoinFramework_QwertyNoteCore)
+target_include_directories(QwertycoinFramework_QwertyNoteCore PRIVATE ${QwertycoinFramework_INCLUDE_DIRS})
+target_link_libraries(QwertycoinFramework_QwertyNoteCore PRIVATE ${QwertycoinFramework_QwertyNoteCore_LIBS})
 
-# QwertycoinFramework::CryptoNoteProtocol
+# QwertycoinFramework::QwertyNoteProtocol
 
-set(QwertycoinFramework_CryptoNoteProtocol_SOURCES
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteProtocol/CryptoNoteProtocolHandler.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteProtocol/ICryptoNoteProtocolObserver.h"
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteProtocol/ICryptoNoteProtocolQuery.h"
+set(QwertycoinFramework_QwertyNoteProtocol_SOURCES
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteProtocol/CryptoNoteProtocolDefinitions.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteProtocol/CryptoNoteProtocolHandler.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteProtocol/CryptoNoteProtocolHandler.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteProtocol/CryptoNoteProtocolHandlerCommon.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteProtocol/IQwertyNoteProtocolObserver.h"
+    "${CMAKE_CURRENT_LIST_DIR}/QwertyNoteProtocol/IQwertyNoteProtocolQuery.h"
 )
 
-set(QwertycoinFramework_CryptoNoteProtocol_LIBS
+set(QwertycoinFramework_QwertyNoteProtocol_LIBS
     QwertycoinFramework::Global
 )
 
-add_library(QwertycoinFramework_CryptoNoteProtocol STATIC ${QwertycoinFramework_CryptoNoteProtocol_SOURCES})
-add_library(QwertycoinFramework::CryptoNoteProtocol ALIAS QwertycoinFramework_CryptoNoteProtocol)
-target_include_directories(QwertycoinFramework_CryptoNoteProtocol PRIVATE ${QwertycoinFramework_INCLUDE_DIRS})
-target_link_libraries(QwertycoinFramework_CryptoNoteProtocol PRIVATE ${QwertycoinFramework_CryptoNoteProtocol_LIBS})
+add_library(QwertycoinFramework_QwertyNoteProtocol STATIC ${QwertycoinFramework_QwertyNoteProtocol_SOURCES})
+add_library(QwertycoinFramework::QwertyNoteProtocol ALIAS QwertycoinFramework_QwertyNoteProtocol)
+target_include_directories(QwertycoinFramework_QwertyNoteProtocol PRIVATE ${QwertycoinFramework_INCLUDE_DIRS})
+target_link_libraries(QwertycoinFramework_QwertyNoteProtocol PRIVATE ${QwertycoinFramework_QwertyNoteProtocol_LIBS})
 
 # QwertycoinFramework::Global
 
@@ -356,7 +356,7 @@ set(QwertycoinFramework_Global_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Global/Checkpoints.h"
     "${CMAKE_CURRENT_LIST_DIR}/Global/Constants.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Global/Constants.h"
-    "${CMAKE_CURRENT_LIST_DIR}/Global/CryptoNoteConfig.h"
+    "${CMAKE_CURRENT_LIST_DIR}/Global/QwertyNoteConfig.h"
 )
 
 add_library(QwertycoinFramework_Global STATIC ${QwertycoinFramework_Global_SOURCES})
@@ -514,7 +514,7 @@ set(QwertycoinFramework_P2p_SOURCES
 
 set(QwertycoinFramework_P2p_LIBS
     MiniUPnP::miniupnpc
-    QwertycoinFramework::CryptoNoteProtocol
+    QwertycoinFramework::QwertyNoteProtocol
     QwertycoinFramework::Global
 )
 
@@ -575,7 +575,7 @@ set(QwertycoinFramework_Rpc_SOURCES
 
 set(QwertycoinFramework_Rpc_LIBS
     QwertycoinFramework::BlockchainExplorer
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
     QwertycoinFramework::Global
     QwertycoinFramework::P2p
     QwertycoinFramework::PaymentGate
@@ -783,7 +783,7 @@ set(QwertycoinFramework_Transfers_SOURCES
 )
 
 set(QwertycoinFramework_Transfers_LIBS
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
     QwertycoinFramework::Global
 )
 
@@ -843,7 +843,7 @@ set(QwertycoinFramework_Wallet_LIBS
     Boost::filesystem
     QwertycoinFramework::Common
     QwertycoinFramework::Crypto
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
     QwertycoinFramework::Global
     QwertycoinFramework::Logging
     QwertycoinFramework::Mnemonics
@@ -872,8 +872,8 @@ install(TARGETS
             QwertycoinFramework_BlockchainExplorer
             QwertycoinFramework_Common
             QwertycoinFramework_Crypto
-            QwertycoinFramework_CryptoNoteCore
-            QwertycoinFramework_CryptoNoteProtocol
+            QwertycoinFramework_QwertyNoteCore
+            QwertycoinFramework_QwertyNoteProtocol
             QwertycoinFramework_Http
             QwertycoinFramework_InProcessNode
             QwertycoinFramework_JsonRpcServer

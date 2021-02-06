@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 #include <CryptoTypes.h>
-#include <Global/CryptoNoteConfig.h>
+#include <Global/QwertyNoteConfig.h>
 #include <version.h>
 
 namespace Qwertycoin {

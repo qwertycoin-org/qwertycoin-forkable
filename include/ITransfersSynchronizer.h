@@ -20,13 +20,14 @@
 
 #include <cstdint>
 #include <system_error>
-#include <CryptoNoteCore/ITransaction.h>
+
 #include <IStreamSerializable.h>
 #include <ITransfersContainer.h>
 
 #include <QwertyNoteCore/ITransaction.h>
 
 namespace QwertyNote {
+
 struct SynchronizationStart
 {
     uint64_t timestamp;

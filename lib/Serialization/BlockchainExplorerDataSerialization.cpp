@@ -18,9 +18,12 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdexcept>
+
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
-#include <CryptoNoteCore/CryptoNoteSerialization.h>
+
+#include <QwertyNoteCore/CryptoNoteSerialization.h>
+
 #include <Serialization/BlockchainExplorerDataSerialization.h>
 #include <Serialization/SerializationOverloads.h>
 

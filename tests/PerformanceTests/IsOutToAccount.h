@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
 
 #include "SingleTransactionTestBase.h"
 

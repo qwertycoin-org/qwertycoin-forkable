@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include "CryptoNoteCore/Account.h"
+#include <QwertyNoteCore/Account.h>
+
 #include "CryptoNoteBoostSerialization.h"
 
 //namespace CryptoNote {

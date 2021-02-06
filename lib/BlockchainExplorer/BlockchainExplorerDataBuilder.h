@@ -20,16 +20,16 @@
 
 #include <BlockchainExplorer/BlockchainExplorerData.h>
 
-#include <CryptoNoteCore/ICore.h>
+#include <QwertyNoteCore/ICore.h>
 
-#include <CryptoNoteProtocol/ICryptoNoteProtocolQuery.h>
+#include <QwertyNoteProtocol/IQwertyNoteProtocolQuery.h>
 
 namespace QwertyNote {
 
 class BlockchainExplorerDataBuilder
 {
 public:
-    BlockchainExplorerDataBuilder(ICore &core, ICryptoNoteProtocolQuery &protocol);
+    BlockchainExplorerDataBuilder(ICore &core, IQwertyNoteProtocolQuery &protocol);
     BlockchainExplorerDataBuilder(const BlockchainExplorerDataBuilder &) = delete;
     BlockchainExplorerDataBuilder(BlockchainExplorerDataBuilder &&) = delete;
 
@@ -50,7 +50,7 @@ private:
     static size_t median(std::vector<size_t> &v);
 
     ICore &m_core;
-    ICryptoNoteProtocolQuery &m_protocol; // Not used, but why we have it here?
+    IQwertyNoteProtocolQuery &mProtocol; // Not used, but why we have it here?
 };
 
 } // namespace QwertyNote

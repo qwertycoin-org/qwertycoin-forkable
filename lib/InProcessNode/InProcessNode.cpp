@@ -17,17 +17,23 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <functional>
+
 #include <boost/utility/value_init.hpp>
-#include <CryptoNoteCore/TransactionApi.h>
+
 #include <Common/StringTools.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/IBlock.h>
-#include <CryptoNoteCore/VerificationContext.h>
-#include <CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h>
+
 #include <Global/Constants.h>
-#include <Global/CryptoNoteConfig.h>
+#include <Global/QwertyNoteConfig.h>
+
 #include <InProcessNode/InProcessNode.h>
 #include <InProcessNode/InProcessNodeErrors.h>
+
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/IBlock.h>
+#include <QwertyNoteCore/TransactionApi.h>
+#include <QwertyNoteCore/VerificationContext.h>
+
+#include <QwertyNoteProtocol/CryptoNoteProtocolHandlerCommon.h>
 
 using namespace Crypto;
 using namespace Common;

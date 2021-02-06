@@ -26,14 +26,15 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/program_options.hpp>
 
-#include "Common/CommandLine.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/Core.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/UpgradeDetector.h"
+#include <Common/CommandLine.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/Core.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/UpgradeDetector.h>
 
 //#include "AccountBoostSerialization.h"
 //#include "cryptonote_boost_serialization.h"

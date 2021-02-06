@@ -16,17 +16,21 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gtest/gtest.h"
 
 #include <cstdint>
+
+#include <gtest/gtest.h>
+
+#include <Common/Base58.cpp>
+
 #include <Logging/LoggerGroup.h>
 
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/CryptoNoteSerialization.h"
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/CryptoNoteSerialization.h>
 
-#include "Serialization/BinarySerializationTools.h"
-#include "Common/Base58.cpp"
+#include <Serialization/BinarySerializationTools.h>
+
 
 using namespace Tools;
 using namespace CryptoNote;

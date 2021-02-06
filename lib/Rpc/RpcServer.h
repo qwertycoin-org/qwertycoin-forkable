@@ -27,10 +27,11 @@
 
 #include <Common/Math.h>
 
-#include <CryptoNoteCore/ITransaction.h>
-
 #include <Global/Constants.h>
+
 #include <Logging/LoggerRef.h>
+
+#include <QwertyNoteCore/ITransaction.h>
 
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
 #include <Rpc/HttpServer.h>
@@ -45,7 +46,7 @@ class NodeServer;
 
 class BlockchainExplorer;
 
-class ICryptoNoteProtocolQuery;
+class IQwertyNoteProtocolQuery;
 
 class RpcServer : public HttpServer
 {
@@ -60,10 +61,10 @@ public:
             HandlerFunction;
 
     RpcServer(System::Dispatcher &dispatcher,
-              Logging::ILogger &log,
-              core &core,
-              NodeServer &p2p,
-              ICryptoNoteProtocolQuery &protocolQuery);
+			  Logging::ILogger &log,
+			  core &core,
+			  NodeServer &p2p,
+			  IQwertyNoteProtocolQuery &protocolQuery);
 
     bool restrictRPC(const bool is_resctricted);
     bool enableCors(const std::string domain);
@@ -271,7 +272,7 @@ private:
     Logging::LoggerRef logger;
     core &m_core;
     NodeServer &m_p2p;
-    const ICryptoNoteProtocolQuery &m_protocolQuery;
+    const IQwertyNoteProtocolQuery &m_protocolQuery;
     bool m_restricted_rpc;
     std::string m_cors_domain;
     std::string m_fee_address;

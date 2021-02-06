@@ -20,9 +20,12 @@
 
 #include <Common/StdInputStream.h>
 #include <Common/StdOutputStream.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
+
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+
 #include <Serialization/BinaryInputStreamSerializer.h>
 #include <Serialization/BinaryOutputStreamSerializer.h>
+
 #include <Transfers/TransfersConsumer.h>
 #include <Transfers/TransfersSynchronizer.h>
 

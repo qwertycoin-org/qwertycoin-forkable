@@ -18,11 +18,12 @@
 
 #pragma once
 
-#include "Chaingen.h"
+#include <QwertyNoteCore/Currency.h>
 
-#include "CryptoNoteCore/Currency.h"
-#include "TransactionBuilder.h"
 #include <Logging/LoggerGroup.h>
+
+#include "Chaingen.h"
+#include "TransactionBuilder.h"
 
 class TestGenerator {
 public:

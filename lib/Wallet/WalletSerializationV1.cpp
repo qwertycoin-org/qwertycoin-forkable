@@ -18,14 +18,20 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/optional.hpp>
+
 #include <Crypto/Crypto.h>
+
 #include <Common/MemoryInputStream.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/CryptoNoteBasic.h>
+
 #include <Global/Constants.h>
+
+#include <QwertyNoteCore/CryptoNoteTools.h>
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+
 #include <Wallet/WalletErrors.h>
 #include <Wallet/WalletSerializationV1.h>
 #include <Wallet/WalletUtils.h>
+
 #include <WalletLegacy/KeysStorage.h>
 #include <WalletLegacy/WalletLegacySerialization.h>
 #include <WalletLegacy/WalletLegacySerializer.h>
@@ -234,7 +240,7 @@ QwertyNote::WalletTransaction convert(const QwertyNote::WalletLegacyTransaction 
 {
     QwertyNote::WalletTransaction mtx;
 
-    mtx.state = CryptoNote::WalletTransactionState::SUCCEEDED;
+    mtx.mState = QwertyNote::WalletTransactionState::SUCCEEDED;
     mtx.timestamp = tx.timestamp;
     mtx.blockHeight = tx.blockHeight;
     mtx.hash = tx.hash;

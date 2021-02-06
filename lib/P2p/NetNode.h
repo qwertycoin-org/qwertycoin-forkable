@@ -23,11 +23,15 @@
 
 #include <functional>
 #include <unordered_map>
+
 #include <boost/functional/hash.hpp>
+
+#include <version.h>
+
 #include <Common/CommandLine.h>
-#include <CryptoNoteCore/OnceInInterval.h>
-#include <CryptoNoteProtocol/CryptoNoteProtocolHandler.h>
+
 #include <Logging/LoggerRef.h>
+
 #include <P2p/ConnectionContext.h>
 #include <P2p/LevinProtocol.h>
 #include <P2p/NetNodeCommon.h>
@@ -35,6 +39,10 @@
 #include <P2p/P2pProtocolDefinitions.h>
 #include <P2p/P2pNetworks.h>
 #include <P2p/PeerListManager.h>
+
+#include <QwertyNoteCore/OnceInInterval.h>
+#include <QwertyNoteProtocol/CryptoNoteProtocolHandler.h>
+
 #include <System/Context.h>
 #include <System/ContextGroup.h>
 #include <System/Dispatcher.h>
@@ -42,7 +50,6 @@
 #include <System/Timer.h>
 #include <System/TcpConnection.h>
 #include <System/TcpListener.h>
-#include "version.h"
 
 namespace System {
 

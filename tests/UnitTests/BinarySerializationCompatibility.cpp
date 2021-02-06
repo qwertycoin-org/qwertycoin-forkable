@@ -28,10 +28,10 @@
 //#include "Serialization/serialization.h"
 //#include "Serialization/binary_utils.h"
 //
-//#include "CryptoNoteCore/CryptoNoteBasic.h"
-//#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-//#include "CryptoNoteCore/CryptoNoteSerialization.h"
-//#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
+//#include "QwertyNoteCore/CryptoNoteBasic.h"
+//#include "QwertyNoteCore/CryptoNoteBasicImpl.h"
+//#include "QwertyNoteCore/CryptoNoteSerialization.h"
+//#include "QwertyNoteCore/CryptoNoteFormatUtils.h"
 //#include "serialization_structs_comparators.h"
 //
 //#include <iostream>

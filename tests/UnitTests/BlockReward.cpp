@@ -17,9 +17,11 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <gtest/gtest.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/Currency.h>
+
 #include <Logging/LoggerGroup.h>
+
+#include <QwertyNoteCore/CryptoNoteBasicImpl.h>
+#include <QwertyNoteCore/Currency.h>
 
 using namespace CryptoNote;
 

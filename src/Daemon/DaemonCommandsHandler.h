@@ -22,17 +22,21 @@
 #pragma once
 
 #include <boost/format.hpp>
+
 #include <Common/ConsoleHandler.h>
-#include <CryptoNoteProtocol/ICryptoNoteProtocolQuery.h>
+
 #include <Logging/LoggerRef.h>
 #include <Logging/LoggerManager.h>
+
+#include <QwertyNoteProtocol/IQwertyNoteProtocolQuery.h>
+
 #include <Rpc/RpcServer.h>
 
 namespace QwertyNote {
 
 class core;
 class NodeServer;
-class ICryptoNoteProtocolQuery;
+class IQwertyNoteProtocolQuery;
 
 } // namespace QwertyNote
 
@@ -96,6 +100,6 @@ private:
     QwertyNote::NodeServer &m_srv;
     Logging::LoggerRef logger;
     Logging::LoggerManager &m_logManager;
-    const CryptoNote::ICryptoNoteProtocolQuery &protocolQuery;
+    const QwertyNote::IQwertyNoteProtocolQuery &protocolQuery;
     QwertyNote::RpcServer *m_prpc_server;
 };

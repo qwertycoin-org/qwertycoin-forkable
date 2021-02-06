@@ -20,7 +20,8 @@
 
 #include <cstring>
 #include <functional>
-#include <CryptoNoteCore/ITransaction.h>
+
+#include <QwertyNoteCore/ITransaction.h>
 
 namespace QwertyNote {
 

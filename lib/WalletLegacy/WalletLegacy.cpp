@@ -36,15 +36,23 @@
 #include <time.h>
 #include <tuple>
 #include <utility>
+
 #include <Crypto/Crypto.h>
 #include <Crypto/Random.h>
+
 #include <Common/Base58.h>
 #include <Common/ShuffleGenerator.h>
 #include <Common/StringTools.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
+
+
 #include <Global/Constants.h>
+
 #include <Logging/ConsoleLogger.h>
+
 #include <Mnemonics/electrum-words.h>
+
+#include <QwertyNoteCore/CryptoNoteTools.h>
+
 #include <WalletLegacy/WalletHelper.h>
 #include <WalletLegacy/WalletLegacy.h>
 #include <WalletLegacy/WalletLegacySerialization.h>

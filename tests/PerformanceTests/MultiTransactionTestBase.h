@@ -20,15 +20,15 @@
 
 #include <vector>
 
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/TransactionExtra.h"
+#include <Crypto/Crypto.h>
 
-#include "crypto/Crypto.h"
+#include <Logging/ConsoleLogger.h>
 
-#include "Logging/ConsoleLogger.h"
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+#include <QwertyNoteCore/CryptoNoteFormatUtils.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/TransactionExtra.h>
 
 template<size_t a_ring_size>
 class multi_tx_test_base

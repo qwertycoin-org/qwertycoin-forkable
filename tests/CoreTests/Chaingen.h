@@ -20,24 +20,22 @@
 
 #include <boost/program_options.hpp>
 #include <boost/serialization/variant.hpp>
-#include "CryptoNoteCore/CoreConfig.h"
 
-#include "Common/CommandLine.h"
-#include "Common/ConsoleTools.h"
+#include <Common/CommandLine.h>
+#include <Common/ConsoleTools.h>
 
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/Core.h"
-#include "CryptoNoteCore/TransactionExtra.h"
-
-#include "../TestGenerator/TestGenerator.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-
-#include "BoostSerializationHelper.h"
-#include "AccountBoostSerialization.h"
+#include <QwertyNoteCore/CoreConfig.h>
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/Core.h>
+#include <QwertyNoteCore/TransactionExtra.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
 
 #include <Logging/LoggerGroup.h>
 #include <Logging/ConsoleLogger.h>
 
+#include "AccountBoostSerialization.h"
+#include "BoostSerializationHelper.h"
+#include "../TestGenerator/TestGenerator.h"
 
 namespace concolor
 {

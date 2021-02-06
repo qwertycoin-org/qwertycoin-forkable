@@ -21,7 +21,7 @@
 #include <Common/CommandLine.h>
 #include <Common/StringTools.h>
 #include <Crypto/Crypto.h>
-#include <Global/CryptoNoteConfig.h>
+#include <Global/QwertyNoteConfig.h>
 #include <P2p/NetNodeConfig.h>
 
 namespace QwertyNote {

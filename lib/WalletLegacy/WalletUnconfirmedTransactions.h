@@ -22,17 +22,22 @@
 #include <time.h>
 #include <unordered_map>
 #include <unordered_set>
+
 #include <boost/functional/hash.hpp>
-#include <Crypto/Crypto.h>
-#include <CryptoNoteCore/CryptoNoteBasic.h>
-#include <WalletLegacy/IWalletLegacy.h>
+
 #include <ITransfersContainer.h>
+
+#include <Crypto/Crypto.h>
+
+#include <QwertyNoteCore/CryptoNoteBasic.h>
+
+#include <WalletLegacy/IWalletLegacy.h>
 
 namespace QwertyNote {
 
 class ISerializer;
 
-typedef std::pair<Crypto::PublicKey, size_t> TransactionOutputId;
+typedef std::pair<Crypto::FPublicKey, size_t> TransactionOutputId;
 
 } // namespace QwertyNote
 

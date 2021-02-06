@@ -18,14 +18,19 @@
 
 #include <system_error>
 #include <vector>
+
 #include <Common/StringTools.h>
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/Currency.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
+
+#include <QwertyNoteCore/Account.h>
+#include <QwertyNoteCore/Currency.h>
+#include <QwertyNoteCore/CryptoNoteTools.h>
+
 #include <Serialization/SerializationTools.h>
+
 #include <Wallet/LegacyKeysImporter.h>
 #include <Wallet/WalletUtils.h>
 #include <Wallet/WalletErrors.h>
+
 #include <WalletLegacy/WalletLegacySerializer.h>
 #include <WalletLegacy/WalletUserTransactionsCache.h>
 

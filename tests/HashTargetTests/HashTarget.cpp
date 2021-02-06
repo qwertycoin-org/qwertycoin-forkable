@@ -20,8 +20,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits>
-#include "crypto/hash.h"
-#include "CryptoNoteCore/Difficulty.h"
+
+#include <Crypto/Hash.h>
+
+#include <QwertyNoteCore/Difficulty.h>
 
 using namespace std;
 using CryptoNote::check_hash;

@@ -64,7 +64,7 @@ set(QwertycoinTests_CoreTests_LIBS
     Boost::serialization
     codecov
     QwertycoinFramework::Common
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
     QwertycoinFramework::InProcessNode
     QwertycoinFramework::Logging
     QwertycoinFramework::Serialization
@@ -118,7 +118,7 @@ set(QwertycoinTests_DifficultyTests_SOURCES
 set(QwertycoinTests_DifficultyTests_LIBS
     codecov
     QwertycoinFramework::Logging
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
 )
 
 add_executable(QwertycoinTests_DifficultyTests ${QwertycoinTests_DifficultyTests_SOURCES})
@@ -140,7 +140,7 @@ set(QwertycoinTests_HashTargetTests_SOURCES
 
 set(QwertycoinTests_HashTargetTests_LIBS
     codecov
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
 )
 
 add_executable(QwertycoinTests_HashTargetTests ${QwertycoinTests_HashTargetTests_SOURCES})
@@ -226,7 +226,7 @@ set(QwertycoinTests_PerformanceTests_SOURCES
 set(QwertycoinTests_PerformanceTests_LIBS
     Boost::chrono
     codecov
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
     QwertycoinFramework::Logging
 )
 
@@ -356,7 +356,7 @@ set(QwertycoinTests_UnitTests_SOURCES
 set(QwertycoinTests_UnitTests_LIBS
     codecov
     GTest::gtest_main
-    QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::QwertyNoteCore
     QwertycoinFramework::CryptoNoteProtocol
     QwertycoinFramework::Http
     QwertycoinFramework::InProcessNode
