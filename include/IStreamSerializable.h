@@ -24,8 +24,8 @@ namespace QwertyNote {
 
 class IStreamSerializable {
 public:
-    virtual void save(std::ostream &os) = 0;
-    virtual void load(std::istream &in) = 0;
+    virtual void save(std::ostream &sOStream) = 0;
+    virtual void load(std::istream &sIStream) = 0;
 };
 
 } // namespace QwertyNote
