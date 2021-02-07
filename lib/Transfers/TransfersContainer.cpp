@@ -406,10 +406,10 @@ bool TransfersContainer::addTransactionInputs(
         auto inputType = tx.getInputType(i);
 
         if (inputType == TransactionTypes::InputType::Key) {
-            KeyInput input;
+            FKeyInput input;
             tx.getInput(i, input);
 
-            SpentOutputDescriptor descriptor(&input.keyImage);
+            SpentOutputDescriptor descriptor(&input.sKeyImage);
             auto spentRange =
                 m_spentTransfers.get<SpentOutputDescriptorIndex>().equal_range(descriptor);
             if (std::distance(spentRange.first, spentRange.second) > 0) {
@@ -417,16 +417,16 @@ bool TransfersContainer::addTransactionInputs(
                 const auto &spentOutput = *spentRange.first;
                 auto message = "Failed add key input: key image already spent";
                 m_logger(ERROR, BRIGHT_RED) << message <<
-                    ", key image " << input.keyImage << '\n' <<
-															 "    rejected transaction" <<
-															 ": hash " << tx.getTransactionHash() <<
-															 ", block " << block.height <<
-															 ", transaction index " << block.transactionIndex <<
-															 ", input " << i << '\n' <<
-															 "    spending transaction" <<
-															 ": hash " << spentOutput.spendingTransactionHash <<
-															 ", block " << spentOutput.spendingBlock.height <<
-															 ", input " << spentOutput.inputInTransaction << '\n' <<
+											", key image " << input.sKeyImage << '\n' <<
+											"    rejected transaction" <<
+											": hash " << tx.getTransactionHash() <<
+											", block " << block.height <<
+											", transaction index " << block.transactionIndex <<
+											", input " << i << '\n' <<
+											"    spending transaction" <<
+											": hash " << spentOutput.spendingTransactionHash <<
+											", block " << spentOutput.spendingBlock.height <<
+											", input " << spentOutput.inputInTransaction << '\n' <<
 															 "    spent output        " <<
 															 ": hash " << spentOutput.sTransactionHash <<
 															 ", block " << spentOutput.blockHeight <<
@@ -446,7 +446,7 @@ bool TransfersContainer::addTransactionInputs(
             if (availableCount == 0) {
                 if (unconfirmedCount > 0) {
                     auto message="Failed to add key input: spend output of unconfirmed transaction";
-                    m_logger(ERROR, BRIGHT_RED) << message << ", key image " << input.keyImage;
+                    m_logger(ERROR, BRIGHT_RED) << message << ", key image " << input.sKeyImage;
                     throw std::runtime_error(message);
                 } else {
                     // This input doesn't spend any transfer from this container
@@ -456,36 +456,36 @@ bool TransfersContainer::addTransactionInputs(
 
             auto &outputDescriptorIndex = m_availableTransfers.get<SpentOutputDescriptorIndex>();
             auto availableOutputsRange =
-                outputDescriptorIndex.equal_range(SpentOutputDescriptor(&input.keyImage));
+                outputDescriptorIndex.equal_range(SpentOutputDescriptor(&input.sKeyImage));
 
             auto iteratorList = createTransferIteratorList(availableOutputsRange);
             iteratorList.sort();
-            auto spendingTransferIt = iteratorList.findFirstByAmount(input.amount);
+            auto spendingTransferIt = iteratorList.findFirstByAmount(input.uAmount);
 
             if (spendingTransferIt == availableOutputsRange.second) {
                 auto message = "Failed to add key input: invalid amount";
                 m_logger(ERROR, BRIGHT_RED)
                     << message
-                    << ", key image " << input.keyImage
-                    << ", amount " << m_currency.formatAmount(input.amount);
+                    << ", key image " << input.sKeyImage
+                    << ", amount " << m_currency.formatAmount(input.uAmount);
                 throw std::runtime_error(message);
             }
 
-            assert(spendingTransferIt->keyImage == input.keyImage);
+            assert(spendingTransferIt->keyImage == input.sKeyImage);
 
             copyToSpent(block, tx, i, *spendingTransferIt);
             // erase from available outputs
             outputDescriptorIndex.erase(spendingTransferIt);
-            updateTransfersVisibility(input.keyImage);
+            updateTransfersVisibility(input.sKeyImage);
 
             inputsAdded = true;
         } else if (inputType == TransactionTypes::InputType::Multisignature) {
-            MultiSignatureInput input;
+            FMultiSignatureInput input;
             tx.getInput(i, input);
 
             auto &outputDescriptorIndex = m_availableTransfers.get<SpentOutputDescriptorIndex>();
             auto availableOutputIt = outputDescriptorIndex.find(
-                SpentOutputDescriptor(input.amount, input.outputIndex)
+                SpentOutputDescriptor(input.uAmount, input.uOutputIndex)
             );
             if (availableOutputIt != outputDescriptorIndex.end()) {
                 copyToSpent(block, tx, i, *availableOutputIt);

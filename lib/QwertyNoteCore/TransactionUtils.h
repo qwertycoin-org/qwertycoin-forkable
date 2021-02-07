@@ -21,15 +21,15 @@
 
 namespace QwertyNote {
 
-bool checkInputsKeyimagesDiff(const QwertyNote::TransactionPrefix &tx);
+bool checkInputsKeyimagesDiff(const QwertyNote::FTransactionPrefix &tx);
 
 // TransactionInput helper functions
-size_t getRequiredSignaturesCount(const TransactionInput &in);
-uint64_t getTransactionInputAmount(const TransactionInput &in);
-TransactionTypes::InputType getTransactionInputType(const TransactionInput &in);
-const TransactionInput &getInputChecked(const TransactionPrefix &transaction, size_t index);
-const TransactionInput &getInputChecked(
-    const TransactionPrefix &transaction,
+size_t getRequiredSignaturesCount(const FTransactionInput &in);
+uint64_t getTransactionInputAmount(const FTransactionInput &in);
+TransactionTypes::InputType getTransactionInputType(const FTransactionInput &in);
+const FTransactionInput &getInputChecked(const FTransactionPrefix &transaction, size_t index);
+const FTransactionInput &getInputChecked(
+    const FTransactionPrefix &transaction,
     size_t index,
     TransactionTypes::InputType type);
 
@@ -40,16 +40,16 @@ bool isOutToKey(
     size_t keyIndex);
 
 // TransactionOutput helper functions
-TransactionTypes::OutputType getTransactionOutputType(const TransactionOutputTarget &out);
-const TransactionOutput &getOutputChecked(const TransactionPrefix &transaction, size_t index);
-const TransactionOutput &getOutputChecked(
-    const TransactionPrefix &transaction,
+TransactionTypes::OutputType getTransactionOutputType(const FTransactionOutputTarget &out);
+const FTransactionOutput &getOutputChecked(const FTransactionPrefix &transaction, size_t index);
+const FTransactionOutput &getOutputChecked(
+    const FTransactionPrefix &transaction,
     size_t index,
     TransactionTypes::OutputType type);
 
 bool findOutputsToAccount(
-    const QwertyNote::TransactionPrefix &transaction,
-    const AccountPublicAddress &addr,
+    const QwertyNote::FTransactionPrefix &transaction,
+    const FAccountPublicAddress &addr,
     const Crypto::FSecretKey &viewSecretKey,
     std::vector<uint32_t> &out,
     uint64_t &amount);

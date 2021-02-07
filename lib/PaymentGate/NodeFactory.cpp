@@ -49,7 +49,7 @@ public:
     }
     uint32_t getGRBHeight() const override { return 0; };
 
-    void relayTransaction(const QwertyNote::Transaction &transaction,
+    void relayTransaction(const QwertyNote::FTransaction &transaction,
                           const UCallback &callback) override
     {
         callback(std::error_code());
@@ -133,7 +133,7 @@ public:
 
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
                                               uint32_t gindex,
-                                              QwertyNote::MultiSignatureOutput &out,
+                                              QwertyNote::FMultiSignatureOutput &out,
                                               const UCallback &callback) override { }
 
     void isSynchronized(bool &syncStatus, const UCallback &callback) override { }

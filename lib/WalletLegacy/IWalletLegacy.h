@@ -137,7 +137,7 @@ public:
         bool recover = false,
         bool two_random = false) = 0;
     virtual void initAndLoad(std::istream &source, const std::string &password) = 0;
-    virtual void initWithKeys(const AccountKeys &accountKeys, const std::string &password) = 0;
+    virtual void initWithKeys(const FAccountKeys &accountKeys, const std::string &password) = 0;
     virtual void shutdown() = 0;
     virtual void rescan() = 0;
     virtual void purge() = 0;
@@ -167,13 +167,13 @@ public:
     virtual std::vector<Payments> getTransactionsByPaymentIds(
         const std::vector<PaymentId> &paymentIds) const = 0;
     virtual bool getTxProof(
-			Crypto::FHash &txid, QwertyNote::AccountPublicAddress &address,
+			Crypto::FHash &txid, QwertyNote::FAccountPublicAddress &address,
 			Crypto::FSecretKey &tx_key,
 			std::string &sig_str) = 0;
     virtual std::string getReserveProof(const uint64_t &reserve, const std::string &message) = 0;
     virtual Crypto::FSecretKey getTxKey(Crypto::FHash &txid) = 0;
     virtual bool get_tx_key(Crypto::FHash &txid, Crypto::FSecretKey &txSecretKey) = 0;
-    virtual void getAccountKeys(AccountKeys &keys) = 0;
+    virtual void getAccountKeys(FAccountKeys &keys) = 0;
     virtual bool getSeed(std::string &electrum_words) = 0;
 
     virtual TransactionId sendTransaction(
@@ -217,7 +217,7 @@ public:
     virtual std::string sign_message(const std::string &data) = 0;
     virtual bool verify_message(
         const std::string &data,
-        const QwertyNote::AccountPublicAddress &address,
+        const QwertyNote::FAccountPublicAddress &address,
         const std::string &signature) = 0;
 
     virtual bool isTrackingWallet() = 0;

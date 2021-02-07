@@ -48,9 +48,9 @@ public:
                       const Crypto::FSecretKey &viewSecret);
 
     ITransfersSubscription& addSubscription(const FAccountSubscription &subscription);
-    bool removeSubscription(const AccountPublicAddress &address); // true if no subscribers left
-    ITransfersSubscription *getSubscription(const AccountPublicAddress &acc);
-    void getSubscriptions(std::vector<AccountPublicAddress> &subscriptions);
+    bool removeSubscription(const FAccountPublicAddress &address); // true if no subscribers left
+    ITransfersSubscription *getSubscription(const FAccountPublicAddress &acc);
+    void getSubscriptions(std::vector<FAccountPublicAddress> &subscriptions);
 
     void initTransactionPool(const std::unordered_set<Crypto::FHash> &uncommitedTransactions);
     void addPublicKeysSeen(const Crypto::FHash &transactionHash, const Crypto::FPublicKey &outputKey);
@@ -98,7 +98,7 @@ private:
         bool &contains,
         bool &updated);
     std::error_code createTransfers(
-        const AccountKeys &account,
+        const FAccountKeys &account,
         const TransactionBlockInfo &blockInfo,
         const ITransactionReader &tx,
         const std::vector<uint32_t> &outputs,

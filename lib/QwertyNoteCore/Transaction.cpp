@@ -38,14 +38,14 @@ namespace {
 using namespace QwertyNote;
 
 void derivePublicKey(
-		const AccountPublicAddress &to,
+		const FAccountPublicAddress &to,
 		const FSecretKey &txKey,
 		size_t outputIndex,
 		FPublicKey &ephemeralKey)
 {
     FKeyDerivation derivation;
-    generateKeyDerivation(to.viewPublicKey, txKey, derivation);
-    derivePublicKey(derivation, outputIndex, to.spendPublicKey, ephemeralKey);
+    generateKeyDerivation(to.sViewPublicKey, txKey, derivation);
+    derivePublicKey(derivation, outputIndex, to.sSpendPublicKey, ephemeralKey);
 }
 
 } // namespace
@@ -59,7 +59,7 @@ class TransactionImpl : public ITransaction
 public:
     TransactionImpl();
     explicit TransactionImpl(const BinaryArray &txblob);
-    explicit TransactionImpl(const QwertyNote::Transaction &tx);
+    explicit TransactionImpl(const QwertyNote::FTransaction &tx);
 
     // ITransactionReader
     FHash getTransactionHash() const override;
@@ -74,19 +74,19 @@ public:
     size_t getInputCount() const override;
     uint64_t getInputTotalAmount() const override;
     TransactionTypes::InputType getInputType(size_t index) const override;
-    void getInput(size_t index, KeyInput &input) const override;
-    void getInput(size_t index, MultiSignatureInput &input) const override;
+    void getInput(size_t index, FKeyInput &input) const override;
+    void getInput(size_t index, FMultiSignatureInput &input) const override;
 
     // outputs
     size_t getOutputCount() const override;
     uint64_t getOutputTotalAmount() const override;
     TransactionTypes::OutputType getOutputType(size_t index) const override;
-    void getOutput(size_t index, KeyOutput &output, uint64_t &amount) const override;
-    void getOutput(size_t index, MultiSignatureOutput &output, uint64_t &amount) const override;
+    void getOutput(size_t index, FKeyOutput &output, uint64_t &amount) const override;
+    void getOutput(size_t index, FMultiSignatureOutput &output, uint64_t &amount) const override;
 
     size_t getRequiredSignaturesCount(size_t index) const override;
     bool findOutputsToAccount(
-        const AccountPublicAddress &addr,
+        const FAccountPublicAddress &addr,
         const FSecretKey &viewSecretKey,
         std::vector<uint32_t> &outs,
         uint64_t &outputAmount) const override;
@@ -106,31 +106,31 @@ public:
     void appendExtra(const BinaryArray &extraData) override;
 
     // Inputs/Outputs
-    size_t addInput(const KeyInput &input) override;
-    size_t addInput(const MultiSignatureInput &input) override;
+    size_t addInput(const FKeyInput &input) override;
+    size_t addInput(const FMultiSignatureInput &input) override;
     size_t addInput(
-        const AccountKeys &senderKeys,
-        const TransactionTypes::InputKeyInfo &info,
-        KeyPair &ephKeys) override;
+			const FAccountKeys &senderKeys,
+			const TransactionTypes::InputKeyInfo &info,
+			FKeyPair &ephKeys) override;
 
-    size_t addOutput(uint64_t amount, const AccountPublicAddress &to) override;
+    size_t addOutput(uint64_t amount, const FAccountPublicAddress &to) override;
     size_t addOutput(
         uint64_t amount,
-        const std::vector<AccountPublicAddress> &to,
+        const std::vector<FAccountPublicAddress> &to,
         uint32_t requiredSignatures) override;
-    size_t addOutput(uint64_t amount, const KeyOutput &out) override;
-    size_t addOutput(uint64_t amount, const MultiSignatureOutput &out) override;
+    size_t addOutput(uint64_t amount, const FKeyOutput &out) override;
+    size_t addOutput(uint64_t amount, const FMultiSignatureOutput &out) override;
 
     void signInputKey(
         size_t input,
         const TransactionTypes::InputKeyInfo &info,
-        const KeyPair &ephKeys) override;
+        const FKeyPair &ephKeys) override;
     void signInputMultisignature(
         size_t input,
         const FPublicKey &sourceTransactionKey,
         size_t outputIndex,
-        const AccountKeys &accountKeys) override;
-    void signInputMultisignature(size_t input, const KeyPair &ephemeralKeys) override;
+        const FAccountKeys &accountKeys) override;
+    void signInputMultisignature(size_t input, const FKeyPair &ephemeralKeys) override;
 
     // secret key
     bool getTransactionSecretKey(FSecretKey &key) const override;
@@ -151,7 +151,7 @@ private:
 
     void checkIfSigning() const
     {
-        if (!transaction.signatures.empty()) {
+        if (!transaction.vSignatures.empty()) {
             throw std::runtime_error(
                 "Cannot perform requested operation, "
                 "since it will invalidate transaction signatures"
@@ -160,7 +160,7 @@ private:
     }
 
 private:
-    QwertyNote::Transaction transaction;
+    QwertyNote::FTransaction transaction;
     boost::optional<FSecretKey> secretKey;
     mutable boost::optional<FHash> transactionHash;
     TransactionExtra extra;
@@ -176,23 +176,23 @@ std::unique_ptr<ITransaction> createTransaction(const BinaryArray &transactionBl
     return std::unique_ptr<ITransaction>(new TransactionImpl(transactionBlob));
 }
 
-std::unique_ptr<ITransaction> createTransaction(const QwertyNote::Transaction &tx)
+std::unique_ptr<ITransaction> createTransaction(const QwertyNote::FTransaction &tx)
 {
     return std::unique_ptr<ITransaction>(new TransactionImpl(tx));
 }
 
 TransactionImpl::TransactionImpl()
 {
-    QwertyNote::KeyPair txKeys(QwertyNote::generateKeyPair());
+    QwertyNote::FKeyPair txKeys(QwertyNote::generateKeyPair());
 
-    TransactionExtraPublicKey pk = { txKeys.publicKey };
+    TransactionExtraPublicKey pk = { txKeys.sPublicKey };
     extra.set(pk);
 
-    transaction.version = CURRENT_TRANSACTION_VERSION;
-    transaction.unlockTime = 0;
-    transaction.extra = extra.serialize();
+    transaction.uVersion = CURRENT_TRANSACTION_VERSION;
+    transaction.uUnlockTime = 0;
+    transaction.vExtra = extra.serialize();
 
-    secretKey = txKeys.secretKey;
+    secretKey = txKeys.sSecretKey;
 }
 
 TransactionImpl::TransactionImpl(const BinaryArray &ba)
@@ -201,14 +201,14 @@ TransactionImpl::TransactionImpl(const BinaryArray &ba)
         throw std::runtime_error("Invalid transaction uData");
     }
 
-    extra.parse(transaction.extra);
+    extra.parse(transaction.vExtra);
     transactionHash = getBinaryArrayHash(ba); // avoid serialization if we already have blob
 }
 
-TransactionImpl::TransactionImpl(const QwertyNote::Transaction &tx)
+TransactionImpl::TransactionImpl(const QwertyNote::FTransaction &tx)
     : transaction(tx)
 {
-    extra.parse(transaction.extra);
+    extra.parse(transaction.vExtra);
 }
 
 void TransactionImpl::invalidateHash()
@@ -229,7 +229,7 @@ FHash TransactionImpl::getTransactionHash() const
 
 FHash TransactionImpl::getTransactionPrefixHash() const
 {
-    return getObjectHash(*static_cast<const TransactionPrefix *>(&transaction));
+    return getObjectHash(*static_cast<const FTransactionPrefix *>(&transaction));
 }
 
 FPublicKey TransactionImpl::getTransactionPublicKey() const
@@ -241,13 +241,13 @@ FPublicKey TransactionImpl::getTransactionPublicKey() const
 
 uint64_t TransactionImpl::getUnlockTime() const
 {
-    return transaction.unlockTime;
+    return transaction.uUnlockTime;
 }
 
 void TransactionImpl::setUnlockTime(uint64_t unlockTime)
 {
     checkIfSigning();
-    transaction.unlockTime = unlockTime;
+    transaction.uUnlockTime = unlockTime;
     invalidateHash();
 }
 
@@ -278,102 +278,102 @@ void TransactionImpl::setTransactionSecretKey(const FSecretKey &key)
     secretKey = key;
 }
 
-size_t TransactionImpl::addInput(const KeyInput &input)
+size_t TransactionImpl::addInput(const FKeyInput &input)
 {
     checkIfSigning();
-    transaction.inputs.emplace_back(input);
+    transaction.vInputs.emplace_back(input);
     invalidateHash();
-    return transaction.inputs.size() - 1;
+    return transaction.vInputs.size() - 1;
 }
 
 size_t TransactionImpl::addInput(
-    const AccountKeys &senderKeys,
-    const TransactionTypes::InputKeyInfo &info,
-    KeyPair &ephKeys)
+		const FAccountKeys &senderKeys,
+		const TransactionTypes::InputKeyInfo &info,
+		FKeyPair &ephKeys)
 {
     checkIfSigning();
-    KeyInput input;
-    input.amount = info.amount;
+    FKeyInput input;
+    input.uAmount = info.amount;
 
     generate_key_image_helper(
         senderKeys,
         info.realOutput.transactionPublicKey,
         info.realOutput.outputInTransaction,
         ephKeys,
-        input.keyImage
+        input.sKeyImage
     );
 
     // fill outputs array and use relative offsets
     for (const auto &out : info.outputs) {
-        input.outputIndexes.push_back(out.outputIndex);
+        input.vOutputIndexes.push_back(out.outputIndex);
     }
 
-    input.outputIndexes = absolute_output_offsets_to_relative(input.outputIndexes);
+    input.vOutputIndexes = absolute_output_offsets_to_relative(input.vOutputIndexes);
 
     return addInput(input);
 }
 
-size_t TransactionImpl::addInput(const MultiSignatureInput &input)
+size_t TransactionImpl::addInput(const FMultiSignatureInput &input)
 {
     checkIfSigning();
-    transaction.inputs.push_back(input);
+    transaction.vInputs.push_back(input);
     invalidateHash();
-    return transaction.inputs.size() - 1;
+    return transaction.vInputs.size() - 1;
 }
 
-size_t TransactionImpl::addOutput(uint64_t amount, const AccountPublicAddress &to)
+size_t TransactionImpl::addOutput(uint64_t amount, const FAccountPublicAddress &to)
 {
     checkIfSigning();
 
-    KeyOutput outKey;
-    derivePublicKey(to, txSecretKey(), transaction.outputs.size(), outKey.key);
-    TransactionOutput out = { amount, outKey };
-    transaction.outputs.emplace_back(out);
+    FKeyOutput outKey;
+    derivePublicKey(to, txSecretKey(), transaction.vOutputs.size(), outKey.sPublicKey);
+    FTransactionOutput out = {amount, outKey };
+    transaction.vOutputs.emplace_back(out);
     invalidateHash();
 
-    return transaction.outputs.size() - 1;
+    return transaction.vOutputs.size() - 1;
 }
 
 size_t TransactionImpl::addOutput(
     uint64_t amount,
-    const std::vector<AccountPublicAddress> &to,
+    const std::vector<FAccountPublicAddress> &to,
     uint32_t requiredSignatures)
 {
     checkIfSigning();
 
     const auto &txKey = txSecretKey();
-    size_t outputIndex = transaction.outputs.size();
-    MultiSignatureOutput outMsig;
-    outMsig.requiredSignatureCount = requiredSignatures;
-    outMsig.keys.resize(to.size());
+    size_t outputIndex = transaction.vOutputs.size();
+    FMultiSignatureOutput outMsig;
+    outMsig.uRequiredSignatureCount = requiredSignatures;
+    outMsig.vPublicKeys.resize(to.size());
 
     for (size_t i = 0; i < to.size(); ++i) {
-        derivePublicKey(to[i], txKey, outputIndex, outMsig.keys[i]);
+        derivePublicKey(to[i], txKey, outputIndex, outMsig.vPublicKeys[i]);
     }
 
-    TransactionOutput out = { amount, outMsig };
-    transaction.outputs.emplace_back(out);
+    FTransactionOutput out = {amount, outMsig };
+    transaction.vOutputs.emplace_back(out);
     invalidateHash();
 
     return outputIndex;
 }
 
-size_t TransactionImpl::addOutput(uint64_t amount, const KeyOutput &out)
+size_t TransactionImpl::addOutput(uint64_t amount, const FKeyOutput &out)
 {
     checkIfSigning();
-    size_t outputIndex = transaction.outputs.size();
-    TransactionOutput realOut = { amount, out };
-    transaction.outputs.emplace_back(realOut);
+    size_t outputIndex = transaction.vOutputs.size();
+    FTransactionOutput realOut = {amount, out };
+    transaction.vOutputs.emplace_back(realOut);
     invalidateHash();
     return outputIndex;
 }
 
-size_t TransactionImpl::addOutput(uint64_t amount, const MultiSignatureOutput &out)
+size_t TransactionImpl::addOutput(uint64_t amount, const FMultiSignatureOutput &out)
 {
     checkIfSigning();
-    size_t outputIndex = transaction.outputs.size();
-    TransactionOutput realOut = { amount, out };
-    transaction.outputs.emplace_back(realOut);
+    size_t outputIndex = transaction.vOutputs.size();
+    FTransactionOutput realOut = {amount, out };
+    transaction.vOutputs.emplace_back(realOut);
     invalidateHash();
     return outputIndex;
 }
@@ -381,9 +381,9 @@ size_t TransactionImpl::addOutput(uint64_t amount, const MultiSignatureOutput &o
 void TransactionImpl::signInputKey(
     size_t index,
     const TransactionTypes::InputKeyInfo &info,
-    const KeyPair &ephKeys)
+    const FKeyPair &ephKeys)
 {
-    const auto &input = boost::get<KeyInput>(
+    const auto &input = boost::get<FKeyInput>(
         getInputChecked(transaction, index, TransactionTypes::InputType::Key)
     );
     FHash prefixHash = getTransactionPrefixHash();
@@ -398,8 +398,8 @@ void TransactionImpl::signInputKey(
     signatures.resize(keysPtrs.size());
 
     generateRingSignature(reinterpret_cast<const FHash &>(prefixHash),
-						  reinterpret_cast<const FKeyImage &>(input.keyImage), keysPtrs,
-						  reinterpret_cast<const FSecretKey &>(ephKeys.secretKey),
+						  reinterpret_cast<const FKeyImage &>(input.sKeyImage), keysPtrs,
+						  reinterpret_cast<const FSecretKey &>(ephKeys.sSecretKey),
 						  info.realOutput.transactionIndex, signatures.data());
 
     getSignatures(index) = signatures;
@@ -410,21 +410,21 @@ void TransactionImpl::signInputMultisignature(
     size_t index,
     const FPublicKey &sourceTransactionKey,
     size_t outputIndex,
-    const AccountKeys &accountKeys)
+    const FAccountKeys &accountKeys)
 {
     FKeyDerivation derivation;
     FPublicKey ephemeralPublicKey;
     FSecretKey ephemeralSecretKey;
 
     generateKeyDerivation(reinterpret_cast<const FPublicKey &>(sourceTransactionKey),
-                          reinterpret_cast<const FSecretKey &>(accountKeys.viewSecretKey),
+                          reinterpret_cast<const FSecretKey &>(accountKeys.sViewSecretKey),
                           derivation);
 
     derivePublicKey(derivation, outputIndex,
-                    reinterpret_cast<const FPublicKey &>(accountKeys.address.spendPublicKey),
+                    reinterpret_cast<const FPublicKey &>(accountKeys.sAddress.sSpendPublicKey),
                     ephemeralPublicKey);
     deriveSecretKey(derivation, outputIndex,
-                    reinterpret_cast<const FSecretKey &>(accountKeys.spendSecretKey),
+                    reinterpret_cast<const FSecretKey &>(accountKeys.sSpendSecretKey),
                     ephemeralSecretKey);
 
     FSignature signature;
@@ -437,12 +437,12 @@ void TransactionImpl::signInputMultisignature(
     invalidateHash();
 }
 
-void TransactionImpl::signInputMultisignature(size_t index, const KeyPair &ephemeralKeys)
+void TransactionImpl::signInputMultisignature(size_t index, const FKeyPair &ephemeralKeys)
 {
     FSignature signature;
     auto txPrefixHash = getTransactionPrefixHash();
 
-    generateSignature(txPrefixHash, ephemeralKeys.publicKey, ephemeralKeys.secretKey, signature);
+    generateSignature(txPrefixHash, ephemeralKeys.sPublicKey, ephemeralKeys.sSecretKey, signature);
 
     getSignatures(index).push_back(signature);
     invalidateHash();
@@ -451,15 +451,15 @@ void TransactionImpl::signInputMultisignature(size_t index, const KeyPair &ephem
 std::vector<FSignature> &TransactionImpl::getSignatures(size_t input)
 {
     // update signatures container size if needed
-    if (transaction.signatures.size() < transaction.inputs.size()) {
-        transaction.signatures.resize(transaction.inputs.size());
+    if (transaction.vSignatures.size() < transaction.vInputs.size()) {
+        transaction.vSignatures.resize(transaction.vInputs.size());
     }
     // check range
-    if (input >= transaction.signatures.size()) {
+    if (input >= transaction.vSignatures.size()) {
         throw std::runtime_error("Invalid input index");
     }
 
-    return transaction.signatures[input];
+    return transaction.vSignatures[input];
 }
 
 BinaryArray TransactionImpl::getTransactionData() const
@@ -493,14 +493,14 @@ void TransactionImpl::setExtraNonce(const BinaryArray &nonce)
     checkIfSigning();
     TransactionExtraNonce extraNonce = { nonce };
     extra.set(extraNonce);
-    transaction.extra = extra.serialize();
+    transaction.vExtra = extra.serialize();
     invalidateHash();
 }
 
 void TransactionImpl::appendExtra(const BinaryArray &extraData)
 {
     checkIfSigning();
-    transaction.extra.insert(transaction.extra.end(), extraData.begin(), extraData.end());
+    transaction.vExtra.insert(transaction.vExtra.end(), extraData.begin(), extraData.end());
 }
 
 bool TransactionImpl::getExtraNonce(BinaryArray &nonce) const
@@ -516,21 +516,21 @@ bool TransactionImpl::getExtraNonce(BinaryArray &nonce) const
 
 BinaryArray TransactionImpl::getExtra() const
 {
-    return transaction.extra;
+    return transaction.vExtra;
 }
 
 size_t TransactionImpl::getInputCount() const
 {
-    return transaction.inputs.size();
+    return transaction.vInputs.size();
 }
 
 uint64_t TransactionImpl::getInputTotalAmount() const
 {
     return std::accumulate(
-        transaction.inputs.begin(),
-        transaction.inputs.end(),
+        transaction.vInputs.begin(),
+        transaction.vInputs.end(),
         0ULL,
-        [](uint64_t val, const TransactionInput& in) {
+        [](uint64_t val, const FTransactionInput& in) {
             return val + getTransactionInputAmount(in);
         }
     );
@@ -541,62 +541,62 @@ TransactionTypes::InputType TransactionImpl::getInputType(size_t index) const
     return getTransactionInputType(getInputChecked(transaction, index));
 }
 
-void TransactionImpl::getInput(size_t index, KeyInput &input) const
+void TransactionImpl::getInput(size_t index, FKeyInput &input) const
 {
-    input = boost::get<KeyInput>(
+    input = boost::get<FKeyInput>(
         getInputChecked(transaction, index, TransactionTypes::InputType::Key)
     );
 }
 
-void TransactionImpl::getInput(size_t index, MultiSignatureInput &input) const
+void TransactionImpl::getInput(size_t index, FMultiSignatureInput &input) const
 {
-    input = boost::get<MultiSignatureInput>(
+    input = boost::get<FMultiSignatureInput>(
         getInputChecked(transaction, index, TransactionTypes::InputType::Multisignature)
     );
 }
 
 size_t TransactionImpl::getOutputCount() const
 {
-    return transaction.outputs.size();
+    return transaction.vOutputs.size();
 }
 
 uint64_t TransactionImpl::getOutputTotalAmount() const
 {
     return std::accumulate(
-        transaction.outputs.begin(),
-        transaction.outputs.end(),
+        transaction.vOutputs.begin(),
+        transaction.vOutputs.end(),
         0ULL,
-        [](uint64_t val, const TransactionOutput &out) {
-            return val + out.amount;
+        [](uint64_t val, const FTransactionOutput &out) {
+            return val + out.uAmount;
         }
     );
 }
 
 TransactionTypes::OutputType TransactionImpl::getOutputType(size_t index) const
 {
-    return getTransactionOutputType(getOutputChecked(transaction, index).target);
+    return getTransactionOutputType(getOutputChecked(transaction, index).sTarget);
 }
 
-void TransactionImpl::getOutput(size_t index, KeyOutput &output, uint64_t &amount) const
+void TransactionImpl::getOutput(size_t index, FKeyOutput &output, uint64_t &amount) const
 {
     const auto &out = getOutputChecked(transaction, index, TransactionTypes::OutputType::Key);
-    output = boost::get<KeyOutput>(out.target);
-    amount = out.amount;
+    output = boost::get<FKeyOutput>(out.sTarget);
+    amount = out.uAmount;
 }
 
-void TransactionImpl::getOutput(size_t index, MultiSignatureOutput & output, uint64_t& amount) const
+void TransactionImpl::getOutput(size_t index, FMultiSignatureOutput & output, uint64_t& amount) const
 {
     const auto &out = getOutputChecked(
         transaction,
         index,
         TransactionTypes::OutputType::Multisignature
     );
-    output = boost::get<MultiSignatureOutput>(out.target);
-    amount = out.amount;
+    output = boost::get<FMultiSignatureOutput>(out.sTarget);
+    amount = out.uAmount;
 }
 
 bool TransactionImpl::findOutputsToAccount(
-    const AccountPublicAddress &addr,
+    const FAccountPublicAddress &addr,
     const FSecretKey &viewSecretKey,
     std::vector<uint32_t> &out,
     uint64_t &amount) const
@@ -625,12 +625,12 @@ bool TransactionImpl::validateOutputs() const
 
 bool TransactionImpl::validateSignatures() const
 {
-    if (transaction.signatures.size() < transaction.inputs.size()) {
+    if (transaction.vSignatures.size() < transaction.vInputs.size()) {
         return false;
     }
 
-    for (size_t i = 0; i < transaction.inputs.size(); ++i) {
-        if (getRequiredSignaturesCount(i) > transaction.signatures[i].size()) {
+    for (size_t i = 0; i < transaction.vInputs.size(); ++i) {
+        if (getRequiredSignaturesCount(i) > transaction.vSignatures[i].size()) {
             return false;
         }
     }

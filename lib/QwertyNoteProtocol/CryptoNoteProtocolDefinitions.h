@@ -59,7 +59,7 @@ struct TransactionPrefixInfo {
     }
 
     Crypto::FHash txHash;
-    TransactionPrefix txPrefix;
+    FTransactionPrefix txPrefix;
 };
 
 struct BlockShortInfo {

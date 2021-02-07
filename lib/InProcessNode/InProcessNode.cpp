@@ -43,11 +43,11 @@ namespace QwertyNote {
 
 namespace {
 
-    uint64_t getBlockReward(const Block &block)
+    uint64_t getBlockReward(const FBlock &block)
     {
         uint64_t reward = 0;
-        for (const TransactionOutput& out : block.baseTransaction.outputs) {
-            reward += out.amount;
+        for (const FTransactionOutput& out : block.sBaseTransaction.vOutputs) {
+            reward += out.uAmount;
         }
 
         return reward;
@@ -349,7 +349,7 @@ std::error_code InProcessNode::doGetRandomOutsByAmounts(
 }
 
 
-void InProcessNode::relayTransaction(const QwertyNote::Transaction &transaction,
+void InProcessNode::relayTransaction(const QwertyNote::FTransaction &transaction,
                                      const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
@@ -368,7 +368,7 @@ void InProcessNode::relayTransaction(const QwertyNote::Transaction &transaction,
     ));
 }
 
-void InProcessNode::relayTransactionAsync(const QwertyNote::Transaction &transaction,
+void InProcessNode::relayTransactionAsync(const QwertyNote::FTransaction &transaction,
                                           const UCallback &callback)
 {
     std::error_code ec = doRelayTransaction(transaction);
@@ -376,7 +376,7 @@ void InProcessNode::relayTransactionAsync(const QwertyNote::Transaction &transac
 }
 
 // it's always protected with mutex
-std::error_code InProcessNode::doRelayTransaction(const QwertyNote::Transaction &transaction)
+std::error_code InProcessNode::doRelayTransaction(const QwertyNote::FTransaction &transaction)
 {
     {
         std::unique_lock<std::mutex> lock(mutex);
@@ -536,7 +536,7 @@ void InProcessNode::updateLastLocalBlockHeaderInfo()
 {
     uint32_t height;
     Crypto::FHash hash;
-    Block block;
+    FBlock block;
     uint64_t difficulty;
 
     try {
@@ -548,12 +548,12 @@ void InProcessNode::updateLastLocalBlockHeaderInfo()
     }
 
     lastLocalBlockHeaderInfo.uIndex = height;
-    lastLocalBlockHeaderInfo.uMajorVersion = block.majorVersion;
-    lastLocalBlockHeaderInfo.uMinorVersion = block.minorVersion;
-    lastLocalBlockHeaderInfo.uTimestamp  = block.timestamp;
+    lastLocalBlockHeaderInfo.uMajorVersion = block.uMajorVersion;
+    lastLocalBlockHeaderInfo.uMinorVersion = block.uMinorVersion;
+    lastLocalBlockHeaderInfo.uTimestamp  = block.uTimestamp;
     lastLocalBlockHeaderInfo.sHash = hash;
-    lastLocalBlockHeaderInfo.sPrevHash = block.previousBlockHash;
-    lastLocalBlockHeaderInfo.uNonce = block.nonce;
+    lastLocalBlockHeaderInfo.sPrevHash = block.sPreviousBlockHash;
+    lastLocalBlockHeaderInfo.uNonce = block.uNonce;
     lastLocalBlockHeaderInfo.bIsAlternative = false;
     lastLocalBlockHeaderInfo.uDepth = 0;
     lastLocalBlockHeaderInfo.sDifficulty = difficulty;
@@ -711,9 +711,9 @@ void InProcessNode::getPoolSymmetricDifferenceAsync(
 }
 
 void InProcessNode::getMultisignatureOutputByGlobalIndex(uint64_t amount,
-                                                         uint32_t gindex,
-                                                         MultiSignatureOutput &out,
-                                                         const UCallback &callback)
+														 uint32_t gindex,
+														 FMultiSignatureOutput &out,
+														 const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
@@ -729,9 +729,9 @@ void InProcessNode::getMultisignatureOutputByGlobalIndex(uint64_t amount,
 }
 
 void InProcessNode::getOutByMSigGIndexAsync(uint64_t amount,
-                                            uint32_t gindex,
-                                            MultiSignatureOutput &out,
-                                            const UCallback &callback)
+											uint32_t gindex,
+											FMultiSignatureOutput &out,
+											const UCallback &callback)
 {
     std::error_code ec = std::error_code();
     bool result = core.getOutByMultiSigGlobalIndex(amount, gindex, out);
@@ -797,7 +797,7 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<uint32_t> &blockHei
                 return make_error_code(QwertyNote::error::REQUEST_ERROR);
             }
             Crypto::FHash hash = core.getBlockIdByHeight(height);
-            Block block;
+            FBlock block;
             if (!core.getBlockByHash(hash, block)) {
                 return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
             }
@@ -811,9 +811,9 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<uint32_t> &blockHei
             blocksOnSameHeight.push_back(std::move(blockDetails));
 
             // getting orphans
-            std::vector<Block> orphanBlocks;
+            std::vector<FBlock> orphanBlocks;
             core.getOrphanBlocksByHeight(height, orphanBlocks);
-            for (const Block &orphanBlock : orphanBlocks) {
+            for (const FBlock &orphanBlock : orphanBlocks) {
                 BlockDetails orphanBlockDetails;
                 if (!blockchainExplorerDataBuilder.fillBlockDetails(orphanBlock,
                                                                     orphanBlockDetails,
@@ -877,7 +877,7 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<Crypto::FHash> &blo
 {
     try {
         for (const Crypto::FHash& hash : blockHashes) {
-            Block block;
+            FBlock block;
             if (!core.getBlockByHash(hash, block)) {
                 return make_error_code(QwertyNote::error::REQUEST_ERROR);
             }
@@ -962,7 +962,7 @@ std::error_code InProcessNode::doGetBlocks(uint64_t timestampBegin,
                                            uint32_t &blocksNumberWithinTimestamps)
 {
     try {
-        std::vector<Block> rawBlocks;
+        std::vector<FBlock> rawBlocks;
         if (!core.getBlocksByTimestamp(timestampBegin,
                                        timestampEnd,
                                        blocksNumberLimit,
@@ -970,7 +970,7 @@ std::error_code InProcessNode::doGetBlocks(uint64_t timestampBegin,
                                        blocksNumberWithinTimestamps)) {
             return make_error_code(QwertyNote::error::REQUEST_ERROR);
         }
-        for (const Block &rawBlock : rawBlocks) {
+        for (const FBlock &rawBlock : rawBlocks) {
             BlockDetails block;
             if (!blockchainExplorerDataBuilder.fillBlockDetails(rawBlock,
                                                                 block,
@@ -1032,13 +1032,13 @@ std::error_code InProcessNode::doGetTransactions(const std::vector<Crypto::FHash
                                                  std::vector<TransactionDetails> &transactions)
 {
     try {
-        std::list<Transaction> txs;
+        std::list<FTransaction> txs;
         std::list<Crypto::FHash> missed_txs;
         core.getTransactions(transactionHashes, txs, missed_txs, true);
         if (!missed_txs.empty()) {
             return make_error_code(QwertyNote::error::REQUEST_ERROR);
         }
-        for (const Transaction &tx : txs) {
+        for (const FTransaction &tx : txs) {
             TransactionDetails transactionDetails;
             if (!blockchainExplorerDataBuilder.fillTransactionDetails(tx, transactionDetails)) {
                 return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
@@ -1109,7 +1109,7 @@ std::error_code InProcessNode::doGetPoolTransactions(
     uint64_t &transactionsNumberWithinTimestamps)
 {
     try {
-        std::vector<Transaction> rawTransactions;
+        std::vector<FTransaction> rawTransactions;
         if (!core.getPoolTransactionsByTimestamp(timestampBegin,
                                                  timestampEnd,
                                                  transactionsNumberLimit,
@@ -1117,7 +1117,7 @@ std::error_code InProcessNode::doGetPoolTransactions(
                                                  transactionsNumberWithinTimestamps)) {
             return make_error_code(QwertyNote::error::REQUEST_ERROR);
         }
-        for (const Transaction& rawTransaction : rawTransactions) {
+        for (const FTransaction& rawTransaction : rawTransactions) {
             TransactionDetails transactionDetails;
             if (!blockchainExplorerDataBuilder.fillTransactionDetails(rawTransaction,
                                                                       transactionDetails)) {
@@ -1174,11 +1174,11 @@ std::error_code InProcessNode::doGetTransactionsByPaymentId(
     std::vector<TransactionDetails> &transactions)
 {
     try {
-        std::vector<Transaction> rawTransactions;
+        std::vector<FTransaction> rawTransactions;
         if (!core.getTransactionsByPaymentId(paymentId, rawTransactions)) {
             return make_error_code(QwertyNote::error::REQUEST_ERROR);
         }
-        for (const Transaction &rawTransaction : rawTransactions) {
+        for (const FTransaction &rawTransaction : rawTransactions) {
             TransactionDetails transactionDetails;
             if (!blockchainExplorerDataBuilder.fillTransactionDetails(rawTransaction,
                                                                       transactionDetails)) {

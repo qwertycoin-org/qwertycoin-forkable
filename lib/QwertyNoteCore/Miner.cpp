@@ -47,7 +47,7 @@ miner::miner(const Currency &currency, IMinerHandler &handler, Logging::ILogger 
     : m_currency(currency),
       logger(log, "miner"),
       m_stop(true),
-      m_template(boost::value_initialized<Block>()),
+      m_template(boost::value_initialized<FBlock>()),
       m_template_no(0),
       m_diffic(0),
       m_handler(handler),
@@ -69,7 +69,7 @@ miner::~miner()
     stop();
 }
 
-bool miner::set_block_template(const Block &bl, const difficulty_type &di)
+bool miner::set_block_template(const FBlock &bl, const difficulty_type &di)
 {
     std::lock_guard<decltype(m_template_lock)> lk(m_template_lock);
 
@@ -93,7 +93,7 @@ bool miner::on_block_chain_update()
 
 bool miner::request_block_template()
 {
-    Block bl = boost::value_initialized<Block>();
+    FBlock bl = boost::value_initialized<FBlock>();
     difficulty_type di = 0;
     uint32_t height;
     QwertyNote::BinaryArray extra_nonce;
@@ -230,7 +230,7 @@ bool miner::is_mining()
     return !m_stop;
 }
 
-bool miner::start(const AccountPublicAddress &adr, size_t threads_count)
+bool miner::start(const FAccountPublicAddress &adr, size_t threads_count)
 {
     if (is_mining()) {
         logger(ERROR) << "Starting miner but it's already started";
@@ -332,7 +332,7 @@ bool miner::worker_thread(uint32_t th_local_index)
     difficulty_type local_diff = 0;
     uint32_t local_template_ver = 0;
     Crypto::CnContext context;
-    Block b;
+    FBlock b;
 
     while(!m_stop) {
         if(m_pausers_count) { // anti split workaround
@@ -356,7 +356,7 @@ bool miner::worker_thread(uint32_t th_local_index)
             continue;
         }
 
-        b.nonce = nonce;
+        b.uNonce = nonce;
         Crypto::FHash h;
         if (!m_stop && !getBlockLongHash(context, b, h)) {
             logger(ERROR) << "Failed to get block long FHash";

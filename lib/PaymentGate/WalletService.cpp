@@ -383,13 +383,13 @@ void generateNewWallet(const QwertyNote::Currency &currency,
             log(Logging::INFO, Logging::BRIGHT_WHITE) << "Generating new deterministic wallet";
 
             Crypto::FSecretKey private_view_key;
-            QwertyNote::KeyPair spendKey;
+            QwertyNote::FKeyPair spendKey;
 
-            Crypto::generateKeys(spendKey.publicKey, spendKey.secretKey);
-            QwertyNote::AccountBase::generateViewFromSpend(spendKey.secretKey, private_view_key);
+            Crypto::generateKeys(spendKey.sPublicKey, spendKey.sSecretKey);
+            QwertyNote::AccountBase::generateViewFromSpend(spendKey.sSecretKey, private_view_key);
 
             wallet->initializeWithViewKey(conf.walletFile, conf.walletPassword, private_view_key);
-            address = wallet->createAddress(spendKey.secretKey);
+            address = wallet->createAddress(spendKey.sSecretKey);
 
             log(Logging::INFO, Logging::BRIGHT_WHITE)
                 << "New deterministic wallet is generated. Address: "
@@ -798,10 +798,10 @@ std::error_code WalletService::getSpendkeys(const std::string &address,
     try {
         System::EventLock lk(readyEvent);
 
-        QwertyNote::KeyPair key = wallet.getAddressSpendKey(address);
+        QwertyNote::FKeyPair key = wallet.getAddressSpendKey(address);
 
-        publicSpendKeyText = Common::podToHex(key.publicKey);
-        secretSpendKeyText = Common::podToHex(key.secretKey);
+        publicSpendKeyText = Common::podToHex(key.sPublicKey);
+        secretSpendKeyText = Common::podToHex(key.sSecretKey);
     } catch (std::system_error &x) {
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting spend key: "
@@ -887,8 +887,8 @@ std::error_code WalletService::getViewKey(std::string &viewSecretKey)
 {
     try {
         System::EventLock lk(readyEvent);
-        QwertyNote::KeyPair viewKey = wallet.getViewKey();
-        viewSecretKey = Common::podToHex(viewKey.secretKey);
+        QwertyNote::FKeyPair viewKey = wallet.getViewKey();
+        viewSecretKey = Common::podToHex(viewKey.sSecretKey);
     } catch (std::system_error& x) {
         logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
             << "Error while getting view key: "
@@ -904,17 +904,17 @@ std::error_code WalletService::getMnemonicSeed(const std::string &address,
 {
     try {
         System::EventLock lk(readyEvent);
-        QwertyNote::KeyPair key = wallet.getAddressSpendKey(address);
-        QwertyNote::KeyPair viewKey = wallet.getViewKey();
+        QwertyNote::FKeyPair key = wallet.getAddressSpendKey(address);
+        QwertyNote::FKeyPair viewKey = wallet.getViewKey();
 
         Crypto::FSecretKey deterministic_private_view_key;
 
-        QwertyNote::AccountBase::generateViewFromSpend(key.secretKey, deterministic_private_view_key);
+        QwertyNote::AccountBase::generateViewFromSpend(key.sSecretKey, deterministic_private_view_key);
 
-        bool deterministic_private_keys = deterministic_private_view_key == viewKey.secretKey;
+        bool deterministic_private_keys = deterministic_private_view_key == viewKey.sSecretKey;
 
         if (deterministic_private_keys) {
-            Crypto::ElectrumWords::bytes_to_words(key.secretKey, mnemonicSeed, "English");
+            Crypto::ElectrumWords::bytes_to_words(key.sSecretKey, mnemonicSeed, "English");
         } else {
             // Have to be able to derive view key from spend key to create a mnemonic seed,
             // due to being able to generate multiple addresses we can't do this in walletd
@@ -1409,12 +1409,12 @@ std::error_code WalletService::validateAddress(
     try {
         System::EventLock lk(readyEvent);
 
-        QwertyNote::AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
+        QwertyNote::FAccountPublicAddress acc = boost::value_initialized<FAccountPublicAddress>();
         if (currency.parseAccountAddressString(address, acc)) {
             isvalid = true;
             _address = currency.accountAddressAsString(acc);
-            spendPublicKey = Common::podToHex(acc.spendPublicKey);
-            viewPublicKey = Common::podToHex(acc.viewPublicKey);
+            spendPublicKey = Common::podToHex(acc.sSpendPublicKey);
+            viewPublicKey = Common::podToHex(acc.sViewPublicKey);
         } else {
             isvalid = false;
         }

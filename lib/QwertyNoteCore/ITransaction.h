@@ -87,20 +87,20 @@ public:
     virtual size_t getInputCount() const = 0;
     virtual uint64_t getInputTotalAmount() const = 0;
     virtual TransactionTypes::InputType getInputType(size_t index) const = 0;
-    virtual void getInput(size_t index, KeyInput &input) const = 0;
-    virtual void getInput(size_t index, MultiSignatureInput &input) const = 0;
+    virtual void getInput(size_t index, FKeyInput &input) const = 0;
+    virtual void getInput(size_t index, FMultiSignatureInput &input) const = 0;
 
     // outputs
     virtual size_t getOutputCount() const = 0;
     virtual uint64_t getOutputTotalAmount() const = 0;
     virtual TransactionTypes::OutputType getOutputType(size_t index) const = 0;
-    virtual void getOutput(size_t index, KeyOutput &output, uint64_t &amount) const = 0;
-    virtual void getOutput(size_t index, MultiSignatureOutput &output, uint64_t &amount) const = 0;
+    virtual void getOutput(size_t index, FKeyOutput &output, uint64_t &amount) const = 0;
+    virtual void getOutput(size_t index, FMultiSignatureOutput &output, uint64_t &amount) const = 0;
 
     // signatures
     virtual size_t getRequiredSignaturesCount(size_t inputIndex) const = 0;
     virtual bool findOutputsToAccount(
-        const AccountPublicAddress &addr,
+        const FAccountPublicAddress &addr,
         const Crypto::FSecretKey &viewSecretKey,
         std::vector<uint32_t> &outs,
         uint64_t &outputAmount) const = 0;
@@ -128,20 +128,20 @@ public:
     virtual void appendExtra(const BinaryArray &extraData) = 0;
 
     // Inputs/Outputs
-    virtual size_t addInput(const KeyInput &input) = 0;
-    virtual size_t addInput(const MultiSignatureInput &input) = 0;
+    virtual size_t addInput(const FKeyInput &input) = 0;
+    virtual size_t addInput(const FMultiSignatureInput &input) = 0;
     virtual size_t addInput(
-        const AccountKeys &senderKeys,
-        const TransactionTypes::InputKeyInfo &info,
-        KeyPair &ephKeys) = 0;
+			const FAccountKeys &senderKeys,
+			const TransactionTypes::InputKeyInfo &info,
+			FKeyPair &ephKeys) = 0;
 
-    virtual size_t addOutput(uint64_t amount, const AccountPublicAddress &to) = 0;
+    virtual size_t addOutput(uint64_t amount, const FAccountPublicAddress &to) = 0;
     virtual size_t addOutput(
         uint64_t amount,
-        const std::vector<AccountPublicAddress> &to,
+        const std::vector<FAccountPublicAddress> &to,
         uint32_t requiredSignatures) = 0;
-    virtual size_t addOutput(uint64_t amount, const KeyOutput &out) = 0;
-    virtual size_t addOutput(uint64_t amount, const MultiSignatureOutput &out) = 0;
+    virtual size_t addOutput(uint64_t amount, const FKeyOutput &out) = 0;
+    virtual size_t addOutput(uint64_t amount, const FMultiSignatureOutput &out) = 0;
 
     // transaction info
     virtual void setTransactionSecretKey(const Crypto::FSecretKey &key) = 0;
@@ -150,13 +150,13 @@ public:
     virtual void signInputKey(
         size_t input,
         const TransactionTypes::InputKeyInfo &info,
-        const KeyPair &ephKeys) = 0;
+        const FKeyPair &ephKeys) = 0;
     virtual void signInputMultisignature(
         size_t input,
         const Crypto::FPublicKey &sourceTransactionKey,
         size_t outputIndex,
-        const AccountKeys &accountKeys) = 0;
-    virtual void signInputMultisignature(size_t input, const KeyPair &ephemeralKeys) = 0;
+        const FAccountKeys &accountKeys) = 0;
+    virtual void signInputMultisignature(size_t input, const FKeyPair &ephemeralKeys) = 0;
 };
 
 class ITransaction : public ITransactionReader, public ITransactionWriter

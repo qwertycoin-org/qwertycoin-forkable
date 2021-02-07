@@ -48,7 +48,7 @@ namespace QwertyNote {
 
 bool parseAndValidateTransactionFromBinaryArray(
 		const BinaryArray &tx_blob,
-		Transaction &tx,
+		FTransaction &tx,
 		FHash &tx_hash,
 		FHash &tx_prefix_hash)
 {
@@ -58,20 +58,20 @@ bool parseAndValidateTransactionFromBinaryArray(
 
     //TODO: validate tx
     cnFastHash(tx_blob.data(), tx_blob.size(), tx_hash);
-    getObjectHash(*static_cast<TransactionPrefix *>(&tx), tx_prefix_hash);
+    getObjectHash(*static_cast<FTransactionPrefix *>(&tx), tx_prefix_hash);
 
     return true;
 }
 
 bool generate_key_image_helper(
-		const AccountKeys &ack,
+		const FAccountKeys &ack,
 		const FPublicKey &tx_public_key,
 		size_t real_output_index,
-		KeyPair &in_ephemeral,
+		FKeyPair &in_ephemeral,
 		FKeyImage &ki)
 {
     FKeyDerivation recv_derivation;
-    bool r = generateKeyDerivation(tx_public_key, ack.viewSecretKey, recv_derivation);
+    bool r = generateKeyDerivation(tx_public_key, ack.sViewSecretKey, recv_derivation);
 
     assert(r && "key image helper: failed to generateKeyDerivation");
 
@@ -79,8 +79,8 @@ bool generate_key_image_helper(
         return false;
     }
 
-    r = derivePublicKey(recv_derivation, real_output_index, ack.address.spendPublicKey,
-                        in_ephemeral.publicKey);
+    r = derivePublicKey(recv_derivation, real_output_index, ack.sAddress.sSpendPublicKey,
+                        in_ephemeral.sPublicKey);
 
     assert(r && "key image helper: failed to derivePublicKey");
 
@@ -88,8 +88,8 @@ bool generate_key_image_helper(
         return false;
     }
 
-    deriveSecretKey(recv_derivation, real_output_index, ack.spendSecretKey, in_ephemeral.secretKey);
-    generateKeyImage(in_ephemeral.publicKey, in_ephemeral.secretKey, ki);
+    deriveSecretKey(recv_derivation, real_output_index, ack.sSpendSecretKey, in_ephemeral.sSecretKey);
+    generateKeyImage(in_ephemeral.sPublicKey, in_ephemeral.sSecretKey, ki);
 
     return true;
 }
@@ -106,21 +106,21 @@ uint64_t power_integral(uint64_t a, uint64_t b)
     return total;
 }
 
-bool getTxFee(const Transaction &tx, uint64_t &fee)
+bool getTxFee(const FTransaction &tx, uint64_t &fee)
 {
     uint64_t amountIn = 0;
     uint64_t amountOut = 0;
 
-    for (const auto &in : tx.inputs) {
-        if (in.type() == typeid(KeyInput)) {
-            amountIn += boost::get<KeyInput>(in).amount;
-        } else if (in.type() == typeid(MultiSignatureInput)) {
-            amountIn += boost::get<MultiSignatureInput>(in).amount;
+    for (const auto &in : tx.vInputs) {
+        if (in.type() == typeid(FKeyInput)) {
+            amountIn += boost::get<FKeyInput>(in).uAmount;
+        } else if (in.type() == typeid(FMultiSignatureInput)) {
+            amountIn += boost::get<FMultiSignatureInput>(in).uAmount;
         }
     }
 
-    for (const auto &o : tx.outputs) {
-        amountOut += o.amount;
+    for (const auto &o : tx.vOutputs) {
+        amountOut += o.uAmount;
     }
 
     if (!(amountIn >= amountOut)) {
@@ -132,7 +132,7 @@ bool getTxFee(const Transaction &tx, uint64_t &fee)
     return true;
 }
 
-uint64_t getTxFee(const Transaction &tx)
+uint64_t getTxFee(const FTransaction &tx)
 {
     uint64_t r = 0;
     if (!getTxFee(tx, r)) {
@@ -142,36 +142,36 @@ uint64_t getTxFee(const Transaction &tx)
 }
 
 bool constructTransaction(
-    const AccountKeys &sender_account_keys,
-    const std::vector<TransactionSourceEntry> &sources,
-    const std::vector<TransactionDestinationEntry> &destinations,
-    const std::vector<tx_message_entry> &messages,
-    const std::string &sender,
-    uint64_t ttl,
-    std::vector<uint8_t> extra,
-    Transaction &tx,
-    uint64_t unlock_time,
-    Crypto::FSecretKey &tx_key,
-    Logging::ILogger &log)
+		const FAccountKeys &sender_account_keys,
+		const std::vector<TransactionSourceEntry> &sources,
+		const std::vector<TransactionDestinationEntry> &destinations,
+		const std::vector<tx_message_entry> &messages,
+		const std::string &sender,
+		uint64_t ttl,
+		std::vector<uint8_t> extra,
+		FTransaction &tx,
+		uint64_t unlock_time,
+		Crypto::FSecretKey &tx_key,
+		Logging::ILogger &log)
 {
     LoggerRef logger(log, "construct_tx");
 
-    tx.inputs.clear();
-    tx.outputs.clear();
-    tx.signatures.clear();
+    tx.vInputs.clear();
+    tx.vOutputs.clear();
+    tx.vSignatures.clear();
 
-    tx.version = CURRENT_TRANSACTION_VERSION;
-    tx.unlockTime = unlock_time;
+    tx.uVersion = CURRENT_TRANSACTION_VERSION;
+    tx.uUnlockTime = unlock_time;
 
-    tx.extra = extra;
-    KeyPair txkey = generateKeyPair();
-    addTransactionPublicKeyToExtra(tx.extra, txkey.publicKey);
+    tx.vExtra = extra;
+    FKeyPair txkey = generateKeyPair();
+    addTransactionPublicKeyToExtra(tx.vExtra, txkey.sPublicKey);
 
-    tx_key = txkey.secretKey;
+    tx_key = txkey.sSecretKey;
 
     struct input_generation_context_data
     {
-        KeyPair in_ephemeral;
+        FKeyPair in_ephemeral;
     };
 
     std::vector<input_generation_context_data> in_contexts;
@@ -189,7 +189,7 @@ bool constructTransaction(
         summary_inputs_money += src_entr.amount;
 
         in_contexts.push_back(input_generation_context_data());
-        KeyPair &in_ephemeral = in_contexts.back().in_ephemeral;
+        FKeyPair &in_ephemeral = in_contexts.back().in_ephemeral;
         FKeyImage img;
         if (!generate_key_image_helper(
                 sender_account_keys,
@@ -202,27 +202,27 @@ bool constructTransaction(
         }
 
         // check that derived key is equal with real output key
-        if (!(in_ephemeral.publicKey == src_entr.outputs[src_entr.realOutput].second)) {
+        if (!(in_ephemeral.sPublicKey == src_entr.outputs[src_entr.realOutput].second)) {
             logger(ERROR)
-                << "derived public key mismatch with output public key! " << ENDL
-                << "derived_key:" << Common::podToHex(in_ephemeral.publicKey) << ENDL
-                << "real output_public_key:"
-                << Common::podToHex(src_entr.outputs[src_entr.realOutput].second);
+					<< "derived public key mismatch with output public key! " << ENDL
+					<< "derived_key:" << Common::podToHex(in_ephemeral.sPublicKey) << ENDL
+					<< "real output_public_key:"
+					<< Common::podToHex(src_entr.outputs[src_entr.realOutput].second);
             return false;
         }
 
         // put key image into tx input
-        KeyInput input_to_key;
-        input_to_key.amount = src_entr.amount;
-        input_to_key.keyImage = img;
+        FKeyInput input_to_key;
+        input_to_key.uAmount = src_entr.amount;
+        input_to_key.sKeyImage = img;
 
         // fill outputs array and use relative offsets
         for (const TransactionSourceEntry::OutputEntry &out_entry : src_entr.outputs) {
-            input_to_key.outputIndexes.push_back(out_entry.first);
+            input_to_key.vOutputIndexes.push_back(out_entry.first);
         }
 
-        input_to_key.outputIndexes=absolute_output_offsets_to_relative(input_to_key.outputIndexes);
-        tx.inputs.push_back(input_to_key);
+        input_to_key.vOutputIndexes=absolute_output_offsets_to_relative(input_to_key.vOutputIndexes);
+        tx.vInputs.push_back(input_to_key);
     }
 
     // "shuffle" outs
@@ -245,19 +245,19 @@ bool constructTransaction(
         }
         FKeyDerivation derivation;
         FPublicKey out_eph_public_key;
-        bool r = generateKeyDerivation(dst_entr.addr.viewPublicKey, txkey.secretKey, derivation);
+        bool r = generateKeyDerivation(dst_entr.addr.sViewPublicKey, txkey.sSecretKey, derivation);
 
         if (!(r)) {
             logger(ERROR, BRIGHT_RED)
                 << "at creation outs: failed to generateKeyDerivation("
-                << dst_entr.addr.viewPublicKey
+                << dst_entr.addr.sViewPublicKey
                 << ", "
-                << txkey.secretKey
+                << txkey.sSecretKey
                 << ")";
             return false;
         }
 
-        r = derivePublicKey(derivation, output_index, dst_entr.addr.spendPublicKey,
+        r = derivePublicKey(derivation, output_index, dst_entr.addr.sSpendPublicKey,
                             out_eph_public_key);
         if (!(r)) {
             logger(ERROR, BRIGHT_RED)
@@ -266,17 +266,17 @@ bool constructTransaction(
                 << ", "
                 << output_index
                 << ", "
-                << dst_entr.addr.spendPublicKey
+                << dst_entr.addr.sSpendPublicKey
                 << ")";
             return false;
         }
 
-        TransactionOutput out;
-        out.amount = dst_entr.amount;
-        KeyOutput tk;
-        tk.key = out_eph_public_key;
-        out.target = tk;
-        tx.outputs.push_back(out);
+        FTransactionOutput out;
+        out.uAmount = dst_entr.amount;
+        FKeyOutput tk;
+        tk.sPublicKey = out_eph_public_key;
+        out.sTarget = tk;
+        tx.vOutputs.push_back(out);
         output_index++;
         summary_outs_money += dst_entr.amount;
     }
@@ -306,23 +306,23 @@ bool constructTransaction(
                 return false;
             }
 
-            if (!appendMessageToExtra(tx.extra, tag)) {
+            if (!appendMessageToExtra(tx.vExtra, tag)) {
                 return false;
             }
 
-            if (!appendSenderToExtra(tx.extra, sTag)) {
+            if (!appendSenderToExtra(tx.vExtra, sTag)) {
                 return false;
             }
         }
 
         if (ttl != 0) {
-            appendTTLToExtra(tx.extra, ttl);
+            appendTTLToExtra(tx.vExtra, ttl);
         }
     }
 
     //generate ring signatures
     FHash tx_prefix_hash;
-    getObjectHash(*static_cast<TransactionPrefix *>(&tx), tx_prefix_hash);
+    getObjectHash(*static_cast<FTransactionPrefix *>(&tx), tx_prefix_hash);
 
     size_t i = 0;
     for (const TransactionSourceEntry &src_entr : sources) {
@@ -331,29 +331,29 @@ bool constructTransaction(
             keys_ptrs.push_back(&o.second);
         }
 
-        tx.signatures.push_back(std::vector<FSignature>());
-        std::vector<FSignature> &sigs = tx.signatures.back();
+        tx.vSignatures.push_back(std::vector<FSignature>());
+        std::vector<FSignature> &sigs = tx.vSignatures.back();
         sigs.resize(src_entr.outputs.size());
-        generateRingSignature(tx_prefix_hash, boost::get<KeyInput>(tx.inputs[i]).keyImage,
-                              keys_ptrs, in_contexts[i].in_ephemeral.secretKey, src_entr.realOutput,
-                              sigs.data());
+        generateRingSignature(tx_prefix_hash, boost::get<FKeyInput>(tx.vInputs[i]).sKeyImage,
+							  keys_ptrs, in_contexts[i].in_ephemeral.sSecretKey, src_entr.realOutput,
+							  sigs.data());
         i++;
     }
 
     return true;
 }
 
-bool getInputsMoneyAmount(const Transaction &tx, uint64_t &money)
+bool getInputsMoneyAmount(const FTransaction &tx, uint64_t &money)
 {
     money = 0;
 
-    for (const auto &in : tx.inputs) {
+    for (const auto &in : tx.vInputs) {
         uint64_t amount = 0;
 
-        if (in.type() == typeid(KeyInput)) {
-            amount = boost::get<KeyInput>(in).amount;
-        } else if (in.type() == typeid(MultiSignatureInput)) {
-            amount = boost::get<MultiSignatureInput>(in).amount;
+        if (in.type() == typeid(FKeyInput)) {
+            amount = boost::get<FKeyInput>(in).uAmount;
+        } else if (in.type() == typeid(FMultiSignatureInput)) {
+            amount = boost::get<FMultiSignatureInput>(in).uAmount;
         }
 
         money += amount;
@@ -361,22 +361,22 @@ bool getInputsMoneyAmount(const Transaction &tx, uint64_t &money)
     return true;
 }
 
-uint32_t get_block_height(const Block &b)
+uint32_t get_block_height(const FBlock &b)
 {
-    if (b.baseTransaction.inputs.size() != 1) {
+    if (b.sBaseTransaction.vInputs.size() != 1) {
         return 0;
     }
-    const auto &in = b.baseTransaction.inputs[0];
-    if (in.type() != typeid(BaseInput)) {
+    const auto &in = b.sBaseTransaction.vInputs[0];
+    if (in.type() != typeid(FBaseInput)) {
         return 0;
     }
-    return boost::get<BaseInput>(in).blockIndex;
+    return boost::get<FBaseInput>(in).uBlockIndex;
 }
 
-bool check_inputs_types_supported(const TransactionPrefix &tx)
+bool check_inputs_types_supported(const FTransactionPrefix &tx)
 {
-    for (const auto &in : tx.inputs) {
-        if (in.type() != typeid(KeyInput) && in.type() != typeid(MultiSignatureInput)) {
+    for (const auto &in : tx.vInputs) {
+        if (in.type() != typeid(FKeyInput) && in.type() != typeid(FMultiSignatureInput)) {
             return false;
         }
     }
@@ -384,42 +384,42 @@ bool check_inputs_types_supported(const TransactionPrefix &tx)
     return true;
 }
 
-bool check_outs_valid(const TransactionPrefix &tx, std::string *error)
+bool check_outs_valid(const FTransactionPrefix &tx, std::string *error)
 {
     std::unordered_set<FPublicKey> keys_seen;
-    for (const TransactionOutput& out : tx.outputs) {
-        if (out.target.type() == typeid(KeyOutput)) {
-            if (out.amount == 0) {
+    for (const FTransactionOutput& out : tx.vOutputs) {
+        if (out.sTarget.type() == typeid(FKeyOutput)) {
+            if (out.uAmount == 0) {
                 if (error) {
                     *error = "Zero amount ouput";
                 }
                 return false;
             }
 
-            if (!checkKey(boost::get<KeyOutput>(out.target).key)) {
+            if (!checkKey(boost::get<FKeyOutput>(out.sTarget).sPublicKey)) {
                 if (error) {
                     *error = "Output with invalid key";
                 }
                 return false;
             }
 
-            if (keys_seen.find(boost::get<KeyOutput>(out.target).key) != keys_seen.end()) {
+            if (keys_seen.find(boost::get<FKeyOutput>(out.sTarget).sPublicKey) != keys_seen.end()) {
                 if (error) {
                     *error = "The same output target is present more than once";
                 }
                 return false;
             }
-            keys_seen.insert(boost::get<KeyOutput>(out.target).key);
-        } else if (out.target.type() == typeid(MultiSignatureOutput)) {
-            const MultiSignatureOutput &multisignatureOutput =
-                ::boost::get<MultiSignatureOutput>(out.target);
-            if (multisignatureOutput.requiredSignatureCount > multisignatureOutput.keys.size()) {
+            keys_seen.insert(boost::get<FKeyOutput>(out.sTarget).sPublicKey);
+        } else if (out.sTarget.type() == typeid(FMultiSignatureOutput)) {
+            const FMultiSignatureOutput &multisignatureOutput =
+                ::boost::get<FMultiSignatureOutput>(out.sTarget);
+            if (multisignatureOutput.uRequiredSignatureCount > multisignatureOutput.vPublicKeys.size()) {
                 if (error) {
                     *error = "Multisignature output with invalid required signature count";
                 }
                 return false;
             }
-            for (const FPublicKey &key : multisignatureOutput.keys) {
+            for (const FPublicKey &key : multisignatureOutput.vPublicKeys) {
                 if (!checkKey(key)) {
                     if (error) {
                         *error = "Multisignature output with invalid public key";
@@ -446,13 +446,13 @@ bool check_outs_valid(const TransactionPrefix &tx, std::string *error)
     return true;
 }
 
-bool checkMultisignatureInputsDiff(const TransactionPrefix &tx)
+bool checkMultisignatureInputsDiff(const FTransactionPrefix &tx)
 {
     std::set<std::pair<uint64_t, uint32_t>> inputsUsage;
-    for (const auto &inv : tx.inputs) {
-        if (inv.type() == typeid(MultiSignatureInput)) {
-            const MultiSignatureInput & in = ::boost::get<MultiSignatureInput>(inv);
-            if (!inputsUsage.insert(std::make_pair(in.amount, in.outputIndex)).second) {
+    for (const auto &inv : tx.vInputs) {
+        if (inv.type() == typeid(FMultiSignatureInput)) {
+            const FMultiSignatureInput & in = ::boost::get<FMultiSignatureInput>(inv);
+            if (!inputsUsage.insert(std::make_pair(in.uAmount, in.uOutputIndex)).second) {
                 return false;
             }
         }
@@ -460,22 +460,22 @@ bool checkMultisignatureInputsDiff(const TransactionPrefix &tx)
     return true;
 }
 
-bool check_money_overflow(const TransactionPrefix &tx)
+bool check_money_overflow(const FTransactionPrefix &tx)
 {
     return check_inputs_overflow(tx) && check_outs_overflow(tx);
 }
 
-bool check_inputs_overflow(const TransactionPrefix &tx)
+bool check_inputs_overflow(const FTransactionPrefix &tx)
 {
     uint64_t money = 0;
 
-    for (const auto &in : tx.inputs) {
+    for (const auto &in : tx.vInputs) {
         uint64_t amount = 0;
 
-        if (in.type() == typeid(KeyInput)) {
-            amount = boost::get<KeyInput>(in).amount;
-        } else if (in.type() == typeid(MultiSignatureInput)) {
-            amount = boost::get<MultiSignatureInput>(in).amount;
+        if (in.type() == typeid(FKeyInput)) {
+            amount = boost::get<FKeyInput>(in).uAmount;
+        } else if (in.type() == typeid(FMultiSignatureInput)) {
+            amount = boost::get<FMultiSignatureInput>(in).uAmount;
         }
 
         if (money > amount + money) {
@@ -487,23 +487,23 @@ bool check_inputs_overflow(const TransactionPrefix &tx)
     return true;
 }
 
-bool check_outs_overflow(const TransactionPrefix &tx)
+bool check_outs_overflow(const FTransactionPrefix &tx)
 {
     uint64_t money = 0;
-    for (const auto& o : tx.outputs) {
-        if (money > o.amount + money) {
+    for (const auto& o : tx.vOutputs) {
+        if (money > o.uAmount + money) {
             return false;
         }
-        money += o.amount;
+        money += o.uAmount;
     }
     return true;
 }
 
-uint64_t getOutsMoneyAmount(const Transaction &tx)
+uint64_t getOutsMoneyAmount(const FTransaction &tx)
 {
     uint64_t outputs_amount = 0;
-    for (const auto &o : tx.outputs) {
-        outputs_amount += o.amount;
+    for (const auto &o : tx.vOutputs) {
+        outputs_amount += o.uAmount;
     }
     return outputs_amount;
 }
@@ -521,34 +521,34 @@ std::string short_hash_str(const FHash &h)
 }
 
 bool is_out_to_acc(
-    const AccountKeys &acc,
-    const KeyOutput &out_key,
+    const FAccountKeys &acc,
+    const FKeyOutput &out_key,
     const FKeyDerivation &derivation,
     size_t keyIndex)
 {
     FPublicKey pk;
-    derivePublicKey(derivation, keyIndex, acc.address.spendPublicKey, pk);
-    return pk == out_key.key;
+    derivePublicKey(derivation, keyIndex, acc.sAddress.sSpendPublicKey, pk);
+    return pk == out_key.sPublicKey;
 }
 
 bool is_out_to_acc(
-    const AccountKeys &acc,
-    const KeyOutput &out_key,
+    const FAccountKeys &acc,
+    const FKeyOutput &out_key,
     const FPublicKey &tx_pub_key,
     size_t keyIndex)
 {
     FKeyDerivation derivation;
-    generateKeyDerivation(tx_pub_key, acc.viewSecretKey, derivation);
+    generateKeyDerivation(tx_pub_key, acc.sViewSecretKey, derivation);
     return is_out_to_acc(acc, out_key, derivation, keyIndex);
 }
 
 bool lookup_acc_outs(
-    const AccountKeys &acc,
-    const Transaction &tx,
+    const FAccountKeys &acc,
+    const FTransaction &tx,
     std::vector<size_t> &outs,
     uint64_t &money_transfered)
 {
-    FPublicKey transactionPublicKey = getTransactionPublicKeyFromExtra(tx.extra);
+    FPublicKey transactionPublicKey = getTransactionPublicKeyFromExtra(tx.vExtra);
     if (transactionPublicKey == NULL_PUBLIC_KEY) {
         return false;
     }
@@ -556,8 +556,8 @@ bool lookup_acc_outs(
 }
 
 bool lookup_acc_outs(
-    const AccountKeys &acc,
-    const Transaction &tx,
+    const FAccountKeys &acc,
+    const FTransaction &tx,
     const FPublicKey &tx_pub_key,
     std::vector<size_t> &outs,
     uint64_t &money_transfered)
@@ -567,21 +567,21 @@ bool lookup_acc_outs(
     size_t outputIndex = 0;
 
     FKeyDerivation derivation;
-    generateKeyDerivation(tx_pub_key, acc.viewSecretKey, derivation);
+    generateKeyDerivation(tx_pub_key, acc.sViewSecretKey, derivation);
 
-    for (const TransactionOutput &o : tx.outputs) {
-        assert(o.target.type() == typeid(KeyOutput)
-               || o.target.type() == typeid(MultiSignatureOutput));
+    for (const FTransactionOutput &o : tx.vOutputs) {
+        assert(o.sTarget.type() == typeid(FKeyOutput)
+               || o.sTarget.type() == typeid(FMultiSignatureOutput));
 
-        if (o.target.type() == typeid(KeyOutput)) {
-            if (is_out_to_acc(acc, boost::get<KeyOutput>(o.target), derivation, keyIndex)) {
+        if (o.sTarget.type() == typeid(FKeyOutput)) {
+            if (is_out_to_acc(acc, boost::get<FKeyOutput>(o.sTarget), derivation, keyIndex)) {
                 outs.push_back(outputIndex);
-                money_transfered += o.amount;
+                money_transfered += o.uAmount;
             }
 
             ++keyIndex;
-        } else if (o.target.type() == typeid(MultiSignatureOutput)) {
-            keyIndex += boost::get<MultiSignatureOutput>(o.target).keys.size();
+        } else if (o.sTarget.type() == typeid(FMultiSignatureOutput)) {
+            keyIndex += boost::get<FMultiSignatureOutput>(o.sTarget).vPublicKeys.size();
         }
 
         ++outputIndex;
@@ -589,21 +589,21 @@ bool lookup_acc_outs(
     return true;
 }
 
-bool get_block_hashing_blob(const Block &b, BinaryArray &ba)
+bool get_block_hashing_blob(const FBlock &b, BinaryArray &ba)
 {
-    if (!toBinaryArray(static_cast<const BlockHeader &>(b), ba)) {
+    if (!toBinaryArray(static_cast<const FBlockHeader &>(b), ba)) {
         return false;
     }
 
     FHash treeRootHash = get_tx_tree_hash(b);
     ba.insert(ba.end(), treeRootHash.uData, treeRootHash.uData + 32);
-    auto transactionCount = asBinaryArray(Tools::getVarintData(b.transactionHashes.size() + 1));
+    auto transactionCount = asBinaryArray(Tools::getVarintData(b.vTransactionHashes.size() + 1));
     ba.insert(ba.end(), transactionCount.begin(), transactionCount.end());
 
     return true;
 }
 
-bool getBlockHash(const Block &b, FHash &res)
+bool getBlockHash(const FBlock &b, FHash &res)
 {
     BinaryArray ba;
     if (!get_block_hashing_blob(b, ba)) {
@@ -613,14 +613,14 @@ bool getBlockHash(const Block &b, FHash &res)
     return getObjectHash(ba, res);
 }
 
-FHash getBlockHash(const Block &b)
+FHash getBlockHash(const FBlock &b)
 {
     FHash p = NULL_HASH;
     getBlockHash(b, p);
     return p;
 }
 
-bool getBlockLongHash(CnContext &context, const Block &b, FHash &res)
+bool getBlockLongHash(CnContext &context, const FBlock &b, FHash &res)
 {
     BinaryArray bd;
     if (!get_block_hashing_blob(b, bd)) {
@@ -668,13 +668,13 @@ FHash get_tx_tree_hash(const std::vector<FHash> &tx_hashes)
     return h;
 }
 
-FHash get_tx_tree_hash(const Block &b)
+FHash get_tx_tree_hash(const FBlock &b)
 {
     std::vector<FHash> txs_ids;
     FHash h = NULL_HASH;
-    getObjectHash(b.baseTransaction, h);
+    getObjectHash(b.sBaseTransaction, h);
     txs_ids.push_back(h);
-    for (auto &th : b.transactionHashes) {
+    for (auto &th : b.vTransactionHashes) {
         txs_ids.push_back(th);
     }
     return get_tx_tree_hash(txs_ids);

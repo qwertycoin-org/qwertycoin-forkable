@@ -72,13 +72,13 @@ public:
     const Currency &currency() const { return m_currency; }
 
     // IMinerHandler
-    bool handle_block_found(Block &b) override;
+    bool handle_block_found(FBlock &b) override;
     bool get_block_template(
-        Block &b,
-        const AccountPublicAddress &adr,
-        difficulty_type &diffic,
-        uint32_t &height,
-        const BinaryArray &ex_nonce) override;
+			FBlock &b,
+			const FAccountPublicAddress &adr,
+			difficulty_type &diffic,
+			uint32_t &height,
+			const BinaryArray &ex_nonce) override;
     bool get_difficulty_stat(
         uint32_t height,
         stat_period period,
@@ -97,7 +97,7 @@ public:
 
     static void init_options(boost::program_options::options_description &desc);
     bool init(const CoreConfig &config, const MinerConfig &minerConfig, bool load_existing);
-    bool set_genesis_block(const Block &b);
+    bool set_genesis_block(const FBlock &b);
     bool deinit();
 
     // ICore
@@ -122,7 +122,7 @@ public:
         uint32_t height,
         uint64_t blockTarget = QwertyNote::parameters::DIFFICULTY_TARGET) override;
     bool scanOutputkeysForIndices(
-        const KeyInput &txInToKey,
+        const FKeyInput &txInToKey,
         std::list<std::pair<Crypto::FHash, size_t>> &outputReferences) override;
     bool getBlockDifficulty(uint32_t height, difficulty_type &difficulty) override;
     bool getBlockCumulativeDifficulty(uint32_t height, difficulty_type &difficulty) override;
@@ -131,31 +131,31 @@ public:
         Crypto::FHash &blockId,
         uint32_t &blockHeight) override;
     bool getMultisigOutputReference(
-        const MultiSignatureInput &txInMultisig,
+        const FMultiSignatureInput &txInMultisig,
         std::pair<Crypto::FHash, size_t> &output_reference) override;
     bool getGeneratedTransactionsNumber(uint32_t height, uint64_t &generatedTransactions) override;
-    bool getOrphanBlocksByHeight(uint32_t height, std::vector<Block> &blocks) override;
+    bool getOrphanBlocksByHeight(uint32_t height, std::vector<FBlock> &blocks) override;
     bool getBlocksByTimestamp(
         uint64_t timestampBegin,
         uint64_t timestampEnd,
         uint32_t blocksNumberLimit,
-        std::vector<Block> &blocks,
+        std::vector<FBlock> &blocks,
         uint32_t &blocksNumberWithinTimestamps) override;
     bool getPoolTransactionsByTimestamp(
         uint64_t timestampBegin,
         uint64_t timestampEnd,
         uint32_t transactionsNumberLimit,
-        std::vector<Transaction> &transactions,
+        std::vector<FTransaction> &transactions,
         uint64_t &transactionsNumberWithinTimestamps) override;
     bool getTransactionsByPaymentId(
         const Crypto::FHash &paymentId,
-        std::vector<Transaction> &transactions) override;
+        std::vector<FTransaction> &transactions) override;
     std::vector<Crypto::FHash> getTransactionHashesByPaymentId(
         const Crypto::FHash &paymentId) override;
-    bool getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, MultiSignatureOutput &out) override;
+    bool getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, FMultiSignatureOutput &out) override;
     std::unique_ptr<IBlock> getBlock(const Crypto::FHash &blocksId) override;
     bool handleIncomingTransaction(
-        const Transaction &tx,
+        const FTransaction &tx,
         const Crypto::FHash &txHash,
         size_t blobSize,
         tx_verification_context &tvc,
@@ -176,7 +176,7 @@ public:
     uint8_t getCurrentBlockMajorVersion() override;
     uint8_t getBlockMajorVersionForHeight(uint32_t height) override;
 
-    static bool getPaymentId(const Transaction &transaction, Crypto::FHash &paymentId);
+    static bool getPaymentId(const FTransaction &transaction, Crypto::FHash &paymentId);
 
     bool have_block(const Crypto::FHash &id) override;
     std::vector<Crypto::FHash> buildSparseChain() override;
@@ -187,9 +187,9 @@ public:
     bool get_blocks(
         uint32_t start_offset,
         uint32_t count,
-        std::list<Block> &blocks,
-        std::list<Transaction> &txs);
-    bool get_blocks(uint32_t start_offset, uint32_t count, std::list<Block> &blocks);
+        std::list<FBlock> &blocks,
+        std::list<FTransaction> &txs);
+    bool get_blocks(uint32_t start_offset, uint32_t count, std::list<FBlock> &blocks);
 
     template<class T, class D, class S>
     bool get_blocks(const T &block_ids, D &blocks, S &missed_bs)
@@ -224,17 +224,17 @@ public:
     Crypto::FHash getBlockIdByHeight(uint32_t height) override;
     void getTransactions(
         const std::vector<Crypto::FHash> &txs_ids,
-        std::list<Transaction> &txs,
+        std::list<FTransaction> &txs,
         std::list<Crypto::FHash> &missed_txs,
         bool checkTxPool = false) override;
     bool getTransactionsWithOutputGlobalIndexes(const std::vector<Crypto::FHash> &txsIds,
 												std::list<Crypto::FHash> &missedTxs,
-												std::vector<std::pair<Transaction,
+												std::vector<std::pair<FTransaction,
 																	  std::vector<uint32_t>>> &txs) override;
-    bool getBlockByHash(const Crypto::FHash &h, Block &blk) override;
+    bool getBlockByHash(const Crypto::FHash &h, FBlock &blk) override;
     bool getBlockHeight(const Crypto::FHash &blockId, uint32_t &blockHeight) override;
 
-    bool getAlternativeBlocks(std::list<Block> &blocks);
+    bool getAlternativeBlocks(std::list<FBlock> &blocks);
     size_t getAlternativeBlocksCount();
 
     virtual bool getBlockEntry(uint32_t height,
@@ -248,7 +248,7 @@ public:
     void set_cryptonote_protocol(i_cryptonote_protocol *pprotocol);
     void set_checkpoints(Checkpoints &&chk_pts);
 
-    std::vector<Transaction> getPoolTransactions() override;
+    std::vector<FTransaction> getPoolTransactions() override;
     size_t get_pool_transactions_count();
     size_t get_blockchain_total_transactions();
 
@@ -281,7 +281,7 @@ public:
     bool getPoolChanges(
         const Crypto::FHash &tailBlockId,
         const std::vector<Crypto::FHash> &knownTxsIds,
-        std::vector<Transaction> &addedTxs,
+        std::vector<FTransaction> &addedTxs,
         std::vector<Crypto::FHash> &deletedTxsIds) override;
     bool getPoolChangesLite(
         const Crypto::FHash &tailBlockId,
@@ -290,7 +290,7 @@ public:
         std::vector<Crypto::FHash> &deletedTxsIds) override;
     void getPoolChanges(
         const std::vector<Crypto::FHash> &knownTxsIds,
-        std::vector<Transaction> &addedTxs,
+        std::vector<FTransaction> &addedTxs,
         std::vector<Crypto::FHash> &deletedTxsIds) override;
 
     void rollbackBlockchain(uint32_t height) override;
@@ -298,7 +298,7 @@ public:
     uint64_t getNextBlockDifficulty(uint64_t nextBlockTime);
     uint64_t getTotalGeneratedAmount();
     uint8_t getBlockMajorVersionForHeight(uint32_t height) const;
-    bool getMixin(const Transaction &transaction, uint64_t &mixin);
+    bool getMixin(const FTransaction &transaction, uint64_t &mixin);
 
     bool is_key_image_spent(const Crypto::FKeyImage &key_im);
 
@@ -306,41 +306,41 @@ public:
 
 private:
     bool add_new_tx(
-        const Transaction &tx,
+        const FTransaction &tx,
         const Crypto::FHash &tx_hash,
         size_t blob_size,
         tx_verification_context &tvc,
         bool keeped_by_block);
     bool load_state_data();
     bool parse_tx_from_blob(
-        Transaction &tx,
-        Crypto::FHash &tx_hash,
-        Crypto::FHash &tx_prefix_hash,
-        const BinaryArray &blob);
+			FTransaction &tx,
+			Crypto::FHash &tx_hash,
+			Crypto::FHash &tx_prefix_hash,
+			const BinaryArray &blob);
     bool handle_incoming_block(
-        const Block &b,
+        const FBlock &b,
         block_verification_context &bvc,
         bool control_miner,
         bool relay_block);
 
-    bool check_tx_syntax(const Transaction &tx);
+    bool check_tx_syntax(const FTransaction &tx);
     // check correct values, amounts and all lightweight checks not related with database
-    bool check_tx_semantic(const Transaction &tx, bool keeped_by_block);
+    bool check_tx_semantic(const FTransaction &tx, bool keeped_by_block);
     // check if tx already in memory pool or in main blockchain
-    bool check_tx_mixin(const Transaction &tx, uint32_t height);
+    bool check_tx_mixin(const FTransaction &tx, uint32_t height);
     // check if the mixin is not too large
     bool check_tx_fee(
-        const Transaction &tx,
+        const FTransaction &tx,
         size_t blobSize,
         tx_verification_context &tvc,
         uint32_t height,
         bool loose_check);
     // check if tx is not sending unmixable outputs
-    bool check_tx_unmixable(const Transaction &tx, uint32_t height);
+    bool check_tx_unmixable(const FTransaction &tx, uint32_t height);
 
     bool update_miner_block_template();
     bool handle_command_line(const boost::program_options::variables_map &vm);
-    bool check_tx_inputs_keyimages_diff(const Transaction &tx);
+    bool check_tx_inputs_keyimages_diff(const FTransaction &tx);
     void blockchainUpdated() override;
     void txDeletedFromPool() override;
     void poolUpdated();

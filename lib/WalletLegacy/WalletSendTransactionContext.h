@@ -38,8 +38,8 @@ struct TxDustPolicy
     explicit TxDustPolicy(
         uint64_t a_dust_threshold = 0,
         bool an_add_to_fee = true,
-            QwertyNote::AccountPublicAddress
-        an_addr_for_dust = QwertyNote::AccountPublicAddress())
+            QwertyNote::FAccountPublicAddress
+        an_addr_for_dust = QwertyNote::FAccountPublicAddress())
         : dustThreshold(a_dust_threshold),
           addToFee(an_add_to_fee),
           addrForDust(an_addr_for_dust)
@@ -48,7 +48,7 @@ struct TxDustPolicy
 
     uint64_t dustThreshold;
     bool addToFee;
-    QwertyNote::AccountPublicAddress addrForDust;
+    QwertyNote::FAccountPublicAddress addrForDust;
 };
 
 struct SendTransactionContext

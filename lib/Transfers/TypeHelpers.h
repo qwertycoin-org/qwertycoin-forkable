@@ -25,9 +25,9 @@
 
 namespace QwertyNote {
 
-inline bool operator==(const AccountPublicAddress &_v1, const AccountPublicAddress &_v2)
+inline bool operator==(const FAccountPublicAddress &_v1, const FAccountPublicAddress &_v2)
 {
-    return memcmp(&_v1, &_v2, sizeof(AccountPublicAddress)) == 0;
+    return memcmp(&_v1, &_v2, sizeof(FAccountPublicAddress)) == 0;
 }
 
 } // namespace QwertyNote
@@ -35,12 +35,12 @@ inline bool operator==(const AccountPublicAddress &_v1, const AccountPublicAddre
 namespace std {
 
 template<>
-struct hash <QwertyNote::AccountPublicAddress>
+struct hash <QwertyNote::FAccountPublicAddress>
 {
-    size_t operator()(const QwertyNote::AccountPublicAddress &val) const
+    size_t operator()(const QwertyNote::FAccountPublicAddress &val) const
     {
-        size_t spend = *(reinterpret_cast<const size_t *>(&val.spendPublicKey));
-        size_t view = *(reinterpret_cast<const size_t *>(&val.viewPublicKey));
+        size_t spend = *(reinterpret_cast<const size_t *>(&val.sSpendPublicKey));
+        size_t view = *(reinterpret_cast<const size_t *>(&val.sViewPublicKey));
         return spend ^ view;
     }
 };

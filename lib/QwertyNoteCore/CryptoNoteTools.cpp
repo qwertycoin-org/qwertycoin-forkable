@@ -49,41 +49,41 @@ Crypto::FHash getBinaryArrayHash(const BinaryArray &binaryArray)
     return hash;
 }
 
-uint64_t getInputAmount(const Transaction &transaction)
+uint64_t getInputAmount(const FTransaction &transaction)
 {
     uint64_t amount = 0;
-    for (auto &input : transaction.inputs) {
-        if (input.type() == typeid(KeyInput)) {
-            amount += boost::get<KeyInput>(input).amount;
-        } else if (input.type() == typeid(MultiSignatureInput)) {
-            amount += boost::get<MultiSignatureInput>(input).amount;
+    for (auto &input : transaction.vInputs) {
+        if (input.type() == typeid(FKeyInput)) {
+            amount += boost::get<FKeyInput>(input).uAmount;
+        } else if (input.type() == typeid(FMultiSignatureInput)) {
+            amount += boost::get<FMultiSignatureInput>(input).uAmount;
         }
     }
 
     return amount;
 }
 
-std::vector<uint64_t> getInputsAmounts(const Transaction &transaction)
+std::vector<uint64_t> getInputsAmounts(const FTransaction &transaction)
 {
     std::vector<uint64_t> inputsAmounts;
-    inputsAmounts.reserve(transaction.inputs.size());
+    inputsAmounts.reserve(transaction.vInputs.size());
 
-    for (auto &input: transaction.inputs) {
-        if (input.type() == typeid(KeyInput)) {
-            inputsAmounts.push_back(boost::get<KeyInput>(input).amount);
-        } else if (input.type() == typeid(MultiSignatureInput)) {
-            inputsAmounts.push_back(boost::get<MultiSignatureInput>(input).amount);
+    for (auto &input: transaction.vInputs) {
+        if (input.type() == typeid(FKeyInput)) {
+            inputsAmounts.push_back(boost::get<FKeyInput>(input).uAmount);
+        } else if (input.type() == typeid(FMultiSignatureInput)) {
+            inputsAmounts.push_back(boost::get<FMultiSignatureInput>(input).uAmount);
         }
     }
 
     return inputsAmounts;
 }
 
-uint64_t getOutputAmount(const Transaction &transaction)
+uint64_t getOutputAmount(const FTransaction &transaction)
 {
     uint64_t amount = 0;
-    for (auto &output : transaction.outputs) {
-        amount += output.amount;
+    for (auto &output : transaction.vOutputs) {
+        amount += output.uAmount;
     }
 
     return amount;

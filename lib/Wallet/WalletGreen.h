@@ -73,10 +73,10 @@ public:
 
     size_t getAddressCount() const override;
     std::string getAddress(size_t index) const override;
-    AccountPublicAddress getAccountPublicAddress(size_t index) const override;
-    KeyPair getAddressSpendKey(size_t index) const override;
-    KeyPair getAddressSpendKey(const std::string& address) const override;
-    KeyPair getViewKey() const override;
+    FAccountPublicAddress getAccountPublicAddress(size_t index) const override;
+    FKeyPair getAddressSpendKey(size_t index) const override;
+    FKeyPair getAddressSpendKey(const std::string& address) const override;
+    FKeyPair getViewKey() const override;
     std::string createAddress() override;
     std::string createAddress(const Crypto::FSecretKey &spendSecretKey, bool reset = true) override;
     std::string createAddress(const Crypto::FPublicKey &spendPublicKey) override;
@@ -198,7 +198,7 @@ protected:
     {
         TransactionTypes::InputKeyInfo keyInfo;
         WalletRecord *walletRecord = nullptr;
-        KeyPair ephKeys;
+        FKeyPair ephKeys;
     };
 
     struct OutputToTransfer
@@ -209,7 +209,7 @@ protected:
 
     struct ReceiverAmounts
     {
-        QwertyNote::AccountPublicAddress receiver;
+        QwertyNote::FAccountPublicAddress receiver;
         std::vector<uint64_t> amounts;
     };
 
@@ -302,12 +302,12 @@ protected:
     const WalletRecord &getWalletRecord(const std::string &address) const;
     const WalletRecord &getWalletRecord(QwertyNote::ITransfersContainer *container) const;
 
-    QwertyNote::AccountPublicAddress parseAddress(const std::string &address) const;
+    QwertyNote::FAccountPublicAddress parseAddress(const std::string &address) const;
     std::string addWallet(
         const Crypto::FPublicKey &spendPublicKey,
         const Crypto::FSecretKey &spendSecretKey,
         uint64_t creationTimestamp);
-    AccountKeys makeAccountKeys(const WalletRecord &wallet) const;
+    FAccountKeys makeAccountKeys(const WalletRecord &wallet) const;
     size_t getTransactionId(const Crypto::FHash &transactionHash) const;
     void pushEvent(const WalletEvent &event);
     bool isFusionTransaction(const WalletTransaction &walletTx) const;
@@ -328,7 +328,7 @@ protected:
         const std::string &extra,
         uint64_t unlockTimestamp,
         const DonationSettings &donation,
-        const QwertyNote::AccountPublicAddress &changeDestinationAddress,
+        const QwertyNote::FAccountPublicAddress &changeDestinationAddress,
         PreparedTransaction &preparedTransaction,
         Crypto::FSecretKey &txSecretKey);
 
@@ -344,7 +344,7 @@ protected:
     uint64_t countNeededMoney(
         const std::vector<QwertyNote::WalletTransfer> &destinations,
         uint64_t fee) const;
-    QwertyNote::AccountPublicAddress parseAccountAddressString(
+    QwertyNote::FAccountPublicAddress parseAccountAddressString(
         const std::string &addressString) const;
     uint64_t pushDonationTransferIfPossible(
         const DonationSettings &donation,
@@ -384,7 +384,7 @@ protected:
         const Currency &currency);
     ReceiverAmounts splitAmount(
         uint64_t amount,
-        const AccountPublicAddress &destination,
+        const FAccountPublicAddress &destination,
         uint64_t dustThreshold);
 
     std::unique_ptr<QwertyNote::ITransaction> makeTransaction(
@@ -394,7 +394,7 @@ protected:
         uint64_t unlockTimestamp,
         Crypto::FSecretKey &txSecretKey);
 
-    void sendTransaction(const QwertyNote::Transaction &cryptoNoteTransaction);
+    void sendTransaction(const QwertyNote::FTransaction &cryptoNoteTransaction);
     size_t validateSaveAndSendTransaction(
         const ITransactionReader &transaction,
         const std::vector<WalletTransfer> &destinations,
@@ -508,7 +508,7 @@ protected:
         size_t minInputCount,
         size_t maxInputCount);
     static ReceiverAmounts decomposeFusionOutputs(
-        const AccountPublicAddress &address,
+        const FAccountPublicAddress &address,
         uint64_t inputsAmount);
 
     enum class WalletState
@@ -538,7 +538,7 @@ protected:
       WalletTransfers &transfers,
       std::function<bool (const WalletTransaction &)> &&pred) const;
   void initBlockchain(const Crypto::FPublicKey &viewPublicKey);
-  QwertyNote::AccountPublicAddress getChangeDestination(
+  QwertyNote::FAccountPublicAddress getChangeDestination(
       const std::string &changeDestinationAddress,
       const std::vector<std::string> &sourceAddresses) const;
   bool isMyAddress(const std::string &address) const;

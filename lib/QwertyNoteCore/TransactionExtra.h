@@ -66,8 +66,8 @@ struct tx_extra_message
     bool encrypt(
         std::size_t index,
         const std::string &message,
-        const AccountPublicAddress *recipient,
-        const KeyPair &txkey
+        const FAccountPublicAddress *recipient,
+        const FKeyPair &txkey
     );
     bool decrypt(
         std::size_t index,
@@ -86,8 +86,8 @@ struct tx_extra_sender
     bool encrypt(
         std::size_t index,
         const std::string &sender,
-        const AccountPublicAddress *recipient,
-        const KeyPair &txkey
+        const FAccountPublicAddress *recipient,
+        const FKeyPair &txkey
     );
     bool decrypt(
         std::size_t index,

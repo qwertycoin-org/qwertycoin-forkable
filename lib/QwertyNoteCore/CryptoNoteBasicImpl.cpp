@@ -75,7 +75,7 @@ uint64_t getPenalizedAmount(uint64_t amount, size_t medianSize, size_t currentBl
     return penalizedAmountLo;
 }
 
-std::string getAccountAddressAsStr(uint64_t prefix, const AccountPublicAddress &adr)
+std::string getAccountAddressAsStr(uint64_t prefix, const FAccountPublicAddress &adr)
 {
     BinaryArray ba;
     bool r = toBinaryArray(adr, ba);
@@ -83,35 +83,35 @@ std::string getAccountAddressAsStr(uint64_t prefix, const AccountPublicAddress &
     return Tools::Base58::encodeAddr(prefix, Common::asString(ba));
 }
 
-bool is_coinbase(const Transaction &tx)
+bool is_coinbase(const FTransaction &tx)
 {
-    if(tx.inputs.size() != 1) {
+    if(tx.vInputs.size() != 1) {
         return false;
     }
 
-    if(tx.inputs[0].type() != typeid(BaseInput)) {
+    if(tx.vInputs[0].type() != typeid(FBaseInput)) {
         return false;
     }
 
     return true;
 }
 
-bool parseAccountAddressString(uint64_t& prefix, AccountPublicAddress& adr, const std::string& str)
+bool parseAccountAddressString(uint64_t& prefix, FAccountPublicAddress& adr, const std::string& str)
 {
     std::string data;
 
     return Tools::Base58::decodeAddr(str, prefix, data)
            && fromBinaryArray(adr, asBinaryArray(data))
-           && checkKey(adr.spendPublicKey)
-           && checkKey(adr.viewPublicKey);
+           && checkKey(adr.sSpendPublicKey)
+           && checkKey(adr.sViewPublicKey);
 }
 
-bool operator ==(const QwertyNote::Transaction &a, const QwertyNote::Transaction &b)
+bool operator ==(const QwertyNote::FTransaction &a, const QwertyNote::FTransaction &b)
 {
     return getObjectHash(a) == getObjectHash(b);
 }
 
-bool operator ==(const QwertyNote::Block &a, const QwertyNote::Block &b)
+bool operator ==(const QwertyNote::FBlock &a, const QwertyNote::FBlock &b)
 {
     return QwertyNote::getBlockHash(a) == QwertyNote::getBlockHash(b);
 }

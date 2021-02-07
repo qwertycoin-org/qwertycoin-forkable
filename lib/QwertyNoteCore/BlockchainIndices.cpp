@@ -39,7 +39,7 @@ PaymentIdIndex::PaymentIdIndex(bool _enabled)
 {
 }
 
-bool PaymentIdIndex::add(const Transaction &transaction)
+bool PaymentIdIndex::add(const FTransaction &transaction)
 {
     if (!enabled) {
         return false;
@@ -56,7 +56,7 @@ bool PaymentIdIndex::add(const Transaction &transaction)
     return true;
 }
 
-bool PaymentIdIndex::remove(const Transaction &transaction)
+bool PaymentIdIndex::remove(const FTransaction &transaction)
 {
     if (!enabled) {
         return false;
@@ -288,13 +288,13 @@ GeneratedTransactionsIndex::GeneratedTransactionsIndex(bool _enabled)
 {
 }
 
-bool GeneratedTransactionsIndex::add(const Block &block)
+bool GeneratedTransactionsIndex::add(const FBlock &block)
 {
     if (!enabled) {
         return false;
     }
 
-    uint32_t blockHeight = boost::get<BaseInput>(block.baseTransaction.inputs.front()).blockIndex;
+    uint32_t blockHeight = boost::get<FBaseInput>(block.sBaseTransaction.vInputs.front()).uBlockIndex;
 
     if (index.size() != blockHeight) {
         return false;
@@ -302,21 +302,21 @@ bool GeneratedTransactionsIndex::add(const Block &block)
 
     bool status = index.emplace(
         blockHeight,
-        lastGeneratedTxNumber + block.transactionHashes.size() + 1).second; // plus miner tx
+		lastGeneratedTxNumber + block.vTransactionHashes.size() + 1).second; // plus miner tx
     if (status) {
-        lastGeneratedTxNumber += block.transactionHashes.size() + 1;
+        lastGeneratedTxNumber += block.vTransactionHashes.size() + 1;
     }
 
     return status;
 }
 
-bool GeneratedTransactionsIndex::remove(const Block &block)
+bool GeneratedTransactionsIndex::remove(const FBlock &block)
 {
     if (!enabled) {
         return false;
     }
 
-    uint32_t blockHeight = boost::get<BaseInput>(block.baseTransaction.inputs.front()).blockIndex;
+    uint32_t blockHeight = boost::get<FBaseInput>(block.sBaseTransaction.vInputs.front()).uBlockIndex;
 
     if (blockHeight != index.size() - 1) {
         return false;
@@ -379,27 +379,27 @@ OrphanBlocksIndex::OrphanBlocksIndex(bool _enabled)
 {
 }
 
-bool OrphanBlocksIndex::add(const Block &block)
+bool OrphanBlocksIndex::add(const FBlock &block)
 {
     if (!enabled) {
         return false;
     }
 
     Crypto::FHash blockHash = getBlockHash(block);
-    uint32_t blockHeight = boost::get<BaseInput>(block.baseTransaction.inputs.front()).blockIndex;
+    uint32_t blockHeight = boost::get<FBaseInput>(block.sBaseTransaction.vInputs.front()).uBlockIndex;
     index.emplace(blockHeight, blockHash);
 
     return true;
 }
 
-bool OrphanBlocksIndex::remove(const Block &block)
+bool OrphanBlocksIndex::remove(const FBlock &block)
 {
     if (!enabled) {
         return false;
     }
 
     Crypto::FHash blockHash = getBlockHash(block);
-    uint32_t blockHeight = boost::get<BaseInput>(block.baseTransaction.inputs.front()).blockIndex;
+    uint32_t blockHeight = boost::get<FBaseInput>(block.sBaseTransaction.vInputs.front()).uBlockIndex;
     auto range = index.equal_range(blockHeight);
     for (auto iter = range.first; iter != range.second; ++iter) {
         if (iter->second == blockHash) {

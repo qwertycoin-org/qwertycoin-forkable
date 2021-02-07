@@ -107,14 +107,14 @@ private:
 
     bool new_wallet(const std::string &wallet_file, const std::string &password);
     bool new_wallet(Crypto::FSecretKey &secret_key, Crypto::FSecretKey &view_key,
-                    const std::string &wallet_file, const std::string &password);
+					const std::string &wallet_file, const std::string &password);
     bool gen_wallet(const std::string &wallet_file, const std::string &password,
                     const Crypto::FSecretKey &recovery_key = Crypto::FSecretKey(),
                     bool recover = false, bool two_random = false);
-    bool new_wallet(AccountKeys &private_key, const std::string &wallet_file,
-                    const std::string &password);
-    bool new_tracking_wallet(AccountKeys &tracking_key, const std::string &wallet_file,
-                             const std::string &password);
+    bool new_wallet(FAccountKeys &private_key, const std::string &wallet_file,
+					const std::string &password);
+    bool new_tracking_wallet(FAccountKeys &tracking_key, const std::string &wallet_file,
+							 const std::string &password);
     bool close_wallet();
 
     bool help(const std::vector<std::string> &args = std::vector<std::string>());

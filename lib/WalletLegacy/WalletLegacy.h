@@ -81,7 +81,7 @@ public:
     void initAndGenerate(const std::string &password) override;
     void initAndGenerateDeterministic(const std::string &password) override;
     void initAndLoad(std::istream &source, const std::string &password) override;
-    void initWithKeys(const AccountKeys &accountKeys, const std::string &password) override;
+    void initWithKeys(const FAccountKeys &accountKeys, const std::string &password) override;
     void shutdown() override;
     void rescan() override;
     void purge() override;
@@ -116,13 +116,13 @@ public:
     bool getTransfer(TransferId transferId, WalletLegacyTransfer &transfer) override;
     std::vector<Payments> getTransactionsByPaymentIds(const std::vector<PaymentId> &paymentIds) const override;
     bool getTxProof(
-			Crypto::FHash &txid, QwertyNote::AccountPublicAddress &address,
+			Crypto::FHash &txid, QwertyNote::FAccountPublicAddress &address,
 			Crypto::FSecretKey &tx_key,
 			std::string &sig_str) override;
     std::string getReserveProof(const uint64_t &reserve, const std::string &message) override;
     Crypto::FSecretKey getTxKey(Crypto::FHash &txid) override;
     bool get_tx_key(Crypto::FHash &txid, Crypto::FSecretKey &txSecretKey) override;
-    void getAccountKeys(AccountKeys &keys) override;
+    void getAccountKeys(FAccountKeys &keys) override;
     bool getSeed(std::string &electrum_words) override;
 
     TransactionId sendTransaction(
@@ -166,7 +166,7 @@ public:
 
     std::string sign_message(const std::string &data) override;
     bool verify_message(const std::string &data,
-                        const QwertyNote::AccountPublicAddress &address,
+                        const QwertyNote::FAccountPublicAddress &address,
                         const std::string &signature) override;
 
     bool isTrackingWallet() override;

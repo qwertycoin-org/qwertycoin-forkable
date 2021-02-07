@@ -145,7 +145,7 @@ public:
 
     bool isTestnet() const { return m_testnet; }
 
-    const Block &genesisBlock() const { return m_genesisBlock; }
+    const FBlock &genesisBlock() const { return m_genesisBlock; }
     const Crypto::FHash &genesisBlockHash() const { return m_genesisBlockHash; }
 
     uint64_t getBaseReward(uint64_t alreadyGeneratedCoins, uint32_t height) const;
@@ -162,20 +162,20 @@ public:
     size_t maxBlockCumulativeSize(uint64_t height) const;
 
     bool constructMinerTx(
-        uint8_t blockMajorVersion,
-        uint32_t height,
-        size_t medianSize,
-        uint64_t alreadyGeneratedCoins,
-        size_t currentBlockSize,
-        uint64_t fee,
-        const AccountPublicAddress &minerAddress,
-        Transaction &tx,
-        const BinaryArray &extraNonce = BinaryArray(),
-        size_t maxOuts = 1,
-        uint64_t blockTarget = 0xffffffffffffffff) const;
+			uint8_t blockMajorVersion,
+			uint32_t height,
+			size_t medianSize,
+			uint64_t alreadyGeneratedCoins,
+			size_t currentBlockSize,
+			uint64_t fee,
+			const FAccountPublicAddress &minerAddress,
+			FTransaction &tx,
+			const BinaryArray &extraNonce = BinaryArray(),
+			size_t maxOuts = 1,
+			uint64_t blockTarget = 0xffffffffffffffff) const;
 
-    bool isFusionTransaction(const Transaction& transaction, uint32_t height) const;
-    bool isFusionTransaction(const Transaction& transaction, size_t size, uint32_t height) const;
+    bool isFusionTransaction(const FTransaction& transaction, uint32_t height) const;
+    bool isFusionTransaction(const FTransaction& transaction, size_t size, uint32_t height) const;
     bool isFusionTransaction(
         const std::vector<uint64_t> &inputsAmounts,
         const std::vector<uint64_t> &outputsAmounts,
@@ -192,8 +192,8 @@ public:
         uint32_t height) const;
 
     std::string accountAddressAsString(const AccountBase &account) const;
-    std::string accountAddressAsString(const AccountPublicAddress &accountPublicAddress) const;
-    bool parseAccountAddressString(const std::string &str, AccountPublicAddress &addr) const;
+    std::string accountAddressAsString(const FAccountPublicAddress &accountPublicAddress) const;
+    bool parseAccountAddressString(const std::string &str, FAccountPublicAddress &addr) const;
 
     std::string formatAmount(uint64_t amount) const;
     std::string formatAmount(int64_t amount) const;
@@ -218,7 +218,7 @@ public:
 
     bool checkProofOfWork(
         Crypto::CnContext &context,
-        const Block &block,
+        const FBlock &block,
         difficulty_type currentDiffic,
         Crypto::FHash &proofOfWork) const;
 
@@ -228,9 +228,9 @@ public:
         size_t mixinCount) const;
 
     bool isGovernanceEnabled(uint32_t height) const;
-    bool getGovernanceAddressAndKey(AccountKeys& m_account_keys) const;
+    bool getGovernanceAddressAndKey(FAccountKeys& m_account_keys) const;
     uint64_t getGovernanceReward(uint64_t base_reward) const;
-    bool validateGovernmentFee(const Transaction& baseTx) const;
+    bool validateGovernmentFee(const FTransaction& baseTx) const;
 
     static const std::vector<uint64_t> PRETTY_AMOUNTS;
 
@@ -318,7 +318,7 @@ private:
 
     bool m_testnet;
 
-    Block m_genesisBlock;
+    FBlock m_genesisBlock;
     Crypto::FHash m_genesisBlockHash;
 
     Logging::LoggerRef logger;
@@ -339,7 +339,7 @@ public:
         return m_currency;
     }
 
-    Transaction generateGenesisTransaction();
+    FTransaction generateGenesisTransaction();
     CurrencyBuilder &maxBlockNumber(uint64_t val)
     {
         m_currency.m_maxBlockHeight = val;

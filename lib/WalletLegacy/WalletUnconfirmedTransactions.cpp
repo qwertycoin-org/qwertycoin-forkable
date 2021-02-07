@@ -73,7 +73,7 @@ void WalletUnconfirmedTransactions::erase(const FHash &hash)
 }
 
 void WalletUnconfirmedTransactions::add(
-    const Transaction &tx,
+    const FTransaction &tx,
     TransactionId transactionId,
     uint64_t amount,
     const std::list<FTransactionOutputInformation> &usedOutputs,

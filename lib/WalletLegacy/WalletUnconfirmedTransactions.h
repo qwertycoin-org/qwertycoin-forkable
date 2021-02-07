@@ -65,7 +65,7 @@ struct UnconfirmedTransferDetails
     {
     }
 
-    QwertyNote::Transaction tx;
+    QwertyNote::FTransaction tx;
     uint64_t amount;
     uint64_t outsAmount;
     time_t sentTime;
@@ -92,7 +92,7 @@ public:
 
     bool findTransactionId(const Crypto::FHash &hash, TransactionId &id);
     void erase(const Crypto::FHash &hash);
-    void add(const QwertyNote::Transaction &tx,
+    void add(const QwertyNote::FTransaction &tx,
              TransactionId transactionId,
              uint64_t amount,
              const std::list<FTransactionOutputInformation> &usedOutputs,

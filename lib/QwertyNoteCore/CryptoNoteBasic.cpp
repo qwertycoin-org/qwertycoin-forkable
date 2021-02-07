@@ -22,11 +22,11 @@
 
 namespace QwertyNote {
 
-KeyPair generateKeyPair()
+FKeyPair generateKeyPair()
 {
-    KeyPair k;
+    FKeyPair k;
 
-    Crypto::generateKeys(k.publicKey, k.secretKey);
+    Crypto::generateKeys(k.sPublicKey, k.sSecretKey);
 
     return k;
 }

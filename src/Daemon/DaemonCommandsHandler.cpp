@@ -313,7 +313,7 @@ bool DaemonCommandsHandler::generate_blocks(const std::vector<std::string> &args
         return true;
     }
 
-    QwertyNote::AccountPublicAddress adr;
+    QwertyNote::FAccountPublicAddress adr;
     if (!m_core.currency().parseAccountAddressString(args.front(), adr)) {
         std::cout << "target account address has wrong format" << std::endl;
         return true;
@@ -470,7 +470,7 @@ bool DaemonCommandsHandler::set_log(const std::vector<std::string> &args)
 
 bool DaemonCommandsHandler::print_block_by_height(uint32_t height)
 {
-    std::list<QwertyNote::Block> blocks;
+    std::list<QwertyNote::FBlock> blocks;
     m_core.get_blocks(height, 1, blocks);
 
     if (1 == blocks.size()) {
@@ -499,7 +499,7 @@ bool DaemonCommandsHandler::print_block_by_hash(const std::string &arg)
 
     std::list<Crypto::FHash> block_ids;
     block_ids.push_back(block_hash);
-    std::list<QwertyNote::Block> blocks;
+    std::list<QwertyNote::FBlock> blocks;
     std::list<Crypto::FHash> missed_ids;
     m_core.get_blocks(block_ids, blocks, missed_ids);
 
@@ -546,7 +546,7 @@ bool DaemonCommandsHandler::print_tx(const std::vector<std::string> &args)
 
     std::vector<Crypto::FHash> tx_ids;
     tx_ids.push_back(tx_hash);
-    std::list<QwertyNote::Transaction> txs;
+    std::list<QwertyNote::FTransaction> txs;
     std::list<Crypto::FHash> missed_ids;
     m_core.getTransactions(tx_ids, txs, missed_ids, true);
 
@@ -868,7 +868,7 @@ bool DaemonCommandsHandler::start_mining(const std::vector<std::string> &args)
         return true;
     }
 
-    QwertyNote::AccountPublicAddress adr;
+    QwertyNote::FAccountPublicAddress adr;
     if (!m_core.currency().parseAccountAddressString(args.front(), adr)) {
         std::cout << "target account address has wrong format" << std::endl;
         return true;

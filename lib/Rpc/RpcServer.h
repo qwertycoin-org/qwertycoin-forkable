@@ -68,7 +68,7 @@ public:
 
     bool restrictRPC(const bool is_resctricted);
     bool enableCors(const std::string domain);
-    bool setFeeAddress(const std::string &fee_address, const AccountPublicAddress &fee_acc);
+    bool setFeeAddress(const std::string &fee_address, const FAccountPublicAddress &fee_acc);
     bool setViewKey(const std::string &view_key);
     bool setContactInfo(const std::string &contact);
     bool masternodeCheckIncomingTx(const BinaryArray &tx_blob);
@@ -202,9 +202,9 @@ private:
     bool onGetBlockHeaderByHeight(const COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::request &req,
                                   COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::response &res);
 
-    void fillBlockHeaderResponse(const Block &blk, bool orphan_status, uint64_t height,
-                                 const Crypto::FHash &hash,
-                                 BLOCK_HEADER_RESPONSE_ENTRY &responseEntry);
+    void fillBlockHeaderResponse(const FBlock &blk, bool orphan_status, uint64_t height,
+								 const Crypto::FHash &hash,
+								 BLOCK_HEADER_RESPONSE_ENTRY &responseEntry);
 
     bool onBlocksListJson(const COMMAND_RPC_GET_BLOCKS_LIST::request &req,
                           COMMAND_RPC_GET_BLOCKS_LIST::response &res);
@@ -257,7 +257,7 @@ private:
     bool onGetDifficultyStat(const COMMAND_RPC_GET_DIFFICULTY_STAT::request &req,
                              COMMAND_RPC_GET_DIFFICULTY_STAT::response &res);
 
-    bool onGetMixin(const Transaction &transaction, uint64_t &mixin);
+    bool onGetMixin(const FTransaction &transaction, uint64_t &mixin);
 
     bool onGetStatsByHeights(const COMMAND_RPC_GET_STATS_BY_HEIGHTS::request &req,
                              COMMAND_RPC_GET_STATS_BY_HEIGHTS::response &res);
@@ -278,7 +278,7 @@ private:
     std::string m_fee_address;
     std::string m_contact_info;
     Crypto::FSecretKey m_view_key = NULL_SECRET_KEY;
-    AccountPublicAddress m_fee_acc;
+    FAccountPublicAddress m_fee_acc;
 };
 
 } // namespace QwertyNote

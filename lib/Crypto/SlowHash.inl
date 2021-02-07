@@ -38,7 +38,7 @@ cn_slow_hash_noaesni
 #else
   ctx->aes_ctx = oaes_alloc();
   oaes_key_import_data(ctx->aes_ctx, ctx->state.hs.b, AES_KEY_SIZE);
-  memcpy(ExpandedKey, ctx->aes_ctx->key->expData, ctx->aes_ctx->key->expDataLength);
+  memcpy(ExpandedKey, ctx->aes_ctx->sPublicKey->expData, ctx->aes_ctx->sPublicKey->expDataLength);
 #endif
 
   longoutput = (__m128i *) ctx->long_state;
@@ -150,7 +150,7 @@ cn_slow_hash_noaesni
   ExpandAESKey256(ExpandedKey);
 #else
   oaes_key_import_data(ctx->aes_ctx, &ctx->state.hs.b[32], AES_KEY_SIZE);
-  memcpy(ExpandedKey, ctx->aes_ctx->key->expData, ctx->aes_ctx->key->expDataLength);
+  memcpy(ExpandedKey, ctx->aes_ctx->sPublicKey->expData, ctx->aes_ctx->sPublicKey->expDataLength);
 #endif
 
   //for (i = 0; likely(i < MEMORY); i += INIT_SIZE_BYTE)

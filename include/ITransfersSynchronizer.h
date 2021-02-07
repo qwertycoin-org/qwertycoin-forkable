@@ -38,7 +38,7 @@ namespace QwertyNote {
 	{
 		uint64_t uTransactionSpendableAge;
 		uint64_t uSafeTransactionSpendableAge;
-		AccountKeys sKeys;
+		FAccountKeys sKeys;
 		FSynchronizationStart sSyncStart;
 	};
 
@@ -71,7 +71,7 @@ namespace QwertyNote {
 	public:
 		virtual ~ITransfersSubscription () = default;
 
-		virtual AccountPublicAddress getAddress () = 0;
+		virtual FAccountPublicAddress getAddress () = 0;
 
 		virtual ITransfersContainer &getContainer () = 0;
 	};
@@ -113,12 +113,12 @@ namespace QwertyNote {
 
 		virtual ITransfersSubscription &addSubscription (const FAccountSubscription &sAcc) = 0;
 
-		virtual bool removeSubscription (const AccountPublicAddress &sAcc) = 0;
+		virtual bool removeSubscription (const FAccountPublicAddress &sAcc) = 0;
 
-		virtual void getSubscriptions (std::vector <AccountPublicAddress> &vSubscriptions) = 0;
+		virtual void getSubscriptions (std::vector <FAccountPublicAddress> &vSubscriptions) = 0;
 
 		// returns nullptr if address is not found
-		virtual ITransfersSubscription *getSubscription (const AccountPublicAddress &sAcc) = 0;
+		virtual ITransfersSubscription *getSubscription (const FAccountPublicAddress &sAcc) = 0;
 
 		virtual std::vector <Crypto::FHash>
 		getViewKeyKnownBlocks (const Crypto::FPublicKey &sPublicViewKey) = 0;

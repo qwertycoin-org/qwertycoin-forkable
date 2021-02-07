@@ -70,15 +70,16 @@ public:
         if (upgradeHeight == UNDEF_HEIGHT) {
             if (m_blockchain.empty()) {
                 m_votingCompleteHeight = UNDEF_HEIGHT;
-            } else if (m_targetVersion - 1 == m_blockchain.back().bl.majorVersion) {
+            } else if (m_targetVersion - 1 == m_blockchain.back().bl.uMajorVersion) {
                 m_votingCompleteHeight = findVotingCompleteHeight(m_blockchain.size() - 1);
-            } else if (m_targetVersion <= m_blockchain.back().bl.majorVersion) {
+            } else if (m_targetVersion <= m_blockchain.back().bl.uMajorVersion) {
                 auto it = std::lower_bound(
                     m_blockchain.begin(),
                     m_blockchain.end(),
                     m_targetVersion,
-                    [](const typename BC::value_type &b, uint8_t v) {return b.bl.majorVersion<v;});
-                if (it == m_blockchain.end() || it->bl.majorVersion != m_targetVersion) {
+                    [](const typename BC::value_type &b, uint8_t v) {return b.bl.uMajorVersion <
+																			v;});
+                if (it == m_blockchain.end() || it->bl.uMajorVersion != m_targetVersion) {
                     logger(Logging::ERROR, Logging::BRIGHT_RED)
                         << "Internal error: upgrade height isn't found";
                     return false;
@@ -97,19 +98,19 @@ public:
             }
         } else if (!m_blockchain.empty()) {
             if (m_blockchain.size() <= upgradeHeight + 1) {
-                if (m_blockchain.back().bl.majorVersion >= m_targetVersion) {
+                if (m_blockchain.back().bl.uMajorVersion >= m_targetVersion) {
                     logger(Logging::ERROR, Logging::BRIGHT_RED)
                         << "Internal error: block at height "
                         << (m_blockchain.size() - 1)
                         << " has invalid version "
-                        << static_cast<int>(m_blockchain.back().bl.majorVersion)
+                        << static_cast<int>(m_blockchain.back().bl.uMajorVersion)
                         << ", expected "
                         << static_cast<int>(m_targetVersion - 1)
                         << " or less";
                     return false;
                 }
             } else {
-                int blockVersionAtUpgradeHeight = m_blockchain[upgradeHeight].bl.majorVersion;
+                int blockVersionAtUpgradeHeight = m_blockchain[upgradeHeight].bl.uMajorVersion;
                 if (blockVersionAtUpgradeHeight != m_targetVersion - 1) {
                     logger(Logging::ERROR, Logging::BRIGHT_RED)
                         << "Internal error: block at height " << upgradeHeight
@@ -118,7 +119,8 @@ public:
                     return false;
                 }
 
-                int blockVersionAfterUpgradeHeight = m_blockchain[upgradeHeight + 1].bl.majorVersion;
+                int blockVersionAfterUpgradeHeight = m_blockchain[upgradeHeight + 1].bl
+                		.uMajorVersion;
                 if (blockVersionAfterUpgradeHeight != m_targetVersion) {
                     logger(Logging::ERROR, Logging::BRIGHT_RED)
                         << "Internal error: block at height " << (upgradeHeight + 1)
@@ -160,15 +162,15 @@ public:
 
         if (m_currency.upgradeHeight(m_targetVersion) != UNDEF_HEIGHT) {
             if (m_blockchain.size() <= m_currency.upgradeHeight(m_targetVersion) + 1) {
-                assert(m_blockchain.back().bl.majorVersion <= m_targetVersion - 1);
+                assert(m_blockchain.back().bl.uMajorVersion <= m_targetVersion - 1);
             } else {
-                assert(m_blockchain.back().bl.majorVersion >= m_targetVersion);
+                assert(m_blockchain.back().bl.uMajorVersion >= m_targetVersion);
             }
         } else if (m_votingCompleteHeight != UNDEF_HEIGHT) {
             assert(m_blockchain.size() > m_votingCompleteHeight);
 
             if (m_blockchain.size() <= upgradeHeight()) {
-                assert(m_blockchain.back().bl.majorVersion == m_targetVersion - 1);
+                assert(m_blockchain.back().bl.uMajorVersion == m_targetVersion - 1);
 
                 if (m_blockchain.size() % (60 * 60 / m_currency.difficultyTarget()) == 0) {
                     auto interval =
@@ -192,7 +194,7 @@ public:
                         << getBlockHash(m_blockchain.back().bl);
                 }
             } else if (m_blockchain.size() == upgradeHeight() + 1) {
-                assert(m_blockchain.back().bl.majorVersion == m_targetVersion - 1);
+                assert(m_blockchain.back().bl.uMajorVersion == m_targetVersion - 1);
 
                 logger(Logging::INFO, Logging::BRIGHT_GREEN)
                     << "###### UPGRADE has happened! Starting from block index "
@@ -201,7 +203,7 @@ public:
                     << static_cast<int>(m_targetVersion)
                     << " will be rejected!";
             } else {
-                assert(m_blockchain.back().bl.majorVersion == m_targetVersion);
+                assert(m_blockchain.back().bl.uMajorVersion == m_targetVersion);
             }
         } else {
             uint32_t lastBlockHeight = m_blockchain.size() - 1;
@@ -244,8 +246,8 @@ public:
         for (size_t i = height + 1 - m_currency.upgradeVotingWindow(); i <= height; ++i) {
             const auto &b = m_blockchain[i].bl;
             voteCounter +=
-                (b.majorVersion == m_targetVersion - 1)
-                && (b.minorVersion == BLOCK_MINOR_VERSION_1)
+                (b.uMajorVersion == m_targetVersion - 1)
+                && (b.uMinorVersion == BLOCK_MINOR_VERSION_1)
                 ? 1 : 0;
         }
 

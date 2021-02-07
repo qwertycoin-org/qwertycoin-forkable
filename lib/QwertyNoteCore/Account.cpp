@@ -34,23 +34,23 @@ AccountBase::AccountBase()
 
 void AccountBase::setNull()
 {
-    mKeys = AccountKeys();
+    mKeys = FAccountKeys();
 }
 
 void AccountBase::generate()
 {
-    Crypto::generateKeys(mKeys.address.spendPublicKey, mKeys.spendSecretKey);
-    Crypto::generateKeys(mKeys.address.viewPublicKey, mKeys.viewSecretKey);
+    Crypto::generateKeys(mKeys.sAddress.sSpendPublicKey, mKeys.sSpendSecretKey);
+    Crypto::generateKeys(mKeys.sAddress.sViewPublicKey, mKeys.sViewSecretKey);
     mCreationTimestamp = time(nullptr);
 }
 
 void AccountBase::generateDeterministic()
 {
     Crypto::FSecretKey second;
-    Crypto::generateKeys(mKeys.address.spendPublicKey, mKeys.spendSecretKey);
-    auto ssk = (uint8_t *)&mKeys.spendSecretKey;
+    Crypto::generateKeys(mKeys.sAddress.sSpendPublicKey, mKeys.sSpendSecretKey);
+    auto ssk = (uint8_t *)&mKeys.sSpendSecretKey;
     keccak(ssk, sizeof(Crypto::FSecretKey), (uint8_t *)&second, sizeof(Crypto::FSecretKey));
-    Crypto::generateDeterministicKeys(mKeys.address.viewPublicKey, mKeys.viewSecretKey, second);
+    Crypto::generateDeterministicKeys(mKeys.sAddress.sViewPublicKey, mKeys.sViewSecretKey, second);
     mCreationTimestamp = time(nullptr);
 }
 
@@ -59,7 +59,7 @@ Crypto::FSecretKey AccountBase::generateKey(
     bool recover,
     bool two_random)
 {
-    Crypto::FSecretKey first = generateMKeys(mKeys.address.spendPublicKey, mKeys.spendSecretKey,
+    Crypto::FSecretKey first = generateMKeys(mKeys.sAddress.sSpendPublicKey, mKeys.sSpendSecretKey,
 											 recovery_key,
 											 recover
     );
@@ -69,7 +69,7 @@ Crypto::FSecretKey AccountBase::generateKey(
     Crypto::FSecretKey second;
     keccak((uint8_t*)&first, sizeof(Crypto::FSecretKey), (uint8_t*)&second, sizeof(Crypto::FSecretKey));
 
-    generateMKeys(mKeys.address.viewPublicKey, mKeys.viewSecretKey, second, !two_random);
+    generateMKeys(mKeys.sAddress.sViewPublicKey, mKeys.sViewSecretKey, second, !two_random);
 
     struct tm timestamp;
     timestamp.tm_year = 2016 - 1900; // year 2016
@@ -105,12 +105,12 @@ void AccountBase::generateViewFromSpend(Crypto::FSecretKey &spend, Crypto::FSecr
     generateViewFromSpend(spend, viewSecret, unusedDummyVariable);
 }
 
-const AccountKeys &AccountBase::getAccountKeys() const
+const FAccountKeys &AccountBase::getAccountKeys() const
 {
     return mKeys;
 }
 
-void AccountBase::setAccountKeys(const AccountKeys &keys)
+void AccountBase::setAccountKeys(const FAccountKeys &keys)
 {
     mKeys = keys;
 }

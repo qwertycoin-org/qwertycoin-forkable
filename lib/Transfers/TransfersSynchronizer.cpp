@@ -65,17 +65,17 @@ void TransfersSynchronizer::initTransactionPool(
 }
 
 ITransfersSubscription& TransfersSynchronizer::addSubscription(const FAccountSubscription& acc) {
-    auto it = m_consumers.find(acc.sKeys.address.viewPublicKey);
+    auto it = m_consumers.find(acc.sKeys.sAddress.sViewPublicKey);
 
     if (it == m_consumers.end()) {
         std::unique_ptr<TransfersConsumer> consumer(
-            new TransfersConsumer(m_currency, m_node, m_logger.getLogger(), acc.sKeys.viewSecretKey)
+            new TransfersConsumer(m_currency, m_node, m_logger.getLogger(), acc.sKeys.sViewSecretKey)
         );
 
         m_sync.addConsumer(consumer.get());
         consumer->addObserver(this);
         it = m_consumers.insert(std::make_pair(
-            acc.sKeys.address.viewPublicKey,
+            acc.sKeys.sAddress.sViewPublicKey,
             std::move(consumer))
         ).first;
     }
@@ -83,9 +83,9 @@ ITransfersSubscription& TransfersSynchronizer::addSubscription(const FAccountSub
     return it->second->addSubscription(acc);
 }
 
-bool TransfersSynchronizer::removeSubscription(const AccountPublicAddress &acc)
+bool TransfersSynchronizer::removeSubscription(const FAccountPublicAddress &acc)
 {
-    auto it = m_consumers.find(acc.viewPublicKey);
+    auto it = m_consumers.find(acc.sViewPublicKey);
     if (it == m_consumers.end()) {
         return false;
     }
@@ -93,31 +93,31 @@ bool TransfersSynchronizer::removeSubscription(const AccountPublicAddress &acc)
     if (it->second->removeSubscription(acc)) {
         m_sync.removeConsumer(it->second.get());
         m_consumers.erase(it);
-        m_subscribers.erase(acc.viewPublicKey);
+        m_subscribers.erase(acc.sViewPublicKey);
     }
 
     return true;
 }
 
-void TransfersSynchronizer::getSubscriptions(std::vector<AccountPublicAddress> &subscriptions)
+void TransfersSynchronizer::getSubscriptions(std::vector<FAccountPublicAddress> &subscriptions)
 {
     for (const auto &kv : m_consumers) {
         kv.second->getSubscriptions(subscriptions);
     }
 }
 
-ITransfersSubscription *TransfersSynchronizer::getSubscription(const AccountPublicAddress &acc)
+ITransfersSubscription *TransfersSynchronizer::getSubscription(const FAccountPublicAddress &acc)
 {
-    auto it = m_consumers.find(acc.viewPublicKey);
+    auto it = m_consumers.find(acc.sViewPublicKey);
     return (it == m_consumers.end()) ? nullptr : it->second->getSubscription(acc);
 }
 
 void TransfersSynchronizer::addPublicKeysSeen(
-    const AccountPublicAddress &acc,
+    const FAccountPublicAddress &acc,
     const Crypto::FHash &transactionHash,
     const Crypto::FPublicKey &outputKey)
 {
-    auto it = m_consumers.find(acc.viewPublicKey);
+    auto it = m_consumers.find(acc.sViewPublicKey);
     if (it != m_consumers.end()) {
         it->second->addPublicKeysSeen(transactionHash, outputKey);
     }
@@ -260,7 +260,7 @@ void TransfersSynchronizer::save(std::ostream &os)
         std::string blob = consumerState.str();
         s(blob, "state");
 
-        std::vector<AccountPublicAddress> subscriptions;
+        std::vector<FAccountPublicAddress> subscriptions;
         consumer.second->getSubscriptions(subscriptions);
         size_t subCount = subscriptions.size();
 
@@ -324,7 +324,7 @@ void TransfersSynchronizer::load(std::istream &is)
     {
         FPublicKey viewKey;
         std::string state;
-        std::vector<std::pair<AccountPublicAddress, std::string>> subscriptionStates;
+        std::vector<std::pair<FAccountPublicAddress, std::string>> subscriptionStates;
     };
 
     std::vector<ConsumerState> updatedStates;
@@ -361,7 +361,7 @@ void TransfersSynchronizer::load(std::istream &is)
                 while (subCount--) {
                     s.beginObject("");
 
-                    AccountPublicAddress acc;
+                    FAccountPublicAddress acc;
                     std::string state;
 
                     s(acc, "address");

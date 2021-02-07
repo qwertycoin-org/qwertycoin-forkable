@@ -83,7 +83,7 @@ bool Currency::init()
 
 bool Currency::generateGenesisBlock()
 {
-    m_genesisBlock = boost::value_initialized<Block>();
+    m_genesisBlock = boost::value_initialized<FBlock>();
 
     // Hard code coinbase tx in genesis block, because "tru" generating tx use random,
     // but genesis should be always the same
@@ -91,19 +91,19 @@ bool Currency::generateGenesisBlock()
     BinaryArray minerTxBlob;
 
     bool r = fromHex(genesisCoinbaseTxHex, minerTxBlob)
-            && fromBinaryArray(m_genesisBlock.baseTransaction, minerTxBlob);
+            && fromBinaryArray(m_genesisBlock.sBaseTransaction, minerTxBlob);
 
     if (!r) {
         logger(ERROR, BRIGHT_RED) << "failed to parse coinbase tx from hard coded blob";
         return false;
     }
 
-    m_genesisBlock.majorVersion = BLOCK_MAJOR_VERSION_1;
-    m_genesisBlock.minorVersion = BLOCK_MINOR_VERSION_0;
-    m_genesisBlock.timestamp = 0;
-    m_genesisBlock.nonce = 70;
+    m_genesisBlock.uMajorVersion = BLOCK_MAJOR_VERSION_1;
+    m_genesisBlock.uMinorVersion = BLOCK_MINOR_VERSION_0;
+    m_genesisBlock.uTimestamp = 0;
+    m_genesisBlock.uNonce = 70;
     if (m_testnet) {
-        ++m_genesisBlock.nonce;
+        ++m_genesisBlock.uNonce;
     }
 
     return true;
@@ -238,35 +238,35 @@ uint64_t Currency::getGovernanceReward(uint64_t base_reward) const
     return (uint64_t)(base_reward * (percent * 0.01));
 }
 
-bool Currency::validateGovernmentFee(const Transaction &baseTx) const
+bool Currency::validateGovernmentFee(const FTransaction &baseTx) const
 {
-    AccountKeys governanceKeys;
+    FAccountKeys governanceKeys;
     getGovernanceAddressAndKey(governanceKeys);
 
-    Crypto::FPublicKey txPublicKey = getTransactionPublicKeyFromExtra(baseTx.extra);
+    Crypto::FPublicKey txPublicKey = getTransactionPublicKeyFromExtra(baseTx.vExtra);
 
     Crypto::FKeyDerivation derivation{};
-    if (!Crypto::generateKeyDerivation(txPublicKey, governanceKeys.viewSecretKey, derivation)) {
+    if (!Crypto::generateKeyDerivation(txPublicKey, governanceKeys.sViewSecretKey, derivation)) {
         return false;
     }
 
     uint64_t minerReward = 0;
     uint64_t governmentFee = 0;
-    for (size_t idx = 0; idx < baseTx.outputs.size(); ++idx) {
-        minerReward += baseTx.outputs[idx].amount;
-        if (baseTx.outputs[idx].target.type() != typeid(QwertyNote::KeyOutput))
+    for (size_t idx = 0; idx < baseTx.vOutputs.size(); ++idx) {
+        minerReward += baseTx.vOutputs[idx].uAmount;
+        if (baseTx.vOutputs[idx].sTarget.type() != typeid(QwertyNote::FKeyOutput))
             continue;
         Crypto::FPublicKey outEphemeralKey;
-        Crypto::derivePublicKey(derivation, idx, governanceKeys.address.spendPublicKey,
+        Crypto::derivePublicKey(derivation, idx, governanceKeys.sAddress.sSpendPublicKey,
                                 outEphemeralKey);
-        if (outEphemeralKey == boost::get<KeyOutput>(baseTx.outputs[idx].target).key)
-            governmentFee += baseTx.outputs[idx].amount;
+        if (outEphemeralKey == boost::get<FKeyOutput>(baseTx.vOutputs[idx].sTarget).sPublicKey)
+            governmentFee += baseTx.vOutputs[idx].uAmount;
     }
 
     return (governmentFee == getGovernanceReward(minerReward));
 }
 
-bool Currency::getGovernanceAddressAndKey(AccountKeys &governanceKeys) const
+bool Currency::getGovernanceAddressAndKey(FAccountKeys &governanceKeys) const
 {
     std::string address;
     std::string viewSecretKey;
@@ -279,7 +279,7 @@ bool Currency::getGovernanceAddressAndKey(AccountKeys &governanceKeys) const
         viewSecretKey = parameters::GOVERNANCE_VIEW_SECRET_KEY;
     }
 
-    AccountPublicAddress governanceAddress = boost::value_initialized<AccountPublicAddress>();
+    FAccountPublicAddress governanceAddress = boost::value_initialized<FAccountPublicAddress>();
     if (!parseAccountAddressString(address, governanceAddress)) {
         logger(Logging::ERROR) << "Failed to parse governance wallet address (" << address << "), "
                                << "Check /lib/Global/CryptoNoteConfig.h";
@@ -293,40 +293,40 @@ bool Currency::getGovernanceAddressAndKey(AccountKeys &governanceKeys) const
         return false;
     }
 
-    governanceKeys.address = governanceAddress;
-    governanceKeys.viewSecretKey = governanceViewSecretKey;
+    governanceKeys.sAddress = governanceAddress;
+    governanceKeys.sViewSecretKey = governanceViewSecretKey;
 
     return true;
 }
 
 bool Currency::constructMinerTx(uint8_t blockMajorVersion,
-                                uint32_t height,
-                                size_t medianSize,
-                                uint64_t alreadyGeneratedCoins,
-                                size_t currentBlockSize,
-                                uint64_t fee,
-                                const AccountPublicAddress &minerAddress,
-                                Transaction &tx,
-                                const BinaryArray &extraNonce,
-                                size_t maxOuts,
-                                uint64_t blockTarget) const
+								uint32_t height,
+								size_t medianSize,
+								uint64_t alreadyGeneratedCoins,
+								size_t currentBlockSize,
+								uint64_t fee,
+								const FAccountPublicAddress &minerAddress,
+								FTransaction &tx,
+								const BinaryArray &extraNonce,
+								size_t maxOuts,
+								uint64_t blockTarget) const
 {
     if (blockTarget == 0xffffffffffffffff)
         blockTarget = difficultyTarget();
-    tx.inputs.clear();
-    tx.outputs.clear();
-    tx.extra.clear();
+    tx.vInputs.clear();
+    tx.vOutputs.clear();
+    tx.vExtra.clear();
 
-    KeyPair txKey = generateKeyPair();
-    addTransactionPublicKeyToExtra(tx.extra, txKey.publicKey);
+    FKeyPair txKey = generateKeyPair();
+    addTransactionPublicKeyToExtra(tx.vExtra, txKey.sPublicKey);
     if (!extraNonce.empty()) {
-        if (!addExtraNonceToTransactionExtra(tx.extra, extraNonce)) {
+        if (!addExtraNonceToTransactionExtra(tx.vExtra, extraNonce)) {
             return false;
         }
     }
 
-    BaseInput in{};
-    in.blockIndex = height;
+    FBaseInput in{};
+    in.uBlockIndex = height;
 
     uint64_t governanceReward = 0;
     uint64_t totalRewardWithoutGovernanceReward = 0; // totalRewardWithoutGovernanceReward
@@ -374,66 +374,66 @@ bool Currency::constructMinerTx(uint8_t blockMajorVersion,
         Crypto::FKeyDerivation derivation = boost::value_initialized<Crypto::FKeyDerivation>();
         Crypto::FPublicKey outEphemeralPubKey = boost::value_initialized<Crypto::FPublicKey>();
 
-        bool r = Crypto::generateKeyDerivation(minerAddress.viewPublicKey, txKey.secretKey,
-                                               derivation);
+        bool r = Crypto::generateKeyDerivation(minerAddress.sViewPublicKey, txKey.sSecretKey,
+											   derivation);
 
         if (!(r)) {
             logger(ERROR, BRIGHT_RED)
-                    << "while creating outs: failed to generateKeyDerivation("
-                    << minerAddress.viewPublicKey << ", " << txKey.secretKey << ")";
+					<< "while creating outs: failed to generateKeyDerivation("
+					<< minerAddress.sViewPublicKey << ", " << txKey.sSecretKey << ")";
             return false;
         }
 
-        r = Crypto::derivePublicKey(derivation, no, minerAddress.spendPublicKey,
+        r = Crypto::derivePublicKey(derivation, no, minerAddress.sSpendPublicKey,
                                     outEphemeralPubKey);
 
         if (!(r)) {
             logger(ERROR, BRIGHT_RED)
-                    << "while creating outs: failed to derivePublicKey(" << derivation << ", "
-                    << no << ", " << minerAddress.spendPublicKey << ")";
+					<< "while creating outs: failed to derivePublicKey(" << derivation << ", "
+					<< no << ", " << minerAddress.sSpendPublicKey << ")";
             return false;
         }
 
-        KeyOutput tk{};
-        tk.key = outEphemeralPubKey;
+        FKeyOutput tk{};
+        tk.sPublicKey = outEphemeralPubKey;
 
-        TransactionOutput out;
-        summaryAmounts += out.amount = outAmounts[no];
-        out.target = tk;
-        tx.outputs.push_back(out);
+        FTransactionOutput out;
+        summaryAmounts += out.uAmount = outAmounts[no];
+        out.sTarget = tk;
+        tx.vOutputs.push_back(out);
     }
 
     if (enableGovernance) {
-        AccountKeys governanceKeys{};
+        FAccountKeys governanceKeys{};
         getGovernanceAddressAndKey(governanceKeys);
 
         Crypto::FKeyDerivation derivation = boost::value_initialized<Crypto::FKeyDerivation>();
         Crypto::FPublicKey outEphemeralPubKey = boost::value_initialized<Crypto::FPublicKey>();
 
-        bool r = Crypto::generateKeyDerivation(governanceKeys.address.viewPublicKey,
-                                               txKey.secretKey, derivation);
+        bool r = Crypto::generateKeyDerivation(governanceKeys.sAddress.sViewPublicKey,
+											   txKey.sSecretKey, derivation);
         if (!(r)) {
             logger(ERROR, BRIGHT_RED)
-                    << "while creating outs: failed to generateKeyDerivation("
-                    << governanceKeys.address.viewPublicKey << ", " << txKey.secretKey << ")";
+					<< "while creating outs: failed to generateKeyDerivation("
+					<< governanceKeys.sAddress.sViewPublicKey << ", " << txKey.sSecretKey << ")";
             return false;
         }
-        size_t pos = tx.outputs.size();
-        r = Crypto::derivePublicKey(derivation, pos++, governanceKeys.address.spendPublicKey,
+        size_t pos = tx.vOutputs.size();
+        r = Crypto::derivePublicKey(derivation, pos++, governanceKeys.sAddress.sSpendPublicKey,
                                     outEphemeralPubKey);
         if (!(r)) {
             logger(ERROR, BRIGHT_RED)
-                    << "while creating outs: failed to derivePublicKey(" << derivation << ", "
-                    << 0 << ", " << governanceKeys.address.spendPublicKey << ")";
+					<< "while creating outs: failed to derivePublicKey(" << derivation << ", "
+					<< 0 << ", " << governanceKeys.sAddress.sSpendPublicKey << ")";
             return false;
         }
-        KeyOutput tk{};
-        tk.key = outEphemeralPubKey;
+        FKeyOutput tk{};
+        tk.sPublicKey = outEphemeralPubKey;
 
-        TransactionOutput out;
-        summaryAmounts += out.amount = governanceReward;
-        out.target = tk;
-        tx.outputs.push_back(out);
+        FTransactionOutput out;
+        summaryAmounts += out.uAmount = governanceReward;
+        out.sTarget = tk;
+        tx.vOutputs.push_back(out);
     }
 
     if (summaryAmounts != totalRewardWithoutGovernanceReward) {
@@ -442,10 +442,10 @@ bool Currency::constructMinerTx(uint8_t blockMajorVersion,
         return false;
     }
 
-    tx.version = CURRENT_TRANSACTION_VERSION;
+    tx.uVersion = CURRENT_TRANSACTION_VERSION;
     // lock
-    tx.unlockTime = height + m_minedMoneyUnlockWindow;
-    tx.inputs.push_back(in);
+    tx.uUnlockTime = height + m_minedMoneyUnlockWindow;
+    tx.vInputs.push_back(in);
 
     return true;
 }
@@ -493,21 +493,21 @@ bool Currency::isFusionTransaction(const std::vector<uint64_t> &inputsAmounts,
     return true;
 }
 
-bool Currency::isFusionTransaction(const Transaction &transaction, size_t size,
-                                   uint32_t height) const
+bool Currency::isFusionTransaction(const FTransaction &transaction, size_t size,
+								   uint32_t height) const
 {
     assert(getObjectBinarySize(transaction) == size);
 
     std::vector<uint64_t> outputsAmounts;
-    outputsAmounts.reserve(transaction.outputs.size());
-    for (const TransactionOutput &output : transaction.outputs) {
-        outputsAmounts.push_back(output.amount);
+    outputsAmounts.reserve(transaction.vOutputs.size());
+    for (const FTransactionOutput &output : transaction.vOutputs) {
+        outputsAmounts.push_back(output.uAmount);
     }
 
     return isFusionTransaction(getInputsAmounts(transaction), outputsAmounts, size, height);
 }
 
-bool Currency::isFusionTransaction(const Transaction &transaction, uint32_t height) const
+bool Currency::isFusionTransaction(const FTransaction &transaction, uint32_t height) const
 {
     return isFusionTransaction(transaction, getObjectBinarySize(transaction), height);
 }
@@ -541,15 +541,15 @@ bool Currency::isAmountApplicableInFusionTransactionInput(uint64_t amount, uint6
 
 std::string Currency::accountAddressAsString(const AccountBase &account) const
 {
-    return getAccountAddressAsStr(m_publicAddressBase58Prefix, account.getAccountKeys().address);
+    return getAccountAddressAsStr(m_publicAddressBase58Prefix, account.getAccountKeys().sAddress);
 }
 
-std::string Currency::accountAddressAsString(const AccountPublicAddress &accountPublicAddress) const
+std::string Currency::accountAddressAsString(const FAccountPublicAddress &accountPublicAddress) const
 {
     return getAccountAddressAsStr(m_publicAddressBase58Prefix, accountPublicAddress);
 }
 
-bool Currency::parseAccountAddressString(const std::string &str, AccountPublicAddress &addr) const
+bool Currency::parseAccountAddressString(const std::string &str, FAccountPublicAddress &addr) const
 {
     uint64_t prefix;
     if (!QwertyNote::parseAccountAddressString(prefix, addr, str)) {
@@ -918,7 +918,7 @@ difficulty_type Currency::getClifDifficulty(uint32_t height, uint8_t blockMajorV
     return new_diff;
 }
 
-bool Currency::checkProofOfWork(Crypto::CnContext &context, const Block &block,
+bool Currency::checkProofOfWork(Crypto::CnContext &context, const FBlock &block,
                                 difficulty_type currentDiffic, Crypto::FHash &proofOfWork) const
 {
     if (!getBlockLongHash(context, block, proofOfWork)) {
@@ -932,7 +932,7 @@ size_t Currency::getApproximateMaximumInputCount(size_t transactionSize, size_t 
                                                  size_t mixinCount) const
 {
     const size_t KEY_IMAGE_SIZE = sizeof(Crypto::FKeyImage);
-    const size_t OUTPUT_KEY_SIZE = sizeof(decltype(KeyOutput::key));
+    const size_t OUTPUT_KEY_SIZE = sizeof(decltype(FKeyOutput::sPublicKey));
     const size_t AMOUNT_SIZE = sizeof(uint64_t) + 2; // varint
     const size_t GLOBAL_INDEXES_VECTOR_SIZE_SIZE = sizeof(uint8_t); // varint
     const size_t GLOBAL_INDEXES_INITIAL_VALUE_SIZE = sizeof(uint32_t); // varint
@@ -1030,10 +1030,10 @@ CurrencyBuilder::CurrencyBuilder(Logging::ILogger &log) : m_currency(log)
     fix_difficulty(0);
 }
 
-Transaction CurrencyBuilder::generateGenesisTransaction()
+FTransaction CurrencyBuilder::generateGenesisTransaction()
 {
-    QwertyNote::Transaction tx;
-    auto ac = boost::value_initialized<QwertyNote::AccountPublicAddress>();
+    QwertyNote::FTransaction tx;
+    auto ac = boost::value_initialized<QwertyNote::FAccountPublicAddress>();
 
     m_currency.constructMinerTx(1, 0, 0, 0, 0, 0, ac, tx); // zero fee in genesis
 

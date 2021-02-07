@@ -203,14 +203,14 @@ TransactionId WalletUserTransactionsCache::addNewTransaction(
 
 void WalletUserTransactionsCache::updateTransaction(
     TransactionId transactionId,
-    const QwertyNote::Transaction &tx,
+    const QwertyNote::FTransaction &tx,
     uint64_t amount,
     const std::list<FTransactionOutputInformation> &usedOutputs,
     Crypto::FSecretKey &tx_key)
 {
     // update extra field from created transaction
     auto &txInfo = m_transactions.at(transactionId);
-    txInfo.extra.assign(tx.extra.begin(), tx.extra.end());
+    txInfo.extra.assign(tx.vExtra.begin(), tx.vExtra.end());
     txInfo.secretKey = tx_key;
     m_unconfirmedTransactions.add(tx, transactionId, amount, usedOutputs, tx_key);
 }

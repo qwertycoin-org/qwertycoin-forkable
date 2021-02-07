@@ -36,10 +36,10 @@ class ILogger;
 namespace QwertyNote {
 
 bool parseAndValidateTransactionFromBinaryArray(
-    const BinaryArray &transactionBinaryArray,
-    Transaction &transaction,
-    Crypto::FHash &transactionHash,
-    Crypto::FHash &transactionPrefixHash);
+		const BinaryArray &transactionBinaryArray,
+		FTransaction &transaction,
+		Crypto::FHash &transactionHash,
+		Crypto::FHash &transactionPrefixHash);
 
 struct TransactionSourceEntry
 {
@@ -56,49 +56,49 @@ struct TransactionDestinationEntry
 {
     TransactionDestinationEntry()
         : amount(0),
-          addr(boost::value_initialized<AccountPublicAddress>())
+          addr(boost::value_initialized<FAccountPublicAddress>())
     {
     }
 
-    TransactionDestinationEntry(uint64_t amount, const AccountPublicAddress &addr)
+    TransactionDestinationEntry(uint64_t amount, const FAccountPublicAddress &addr)
         : amount(amount),
           addr(addr)
     {
     }
 
     uint64_t amount; // money
-    AccountPublicAddress addr; // destination address
+    FAccountPublicAddress addr; // destination address
 };
 
 struct tx_message_entry
 {
     std::string message;
     bool encrypt;
-    AccountPublicAddress addr;
+    FAccountPublicAddress addr;
 };
 
 bool constructTransaction(
-    const AccountKeys &senderAccountKeys,
-    const std::vector<TransactionSourceEntry> &sources,
-    const std::vector<TransactionDestinationEntry> &destinations,
-    const std::vector<tx_message_entry> &messages,
-    const std::string &sender,
-    uint64_t ttl,
-    std::vector<uint8_t> extra,
-    Transaction &transaction,
-    uint64_t unlock_time,
-    Crypto::FSecretKey &tx_key,
-    Logging::ILogger &log);
+		const FAccountKeys &senderAccountKeys,
+		const std::vector<TransactionSourceEntry> &sources,
+		const std::vector<TransactionDestinationEntry> &destinations,
+		const std::vector<tx_message_entry> &messages,
+		const std::string &sender,
+		uint64_t ttl,
+		std::vector<uint8_t> extra,
+		FTransaction &transaction,
+		uint64_t unlock_time,
+		Crypto::FSecretKey &tx_key,
+		Logging::ILogger &log);
 
 inline bool constructTransaction(
-    const AccountKeys &sender_account_keys,
-    const std::vector<TransactionSourceEntry> &sources,
-    const std::vector<TransactionDestinationEntry> &destinations,
-    std::vector<uint8_t> extra,
-    Transaction &tx,
-    uint64_t unlock_time,
-    Crypto::FSecretKey &tx_key,
-    Logging::ILogger &log)
+		const FAccountKeys &sender_account_keys,
+		const std::vector<TransactionSourceEntry> &sources,
+		const std::vector<TransactionDestinationEntry> &destinations,
+		std::vector<uint8_t> extra,
+		FTransaction &tx,
+		uint64_t unlock_time,
+		Crypto::FSecretKey &tx_key,
+		Logging::ILogger &log)
 {
     return constructTransaction(
         sender_account_keys,
@@ -115,52 +115,52 @@ inline bool constructTransaction(
 }
 
 bool is_out_to_acc(
-    const AccountKeys &acc,
-    const KeyOutput &out_key,
+    const FAccountKeys &acc,
+    const FKeyOutput &out_key,
     const Crypto::FPublicKey &tx_pub_key,
     size_t keyIndex);
 bool is_out_to_acc(
-    const AccountKeys &acc,
-    const KeyOutput &out_key,
+    const FAccountKeys &acc,
+    const FKeyOutput &out_key,
     const Crypto::FKeyDerivation &derivation,
     size_t keyIndex);
 
 bool lookup_acc_outs(
-    const AccountKeys &acc,
-    const Transaction &tx,
+    const FAccountKeys &acc,
+    const FTransaction &tx,
     const Crypto::FPublicKey &tx_pub_key,
     std::vector<size_t> &outs,
     uint64_t &money_transfered);
 bool lookup_acc_outs(
-    const AccountKeys &acc,
-    const Transaction &tx,
+    const FAccountKeys &acc,
+    const FTransaction &tx,
     std::vector<size_t> &outs,
     uint64_t &money_transfered);
 
-bool getTxFee(const Transaction &tx, uint64_t &fee);
-uint64_t getTxFee(const Transaction &tx);
+bool getTxFee(const FTransaction &tx, uint64_t &fee);
+uint64_t getTxFee(const FTransaction &tx);
 bool generate_key_image_helper(
-    const AccountKeys &ack,
-    const Crypto::FPublicKey &tx_public_key,
-    size_t real_output_index,
-    KeyPair &in_ephemeral,
-    Crypto::FKeyImage &ki);
+		const FAccountKeys &ack,
+		const Crypto::FPublicKey &tx_public_key,
+		size_t real_output_index,
+		FKeyPair &in_ephemeral,
+		Crypto::FKeyImage &ki);
 std::string short_hash_str(const Crypto::FHash &h);
 
-bool get_block_hashing_blob(const Block &b, BinaryArray &blob);
-bool getBlockHash(const Block &b, Crypto::FHash &res);
-Crypto::FHash getBlockHash(const Block &b);
-bool getBlockLongHash(Crypto::CnContext &context, const Block &b, Crypto::FHash &res);
-bool getInputsMoneyAmount(const Transaction &tx, uint64_t &money);
-uint64_t getOutsMoneyAmount(const Transaction &tx);
-bool check_inputs_types_supported(const TransactionPrefix &tx);
-bool check_outs_valid(const TransactionPrefix &tx, std::string *error = nullptr);
-bool checkMultisignatureInputsDiff(const TransactionPrefix &tx);
+bool get_block_hashing_blob(const FBlock &b, BinaryArray &blob);
+bool getBlockHash(const FBlock &b, Crypto::FHash &res);
+Crypto::FHash getBlockHash(const FBlock &b);
+bool getBlockLongHash(Crypto::CnContext &context, const FBlock &b, Crypto::FHash &res);
+bool getInputsMoneyAmount(const FTransaction &tx, uint64_t &money);
+uint64_t getOutsMoneyAmount(const FTransaction &tx);
+bool check_inputs_types_supported(const FTransactionPrefix &tx);
+bool check_outs_valid(const FTransactionPrefix &tx, std::string *error = nullptr);
+bool checkMultisignatureInputsDiff(const FTransactionPrefix &tx);
 
-bool check_money_overflow(const TransactionPrefix &tx);
-bool check_outs_overflow(const TransactionPrefix &tx);
-bool check_inputs_overflow(const TransactionPrefix &tx);
-uint32_t get_block_height(const Block &b);
+bool check_money_overflow(const FTransactionPrefix &tx);
+bool check_outs_overflow(const FTransactionPrefix &tx);
+bool check_inputs_overflow(const FTransactionPrefix &tx);
+uint32_t get_block_height(const FBlock &b);
 std::vector<uint32_t> relative_output_offsets_to_absolute(const std::vector<uint32_t> &off);
 std::vector<uint32_t> absolute_output_offsets_to_relative(const std::vector<uint32_t> &off);
 
@@ -206,7 +206,7 @@ void decompose_amount_into_digits(
 
 void get_tx_tree_hash(const std::vector<Crypto::FHash> &tx_hashes, Crypto::FHash &h);
 Crypto::FHash get_tx_tree_hash(const std::vector<Crypto::FHash> &tx_hashes);
-Crypto::FHash get_tx_tree_hash(const Block &b);
+Crypto::FHash get_tx_tree_hash(const FBlock &b);
 bool is_valid_decomposed_amount(uint64_t amount);
 
 } // namespace QwertyNote

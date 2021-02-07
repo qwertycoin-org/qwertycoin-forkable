@@ -123,7 +123,7 @@ struct TxWithOutputGlobalIndices {
         KV_MEMBER(output_indexes);
     }
 
-    TransactionPrefix transaction;
+    FTransactionPrefix transaction;
     Crypto::FHash hash;
     Crypto::FHash block_hash;
     uint32_t height;
@@ -160,7 +160,7 @@ struct COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS {
         }
 
         std::string tx_hash;
-        Transaction as_json;
+        FTransaction as_json;
         uint64_t fee;
         uint64_t block_height;
         uint64_t block_timestamp;
@@ -352,7 +352,7 @@ struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS {
 struct COMMAND_RPC_SEND_RAW_TX {
     struct request {
         request() = default;
-        explicit request(const Transaction &) { }
+        explicit request(const FTransaction &) { }
 
         void serialize(ISerializer &s) { KV_MEMBER(tx_as_hex); }
 
@@ -772,7 +772,7 @@ struct MEMPOOL_TRANSACTION_RESPONSE {
     std::string max_used_block_id;
     uint32_t last_failed_height;
     std::string last_failed_id;
-    Transaction tx_json;
+    FTransaction tx_json;
 };
 
 struct BLOCK_SHORT_RESPONSE {
@@ -981,7 +981,7 @@ struct COMMAND_RPC_GET_TRANSACTION_DETAILS {
             KV_MEMBER(status);
         }
 
-        Transaction tx;
+        FTransaction tx;
         TRANSACTION_DETAILS_RESPONSE txDetails;
         BLOCK_SHORT_RESPONSE block;
         std::string status;
@@ -1176,7 +1176,7 @@ struct COMMAND_RPC_CHECK_TX_KEY {
         }
 
         uint64_t amount;
-        std::vector<TransactionOutput> outputs;
+        std::vector<FTransactionOutput> outputs;
         std::string status;
     };
 };
@@ -1205,7 +1205,7 @@ struct COMMAND_RPC_CHECK_TX_WITH_PRIVATE_VIEW_KEY {
         }
 
         uint64_t amount;
-        std::vector<TransactionOutput> outputs;
+        std::vector<FTransactionOutput> outputs;
         uint32_t confirmations = 0;
         std::string status;
     };
@@ -1522,7 +1522,7 @@ struct COMMAND_RPC_CHECK_TX_PROOF {
 
         bool signature_valid;
         uint64_t received_amount;
-        std::vector<TransactionOutput> outputs;
+        std::vector<FTransactionOutput> outputs;
         uint32_t confirmations = 0;
         std::string status;
     };

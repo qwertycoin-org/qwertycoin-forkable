@@ -180,10 +180,10 @@ public:
 
     virtual size_t getAddressCount() const = 0;
     virtual std::string getAddress(size_t index) const = 0;
-    virtual AccountPublicAddress getAccountPublicAddress(size_t index) const = 0;
-    virtual KeyPair getAddressSpendKey(size_t index) const = 0;
-    virtual KeyPair getAddressSpendKey(const std::string &address) const = 0;
-    virtual KeyPair getViewKey() const = 0;
+    virtual FAccountPublicAddress getAccountPublicAddress(size_t index) const = 0;
+    virtual FKeyPair getAddressSpendKey(size_t index) const = 0;
+    virtual FKeyPair getAddressSpendKey(const std::string &address) const = 0;
+    virtual FKeyPair getViewKey() const = 0;
     virtual std::string createAddress() = 0;
     virtual std::string createAddress(const Crypto::FSecretKey &spendSecretKey, bool reset = true)=0;
     virtual std::string createAddress(const Crypto::FPublicKey &spendPublicKey) = 0;

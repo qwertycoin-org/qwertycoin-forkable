@@ -292,11 +292,11 @@ void WalletGreen::clearCaches(bool clearTransactions, bool clearCachedData)
             }
         }
 
-        std::vector<AccountPublicAddress> subscriptions;
+        std::vector<FAccountPublicAddress> subscriptions;
         m_synchronizer.getSubscriptions(subscriptions);
         std::for_each(subscriptions.begin(),
                       subscriptions.end(),
-                      [this](const AccountPublicAddress &address) {
+                      [this](const FAccountPublicAddress &address) {
             m_synchronizer.removeSubscription(address);
         });
 
@@ -665,7 +665,7 @@ void WalletGreen::load(const std::string &path,
 
     // Read all output keys cache
     try {
-        std::vector<AccountPublicAddress> subscriptionList;
+        std::vector<FAccountPublicAddress> subscriptionList;
         m_synchronizer.getSubscriptions(subscriptionList);
         for (auto &addr : subscriptionList) {
             auto sub = m_synchronizer.getSubscription(addr);
@@ -970,9 +970,9 @@ void WalletGreen::initTransactionPool()
 void WalletGreen::deleteOrphanTransactions(const std::unordered_set<Crypto::FPublicKey> &deletedKeys)
 {
     for (auto spendPublicKey : deletedKeys) {
-        AccountPublicAddress deletedAccountAddress;
-        deletedAccountAddress.spendPublicKey = spendPublicKey;
-        deletedAccountAddress.viewPublicKey = m_viewPublicKey;
+        FAccountPublicAddress deletedAccountAddress;
+        deletedAccountAddress.sSpendPublicKey = spendPublicKey;
+        deletedAccountAddress.sViewPublicKey = m_viewPublicKey;
         auto deletedAddressString = m_currency.accountAddressAsString(deletedAccountAddress);
 
         std::vector<size_t> deletedTransactions;
@@ -1041,10 +1041,10 @@ void WalletGreen::subscribeWallets()
             const auto &wallet = *it;
 
             FAccountSubscription sub;
-            sub.sKeys.address.viewPublicKey = m_viewPublicKey;
-            sub.sKeys.address.spendPublicKey = wallet.spendPublicKey;
-            sub.sKeys.viewSecretKey = m_viewSecretKey;
-            sub.sKeys.spendSecretKey = wallet.spendSecretKey;
+            sub.sKeys.sAddress.sViewPublicKey = m_viewPublicKey;
+            sub.sKeys.sAddress.sSpendPublicKey = wallet.spendPublicKey;
+            sub.sKeys.sViewSecretKey = m_viewSecretKey;
+            sub.sKeys.sSpendSecretKey = wallet.spendSecretKey;
             sub.uTransactionSpendableAge = m_transactionSoftLockTime;
             sub.sSyncStart.uHeight = 0;
             sub.sSyncStart.uTimestamp = std::max(
@@ -1063,7 +1063,7 @@ void WalletGreen::subscribeWallets()
     } catch (const std::exception &e) {
         m_logger(ERROR, BRIGHT_RED) << "Failed to subscribe wallets: " << e.what();
 
-        std::vector<AccountPublicAddress> subscriptionList;
+        std::vector<FAccountPublicAddress> subscriptionList;
         m_synchronizer.getSubscriptions(subscriptionList);
         for (auto &subscription : subscriptionList) {
             m_synchronizer.removeSubscription(subscription);
@@ -1204,7 +1204,7 @@ size_t WalletGreen::getAddressCount() const
     return m_walletsContainer.get<RandomAccessIndex>().size();
 }
 
-AccountPublicAddress WalletGreen::getAccountPublicAddress(size_t index) const
+FAccountPublicAddress WalletGreen::getAccountPublicAddress(size_t index) const
 {
     throwIfNotInitialized();
     throwIfStopped();
@@ -1224,7 +1224,7 @@ std::string WalletGreen::getAddress(size_t index) const
     return m_currency.accountAddressAsString(getAccountPublicAddress(index));
 }
 
-KeyPair WalletGreen::getAddressSpendKey(size_t index) const
+FKeyPair WalletGreen::getAddressSpendKey(size_t index) const
 {
     throwIfNotInitialized();
     throwIfStopped();
@@ -1241,14 +1241,14 @@ KeyPair WalletGreen::getAddressSpendKey(size_t index) const
     return {wallet.spendPublicKey, wallet.spendSecretKey};
 }
 
-KeyPair WalletGreen::getAddressSpendKey(const std::string &address) const
+FKeyPair WalletGreen::getAddressSpendKey(const std::string &address) const
 {
     throwIfNotInitialized();
     throwIfStopped();
 
-    QwertyNote::AccountPublicAddress pubAddr = parseAddress(address);
+    QwertyNote::FAccountPublicAddress pubAddr = parseAddress(address);
 
-    auto it = m_walletsContainer.get<KeysIndex>().find(pubAddr.spendPublicKey);
+    auto it = m_walletsContainer.get<KeysIndex>().find(pubAddr.sSpendPublicKey);
     if (it == m_walletsContainer.get<KeysIndex>().end()) {
         m_logger(ERROR, BRIGHT_RED)
             << "Failed to get address spend key: address not found "
@@ -1259,7 +1259,7 @@ KeyPair WalletGreen::getAddressSpendKey(const std::string &address) const
     return {it->spendPublicKey, it->spendSecretKey};
 }
 
-KeyPair WalletGreen::getViewKey() const
+FKeyPair WalletGreen::getViewKey() const
 {
     throwIfNotInitialized();
     throwIfStopped();
@@ -1269,11 +1269,11 @@ KeyPair WalletGreen::getViewKey() const
 
 std::string WalletGreen::createAddress()
 {
-    KeyPair spendKey;
-    Crypto::generateKeys(spendKey.publicKey, spendKey.secretKey);
+    FKeyPair spendKey;
+    Crypto::generateKeys(spendKey.sPublicKey, spendKey.sSecretKey);
     uint64_t creationTimestamp = static_cast<uint64_t>(time(nullptr));
 
-    return doCreateAddress(spendKey.publicKey, spendKey.secretKey, creationTimestamp);
+    return doCreateAddress(spendKey.sPublicKey, spendKey.sSecretKey, creationTimestamp);
 }
 
 std::string WalletGreen::createAddress(const Crypto::FSecretKey &spendSecretKey, bool reset)
@@ -1441,7 +1441,7 @@ std::string WalletGreen::addWallet(const Crypto::FPublicKey &spendPublicKey,
     if (insertIt != index.end()) {
         m_logger(ERROR, BRIGHT_RED)
             << "Failed to add wallet: address already exists, "
-            << m_currency.accountAddressAsString(AccountPublicAddress{
+            << m_currency.accountAddressAsString(FAccountPublicAddress{
                 spendPublicKey,
                 m_viewPublicKey
             });
@@ -1453,10 +1453,10 @@ std::string WalletGreen::addWallet(const Crypto::FPublicKey &spendPublicKey,
 
     try {
         FAccountSubscription sub;
-        sub.sKeys.address.viewPublicKey = m_viewPublicKey;
-        sub.sKeys.address.spendPublicKey = spendPublicKey;
-        sub.sKeys.viewSecretKey = m_viewSecretKey;
-        sub.sKeys.spendSecretKey = spendSecretKey;
+        sub.sKeys.sAddress.sViewPublicKey = m_viewPublicKey;
+        sub.sKeys.sAddress.sSpendPublicKey = spendPublicKey;
+        sub.sKeys.sViewSecretKey = m_viewSecretKey;
+        sub.sKeys.sSpendSecretKey = spendSecretKey;
         sub.uTransactionSpendableAge = m_transactionSoftLockTime;
         sub.sSyncStart.uHeight = 0;
         sub.sSyncStart.uTimestamp = std::max(
@@ -1505,9 +1505,9 @@ void WalletGreen::deleteAddress(const std::string &address)
     throwIfNotInitialized();
     throwIfStopped();
 
-    QwertyNote::AccountPublicAddress pubAddr = parseAddress(address);
+    QwertyNote::FAccountPublicAddress pubAddr = parseAddress(address);
 
-    auto it = m_walletsContainer.get<KeysIndex>().find(pubAddr.spendPublicKey);
+    auto it = m_walletsContainer.get<KeysIndex>().find(pubAddr.sSpendPublicKey);
     if (it == m_walletsContainer.get<KeysIndex>().end()) {
         m_logger(ERROR, BRIGHT_RED) << "Failed to delete wallet: address not found " << address;
         throw std::system_error(make_error_code(error::OBJECT_NOT_FOUND));
@@ -1710,7 +1710,7 @@ void WalletGreen::prepareTransaction(std::vector<WalletOuts> &&wallets,
                                      const std::string &extra,
                                      uint64_t unlockTimestamp,
                                      const DonationSettings &donation,
-                                     const QwertyNote::AccountPublicAddress &changeDestination,
+                                     const QwertyNote::FAccountPublicAddress &changeDestination,
                                      PreparedTransaction &preparedTransaction,
                                      Crypto::FSecretKey &txSecretKey)
 {
@@ -1881,10 +1881,10 @@ uint64_t WalletGreen::countNeededMoney(const std::vector<WalletTransfer> &destin
     return neededMoney;
 }
 
-QwertyNote::AccountPublicAddress WalletGreen::parseAccountAddressString(
+QwertyNote::FAccountPublicAddress WalletGreen::parseAccountAddressString(
     const std::string &addressString) const
 {
-    QwertyNote::AccountPublicAddress address;
+    QwertyNote::FAccountPublicAddress address;
 
     if (!m_currency.parseAccountAddressString(addressString, address)) {
         m_logger(ERROR, BRIGHT_RED) << "Bad address: " << addressString;
@@ -2042,7 +2042,7 @@ size_t WalletGreen::doTransfer(const TransactionParameters &transactionParameter
                                Crypto::FSecretKey &txSecretKey)
 {
     validateTransactionParameters(transactionParameters);
-    QwertyNote::AccountPublicAddress changeDestination = getChangeDestination(
+    QwertyNote::FAccountPublicAddress changeDestination = getChangeDestination(
         transactionParameters.changeDestination,
         transactionParameters.sourceAddresses
     );
@@ -2109,7 +2109,7 @@ size_t WalletGreen::makeTransaction(const TransactionParameters &sendingTransact
         << ", unlockTimestamp " << sendingTransaction.unlockTimestamp;
 
     validateTransactionParameters(sendingTransaction);
-    QwertyNote::AccountPublicAddress changeDestination = getChangeDestination(
+    QwertyNote::FAccountPublicAddress changeDestination = getChangeDestination(
         sendingTransaction.changeDestination,
         sendingTransaction.sourceAddresses
     );

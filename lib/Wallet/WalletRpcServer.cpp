@@ -568,7 +568,7 @@ bool wallet_rpc_server::on_query_key(
     }
 
     if (req.key_type.compare("paperwallet") == 0) {
-        AccountKeys keys;
+        FAccountKeys keys;
         m_wallet.getAccountKeys(keys);
         res.key = Tools::Base58::encodeAddr(
                 parameters::ADDRESS_BASE58_PREFIX,
@@ -600,13 +600,13 @@ bool wallet_rpc_server::on_validate_address(
     const wallet_rpc::COMMAND_RPC_VALIDATE_ADDRESS::request &req,
     wallet_rpc::COMMAND_RPC_VALIDATE_ADDRESS::response &res)
 {
-    AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
+    FAccountPublicAddress acc = boost::value_initialized<FAccountPublicAddress>();
     bool r = m_currency.parseAccountAddressString(req.address, acc);
     res.isvalid = r;
     if (r) {
         res.address = m_currency.accountAddressAsString(acc);
-        res.spendPublicKey = Common::podToHex(acc.spendPublicKey);
-        res.viewPublicKey = Common::podToHex(acc.viewPublicKey);
+        res.spendPublicKey = Common::podToHex(acc.sSpendPublicKey);
+        res.viewPublicKey = Common::podToHex(acc.sViewPublicKey);
     }
     res.status = CORE_RPC_STATUS_OK;
 
@@ -689,7 +689,7 @@ bool wallet_rpc_server::on_get_tx_proof(
         );
     }
 
-    QwertyNote::AccountPublicAddress dest_address;
+    QwertyNote::FAccountPublicAddress dest_address;
     if (!m_currency.parseAccountAddressString(req.dest_address, dest_address)) {
         throw JsonRpc::JsonRpcError(
             WALLET_RPC_ERROR_CODE_WRONG_ADDRESS,
@@ -789,7 +789,7 @@ bool wallet_rpc_server::on_verify_message(
     const wallet_rpc::COMMAND_RPC_VERIFY_MESSAGE::request &req,
     wallet_rpc::COMMAND_RPC_VERIFY_MESSAGE::response &res)
 {
-    QwertyNote::AccountPublicAddress address;
+    QwertyNote::FAccountPublicAddress address;
     if (!m_currency.parseAccountAddressString(req.address, address)) {
         throw JsonRpc::JsonRpcError(
             WALLET_RPC_ERROR_CODE_WRONG_ADDRESS,

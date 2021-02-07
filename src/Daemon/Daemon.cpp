@@ -173,7 +173,7 @@ bool command_line_preprocessor(const boost::program_options::variables_map &vm, 
 
 void print_genesis_tx_hex(const po::variables_map &vm, LoggerManager &logManager)
 {
-    QwertyNote::Transaction tx =
+    QwertyNote::FTransaction tx =
             QwertyNote::CurrencyBuilder(logManager).generateGenesisTransaction();
     std::string tx_hex = Common::toHex(QwertyNote::toBinaryArray(tx));
     std::cout
@@ -465,7 +465,7 @@ int main(int argc, char *argv[])
         if (CommandLine::hasArg(vm, arg_set_fee_address)) {
             std::string addr_str = CommandLine::getArg(vm, arg_set_fee_address);
             if (!addr_str.empty()) {
-                AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
+                FAccountPublicAddress acc = boost::value_initialized<FAccountPublicAddress>();
                 if (!currency.parseAccountAddressString(addr_str, acc)) {
                     logger(ERROR, BRIGHT_RED) << "Bad fee address: " << addr_str;
                     return 1;

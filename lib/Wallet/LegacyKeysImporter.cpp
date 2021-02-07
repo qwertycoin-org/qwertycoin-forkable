@@ -86,9 +86,9 @@ void loadKeysFromFile(const std::string &filename,
         throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
     }
 
-    const QwertyNote::AccountKeys& keys = account.getAccountKeys();
-    QwertyNote::throwIfKeysMissmatch(keys.viewSecretKey, keys.address.viewPublicKey);
-    QwertyNote::throwIfKeysMissmatch(keys.spendSecretKey, keys.address.spendPublicKey);
+    const QwertyNote::FAccountKeys& keys = account.getAccountKeys();
+    QwertyNote::throwIfKeysMissmatch(keys.sViewSecretKey, keys.sAddress.sViewPublicKey);
+    QwertyNote::throwIfKeysMissmatch(keys.sSpendSecretKey, keys.sAddress.sSpendPublicKey);
 }
 
 } // namespace

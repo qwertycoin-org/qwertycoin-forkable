@@ -23,6 +23,6 @@
 
 namespace QwertyNote {
 
-KeyPair generateKeyPair();
+FKeyPair generateKeyPair();
 
 } // namespace QwertyNote

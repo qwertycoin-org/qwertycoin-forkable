@@ -83,7 +83,7 @@ private:
 class WalletRelayTransactionRequest: public WalletRequest
 {
 public:
-    WalletRelayTransactionRequest(const QwertyNote::Transaction &tx, Callback cb)
+    WalletRelayTransactionRequest(const QwertyNote::FTransaction &tx, Callback cb)
         : m_tx(tx), m_cb(cb)
     {
     };
@@ -98,7 +98,7 @@ public:
     }
 
 private:
-    QwertyNote::Transaction m_tx;
+    QwertyNote::FTransaction m_tx;
     Callback m_cb;
 };
 

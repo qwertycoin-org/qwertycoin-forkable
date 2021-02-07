@@ -42,30 +42,30 @@ bool serialize(FEllipticCurvePoint &ecPoint, Common::StringView name, CN::ISeria
 
 namespace QwertyNote {
 
-struct AccountKeys;
+struct FAccountKeys;
 struct TransactionExtraMergeMiningTag;
 
-void serialize(TransactionPrefix &txP, ISerializer &serializer);
-void serialize(Transaction &tx, ISerializer &serializer);
-void serialize(TransactionInput &in, ISerializer &serializer);
-void serialize(TransactionOutput &in, ISerializer &serializer);
+void serialize(FTransactionPrefix &txP, ISerializer &serializer);
+void serialize(FTransaction &tx, ISerializer &serializer);
+void serialize(FTransactionInput &in, ISerializer &serializer);
+void serialize(FTransactionOutput &in, ISerializer &serializer);
 
-void serialize(BaseInput &gen, ISerializer &serializer);
-void serialize(KeyInput &key, ISerializer &serializer);
-void serialize(MultiSignatureInput &multisignature, ISerializer &serializer);
+void serialize(FBaseInput &gen, ISerializer &serializer);
+void serialize(FKeyInput &key, ISerializer &serializer);
+void serialize(FMultiSignatureInput &multisignature, ISerializer &serializer);
 
-void serialize(TransactionOutput &output, ISerializer &serializer);
-void serialize(TransactionOutputTarget &output, ISerializer &serializer);
-void serialize(KeyOutput &key, ISerializer &serializer);
-void serialize(MultiSignatureOutput &multisignature, ISerializer &serializer);
+void serialize(FTransactionOutput &output, ISerializer &serializer);
+void serialize(FTransactionOutputTarget &output, ISerializer &serializer);
+void serialize(FKeyOutput &key, ISerializer &serializer);
+void serialize(FMultiSignatureOutput &multisignature, ISerializer &serializer);
 
-void serialize(BlockHeader &header, ISerializer &serializer);
-void serialize(Block &block, ISerializer &serializer);
+void serialize(FBlockHeader &header, ISerializer &serializer);
+void serialize(FBlock &block, ISerializer &serializer);
 void serialize(TransactionExtraMergeMiningTag& tag, ISerializer& serializer);
 
-void serialize(AccountPublicAddress &address, ISerializer &serializer);
-void serialize(AccountKeys &keys, ISerializer &s);
+void serialize(FAccountPublicAddress &address, ISerializer &serializer);
+void serialize(FAccountKeys &keys, ISerializer &s);
 
-void serialize(KeyPair &keyPair, ISerializer &serializer);
+void serialize(FKeyPair &keyPair, ISerializer &serializer);
 
 } // namespace QwertyNote

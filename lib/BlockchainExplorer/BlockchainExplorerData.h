@@ -73,20 +73,20 @@ struct TransactionInputMultiSignatureDetails
 
 struct BaseInputDetails
 {
-    BaseInput input;
+    FBaseInput input;
     uint64_t amount;
 };
 
 struct KeyInputDetails
 {
-    KeyInput input;
+    FKeyInput input;
     uint64_t mixin;
     std::vector<TransactionOutputReferenceDetails> outputs;
 };
 
 struct MultiSignatureInputDetails
 {
-    MultiSignatureInput input;
+    FMultiSignatureInput input;
     TransactionOutputReferenceDetails output;
 };
 
@@ -98,7 +98,7 @@ typedef boost::variant<
 
 struct TransactionOutputDetails
 {
-    TransactionOutput output;
+    FTransactionOutput output;
     uint64_t globalIndex;
 };
 

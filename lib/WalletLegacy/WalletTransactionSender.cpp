@@ -51,7 +51,7 @@ uint64_t countNeededMoney(uint64_t fee, const std::vector<WalletLegacyTransfer> 
 }
 
 void createChangeDestinations(
-    const AccountPublicAddress &address,
+    const FAccountPublicAddress &address,
     uint64_t neededMoney,
     uint64_t foundMoney,
     TransactionDestinationEntry &changeDts)
@@ -63,17 +63,17 @@ void createChangeDestinations(
 }
 
 void constructTx(
-    const AccountKeys keys,
-    const std::vector<TransactionSourceEntry> &sources,
-    const std::vector<TransactionDestinationEntry> &splittedDests,
-    const std::string &extra,
-    uint64_t unlockTimestamp,
-    uint64_t sizeLimit,
-    Transaction &tx,
-    const std::vector<tx_message_entry> &messages,
-    uint64_t ttl,
-    const std::string &sender,
-    Crypto::FSecretKey &tx_key)
+		const FAccountKeys keys,
+		const std::vector<TransactionSourceEntry> &sources,
+		const std::vector<TransactionDestinationEntry> &splittedDests,
+		const std::string &extra,
+		uint64_t unlockTimestamp,
+		uint64_t sizeLimit,
+		FTransaction &tx,
+		const std::vector<tx_message_entry> &messages,
+		uint64_t ttl,
+		const std::string &sender,
+		Crypto::FSecretKey &tx_key)
 {
     std::vector<uint8_t> extraVec;
     extraVec.reserve(extra.size());
@@ -114,10 +114,10 @@ std::shared_ptr<WalletLegacyEvent> makeCompleteEvent(
 namespace QwertyNote {
 
 WalletTransactionSender::WalletTransactionSender(
-    const Currency &currency,
-    WalletUserTransactionsCache &transactionsCache,
-    AccountKeys keys,
-    ITransfersContainer &transfersContainer)
+		const Currency &currency,
+		WalletUserTransactionsCache &transactionsCache,
+		FAccountKeys keys,
+		ITransfersContainer &transfersContainer)
     : m_currency(currency),
       m_transactionsCache(transactionsCache),
       m_isStoping(false),
@@ -134,7 +134,7 @@ void WalletTransactionSender::stop()
 
 bool WalletTransactionSender::validateDestinationAddress(const std::string &address)
 {
-    AccountPublicAddress ignore;
+    FAccountPublicAddress ignore;
     return m_currency.parseAccountAddressString(address, ignore);
 }
 
@@ -189,7 +189,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendRequest(
     context->sender = sender;
 
     for (const TransactionMessage &message : messages) {
-        AccountPublicAddress address;
+        FAccountPublicAddress address;
         bool extracted = m_currency.parseAccountAddressString(message.address, address);
         if (!extracted) {
             throw std::system_error(make_error_code(error::BAD_ADDRESS));
@@ -377,7 +377,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::doSendTransaction(
         TransactionDestinationEntry changeDts;
         changeDts.amount = 0;
         uint64_t totalAmount = -transaction.totalAmount;
-        createChangeDestinations(m_keys.address, totalAmount, context->foundMoney, changeDts);
+        createChangeDestinations(m_keys.sAddress, totalAmount, context->foundMoney, changeDts);
 
         std::vector<TransactionDestinationEntry> splittedDests;
         splitDestinations(
@@ -388,7 +388,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::doSendTransaction(
             splittedDests
         );
 
-        Transaction tx;
+        FTransaction tx;
         constructTx(
             m_keys,
             sources,
@@ -491,7 +491,7 @@ void WalletTransactionSender::digitSplitStrategy(
     for (TransferId idx = firstTransferId; idx < firstTransferId + transfersCount; ++idx) {
         WalletLegacyTransfer& de = m_transactionsCache.getTransfer(idx);
 
-        AccountPublicAddress addr;
+        FAccountPublicAddress addr;
         if (!m_currency.parseAccountAddressString(de.address, addr)) {
             throw std::system_error(make_error_code(error::BAD_ADDRESS));
         }

@@ -82,7 +82,7 @@ public:
     FBlockHeaderInfo getLastLocalBlockHeaderInfo() const override;
     uint32_t getGRBHeight() const override;
 
-    void relayTransaction(const QwertyNote::Transaction &transaction,
+    void relayTransaction(const QwertyNote::FTransaction &transaction,
                           const UCallback &callback) override;
     void getRandomOutsByAmounts(
         std::vector<uint64_t> &&amounts,
@@ -108,9 +108,9 @@ public:
                                     std::vector<Crypto::FHash> &deletedTxIds,
                                     const UCallback &callback) override;
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
-                                              uint32_t gindex,
-                                              MultiSignatureOutput &out,
-                                              const UCallback &callback) override;
+											  uint32_t gindex,
+											  FMultiSignatureOutput &out,
+											  const UCallback &callback) override;
     void getBlocks(const std::vector<uint32_t> &blockHeights,
                    std::vector<std::vector<BlockDetails>> &blocks,
                    const UCallback &callback) override;
@@ -156,7 +156,7 @@ private:
     void updatePoolState(const std::vector<std::unique_ptr<ITransactionReader>> &addedTxs,
                          const std::vector<Crypto::FHash> &deletedTxsIds);
 
-    std::error_code doRelayTransaction(const QwertyNote::Transaction &transaction);
+    std::error_code doRelayTransaction(const QwertyNote::FTransaction &transaction);
     std::error_code doGetRandomOutsByAmounts(
         std::vector<uint64_t> &amounts,
         uint64_t outsCount,

@@ -33,18 +33,18 @@ public:
     BlockchainExplorerDataBuilder(const BlockchainExplorerDataBuilder &) = delete;
     BlockchainExplorerDataBuilder(BlockchainExplorerDataBuilder &&) = delete;
 
-    bool fillBlockDetails(const Block &block, BlockDetails &blockDetails,
+    bool fillBlockDetails(const FBlock &block, BlockDetails &blockDetails,
                           bool calculatePoW = false);
-    bool fillTransactionDetails(const Transaction &tx, TransactionDetails &txRpcInfo,
+    bool fillTransactionDetails(const FTransaction &tx, TransactionDetails &txRpcInfo,
                                 uint64_t timestamp = 0);
 
-    static bool getPaymentId(const Transaction &transaction, Crypto::FHash &paymentId);
+    static bool getPaymentId(const FTransaction &transaction, Crypto::FHash &paymentId);
 
     BlockchainExplorerDataBuilder &operator=(const BlockchainExplorerDataBuilder &) = delete;
     BlockchainExplorerDataBuilder &operator=(BlockchainExplorerDataBuilder &&) = delete;
 
 private:
-    static bool getMixin(const Transaction &transaction, uint64_t &mixin);
+    static bool getMixin(const FTransaction &transaction, uint64_t &mixin);
     static bool fillTxExtra(const std::vector<uint8_t> &rawExtra,
                             TransactionExtraDetails &extraDetails);
     static size_t median(std::vector<size_t> &v);

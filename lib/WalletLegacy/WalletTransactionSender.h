@@ -36,10 +36,10 @@ class WalletTransactionSender
 {
 public:
     WalletTransactionSender(
-        const Currency &currency,
-        WalletUserTransactionsCache &transactionsCache,
-        AccountKeys keys,
-        ITransfersContainer &transfersContainer
+			const Currency &currency,
+			WalletUserTransactionsCache &transactionsCache,
+			FAccountKeys keys,
+			ITransfersContainer &transfersContainer
     );
 
     void stop();
@@ -127,7 +127,7 @@ private:
 
 private:
     const Currency &m_currency;
-    AccountKeys m_keys;
+    FAccountKeys m_keys;
     WalletUserTransactionsCache &m_transactionsCache;
     uint64_t m_upperTransactionSizeLimit;
 

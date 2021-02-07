@@ -560,10 +560,10 @@ void WalletSerializerV1::subscribeWallets()
         const auto &wallet = *it;
 
         FAccountSubscription sub;
-        sub.sKeys.address.viewPublicKey = m_viewPublicKey;
-        sub.sKeys.address.spendPublicKey = wallet.spendPublicKey;
-        sub.sKeys.viewSecretKey = m_viewSecretKey;
-        sub.sKeys.spendSecretKey = wallet.spendSecretKey;
+        sub.sKeys.sAddress.sViewPublicKey = m_viewPublicKey;
+        sub.sKeys.sAddress.sSpendPublicKey = wallet.spendPublicKey;
+        sub.sKeys.sViewSecretKey = m_viewSecretKey;
+        sub.sKeys.sSpendSecretKey = wallet.spendSecretKey;
         sub.uTransactionSpendableAge = m_transactionSoftLockTime;
         sub.sSyncStart.uHeight = 0;
         sub.sSyncStart.uTimestamp = std::max(static_cast<uint64_t>(wallet.creationTimestamp), ACCOUNT_CREATE_TIME_ACCURACY) - ACCOUNT_CREATE_TIME_ACCURACY;

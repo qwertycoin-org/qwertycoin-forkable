@@ -611,7 +611,7 @@ void BlockchainSynchronizer::processBlocks(GetBlocksResponse &response)
         if (block.bHasBlock) {
             completeBlock.block = std::move(block.sBlock);
             completeBlock.transactions.push_back(createTransactionPrefix(
-                completeBlock.block->baseTransaction
+                completeBlock.block->sBaseTransaction
             ));
 
             try {

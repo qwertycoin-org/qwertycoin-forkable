@@ -36,7 +36,7 @@ public:
     void onBlockchainDetach(uint32_t height);
     void onError(const std::error_code &ec, uint32_t height);
     bool advanceHeight(uint32_t height);
-    const AccountKeys &getKeys() const;
+    const FAccountKeys &getKeys() const;
     bool addTransaction(const TransactionBlockInfo &blockInfo,
                         const ITransactionReader &tx,
                         const std::vector<TransactionOutputInformationIn> &transfers);
@@ -48,7 +48,7 @@ public:
     void markTransactionSafe(const Crypto::FHash &transactionHash);
 
     // ITransfersSubscription
-    AccountPublicAddress getAddress() override;
+    FAccountPublicAddress getAddress() override;
     ITransfersContainer& getContainer() override;
 
 private:

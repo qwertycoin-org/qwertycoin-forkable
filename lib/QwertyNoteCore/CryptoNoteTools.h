@@ -142,9 +142,9 @@ Crypto::FHash getObjectHash(const T &object)
     return hash;
 }
 
-uint64_t getInputAmount(const Transaction &transaction);
-std::vector<uint64_t> getInputsAmounts(const Transaction &transaction);
-uint64_t getOutputAmount(const Transaction &transaction);
+uint64_t getInputAmount(const FTransaction &transaction);
+std::vector<uint64_t> getInputsAmounts(const FTransaction &transaction);
+uint64_t getOutputAmount(const FTransaction &transaction);
 void decomposeAmount(
     uint64_t amount,
     uint64_t dustThreshold,

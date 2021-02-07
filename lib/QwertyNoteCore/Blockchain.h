@@ -70,9 +70,9 @@ public:
     bool removeObserver(IBlockchainStorageObserver *observer);
 
     // ITransactionValidator
-    bool checkTransactionInputs(const Transaction &tx, BlockInfo &maxUsedBlock) override;
-    bool checkTransactionInputs(const Transaction &tx, BlockInfo &maxUsedBlock, BlockInfo &lastFailed) override;
-    bool haveSpentKeyImages(const Transaction &tx) override;
+    bool checkTransactionInputs(const FTransaction &tx, BlockInfo &maxUsedBlock) override;
+    bool checkTransactionInputs(const FTransaction &tx, BlockInfo &maxUsedBlock, BlockInfo &lastFailed) override;
+    bool haveSpentKeyImages(const FTransaction &tx) override;
     bool checkTransactionSize(size_t blobSize) override;
 
     bool init() { return init(Tools::getDefaultDataDirectory(), true); }
@@ -83,20 +83,20 @@ public:
     std::vector<Crypto::FHash> getBlockIds(uint32_t startHeight, uint32_t maxCount);
 
     void setCheckpoints(Checkpoints &&chk_pts) { m_checkpoints = chk_pts; }
-    bool getBlocks(uint32_t start_offset, uint32_t count, std::list<Block> &blocks, std::list<Transaction> &txs);
-    bool getBlocks(uint32_t start_offset, uint32_t count, std::list<Block> &blocks);
+    bool getBlocks(uint32_t start_offset, uint32_t count, std::list<FBlock> &blocks, std::list<FTransaction> &txs);
+    bool getBlocks(uint32_t start_offset, uint32_t count, std::list<FBlock> &blocks);
     bool getTransactionsWithOutputGlobalIndexes(const std::vector<Crypto::FHash> &txsIds,
 							  					std::list<Crypto::FHash> &missedTxs,
-							  					std::vector<std::pair<Transaction,
+							  					std::vector<std::pair<FTransaction,
 							  										  std::vector<uint32_t>>> &txs);
-    bool getAlternativeBlocks(std::list<Block> &blocks);
+    bool getAlternativeBlocks(std::list<FBlock> &blocks);
     uint32_t getAlternativeBlocksCount();
     Crypto::FHash getBlockIdByHeight(uint32_t height);
-    bool getBlockByHash(const Crypto::FHash &h, Block &blk);
+    bool getBlockByHash(const Crypto::FHash &h, FBlock &blk);
     bool getBlockHeight(const Crypto::FHash &blockId, uint32_t &blockHeight);
 
     bool haveTransaction(const Crypto::FHash &id);
-    bool haveTransactionKeyImagesAsSpent(const Transaction &tx);
+    bool haveTransactionKeyImagesAsSpent(const FTransaction &tx);
 
     uint32_t getCurrentBlockchainHeight(); // TODO: rename to getCurrentBlockchainSize
     Crypto::FHash getTailId();
@@ -111,8 +111,8 @@ public:
     uint64_t getMinimalFee(uint32_t height);
     uint64_t getCoinsInCirculation();
     uint8_t getBlockMajorVersionForHeight(uint32_t height) const;
-    bool addNewBlock(const Block &bl, block_verification_context &bvc);
-    bool resetAndSetGenesisBlock(const Block &b);
+    bool addNewBlock(const FBlock &bl, block_verification_context &bvc);
+    bool resetAndSetGenesisBlock(const FBlock &b);
     bool haveBlock(const Crypto::FHash &id);
     size_t getTotalTransactions();
     std::vector<Crypto::FHash> buildSparseChain();
@@ -131,9 +131,9 @@ public:
         COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_response &res);
     bool getBackwardBlocksSize(size_t from_height, std::vector<size_t> &sz, size_t count);
     bool getTransactionOutputGlobalIndexes(const Crypto::FHash &tx_id, std::vector<uint32_t> &indexs);
-    bool getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, MultiSignatureOutput &out);
+    bool getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, FMultiSignatureOutput &out);
     bool checkTransactionInputs(
-        const Transaction &tx,
+        const FTransaction &tx,
         uint32_t &pmax_used_block_height,
         Crypto::FHash &max_used_block_id,
         BlockInfo *tail = 0);
@@ -154,7 +154,7 @@ public:
     bool getAlreadyGeneratedCoins(const Crypto::FHash &hash, uint64_t &generatedCoins);
     bool getBlockSize(const Crypto::FHash &hash, size_t &size);
     bool getMultisigOutputReference(
-        const MultiSignatureInput &txInMultisig,
+        const FMultiSignatureInput &txInMultisig,
         std::pair<Crypto::FHash, size_t> &outputReference);
     bool getGeneratedTransactionsNumber(uint32_t height, uint64_t &generatedTransactions);
     bool getOrphanBlockIdsByHeight(uint32_t height, std::vector<Crypto::FHash> &blockHashes);
@@ -173,7 +173,7 @@ public:
 
     template<class visitor_t>
     bool scanOutputKeysForIndexes(
-        const KeyInput &tx_in_to_key,
+        const FKeyInput &tx_in_to_key,
         visitor_t &vis,
         uint32_t *pmax_related_block_height = nullptr);
 
@@ -282,7 +282,7 @@ private:
             s(m_global_output_indexes, "indexes");
         }
 
-        Transaction tx;
+        FTransaction tx;
         std::vector<uint32_t> m_global_output_indexes;
     };
 
@@ -298,7 +298,7 @@ private:
             s(transactions, "transactions");
         }
 
-        Block bl;
+        FBlock bl;
         uint32_t height;
         uint64_t block_cumulative_size;
         difficulty_type cumulative_difficulty;
@@ -360,22 +360,22 @@ private:
         std::list<blocks_ext_by_hash::iterator> &alt_chain,
         bool discard_disconnected_chain);
     bool handle_alternative_block(
-        const Block &b,
+        const FBlock &b,
         const Crypto::FHash &id,
         block_verification_context &bvc,
         bool sendNewAlternativeBlockMessage = true);
     difficulty_type get_next_difficulty_for_alternative_chain(const std::list<blocks_ext_by_hash::iterator> &alt_chain,
         BlockEntry &bei, uint64_t nextBlockTime);
-    bool prevalidate_miner_transaction(const Block &b, uint32_t height);
+    bool prevalidate_miner_transaction(const FBlock &b, uint32_t height);
     bool validate_miner_transaction(
-        const Block &b,
+        const FBlock &b,
         uint32_t height,
         size_t cumulativeBlockSize,
         uint64_t alreadyGeneratedCoins,
         uint64_t fee,
         uint64_t &reward,
         int64_t &emissionChange);
-    bool rollback_blockchain_switching(std::list<Block> &original_chain, size_t rollback_height);
+    bool rollback_blockchain_switching(std::list<FBlock> &original_chain, size_t rollback_height);
     bool get_last_n_blocks_sizes(std::vector<size_t> &sz, size_t count);
     bool add_out_to_get_random_outs(
         std::vector<std::pair<TransactionIndex, uint16_t>> &amount_outs,
@@ -384,36 +384,36 @@ private:
         size_t i);
     bool is_tx_spendtime_unlocked(uint64_t unlock_time);
     size_t find_end_of_allowed_index(const std::vector<std::pair<TransactionIndex, uint16_t>> &amount_outs);
-    bool check_block_timestamp_main(const Block &b);
-    bool check_block_timestamp(std::vector<uint64_t> timestamps, const Block &b);
+    bool check_block_timestamp_main(const FBlock &b);
+    bool check_block_timestamp(std::vector<uint64_t> timestamps, const FBlock &b);
     uint64_t get_adjusted_time();
     bool complete_timestamps_vector(
         uint8_t blockMajorVersion,
         uint64_t start_height,
         std::vector<uint64_t> &timestamps);
-    bool checkBlockVersion(const Block &b, const Crypto::FHash &blockHash);
+    bool checkBlockVersion(const FBlock &b, const Crypto::FHash &blockHash);
     bool checkCumulativeBlockSize(
         const Crypto::FHash &blockId,
         size_t cumulativeBlockSize,
         uint64_t height);
     std::vector<Crypto::FHash> doBuildSparseChain(const Crypto::FHash &startBlockId) const;
-    bool getBlockCumulativeSize(const Block &block, size_t &cumulativeSize);
+    bool getBlockCumulativeSize(const FBlock &block, size_t &cumulativeSize);
     bool update_next_cumulative_size_limit();
     bool check_tx_input(
-        const KeyInput &txin,
+        const FKeyInput &txin,
         const Crypto::FHash &tx_prefix_hash,
         const std::vector<Crypto::FSignature> &sig,
         uint32_t *pmax_related_block_height = nullptr);
     bool checkTransactionInputs(
-        const Transaction &tx,
+        const FTransaction &tx,
         const Crypto::FHash &tx_prefix_hash,
         uint32_t *pmax_used_block_height = nullptr);
-    bool checkTransactionInputs(const Transaction &tx, uint32_t *pmax_used_block_height = nullptr);
+    bool checkTransactionInputs(const FTransaction &tx, uint32_t *pmax_used_block_height = nullptr);
     const TransactionEntry &transactionByIndex(TransactionIndex index);
-    bool pushBlock(const Block &blockData, block_verification_context &bvc);
+    bool pushBlock(const FBlock &blockData, block_verification_context &bvc);
     bool pushBlock(
-        const Block &blockData,
-        const std::vector<Transaction> &transactions,
+        const FBlock &blockData,
+        const std::vector<FTransaction> &transactions,
         block_verification_context &bvc);
     bool pushBlock(BlockEntry &block);
     void popBlock();
@@ -421,10 +421,10 @@ private:
         BlockEntry &block,
         const Crypto::FHash &transactionHash,
         TransactionIndex transactionIndex);
-    void popTransaction(const Transaction &transaction, const Crypto::FHash &transactionHash);
+    void popTransaction(const FTransaction &transaction, const Crypto::FHash &transactionHash);
     void popTransactions(const BlockEntry &block, const Crypto::FHash &minerTransactionHash);
     bool validateInput(
-        const MultiSignatureInput &input,
+        const FMultiSignatureInput &input,
         const Crypto::FHash &transactionHash,
         const Crypto::FHash &transactionPrefixHash,
         const std::vector<Crypto::FSignature> &transactionSignatures);
@@ -435,8 +435,8 @@ private:
     bool storeBlockchainIndices();
     bool loadBlockchainIndices();
 
-    bool loadTransactions(const Block &block, std::vector<Transaction> &transactions);
-    void saveTransactions(const std::vector<Transaction> &transactions);
+    bool loadTransactions(const FBlock &block, std::vector<FTransaction> &transactions);
+    void saveTransactions(const std::vector<FTransaction> &transactions);
 
     void sendMessage(const BlockchainMessage &message);
 
@@ -464,17 +464,17 @@ private:
 
 template<class visitor_t>
 bool Blockchain::scanOutputKeysForIndexes(
-    const KeyInput &tx_in_to_key,
+    const FKeyInput &tx_in_to_key,
     visitor_t &vis,
     uint32_t *pmax_related_block_height)
 {
     std::lock_guard<std::recursive_mutex> lk(m_blockchain_lock);
-    auto it = m_outputs.find(tx_in_to_key.amount);
-    if (it == m_outputs.end() || tx_in_to_key.outputIndexes.empty()) {
+    auto it = m_outputs.find(tx_in_to_key.uAmount);
+    if (it == m_outputs.end() || tx_in_to_key.vOutputIndexes.empty()) {
         return false;
     }
 
-    auto absolute_offsets = relative_output_offsets_to_absolute(tx_in_to_key.outputIndexes);
+    auto absolute_offsets = relative_output_offsets_to_absolute(tx_in_to_key.vOutputIndexes);
     std::vector<std::pair<TransactionIndex, uint16_t>> &amount_outs_vec = it->second;
     size_t count = 0;
     for (uint64_t i : absolute_offsets) {
@@ -487,16 +487,16 @@ bool Blockchain::scanOutputKeysForIndexes(
 
         const TransactionEntry &tx = transactionByIndex(amount_outs_vec[i].first);
 
-        if (amount_outs_vec[i].second >= tx.tx.outputs.size()) {
+        if (amount_outs_vec[i].second >= tx.tx.vOutputs.size()) {
             logger(Logging::ERROR, Logging::BRIGHT_RED)
                 << "Wrong index in transaction outputs: "
                 << amount_outs_vec[i].second << ", expected less then "
-                << tx.tx.outputs.size();
+                << tx.tx.vOutputs.size();
             return false;
         }
 
         const auto veci = amount_outs_vec[i];
-        if (!vis.handle_output(tx.tx, tx.tx.outputs[veci.second], veci.second)) {
+        if (!vis.handle_output(tx.tx, tx.tx.vOutputs[veci.second], veci.second)) {
             logger(Logging::INFO)
                 << "Failed to handle_output for output no = " << count
                 << ", with absolute offset " << i;

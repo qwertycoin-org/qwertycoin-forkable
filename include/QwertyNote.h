@@ -27,106 +27,106 @@
 
 namespace QwertyNote {
 
-struct BaseInput
-{
-  uint32_t blockIndex;
-};
+	struct FBaseInput
+	{
+		uint32_t uBlockIndex;
+	};
 
-struct KeyInput
-{
-    uint64_t amount;
-    std::vector<uint32_t> outputIndexes;
-    Crypto::FKeyImage keyImage;
-};
+	struct FKeyInput
+	{
+		uint64_t uAmount;
+		std::vector <uint32_t> vOutputIndexes;
+		Crypto::FKeyImage sKeyImage;
+	};
 
-struct MultiSignatureInput
-{
-    uint64_t amount;
-    uint8_t signatureCount;
-    uint32_t outputIndex;
-};
+	struct FMultiSignatureInput
+	{
+		uint8_t uSignatureCount;
+		uint32_t uOutputIndex;
+		uint64_t uAmount;
+	};
 
-struct KeyOutput
-{
-    Crypto::FPublicKey key;
-};
+	struct FKeyOutput
+	{
+		Crypto::FPublicKey sPublicKey;
+	};
 
-struct MultiSignatureOutput
-{
-    std::vector<Crypto::FPublicKey> keys;
-    uint8_t requiredSignatureCount;
-};
+	struct FMultiSignatureOutput
+	{
+		uint8_t uRequiredSignatureCount;
+		std::vector <Crypto::FPublicKey> vPublicKeys;
+	};
 
-typedef boost::variant<BaseInput, KeyInput, MultiSignatureInput> TransactionInput;
+	typedef boost::variant <FBaseInput, FKeyInput, FMultiSignatureInput> FTransactionInput;
 
-typedef boost::variant<KeyOutput, MultiSignatureOutput> TransactionOutputTarget;
+	typedef boost::variant <FKeyOutput, FMultiSignatureOutput> FTransactionOutputTarget;
 
-struct TransactionOutput
-{
-    uint64_t amount;
-    TransactionOutputTarget target;
-};
+	struct FTransactionOutput
+	{
+		uint64_t uAmount;
+		FTransactionOutputTarget sTarget;
+	};
 
-struct TransactionPrefix
-{
-    uint8_t version;
-    uint64_t unlockTime;
-    std::vector<TransactionInput> inputs;
-    std::vector<TransactionOutput> outputs;
-    std::vector<uint8_t> extra;
-};
+	struct FTransactionPrefix
+	{
+		uint8_t uVersion;
+		uint64_t uUnlockTime;
+		std::vector <uint8_t> vExtra;
+		std::vector <FTransactionInput> vInputs;
+		std::vector <FTransactionOutput> vOutputs;
+	};
 
-struct Transaction : public TransactionPrefix
-{
-    std::vector<std::vector<Crypto::FSignature>> signatures;
-};
+	struct FTransaction : public FTransactionPrefix
+	{
+		std::vector <std::vector <Crypto::FSignature>> vSignatures;
+	};
 
-struct ParentBlock
-{
-    uint8_t majorVersion;
-    uint8_t minorVersion;
-    Crypto::FHash previousBlockHash;
-    uint16_t transactionCount;
-    std::vector<Crypto::FHash> baseTransactionBranch;
-    Transaction baseTransaction;
-    std::vector<Crypto::FHash> blockchainBranch;
-};
+	struct FParentBlock
+	{
+		uint8_t uMajorVersion;
+		uint8_t uMinorVersion;
+		uint16_t uTransactionCount;
+		std::vector <Crypto::FHash> vBaseTransactionBranch;
+		std::vector <Crypto::FHash> vBlockchainBranch;
+		Crypto::FHash sPreviousBlockHash;
+		FTransaction sBaseTransaction;
+	};
 
-struct BlockHeader
-{
-    uint8_t majorVersion;
-    uint8_t minorVersion;
-    uint32_t nonce;
-    uint64_t timestamp;
-    Crypto::FHash previousBlockHash;
-};
+	struct FBlockHeader
+	{
+		uint8_t uMajorVersion;
+		uint8_t uMinorVersion;
+		uint32_t uNonce;
+		uint64_t uTimestamp;
+		Crypto::FHash sPreviousBlockHash;
+	};
 
-struct Block : public BlockHeader
-{
-    ParentBlock parentBlock;
-    Transaction baseTransaction;
-    std::vector<Crypto::FHash> transactionHashes;
-};
+	struct FBlock : public FBlockHeader
+	{
+		std::vector <Crypto::FHash> vTransactionHashes;
+		FParentBlock sParentBlock;
+		FTransaction sBaseTransaction;
+	};
 
-struct AccountPublicAddress
-{
-    Crypto::FPublicKey spendPublicKey;
-    Crypto::FPublicKey viewPublicKey;
-};
+	struct FAccountPublicAddress
+	{
+		Crypto::FPublicKey sSpendPublicKey;
+		Crypto::FPublicKey sViewPublicKey;
+	};
 
-struct AccountKeys
-{
-    AccountPublicAddress address;
-    Crypto::FSecretKey spendSecretKey;
-    Crypto::FSecretKey viewSecretKey;
-};
+	struct FAccountKeys
+	{
+		FAccountPublicAddress sAddress;
+		Crypto::FSecretKey sSpendSecretKey;
+		Crypto::FSecretKey sViewSecretKey;
+	};
 
-struct KeyPair
-{
-    Crypto::FPublicKey publicKey;
-    Crypto::FSecretKey secretKey;
-};
+	struct FKeyPair
+	{
+		Crypto::FPublicKey sPublicKey;
+		Crypto::FSecretKey sSecretKey;
+	};
 
-using BinaryArray = std::vector<uint8_t>;
+	using BinaryArray = std::vector <uint8_t>;
 
 } // namespace QwertyNote

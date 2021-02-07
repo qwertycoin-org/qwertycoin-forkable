@@ -107,13 +107,13 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
 void WalletLegacySerializer::saveKeys(QwertyNote::ISerializer &serializer)
 {
     QwertyNote::KeysStorage keys;
-    QwertyNote::AccountKeys acc = account.getAccountKeys();
+    QwertyNote::FAccountKeys acc = account.getAccountKeys();
 
-    keys.creationTimestamp = account.get_createtime();
-    keys.spendPublicKey = acc.address.spendPublicKey;
-    keys.spendSecretKey = acc.spendSecretKey;
-    keys.viewPublicKey = acc.address.viewPublicKey;
-    keys.viewSecretKey = acc.viewSecretKey;
+    keys.creationTimestamp = account.getCreateTime();
+    keys.spendPublicKey = acc.sAddress.sSpendPublicKey;
+    keys.spendSecretKey = acc.sSpendSecretKey;
+    keys.viewPublicKey = acc.sAddress.sViewPublicKey;
+    keys.viewSecretKey = acc.sViewSecretKey;
 
     keys.serialize(serializer, "keys");
 }
@@ -166,17 +166,17 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
 
     loadKeys(serializer);
     throwIfKeysMissmatch(
-        account.getAccountKeys().viewSecretKey,
-        account.getAccountKeys().address.viewPublicKey
+        account.getAccountKeys().sViewSecretKey,
+        account.getAccountKeys().sAddress.sViewPublicKey
     );
 
-    if (account.getAccountKeys().spendSecretKey != NULL_SECRET_KEY) {
+    if (account.getAccountKeys().sSpendSecretKey != NULL_SECRET_KEY) {
         throwIfKeysMissmatch(
-            account.getAccountKeys().spendSecretKey,
-            account.getAccountKeys().address.spendPublicKey
+            account.getAccountKeys().sSpendSecretKey,
+            account.getAccountKeys().sAddress.sSpendPublicKey
         );
     } else {
-        if (!Crypto::checkKey(account.getAccountKeys().address.spendPublicKey)) {
+        if (!Crypto::checkKey(account.getAccountKeys().sAddress.sSpendPublicKey)) {
             throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
         }
     }
@@ -234,11 +234,11 @@ void WalletLegacySerializer::loadKeys(QwertyNote::ISerializer &serializer)
         throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
     }
 
-    QwertyNote::AccountKeys acc;
-    acc.address.spendPublicKey = keys.spendPublicKey;
-    acc.spendSecretKey = keys.spendSecretKey;
-    acc.address.viewPublicKey = keys.viewPublicKey;
-    acc.viewSecretKey = keys.viewSecretKey;
+    QwertyNote::FAccountKeys acc;
+    acc.sAddress.sSpendPublicKey = keys.spendPublicKey;
+    acc.sSpendSecretKey = keys.spendSecretKey;
+    acc.sAddress.sViewPublicKey = keys.viewPublicKey;
+    acc.sViewSecretKey = keys.viewSecretKey;
 
     account.setAccountKeys(acc);
     account.set_createtime(keys.creationTimestamp);

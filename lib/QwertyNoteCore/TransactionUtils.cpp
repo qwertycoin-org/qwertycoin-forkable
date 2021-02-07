@@ -29,66 +29,66 @@ using namespace Crypto;
 
 namespace QwertyNote {
 
-bool checkInputsKeyimagesDiff(const QwertyNote::TransactionPrefix &tx)
+bool checkInputsKeyimagesDiff(const QwertyNote::FTransactionPrefix &tx)
 {
     std::unordered_set<Crypto::FKeyImage> ki;
-    for (const auto &in : tx.inputs) {
-    if (in.type() == typeid(KeyInput)) {
-        if (!ki.insert(boost::get<KeyInput>(in).keyImage).second)
+    for (const auto &in : tx.vInputs) {
+    if (in.type() == typeid(FKeyInput)) {
+        if (!ki.insert(boost::get<FKeyInput>(in).sKeyImage).second)
             return false;
         }
     }
     return true;
 }
 
-size_t getRequiredSignaturesCount(const TransactionInput &in)
+size_t getRequiredSignaturesCount(const FTransactionInput &in)
 {
-    if (in.type() == typeid(KeyInput)) {
-        return boost::get<KeyInput>(in).outputIndexes.size();
+    if (in.type() == typeid(FKeyInput)) {
+        return boost::get<FKeyInput>(in).vOutputIndexes.size();
     }
-    if (in.type() == typeid(MultiSignatureInput)) {
-        return boost::get<MultiSignatureInput>(in).signatureCount;
+    if (in.type() == typeid(FMultiSignatureInput)) {
+        return boost::get<FMultiSignatureInput>(in).uSignatureCount;
     }
     return 0;
 }
 
-uint64_t getTransactionInputAmount(const TransactionInput &in)
+uint64_t getTransactionInputAmount(const FTransactionInput &in)
 {
-    if (in.type() == typeid(KeyInput)) {
-        return boost::get<KeyInput>(in).amount;
+    if (in.type() == typeid(FKeyInput)) {
+        return boost::get<FKeyInput>(in).uAmount;
     }
-    if (in.type() == typeid(MultiSignatureInput)) {
-        return boost::get<MultiSignatureInput>(in).amount;
+    if (in.type() == typeid(FMultiSignatureInput)) {
+        return boost::get<FMultiSignatureInput>(in).uAmount;
     }
     return 0;
 }
 
-TransactionTypes::InputType getTransactionInputType(const TransactionInput &in)
+TransactionTypes::InputType getTransactionInputType(const FTransactionInput &in)
 {
-    if (in.type() == typeid(KeyInput)) {
+    if (in.type() == typeid(FKeyInput)) {
         return TransactionTypes::InputType::Key;
     }
-    if (in.type() == typeid(MultiSignatureInput)) {
+    if (in.type() == typeid(FMultiSignatureInput)) {
         return TransactionTypes::InputType::Multisignature;
     }
-    if (in.type() == typeid(BaseInput)) {
+    if (in.type() == typeid(FBaseInput)) {
         return TransactionTypes::InputType::Generating;
     }
     return TransactionTypes::InputType::Invalid;
 }
 
-const TransactionInput &getInputChecked(
-    const QwertyNote::TransactionPrefix &transaction,
+const FTransactionInput &getInputChecked(
+    const QwertyNote::FTransactionPrefix &transaction,
     size_t index)
 {
-    if (transaction.inputs.size() <= index) {
+    if (transaction.vInputs.size() <= index) {
         throw std::runtime_error("Transaction input index out of range");
     }
-    return transaction.inputs[index];
+    return transaction.vInputs[index];
 }
 
-const TransactionInput &getInputChecked(
-    const QwertyNote::TransactionPrefix &transaction,
+const FTransactionInput &getInputChecked(
+    const QwertyNote::FTransactionPrefix &transaction,
     size_t index,
     TransactionTypes::InputType type)
 {
@@ -99,32 +99,32 @@ const TransactionInput &getInputChecked(
     return input;
 }
 
-TransactionTypes::OutputType getTransactionOutputType(const TransactionOutputTarget &out)
+TransactionTypes::OutputType getTransactionOutputType(const FTransactionOutputTarget &out)
 {
-    if (out.type() == typeid(KeyOutput)) {
+    if (out.type() == typeid(FKeyOutput)) {
         return TransactionTypes::OutputType::Key;
     }
-    if (out.type() == typeid(MultiSignatureOutput)) {
+    if (out.type() == typeid(FMultiSignatureOutput)) {
         return TransactionTypes::OutputType::Multisignature;
     }
     return TransactionTypes::OutputType::Invalid;
 }
 
-const TransactionOutput &getOutputChecked(const TransactionPrefix &transaction, size_t index)
+const FTransactionOutput &getOutputChecked(const FTransactionPrefix &transaction, size_t index)
 {
-    if (transaction.outputs.size() <= index) {
+    if (transaction.vOutputs.size() <= index) {
         throw std::runtime_error("Transaction output index out of range");
     }
-    return transaction.outputs[index];
+    return transaction.vOutputs[index];
 }
 
-const TransactionOutput &getOutputChecked(
-    const QwertyNote::TransactionPrefix &transaction,
+const FTransactionOutput &getOutputChecked(
+    const QwertyNote::FTransactionPrefix &transaction,
     size_t index,
     TransactionTypes::OutputType type)
 {
     const auto &output = getOutputChecked(transaction, index);
-    if (getTransactionOutputType(output.target) != type) {
+    if (getTransactionOutputType(output.sTarget) != type) {
         throw std::runtime_error("Unexpected transaction output target type");
     }
     return output;
@@ -143,40 +143,40 @@ bool isOutToKey(
 }
 
 bool findOutputsToAccount(
-    const QwertyNote::TransactionPrefix &transaction,
-    const AccountPublicAddress &addr,
+    const QwertyNote::FTransactionPrefix &transaction,
+    const FAccountPublicAddress &addr,
     const FSecretKey &viewSecretKey,
     std::vector<uint32_t> &out,
     uint64_t &amount)
 {
-    AccountKeys keys;
-    keys.address = addr;
+    FAccountKeys keys;
+    keys.sAddress = addr;
     // only view secret key is used, spend key is not needed
-    keys.viewSecretKey = viewSecretKey;
+    keys.sViewSecretKey = viewSecretKey;
 
-    Crypto::FPublicKey txPubKey = getTransactionPublicKeyFromExtra(transaction.extra);
+    Crypto::FPublicKey txPubKey = getTransactionPublicKeyFromExtra(transaction.vExtra);
 
     amount = 0;
     size_t keyIndex = 0;
     uint32_t outputIndex = 0;
 
     Crypto::FKeyDerivation derivation;
-    generateKeyDerivation(txPubKey, keys.viewSecretKey, derivation);
+    generateKeyDerivation(txPubKey, keys.sViewSecretKey, derivation);
 
-    for (const TransactionOutput &o : transaction.outputs) {
-        assert(o.target.type() == typeid(KeyOutput)
-               || o.target.type() == typeid(MultiSignatureOutput));
-        if (o.target.type() == typeid(KeyOutput)) {
-            if (is_out_to_acc(keys, boost::get<KeyOutput>(o.target), derivation, keyIndex)) {
+    for (const FTransactionOutput &o : transaction.vOutputs) {
+        assert(o.sTarget.type() == typeid(FKeyOutput)
+               || o.sTarget.type() == typeid(FMultiSignatureOutput));
+        if (o.sTarget.type() == typeid(FKeyOutput)) {
+            if (is_out_to_acc(keys, boost::get<FKeyOutput>(o.sTarget), derivation, keyIndex)) {
                 out.push_back(outputIndex);
-                amount += o.amount;
+                amount += o.uAmount;
             }
             ++keyIndex;
-        } else if (o.target.type() == typeid(MultiSignatureOutput)) {
-        const auto &target = boost::get<MultiSignatureOutput>(o.target);
-            for (const auto &key : target.keys) {
+        } else if (o.sTarget.type() == typeid(FMultiSignatureOutput)) {
+        const auto &target = boost::get<FMultiSignatureOutput>(o.sTarget);
+            for (const auto &key : target.vPublicKeys) {
                 if (isOutToKey(
-                        keys.address.spendPublicKey,
+                        keys.sAddress.sSpendPublicKey,
                         key,
                         derivation,
                         static_cast<size_t>(outputIndex))

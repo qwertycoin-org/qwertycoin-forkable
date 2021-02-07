@@ -61,7 +61,7 @@ public:
 
     void updateTransaction(
         TransactionId transactionId,
-        const QwertyNote::Transaction &tx,
+        const QwertyNote::FTransaction &tx,
         uint64_t amount,
         const std::list<FTransactionOutputInformation> &usedOutputs,
         Crypto::FSecretKey &tx_key);

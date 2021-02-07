@@ -1311,7 +1311,7 @@ bool simple_wallet::get_tx_proof(const std::vector<std::string> &args)
     }
 
     const std::string address_string = args[1];
-    QwertyNote::AccountPublicAddress address;
+    QwertyNote::FAccountPublicAddress address;
     if (!m_currency.parseAccountAddressString(address_string, address)) {
         fail_msg_writer() << "Failed to parse address " << address_string;
         return true;
@@ -1727,7 +1727,7 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
             boost::algorithm::trim(private_key_string);
         } while (private_key_string.empty());
 
-        AccountKeys keys;
+        FAccountKeys keys;
         uint64_t addressPrefix;
         std::string data;
 
@@ -1770,7 +1770,7 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
             return false;
         }
 
-        AccountKeys keys;
+        FAccountKeys keys;
 
         std::string public_spend_key_string = tracking_key_string.substr(0, 64);
         std::string public_view_key_string = tracking_key_string.substr(64, 64);
@@ -1817,10 +1817,10 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
         Crypto::FSecretKey private_spend_key = *(struct Crypto::FSecretKey*) &private_spend_key_hash;
         Crypto::FSecretKey private_view_key = *(struct Crypto::FSecretKey*) &private_view_key_hash;
 
-        keys.address.spendPublicKey = public_spend_key;
-        keys.address.viewPublicKey = public_view_key;
-        keys.spendSecretKey = private_spend_key;
-        keys.viewSecretKey = private_view_key;
+        keys.sAddress.sSpendPublicKey = public_spend_key;
+        keys.sAddress.sViewPublicKey = public_view_key;
+        keys.sSpendSecretKey = private_spend_key;
+        keys.sViewSecretKey = private_view_key;
 
         if (!new_tracking_wallet(keys, walletFileName, pwd_container.password())) {
             logger(ERROR, BRIGHT_RED) << "account creation failed";
@@ -1850,9 +1850,9 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
 
         logger(INFO, BRIGHT_WHITE) << "Opened wallet: " << m_wallet->getAddress();
 
-        AccountKeys keys;
+        FAccountKeys keys;
         m_wallet->getAccountKeys(keys);
-        if (keys.spendSecretKey == boost::value_initialized<Crypto::FSecretKey>()) {
+        if (keys.sSpendSecretKey == boost::value_initialized<Crypto::FSecretKey>()) {
             m_trackingWallet = true;
             success_msg_writer() << "This is tracking wallet. Spending unavailable.\n";
         }
@@ -1931,12 +1931,12 @@ bool simple_wallet::gen_wallet(
             throw;
         }
 
-        AccountKeys keys;
+        FAccountKeys keys;
         m_wallet->getAccountKeys(keys);
 
         logger(INFO, BRIGHT_WHITE)
             << "Generated new wallet: " << m_wallet->getAddress() << std::endl
-            << "view key: " << Common::podToHex(keys.viewSecretKey);
+            << "view key: " << Common::podToHex(keys.sViewSecretKey);
     } catch (const std::exception &e) {
         fail_msg_writer() << "failed to generate new wallet: " << e.what();
         return false;
@@ -2002,22 +2002,22 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
             throw;
         }
 
-        AccountKeys keys;
+        FAccountKeys keys;
         m_wallet->getAccountKeys(keys);
 
         logger(INFO, BRIGHT_WHITE)
             << "Generated new wallet: " << m_wallet->getAddress() << std::endl
-            << "view key: " << Common::podToHex(keys.viewSecretKey);
+            << "view key: " << Common::podToHex(keys.sViewSecretKey);
     } catch (const std::exception &e) {
         fail_msg_writer() << "failed to generate new wallet: " << e.what();
         return false;
     }
 
-    AccountKeys keys;
+    FAccountKeys keys;
     m_wallet->getAccountKeys(keys);
     // convert rng value to electrum-style word list
     std::string electrum_words;
-    Crypto::ElectrumWords::bytes_to_words(keys.spendSecretKey, electrum_words, "English");
+    Crypto::ElectrumWords::bytes_to_words(keys.sSpendSecretKey, electrum_words, "English");
     seedFormater(electrum_words);
     std::string print_electrum = "";
 
@@ -2056,16 +2056,16 @@ bool simple_wallet::new_wallet(
         m_initResultPromise.reset(new std::promise<std::error_code>());
         std::future<std::error_code> f_initError = m_initResultPromise->get_future();
 
-        AccountKeys wallet_keys;
-        wallet_keys.spendSecretKey = secret_key;
-        wallet_keys.viewSecretKey = view_key;
+        FAccountKeys wallet_keys;
+        wallet_keys.sSpendSecretKey = secret_key;
+        wallet_keys.sViewSecretKey = view_key;
         Crypto::secretKeyToPublicKey(
-            wallet_keys.spendSecretKey,
-            wallet_keys.address.spendPublicKey
+            wallet_keys.sSpendSecretKey,
+            wallet_keys.sAddress.sSpendPublicKey
         );
         Crypto::secretKeyToPublicKey(
-            wallet_keys.viewSecretKey,
-            wallet_keys.address.viewPublicKey
+            wallet_keys.sViewSecretKey,
+            wallet_keys.sAddress.sViewPublicKey
         );
 
         m_wallet->initWithKeys(wallet_keys, password);
@@ -2083,7 +2083,7 @@ bool simple_wallet::new_wallet(
             throw;
         }
 
-        AccountKeys keys;
+        FAccountKeys keys;
         m_wallet->getAccountKeys(keys);
 
         logger(INFO, BRIGHT_WHITE) << "Imported wallet: " << m_wallet->getAddress() << std::endl;
@@ -2105,9 +2105,9 @@ bool simple_wallet::new_wallet(
 }
 
 bool simple_wallet::new_wallet(
-    AccountKeys &private_key,
-    const std::string &wallet_file,
-    const std::string &password)
+		FAccountKeys &private_key,
+		const std::string &wallet_file,
+		const std::string &password)
 {
     m_wallet_file = wallet_file;
 
@@ -2133,12 +2133,12 @@ bool simple_wallet::new_wallet(
             throw;
         }
 
-        AccountKeys keys;
+        FAccountKeys keys;
         m_wallet->getAccountKeys(keys);
 
         logger(INFO, BRIGHT_WHITE) << "Imported wallet: " << m_wallet->getAddress() << std::endl;
 
-        if (keys.spendSecretKey == boost::value_initialized<Crypto::FSecretKey>()) {
+        if (keys.sSpendSecretKey == boost::value_initialized<Crypto::FSecretKey>()) {
             m_trackingWallet = true;
         }
     } catch (const std::exception &e) {
@@ -2159,9 +2159,9 @@ bool simple_wallet::new_wallet(
 }
 
 bool simple_wallet::new_tracking_wallet(
-    AccountKeys &tracking_key,
-    const std::string &wallet_file,
-    const std::string &password)
+		FAccountKeys &tracking_key,
+		const std::string &wallet_file,
+		const std::string &password)
 {
     m_wallet_file = wallet_file;
 
@@ -2187,7 +2187,7 @@ bool simple_wallet::new_tracking_wallet(
             throw;
         }
 
-        AccountKeys keys;
+        FAccountKeys keys;
         m_wallet->getAccountKeys(keys);
 
         logger(INFO, BRIGHT_WHITE) << "Imported wallet: " << m_wallet->getAddress() << std::endl;
@@ -2450,10 +2450,10 @@ void simple_wallet::synchronizationProgressUpdated(uint32_t current, uint32_t to
 
 bool simple_wallet::export_keys(const std::vector<std::string> &args)
 {
-    AccountKeys keys;
+    FAccountKeys keys;
     m_wallet->getAccountKeys(keys);
-    std::cout << "Spend secret key: " << Common::podToHex(keys.spendSecretKey) << std::endl;
-    std::cout << "View secret key: " << Common::podToHex(keys.viewSecretKey) << std::endl;
+    std::cout << "Spend secret key: " << Common::podToHex(keys.sSpendSecretKey) << std::endl;
+    std::cout << "View secret key: " << Common::podToHex(keys.sViewSecretKey) << std::endl;
     std::cout
         << "Private keys: "
         << Tools::Base58::encodeAddr(
@@ -2466,16 +2466,16 @@ bool simple_wallet::export_keys(const std::vector<std::string> &args)
 
 bool simple_wallet::export_tracking_key(const std::vector<std::string> &args)
 {
-    AccountKeys keys;
+    FAccountKeys keys;
     m_wallet->getAccountKeys(keys);
-    std::string spend_public_key = Common::podToHex(keys.address.spendPublicKey);
-    keys.spendSecretKey = boost::value_initialized<Crypto::FSecretKey>();
+    std::string spend_public_key = Common::podToHex(keys.sAddress.sSpendPublicKey);
+    keys.sSpendSecretKey = boost::value_initialized<Crypto::FSecretKey>();
     success_msg_writer(true)
         << "Tracking key: "
         << spend_public_key
-        << Common::podToHex(keys.address.viewPublicKey)
-        << Common::podToHex(keys.spendSecretKey)
-        << Common::podToHex(keys.viewSecretKey);
+        << Common::podToHex(keys.sAddress.sViewPublicKey)
+        << Common::podToHex(keys.sSpendSecretKey)
+        << Common::podToHex(keys.sViewSecretKey);
 
     return true;
 }
@@ -2592,9 +2592,9 @@ bool simple_wallet::listMessages(const std::vector<std::string> &args)
         WalletLegacyTransaction txInfo;
         m_wallet->getTransaction(txNr, txInfo);
 
-        AccountKeys keys;
+        FAccountKeys keys;
         m_wallet->getAccountKeys(keys);
-        Crypto::FSecretKey *sKey = &keys.spendSecretKey;
+        Crypto::FSecretKey *sKey = &keys.sSpendSecretKey;
         std::vector<uint8_t> extraVec = Common::asBinaryArray(txInfo.extra);
         Crypto::FPublicKey txPub = getTransactionPublicKeyFromExtra(extraVec);
         std::vector<std::string> msgs = getMessagesFromExtra(extraVec, txPub, sKey);
@@ -2775,7 +2775,7 @@ bool simple_wallet::transfer(const std::vector<std::string> &args)
 
             try {
                 address = resolveAlias(kv.first);
-                AccountPublicAddress ignore;
+                FAccountPublicAddress ignore;
                 if (!m_currency.parseAccountAddressString(address, ignore)) {
                     throw std::runtime_error("Address \"" + address + "\" is invalid");
                 }
@@ -2895,7 +2895,7 @@ bool simple_wallet::sendMsg(const std::vector<std::string> &args)
             try {
                 address = resolveAlias(kv.first);
 
-                AccountPublicAddress ignore;
+                FAccountPublicAddress ignore;
                 if (!m_currency.parseAccountAddressString(address, ignore)) {
                     throw std::runtime_error("Address \"" + address + "\" is invalid");
                 }
@@ -3450,7 +3450,7 @@ bool simple_wallet::verify_message(const std::vector<std::string> &args)
     std::string message = args[0];
     std::string address_string = args[1];
     std::string signature = args[2];
-    QwertyNote::AccountPublicAddress address;
+    QwertyNote::FAccountPublicAddress address;
     if (!m_currency.parseAccountAddressString(address_string, address)) {
         fail_msg_writer() << "failed to parse address " << address_string;
         return true;

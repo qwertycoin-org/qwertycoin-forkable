@@ -25,13 +25,13 @@ namespace QwertyNote {
 
 struct IMinerHandler
 {
-    virtual bool handle_block_found(Block &b) = 0;
+    virtual bool handle_block_found(FBlock &b) = 0;
     virtual bool get_block_template(
-        Block &b,
-        const AccountPublicAddress &adr,
-        difficulty_type &diffic,
-        uint32_t &height,
-        const BinaryArray &ex_nonce) = 0;
+			FBlock &b,
+			const FAccountPublicAddress &adr,
+			difficulty_type &diffic,
+			uint32_t &height,
+			const BinaryArray &ex_nonce) = 0;
 
     enum stat_period
     {

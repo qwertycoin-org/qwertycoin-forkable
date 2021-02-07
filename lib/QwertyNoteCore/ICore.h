@@ -40,15 +40,15 @@ struct NOTIFY_REQUEST_GET_OBJECTS_request;
 class Currency;
 class IBlock;
 class ICoreObserver;
-struct Block;
+struct FBlock;
 struct block_verification_context;
 struct BlockFullInfo;
 struct BlockShortInfo;
 struct core_stat_info;
 struct i_cryptonote_protocol;
-struct Transaction;
-struct MultiSignatureInput;
-struct KeyInput;
+struct FTransaction;
+struct FMultiSignatureInput;
+struct FKeyInput;
 struct TransactionPrefixInfo;
 struct tx_verification_context;
 
@@ -91,19 +91,19 @@ public:
         const Crypto::FHash &tx_id,
         std::vector<uint32_t> &indexs) = 0;
     virtual bool getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex,
-                                    MultiSignatureOutput &out) = 0;
+											 FMultiSignatureOutput &out) = 0;
     virtual i_cryptonote_protocol *get_protocol() = 0;
     virtual bool handle_incoming_tx( // TODO: Deprecated. Should be removed with CryptoNoteProtocolHandler.
         const BinaryArray &tx_blob,
         tx_verification_context &tvc,
         bool keeped_by_block,
         bool loose_check) = 0;
-    virtual std::vector<Transaction> getPoolTransactions() = 0;
+    virtual std::vector<FTransaction> getPoolTransactions() = 0;
 
     virtual bool getPoolChanges(
         const Crypto::FHash &tailBlockId,
         const std::vector<Crypto::FHash> &knownTxsIds,
-        std::vector<Transaction> &addedTxs,
+        std::vector<FTransaction> &addedTxs,
         std::vector<Crypto::FHash> &deletedTxsIds) = 0;
     virtual bool getPoolChangesLite(
         const Crypto::FHash &tailBlockId,
@@ -112,7 +112,7 @@ public:
         std::vector<Crypto::FHash> &deletedTxsIds) = 0;
     virtual void getPoolChanges(
         const std::vector<Crypto::FHash> &knownTxsIds,
-        std::vector<Transaction> &addedTxs,
+        std::vector<FTransaction> &addedTxs,
         std::vector<Crypto::FHash> &deletedTxsIds) = 0;
 
     virtual bool queryBlocks(
@@ -140,16 +140,16 @@ public:
         std::vector<BlockFullInfo> &entries) = 0;
 
     virtual Crypto::FHash getBlockIdByHeight(uint32_t height) = 0;
-    virtual bool getBlockByHash(const Crypto::FHash &h, Block &blk) = 0;
+    virtual bool getBlockByHash(const Crypto::FHash &h, FBlock &blk) = 0;
     virtual bool getBlockHeight(const Crypto::FHash &blockId, uint32_t &blockHeight) = 0;
     virtual void getTransactions(
         const std::vector<Crypto::FHash> &txs_ids,
-        std::list<Transaction> &txs,
+        std::list<FTransaction> &txs,
         std::list<Crypto::FHash> &missed_txs,
         bool checkTxPool = false) = 0;
     virtual bool getTransactionsWithOutputGlobalIndexes(const std::vector<Crypto::FHash> &txsIds,
 							std::list<Crypto::FHash> &missedTxs,
-							std::vector<std::pair<Transaction,
+							std::vector<std::pair<FTransaction,
 							std::vector<uint32_t>>> &txs) = 0;
     virtual bool getBackwardBlocksSizes(
         uint32_t fromHeight,
@@ -168,7 +168,7 @@ public:
         uint32_t height,
         uint64_t blockTarget) = 0;
     virtual bool scanOutputkeysForIndices(
-        const KeyInput &txInToKey,
+        const FKeyInput &txInToKey,
         std::list<std::pair<Crypto::FHash, size_t>> &outputReferences) = 0;
     virtual bool getBlockDifficulty(uint32_t height, difficulty_type& difficulty) = 0;
     virtual bool getBlockCumulativeDifficulty(uint32_t height, difficulty_type &difficulty) = 0;
@@ -177,28 +177,28 @@ public:
         Crypto::FHash &blockId,
         uint32_t &blockHeight) = 0;
     virtual bool getMultisigOutputReference(
-        const MultiSignatureInput &txInMultisig,
+        const FMultiSignatureInput &txInMultisig,
         std::pair<Crypto::FHash, size_t> &outputReference) = 0;
 
     virtual bool getGeneratedTransactionsNumber(
         uint32_t height,
         uint64_t &generatedTransactions) = 0;
-    virtual bool getOrphanBlocksByHeight(uint32_t height, std::vector<Block> &blocks) = 0;
+    virtual bool getOrphanBlocksByHeight(uint32_t height, std::vector<FBlock> &blocks) = 0;
     virtual bool getBlocksByTimestamp(
         uint64_t timestampBegin,
         uint64_t timestampEnd,
         uint32_t blocksNumberLimit,
-        std::vector<Block> &blocks,
+        std::vector<FBlock> &blocks,
         uint32_t &blocksNumberWithinTimestamps) = 0;
     virtual bool getPoolTransactionsByTimestamp(
         uint64_t timestampBegin,
         uint64_t timestampEnd,
         uint32_t transactionsNumberLimit,
-        std::vector<Transaction> &transactions,
+        std::vector<FTransaction> &transactions,
         uint64_t &transactionsNumberWithinTimestamps) = 0;
     virtual bool getTransactionsByPaymentId(
         const Crypto::FHash &paymentId,
-        std::vector<Transaction> &transactions) = 0;
+        std::vector<FTransaction> &transactions) = 0;
     virtual std::vector<Crypto::FHash> getTransactionHashesByPaymentId(
         const Crypto::FHash &paymentId) = 0;
     virtual uint64_t getMinimalFeeForHeight(uint32_t height) = 0;
@@ -218,7 +218,7 @@ public:
                                uint64_t &timestamp) = 0;
     virtual std::unique_ptr<IBlock> getBlock(const Crypto::FHash &blocksId) = 0;
     virtual bool handleIncomingTransaction(
-        const Transaction &tx,
+        const FTransaction &tx,
         const Crypto::FHash &txHash,
         size_t blobSize,
         tx_verification_context &tvc,

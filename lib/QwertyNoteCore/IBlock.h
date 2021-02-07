@@ -27,9 +27,9 @@ class IBlock
 public:
     virtual ~IBlock() = default;
 
-    virtual const Block &getBlock() const = 0;
+    virtual const FBlock &getBlock() const = 0;
     virtual size_t getTransactionCount() const = 0;
-    virtual const Transaction &getTransaction(size_t index) const = 0;
+    virtual const FTransaction &getTransaction(size_t index) const = 0;
 };
 
 } // namespace QwertyNote

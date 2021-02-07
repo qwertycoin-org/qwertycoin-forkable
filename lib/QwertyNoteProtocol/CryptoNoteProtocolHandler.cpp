@@ -481,7 +481,7 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(
     size_t count = 0;
     for (const BlockCompleteEntry & block_entry : arg.blocks) {
         ++count;
-        Block b;
+        FBlock b;
         if (!fromBinaryArray(b, asBinaryArray(block_entry.block))) {
             logger(Logging::ERROR)
                 << context
@@ -515,12 +515,12 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(
                 context.m_state = CryptoNoteConnectionContext::state_shutdown;
                 return 1;
         }
-        if (b.transactionHashes.size() != block_entry.txs.size()) {
+        if (b.vTransactionHashes.size() != block_entry.txs.size()) {
             logger(Logging::ERROR)
                 << context
                 << "sent wrong NOTIFY_RESPONSE_GET_OBJECTS: block with id="
                 << Common::podToHex(blockHash)
-                << ", transactionHashes.size()=" << b.transactionHashes.size()
+                << ", transactionHashes.size()=" << b.vTransactionHashes.size()
                 << " mismatch with BlockCompleteEntry.m_txs.size()=" << block_entry.txs.size()
                 << ", dropping connection";
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
@@ -810,7 +810,7 @@ int CryptoNoteProtocolHandler::handleRequestTxPool(int command,
 {
     logger(Logging::TRACE) << context << "NOTIFY_REQUEST_TX_POOL: txs.size() = " << arg.txs.size();
 
-    std::vector<Transaction> addedTransactions;
+    std::vector<FTransaction> addedTransactions;
     std::vector<Crypto::FHash> deletedTransactions;
     m_core.getPoolChanges(arg.txs, addedTransactions, deletedTransactions);
 

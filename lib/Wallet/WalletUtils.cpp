@@ -36,7 +36,7 @@ void throwIfKeysMissmatch(const Crypto::FSecretKey &secretKey,
 
 bool validateAddress(const std::string &address, const QwertyNote::Currency &currency)
 {
-    QwertyNote::AccountPublicAddress ignore;
+    QwertyNote::FAccountPublicAddress ignore;
     return currency.parseAccountAddressString(address, ignore);
 }
 

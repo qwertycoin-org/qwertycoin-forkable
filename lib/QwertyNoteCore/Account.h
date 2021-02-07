@@ -41,8 +41,8 @@ public:
     static void generateViewFromSpend(Crypto::FSecretKey &, Crypto::FSecretKey &, Crypto::FPublicKey &);
     static void generateViewFromSpend(Crypto::FSecretKey &, Crypto::FSecretKey &);
 
-    const AccountKeys &getAccountKeys() const;
-    void setAccountKeys(const AccountKeys& keys);
+    const FAccountKeys &getAccountKeys() const;
+    void setAccountKeys(const FAccountKeys& keys);
 
     uint64_t getCreateTime() const { return mCreationTimestamp; }
     void setCreateTime(uint64_t val) { mCreationTimestamp = val; }
@@ -59,7 +59,7 @@ public:
 private:
     void setNull();
 
-    AccountKeys mKeys;
+    FAccountKeys mKeys;
     uint64_t mCreationTimestamp;
 };
 

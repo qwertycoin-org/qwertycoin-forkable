@@ -45,13 +45,13 @@ namespace {
 using namespace QwertyNote;
 using namespace Common;
 
-size_t getSignaturesCount(const TransactionInput &input)
+size_t getSignaturesCount(const FTransactionInput &input)
 {
     struct txin_signature_size_visitor : public boost::static_visitor < size_t >
     {
-        size_t operator()(const BaseInput &txin) const { return 0; }
-        size_t operator()(const KeyInput &txin) const { return txin.outputIndexes.size(); }
-        size_t operator()(const MultiSignatureInput &txin) const { return txin.signatureCount; }
+        size_t operator()(const FBaseInput &txin) const { return 0; }
+        size_t operator()(const FKeyInput &txin) const { return txin.vOutputIndexes.size(); }
+        size_t operator()(const FMultiSignatureInput &txin) const { return txin.uSignatureCount; }
     };
 
     return boost::apply_visitor(txin_signature_size_visitor(), input);
@@ -59,13 +59,13 @@ size_t getSignaturesCount(const TransactionInput &input)
 
 struct BinaryVariantTagGetter : boost::static_visitor<uint8_t>
 {
-    uint8_t operator()(const QwertyNote::BaseInput) { return  0xff; }
-    uint8_t operator()(const QwertyNote::KeyInput) { return  0x2; }
-    uint8_t operator()(const QwertyNote::MultiSignatureInput) { return  0x3; }
-    uint8_t operator()(const QwertyNote::KeyOutput) { return  0x2; }
-    uint8_t operator()(const QwertyNote::MultiSignatureOutput) { return  0x3; }
-    uint8_t operator()(const QwertyNote::Transaction) { return  0xcc; }
-    uint8_t operator()(const QwertyNote::Block) { return  0xbb; }
+    uint8_t operator()(const QwertyNote::FBaseInput) { return  0xff; }
+    uint8_t operator()(const QwertyNote::FKeyInput) { return  0x2; }
+    uint8_t operator()(const QwertyNote::FMultiSignatureInput) { return  0x3; }
+    uint8_t operator()(const QwertyNote::FKeyOutput) { return  0x2; }
+    uint8_t operator()(const QwertyNote::FMultiSignatureOutput) { return  0x3; }
+    uint8_t operator()(const QwertyNote::FTransaction) { return  0xcc; }
+    uint8_t operator()(const QwertyNote::FBlock) { return  0xbb; }
 };
 
 struct VariantSerializer : boost::static_visitor<>
@@ -84,23 +84,23 @@ struct VariantSerializer : boost::static_visitor<>
 };
 
 void getVariantValue(QwertyNote::ISerializer&serializer,uint8_t tag,
-                     QwertyNote::TransactionInput&in)
+                     QwertyNote::FTransactionInput&in)
 {
     switch(tag) {
     case 0xff: {
-        QwertyNote::BaseInput v;
+        QwertyNote::FBaseInput v;
         serializer(v, "value");
         in = v;
         break;
     }
     case 0x2: {
-        QwertyNote::KeyInput v;
+        QwertyNote::FKeyInput v;
         serializer(v, "value");
         in = v;
         break;
     }
     case 0x3: {
-        QwertyNote::MultiSignatureInput v;
+        QwertyNote::FMultiSignatureInput v;
         serializer(v, "value");
         in = v;
         break;
@@ -112,17 +112,17 @@ void getVariantValue(QwertyNote::ISerializer&serializer,uint8_t tag,
 
 void getVariantValue(QwertyNote::ISerializer &serializer,
     uint8_t tag,
-                     QwertyNote::TransactionOutputTarget &out)
+                     QwertyNote::FTransactionOutputTarget &out)
 {
     switch(tag) {
     case 0x2: {
-        QwertyNote::KeyOutput v;
+        QwertyNote::FKeyOutput v;
         serializer(v, "uData");
         out = v;
         break;
     }
     case 0x3: {
-        QwertyNote::MultiSignatureOutput v;
+        QwertyNote::FMultiSignatureOutput v;
         serializer(v, "uData");
         out = v;
         break;
@@ -214,41 +214,41 @@ bool serialize(
 
 namespace QwertyNote {
 
-void serialize(TransactionPrefix &txP, ISerializer &serializer)
+void serialize(FTransactionPrefix &txP, ISerializer &serializer)
 {
-    serializer(txP.version, "version");
+    serializer(txP.uVersion, "version");
 
-    if (CURRENT_TRANSACTION_VERSION < txP.version) {
+    if (CURRENT_TRANSACTION_VERSION < txP.uVersion) {
         throw std::runtime_error("Wrong transaction version");
     }
 
-    serializer(txP.unlockTime, "unlock_time");
-    serializer(txP.inputs, "vin");
-    serializer(txP.outputs, "vout");
-    serializeAsBinary(txP.extra, "extra", serializer);
+    serializer(txP.uUnlockTime, "unlock_time");
+    serializer(txP.vInputs, "vin");
+    serializer(txP.vOutputs, "vout");
+    serializeAsBinary(txP.vExtra, "extra", serializer);
 }
 
-void serialize(Transaction &tx, ISerializer &serializer)
+void serialize(FTransaction &tx, ISerializer &serializer)
 {
-    serialize(static_cast<TransactionPrefix&>(tx), serializer);
+    serialize(static_cast<FTransactionPrefix&>(tx), serializer);
 
-    size_t sigSize = tx.inputs.size();
+    size_t sigSize = tx.vInputs.size();
     // TODO: make arrays without sizes
     //serializer.beginArray(sigSize, "signatures");
 
     // ignore base transaction
     if (serializer.type() == ISerializer::INPUT
-        && !(sigSize == 1 && tx.inputs[0].type() == typeid(BaseInput))) {
-        tx.signatures.resize(sigSize);
+        && !(sigSize == 1 && tx.vInputs[0].type() == typeid(FBaseInput))) {
+        tx.vSignatures.resize(sigSize);
     }
 
-    bool signaturesNotExpected = tx.signatures.empty();
-    if (!signaturesNotExpected && tx.inputs.size() != tx.signatures.size()) {
+    bool signaturesNotExpected = tx.vSignatures.empty();
+    if (!signaturesNotExpected && tx.vInputs.size() != tx.vSignatures.size()) {
         throw std::runtime_error("Serialization error: unexpected signatures size");
     }
 
-    for (size_t i = 0; i < tx.inputs.size(); ++i) {
-        size_t signatureSize = getSignaturesCount(tx.inputs[i]);
+    for (size_t i = 0; i < tx.vInputs.size(); ++i) {
+        size_t signatureSize = getSignaturesCount(tx.vInputs[i]);
         if (signaturesNotExpected) {
             if (signatureSize == 0) {
                 continue;
@@ -258,11 +258,11 @@ void serialize(Transaction &tx, ISerializer &serializer)
         }
 
         if (serializer.type() == ISerializer::OUTPUT) {
-            if (signatureSize != tx.signatures[i].size()) {
+            if (signatureSize != tx.vSignatures[i].size()) {
                 throw std::runtime_error("Serialization error: unexpected signatures size");
             }
 
-            for (Crypto::FSignature& sig : tx.signatures[i]) {
+            for (Crypto::FSignature& sig : tx.vSignatures[i]) {
                 serializePod(sig, "", serializer);
             }
         } else {
@@ -271,13 +271,13 @@ void serialize(Transaction &tx, ISerializer &serializer)
                 serializePod(sig, "", serializer);
             }
 
-            tx.signatures[i] = std::move(signatures);
+            tx.vSignatures[i] = std::move(signatures);
         }
     }
     //serializer.endArray();
 }
 
-void serialize(TransactionInput &in, ISerializer &serializer)
+void serialize(FTransactionInput &in, ISerializer &serializer)
 {
     if (serializer.type() == ISerializer::OUTPUT) {
         BinaryVariantTagGetter tagGetter;
@@ -294,32 +294,32 @@ void serialize(TransactionInput &in, ISerializer &serializer)
     }
 }
 
-void serialize(BaseInput &gen, ISerializer &serializer)
+void serialize(FBaseInput &gen, ISerializer &serializer)
 {
-    serializer(gen.blockIndex, "height");
+    serializer(gen.uBlockIndex, "height");
 }
 
-void serialize(KeyInput &key, ISerializer &serializer)
+void serialize(FKeyInput &key, ISerializer &serializer)
 {
-    serializer(key.amount, "amount");
-    serializeVarintVector(key.outputIndexes, serializer, "key_offsets");
-    serializer(key.keyImage, "k_image");
+    serializer(key.uAmount, "amount");
+    serializeVarintVector(key.vOutputIndexes, serializer, "key_offsets");
+    serializer(key.sKeyImage, "k_image");
 }
 
-void serialize(MultiSignatureInput &multisignature, ISerializer &serializer)
+void serialize(FMultiSignatureInput &multisignature, ISerializer &serializer)
 {
-    serializer(multisignature.amount, "amount");
-    serializer(multisignature.signatureCount, "signatures");
-    serializer(multisignature.outputIndex, "outputIndex");
+    serializer(multisignature.uAmount, "amount");
+    serializer(multisignature.uSignatureCount, "signatures");
+    serializer(multisignature.uOutputIndex, "outputIndex");
 }
 
-void serialize(TransactionOutput &output, ISerializer &serializer)
+void serialize(FTransactionOutput &output, ISerializer &serializer)
 {
-    serializer(output.amount, "amount");
-    serializer(output.target, "target");
+    serializer(output.uAmount, "amount");
+    serializer(output.sTarget, "target");
 }
 
-void serialize(TransactionOutputTarget &output, ISerializer &serializer)
+void serialize(FTransactionOutputTarget &output, ISerializer &serializer)
 {
     if (serializer.type() == ISerializer::OUTPUT) {
         BinaryVariantTagGetter tagGetter;
@@ -336,58 +336,58 @@ void serialize(TransactionOutputTarget &output, ISerializer &serializer)
     }
 }
 
-void serialize(KeyOutput &key, ISerializer &serializer)
+void serialize(FKeyOutput &key, ISerializer &serializer)
 {
-    serializer(key.key, "key");
+    serializer(key.sPublicKey, "key");
 }
 
-void serialize(MultiSignatureOutput &multisignature, ISerializer &serializer)
+void serialize(FMultiSignatureOutput &multisignature, ISerializer &serializer)
 {
-    serializer(multisignature.keys, "keys");
-    serializer(multisignature.requiredSignatureCount, "required_signatures");
+    serializer(multisignature.vPublicKeys, "keys");
+    serializer(multisignature.uRequiredSignatureCount, "required_signatures");
 }
 
-void serializeBlockHeader(BlockHeader &header, ISerializer &serializer)
+void serializeBlockHeader(FBlockHeader &header, ISerializer &serializer)
 {
-    serializer(header.majorVersion, "major_version");
-    if (header.majorVersion > BLOCK_MAJOR_VERSION_6) {
+    serializer(header.uMajorVersion, "major_version");
+    if (header.uMajorVersion > BLOCK_MAJOR_VERSION_6) {
         throw std::runtime_error("Wrong major version");
     }
 
-    serializer(header.minorVersion, "minor_version");
+    serializer(header.uMinorVersion, "minor_version");
 
-    if (header.majorVersion >= BLOCK_MAJOR_VERSION_1) {
-        serializer(header.timestamp, "timestamp");
-        serializer(header.previousBlockHash, "prev_id");
-        serializer.binary(&header.nonce, sizeof(header.nonce), "nonce");
+    if (header.uMajorVersion >= BLOCK_MAJOR_VERSION_1) {
+        serializer(header.uTimestamp, "timestamp");
+        serializer(header.sPreviousBlockHash, "prev_id");
+        serializer.binary(&header.uNonce, sizeof(header.uNonce), "nonce");
     } else {
         throw std::runtime_error("Wrong major version");
     }
 }
 
-void serialize(BlockHeader &header, ISerializer &serializer)
+void serialize(FBlockHeader &header, ISerializer &serializer)
 {
     serializeBlockHeader(header, serializer);
 }
 
-void serialize(Block &block, ISerializer &serializer)
+void serialize(FBlock &block, ISerializer &serializer)
 {
     serializeBlockHeader(block, serializer);
-    serializer(block.baseTransaction, "miner_tx");
-    serializer(block.transactionHashes, "tx_hashes");
+    serializer(block.sBaseTransaction, "miner_tx");
+    serializer(block.vTransactionHashes, "tx_hashes");
 }
 
-void serialize(AccountPublicAddress &address, ISerializer &serializer)
+void serialize(FAccountPublicAddress &address, ISerializer &serializer)
 {
-    serializer(address.spendPublicKey, "m_spend_public_key");
-    serializer(address.viewPublicKey, "m_view_public_key");
+    serializer(address.sSpendPublicKey, "m_spend_public_key");
+    serializer(address.sViewPublicKey, "m_view_public_key");
 }
 
-void serialize(AccountKeys &keys, ISerializer &s)
+void serialize(FAccountKeys &keys, ISerializer &s)
 {
-    s(keys.address, "m_account_address");
-    s(keys.spendSecretKey, "m_spend_secret_key");
-    s(keys.viewSecretKey, "m_view_secret_key");
+    s(keys.sAddress, "m_account_address");
+    s(keys.sSpendSecretKey, "m_spend_secret_key");
+    s(keys.sViewSecretKey, "m_view_secret_key");
 }
 
 void doSerialize(TransactionExtraMergeMiningTag &tag, ISerializer &serializer)
@@ -415,10 +415,10 @@ void serialize(TransactionExtraMergeMiningTag &tag, ISerializer &serializer)
     }
 }
 
-void serialize(KeyPair &keyPair, ISerializer &serializer)
+void serialize(FKeyPair &keyPair, ISerializer &serializer)
 {
-    serializer(keyPair.secretKey, "secret_key");
-    serializer(keyPair.publicKey, "public_key");
+    serializer(keyPair.sSecretKey, "secret_key");
+    serializer(keyPair.sPublicKey, "public_key");
 }
 
 } // namespace QwertyNote

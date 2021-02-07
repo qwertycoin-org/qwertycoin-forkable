@@ -87,17 +87,17 @@ void findMyOutputs(
 
         if (outType == TransactionTypes::OutputType::Key) {
             uint64_t amount;
-            KeyOutput out;
+            FKeyOutput out;
             tx.getOutput(idx, out, amount);
 
-            checkOutputKey(derivation, out.key, keyIndex, idx, spendKeys, outputs);
+            checkOutputKey(derivation, out.sPublicKey, keyIndex, idx, spendKeys, outputs);
             ++keyIndex;
         } else if (outType == TransactionTypes::OutputType::Multisignature) {
             uint64_t amount;
-            MultiSignatureOutput out;
+            FMultiSignatureOutput out;
             tx.getOutput(idx, out, amount);
 
-            for (const auto &key : out.keys) {
+            for (const auto &key : out.vPublicKeys) {
                 checkOutputKey(derivation, key, idx, idx, spendKeys, outputs);
                 ++keyIndex;
             }
@@ -136,15 +136,15 @@ TransfersConsumer::TransfersConsumer(
 
 ITransfersSubscription& TransfersConsumer::addSubscription(const FAccountSubscription &subscription)
 {
-    if (subscription.sKeys.viewSecretKey != m_viewSecret) {
+    if (subscription.sKeys.sViewSecretKey != m_viewSecret) {
         throw std::runtime_error("TransfersConsumer: view secret key mismatch");
     }
 
-    auto &res = m_subscriptions[subscription.sKeys.address.spendPublicKey];
+    auto &res = m_subscriptions[subscription.sKeys.sAddress.sSpendPublicKey];
 
     if (res.get() == nullptr) {
         res.reset(new TransfersSubscription(m_currency, m_logger.getLogger(), subscription));
-        m_spendKeys.insert(subscription.sKeys.address.spendPublicKey);
+        m_spendKeys.insert(subscription.sKeys.sAddress.sSpendPublicKey);
         if (m_subscriptions.size() == 1) {
             m_syncStart = res->getSyncStart();
         } else {
@@ -157,24 +157,24 @@ ITransfersSubscription& TransfersConsumer::addSubscription(const FAccountSubscri
     return *res;
 }
 
-bool TransfersConsumer::removeSubscription(const AccountPublicAddress &address)
+bool TransfersConsumer::removeSubscription(const FAccountPublicAddress &address)
 {
-    m_subscriptions.erase(address.spendPublicKey);
-    m_spendKeys.erase(address.spendPublicKey);
+    m_subscriptions.erase(address.sSpendPublicKey);
+    m_spendKeys.erase(address.sSpendPublicKey);
 
     updateSyncStart();
 
     return m_subscriptions.empty();
 }
 
-ITransfersSubscription* TransfersConsumer::getSubscription(const AccountPublicAddress &acc)
+ITransfersSubscription* TransfersConsumer::getSubscription(const FAccountPublicAddress &acc)
 {
-    auto it = m_subscriptions.find(acc.spendPublicKey);
+    auto it = m_subscriptions.find(acc.sSpendPublicKey);
 
     return it == m_subscriptions.end() ? nullptr : it->second.get();
 }
 
-void TransfersConsumer::getSubscriptions(std::vector<AccountPublicAddress> &subscriptions)
+void TransfersConsumer::getSubscriptions(std::vector<FAccountPublicAddress> &subscriptions)
 {
     for (const auto &kv : m_subscriptions) {
         subscriptions.push_back(kv.second->getAddress());
@@ -263,13 +263,13 @@ bool TransfersConsumer::onNewBlocks(const CompleteBlock *blocks,uint32_t startHe
             }
 
             // filter by syncStartTimestamp
-            if (m_syncStart.uTimestamp && block->timestamp < m_syncStart.uTimestamp) {
+            if (m_syncStart.uTimestamp && block->uTimestamp < m_syncStart.uTimestamp) {
                 continue;
             }
 
             TransactionBlockInfo blockInfo;
             blockInfo.height = startHeight + i;
-            blockInfo.timestamp = block->timestamp;
+            blockInfo.timestamp = block->uTimestamp;
             blockInfo.transactionIndex = 0; // position in block
 
             for (const auto &tx : blocks[i].transactions) {
@@ -451,7 +451,7 @@ void TransfersConsumer::addPublicKeysSeen(
 }
 
 std::error_code TransfersConsumer::createTransfers(
-    const AccountKeys &account,
+    const FAccountKeys &account,
     const TransactionBlockInfo &blockInfo,
     const ITransactionReader &tx,
     const std::vector<uint32_t> &outputs,
@@ -485,10 +485,10 @@ std::error_code TransfersConsumer::createTransfers(
 
         if (outType == TransactionTypes::OutputType::Key) {
             uint64_t amount;
-            KeyOutput out;
+            FKeyOutput out;
             tx.getOutput(idx, out, amount);
 
-            QwertyNote::KeyPair in_ephemeral;
+            QwertyNote::FKeyPair in_ephemeral;
             QwertyNote::generate_key_image_helper(
                 account,
                 txPubKey,
@@ -497,11 +497,11 @@ std::error_code TransfersConsumer::createTransfers(
                 info.keyImage
             );
 
-            assert(out.key == reinterpret_cast<const FPublicKey &>(in_ephemeral.publicKey));
+            assert(out.sPublicKey == reinterpret_cast<const FPublicKey &>(in_ephemeral.sPublicKey));
 
             auto it = transactions_hash_seen.find(txHash);
             if (it == transactions_hash_seen.end()) {
-                auto key_it = public_keys_seen.find(out.key);
+                auto key_it = public_keys_seen.find(out.sPublicKey);
                 if (key_it != public_keys_seen.end()) {
                     m_logger(ERROR, BRIGHT_RED)
                         << "Failed to process transaction "
@@ -509,23 +509,23 @@ std::error_code TransfersConsumer::createTransfers(
                         << ": duplicate output key is found!";
                     return std::error_code{};
                 }
-                if (std::find(temp_keys.begin(), temp_keys.end(), out.key) != temp_keys.end()) {
+                if (std::find(temp_keys.begin(), temp_keys.end(), out.sPublicKey) != temp_keys.end()) {
                     m_logger(ERROR, BRIGHT_RED)
                         << "Failed to process transaction "
                         << Common::podToHex(txHash)
                         << ": the same output key is present more than once";
                     return std::error_code{};
                 }
-                temp_keys.push_back(out.key);
+                temp_keys.push_back(out.sPublicKey);
             }
             info.uAmount = amount;
-            info.sOutputKey = out.key;
+            info.sOutputKey = out.sPublicKey;
         } else if (outType == TransactionTypes::OutputType::Multisignature) {
             uint64_t amount;
-            MultiSignatureOutput out;
+            FMultiSignatureOutput out;
             tx.getOutput(idx, out, amount);
 
-            for (const auto &key : out.keys) {
+            for (const auto &key : out.vPublicKeys) {
                 auto it = transactions_hash_seen.find(txHash);
                 if (it == transactions_hash_seen.end()) {
                     auto key_it = public_keys_seen.find(key);
@@ -547,7 +547,7 @@ std::error_code TransfersConsumer::createTransfers(
                 }
             }
             info.uAmount = amount;
-            info.uRequiredSignatures = out.requiredSignatureCount;
+            info.uRequiredSignatures = out.uRequiredSignatureCount;
         }
 
         transfers.push_back(info);

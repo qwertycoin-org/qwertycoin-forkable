@@ -423,7 +423,7 @@ uint32_t NodeRpcProxy::getNodeHeight() const
     return m_nodeHeight.load(std::memory_order_relaxed);
 }
 
-void NodeRpcProxy::relayTransaction(const QwertyNote::Transaction &transaction,
+void NodeRpcProxy::relayTransaction(const QwertyNote::FTransaction &transaction,
                                     const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -554,9 +554,9 @@ void NodeRpcProxy::getPoolSymmetricDifference(
 }
 
 void NodeRpcProxy::getMultisignatureOutputByGlobalIndex(uint64_t amount,
-                                                        uint32_t gindex,
-                                                        MultiSignatureOutput &out,
-                                                        const UCallback &callback)
+														uint32_t gindex,
+														FMultiSignatureOutput &out,
+														const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
@@ -671,7 +671,7 @@ void NodeRpcProxy::isSynchronized(bool &syncStatus, const UCallback &callback)
     callback(std::error_code{});
 }
 
-std::error_code NodeRpcProxy::doRelayTransaction(const QwertyNote::Transaction &transaction)
+std::error_code NodeRpcProxy::doRelayTransaction(const QwertyNote::FTransaction &transaction)
 {
     COMMAND_RPC_SEND_RAW_TX::request req;
     COMMAND_RPC_SEND_RAW_TX::response rsp;

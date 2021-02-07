@@ -26,11 +26,11 @@ namespace QwertyNote {
 
 std::unique_ptr<ITransaction> createTransaction();
 std::unique_ptr<ITransaction> createTransaction(const BinaryArray &transactionBlob);
-std::unique_ptr<ITransaction> createTransaction(const Transaction &tx);
+std::unique_ptr<ITransaction> createTransaction(const FTransaction &tx);
 
-std::unique_ptr<ITransactionReader> createTransactionPrefix(const Transaction &fullTransaction);
+std::unique_ptr<ITransactionReader> createTransactionPrefix(const FTransaction &fullTransaction);
 std::unique_ptr<ITransactionReader> createTransactionPrefix(
-    const TransactionPrefix &prefix,
+    const FTransactionPrefix &prefix,
     const Crypto::FHash &transactionHash);
 
 } // namespace QwertyNote

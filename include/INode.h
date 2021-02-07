@@ -77,7 +77,7 @@ namespace QwertyNote {
 	struct FTransactionShortInfo
 	{
 		Crypto::FHash sTxId;
-		TransactionPrefix sTxPrefix;
+		FTransactionPrefix sTxPrefix;
 	};
 
 	struct FBlockShortEntry
@@ -85,7 +85,7 @@ namespace QwertyNote {
 		bool bHasBlock;
 		std::vector <FTransactionShortInfo> vTxsShortInfo;
 		Crypto::FHash sBlockHash;
-		QwertyNote::Block sBlock;
+		QwertyNote::FBlock sBlock;
 	};
 
 	struct FBlockHeaderInfo
@@ -138,7 +138,7 @@ namespace QwertyNote {
 
 		virtual FBlockHeaderInfo getLastLocalBlockHeaderInfo () const = 0;
 
-		virtual void relayTransaction (const Transaction &sTransaction,
+		virtual void relayTransaction (const FTransaction &sTransaction,
 									   const UCallback &sCallback) = 0;
 
 		virtual void getRandomOutsByAmounts (
@@ -173,7 +173,7 @@ namespace QwertyNote {
 
 		virtual void getMultisignatureOutputByGlobalIndex (uint64_t uAmount,
 														   uint32_t uGlobalIndex,
-														   MultiSignatureOutput &sOut,
+														   FMultiSignatureOutput &sOut,
 														   const UCallback &sCallback) = 0;
 
 		virtual void getBlocks (const std::vector <uint32_t> &vBlockHeights,

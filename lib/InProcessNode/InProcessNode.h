@@ -79,7 +79,7 @@ public:
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result,
         const UCallback &callback) override;
-    void relayTransaction(const QwertyNote::Transaction &transaction,
+    void relayTransaction(const QwertyNote::FTransaction &transaction,
                           const UCallback &callback) override;
     void queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
                      uint64_t timestamp,
@@ -93,9 +93,9 @@ public:
                                     std::vector<Crypto::FHash> &deletedTxIds,
                                     const UCallback &callback) override;
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
-                                              uint32_t gindex,
-                                              MultiSignatureOutput &out,
-                                              const UCallback &callback) override;
+											  uint32_t gindex,
+											  FMultiSignatureOutput &out,
+											  const UCallback &callback) override;
 
     void getBlocks(const std::vector<uint32_t> &blockHeights,
                    std::vector<std::vector<BlockDetails>> &blocks,
@@ -159,8 +159,8 @@ private:
         uint64_t outsCount,
         std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &result);
 
-    void relayTransactionAsync(const QwertyNote::Transaction &transaction, const UCallback &callback);
-    std::error_code doRelayTransaction(const QwertyNote::Transaction &transaction);
+    void relayTransactionAsync(const QwertyNote::FTransaction &transaction, const UCallback &callback);
+    std::error_code doRelayTransaction(const QwertyNote::FTransaction &transaction);
 
     void queryBlocksLiteAsync(std::vector<Crypto::FHash> &knownBlockIds,
                               uint64_t timestamp,
@@ -180,8 +180,8 @@ private:
                                          const UCallback &callback);
 
     void getOutByMSigGIndexAsync(uint64_t amount,
-                                 uint32_t gindex, MultiSignatureOutput &out,
-                                 const UCallback &callback);
+								 uint32_t gindex, FMultiSignatureOutput &out,
+								 const UCallback &callback);
 
     void getBlocksAsync(const std::vector<uint32_t> &blockHeights,
                         std::vector<std::vector<BlockDetails>> &blocks,

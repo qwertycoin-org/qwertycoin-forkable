@@ -53,20 +53,20 @@ namespace QwertyNote {
 class BlockTemplate
 {
 public:
-    bool addTransaction(const Crypto::FHash &txid, const Transaction &tx)
+    bool addTransaction(const Crypto::FHash &txid, const FTransaction &tx)
     {
         if (!canAdd(tx)) {
             return false;
         }
 
-        for (const auto &in : tx.inputs) {
-            if (in.type() == typeid(KeyInput)) {
-                auto r = m_keyImages.insert(boost::get<KeyInput>(in).keyImage);
+        for (const auto &in : tx.vInputs) {
+            if (in.type() == typeid(FKeyInput)) {
+                auto r = m_keyImages.insert(boost::get<FKeyInput>(in).sKeyImage);
                 (void)r; // just to make compiler to shut up
                 assert(r.second);
-            } else if (in.type() == typeid(MultiSignatureInput)) {
-                const auto &msig = boost::get<MultiSignatureInput>(in);
-                auto r = m_usedOutputs.insert(std::make_pair(msig.amount, msig.outputIndex));
+            } else if (in.type() == typeid(FMultiSignatureInput)) {
+                const auto &msig = boost::get<FMultiSignatureInput>(in);
+                auto r = m_usedOutputs.insert(std::make_pair(msig.uAmount, msig.uOutputIndex));
                 (void)r; // just to make compiler to shut up
                 assert(r.second);
             }
@@ -83,16 +83,16 @@ public:
     }
 
 private:
-    bool canAdd(const Transaction &tx)
+    bool canAdd(const FTransaction &tx)
     {
-        for (const auto &in : tx.inputs) {
-            if (in.type() == typeid(KeyInput)) {
-                if (m_keyImages.count(boost::get<KeyInput>(in).keyImage)) {
+        for (const auto &in : tx.vInputs) {
+            if (in.type() == typeid(FKeyInput)) {
+                if (m_keyImages.count(boost::get<FKeyInput>(in).sKeyImage)) {
                     return false;
                 }
-            } else if (in.type() == typeid(MultiSignatureInput)) {
-                const auto &msig = boost::get<MultiSignatureInput>(in);
-                if (m_usedOutputs.count(std::make_pair(msig.amount, msig.outputIndex))) {
+            } else if (in.type() == typeid(FMultiSignatureInput)) {
+                const auto &msig = boost::get<FMultiSignatureInput>(in);
+                if (m_usedOutputs.count(std::make_pair(msig.uAmount, msig.uOutputIndex))) {
                     return false;
                 }
             }
@@ -131,7 +131,7 @@ tx_memory_pool::tx_memory_pool(
 }
 
 bool tx_memory_pool::add_tx(
-    const Transaction &tx,
+    const FTransaction &tx,
     const Crypto::FHash &id,
     size_t blobSize,
     tx_verification_context &tvc,
@@ -161,7 +161,7 @@ bool tx_memory_pool::add_tx(
     }
 
     std::vector<TransactionExtraField> txExtraFields;
-    parseTransactionExtra(tx.extra, txExtraFields);
+    parseTransactionExtra(tx.vExtra, txExtraFields);
     TransactionExtraTTL ttl;
     if (!findTransactionExtraFieldByType(txExtraFields, ttl)) {
         ttl.ttl = 0;
@@ -283,7 +283,7 @@ bool tx_memory_pool::add_tx(
     return true;
 }
 
-bool tx_memory_pool::add_tx(const Transaction &tx,tx_verification_context &tvc,bool keeped_by_block)
+bool tx_memory_pool::add_tx(const FTransaction &tx, tx_verification_context &tvc, bool keeped_by_block)
 {
     Crypto::FHash h = NULL_HASH;
     size_t blobSize = 0;
@@ -292,7 +292,7 @@ bool tx_memory_pool::add_tx(const Transaction &tx,tx_verification_context &tvc,b
     return add_tx(tx, h, blobSize, tvc, keeped_by_block);
 }
 
-bool tx_memory_pool::take_tx(const Crypto::FHash &id, Transaction &tx, size_t &blobSize, uint64_t &fee)
+bool tx_memory_pool::take_tx(const Crypto::FHash &id, FTransaction &tx, size_t &blobSize, uint64_t &fee)
 {
     std::lock_guard<std::recursive_mutex> lock(m_transactions_lock);
     auto it = m_transactions.find(id);
@@ -317,7 +317,7 @@ size_t tx_memory_pool::get_transactions_count() const
     return m_transactions.size();
 }
 
-void tx_memory_pool::get_transactions(std::list<Transaction> &txs) const
+void tx_memory_pool::get_transactions(std::list<FTransaction> &txs) const
 {
     std::lock_guard<std::recursive_mutex> lock(m_transactions_lock);
     for (const auto &tx_vt : m_transactions) {
@@ -427,7 +427,7 @@ std::unique_lock<std::recursive_mutex> tx_memory_pool::obtainGuard() const
     return std::unique_lock<std::recursive_mutex>(m_transactions_lock);
 }
 
-bool tx_memory_pool::is_transaction_ready_to_go(const Transaction&tx,TransactionCheckInfo&txd) const
+bool tx_memory_pool::is_transaction_ready_to_go(const FTransaction&tx, TransactionCheckInfo&txd) const
 {
     if (!m_validator.checkTransactionInputs(tx, txd.maxUsedBlock, txd.lastFailedBlock)) {
         return false;
@@ -456,12 +456,12 @@ std::string tx_memory_pool::print_pool(bool short_format) const
         }
 
         ss
-            << "blobSize: " << txd.blobSize << std::endl
-            << "fee: " << m_currency.formatAmount(txd.fee) << std::endl
-            << "keptByBlock: " << (txd.keptByBlock ? 'T' : 'F') << std::endl
-            << "max_used_block_height: " << txd.maxUsedBlock.height << std::endl
-            << "max_used_block_id: " << txd.maxUsedBlock.id << std::endl
-            << "last_failed_height: " << txd.lastFailedBlock.height << std::endl
+				<< "blobSize: " << txd.blobSize << std::endl
+				<< "fee: " << m_currency.formatAmount(txd.fee) << std::endl
+				<< "keptByBlock: " << (txd.keptByBlock ? 'T' : 'F') << std::endl
+				<< "max_used_block_height: " << txd.maxUsedBlock.height << std::endl
+				<< "max_used_block_id: " << txd.maxUsedBlock.id << std::endl
+				<< "last_failed_height: " << txd.lastFailedBlock.height << std::endl
             << "last_failed_id: " << txd.lastFailedBlock.id << std::endl
             << "amount_out: " << getOutsMoneyAmount(txd.tx) << std::endl
             << "fee_atomic_units: " << txd.fee << std::endl
@@ -480,12 +480,12 @@ std::string tx_memory_pool::print_pool(bool short_format) const
 }
 
 bool tx_memory_pool::fill_block_template(
-    Block &bl,
-    size_t median_size,
-    size_t maxCumulativeSize,
-    uint64_t already_generated_coins,
-    size_t &total_size,
-    uint64_t &fee)
+		FBlock &bl,
+		size_t median_size,
+		size_t maxCumulativeSize,
+		uint64_t already_generated_coins,
+		size_t &total_size,
+		uint64_t &fee)
 {
     std::lock_guard<std::recursive_mutex> lock(m_transactions_lock);
 
@@ -551,7 +551,7 @@ bool tx_memory_pool::fill_block_template(
         }
     }
 
-    bl.transactionHashes = blockTemplate.getTransactions();
+    bl.vTransactionHashes = blockTemplate.getTransactions();
 
     return true;
 }
@@ -740,17 +740,17 @@ tx_memory_pool::tx_container_t::iterator tx_memory_pool::removeTransaction(
 
 bool tx_memory_pool::removeTransactionInputs(
     const Crypto::FHash &tx_id,
-    const Transaction &tx,
+    const FTransaction &tx,
     bool keptByBlock)
 {
-    for (const auto &in : tx.inputs) {
-        if (in.type() == typeid(KeyInput)) {
-            const auto &txin = boost::get<KeyInput>(in);
-            auto it = m_spent_key_images.find(txin.keyImage);
+    for (const auto &in : tx.vInputs) {
+        if (in.type() == typeid(FKeyInput)) {
+            const auto &txin = boost::get<FKeyInput>(in);
+            auto it = m_spent_key_images.find(txin.sKeyImage);
             if (!(it != m_spent_key_images.end())) {
                 logger(ERROR, BRIGHT_RED)
                     << "failed to find transaction input in key images. img="
-                    << txin.keyImage
+                    << txin.sKeyImage
                     << std::endl
                     << "transaction id = "
                     << tx_id;
@@ -759,7 +759,7 @@ bool tx_memory_pool::removeTransactionInputs(
             std::unordered_set<Crypto::FHash> &key_image_set = it->second;
             if (!(!key_image_set.empty())) {
                 logger(ERROR, BRIGHT_RED)
-                    << "empty key_image set, img=" << txin.keyImage << std::endl
+						<< "empty key_image set, img=" << txin.sKeyImage << std::endl
                     << "transaction id = " << tx_id;
                 return false;
             }
@@ -767,7 +767,7 @@ bool tx_memory_pool::removeTransactionInputs(
             auto it_in_set = key_image_set.find(tx_id);
             if (!(it_in_set != key_image_set.end())) {
                 logger(ERROR, BRIGHT_RED)
-                    << "transaction id not found in key_image set, img=" <<txin.keyImage<< std::endl
+						<< "transaction id not found in key_image set, img=" << txin.sKeyImage << std::endl
                     << "transaction id = " << tx_id;
                 return false;
             }
@@ -776,10 +776,10 @@ bool tx_memory_pool::removeTransactionInputs(
                 // it is now empty FHash container for this key_image
                 m_spent_key_images.erase(it);
             }
-        } else if (in.type() == typeid(MultiSignatureInput)) {
+        } else if (in.type() == typeid(FMultiSignatureInput)) {
             if (!keptByBlock) {
-                const auto &msig = boost::get<MultiSignatureInput>(in);
-                auto output = GlobalOutput(msig.amount, msig.outputIndex);
+                const auto &msig = boost::get<FMultiSignatureInput>(in);
+                auto output = GlobalOutput(msig.uAmount, msig.uOutputIndex);
                 assert(m_spentOutputs.count(output));
                 m_spentOutputs.erase(output);
             }
@@ -791,19 +791,19 @@ bool tx_memory_pool::removeTransactionInputs(
 
 bool tx_memory_pool::addTransactionInputs(
     const Crypto::FHash &id,
-    const Transaction &tx,
+    const FTransaction &tx,
     bool keptByBlock)
 {
     // should not fail
-    for (const auto &in : tx.inputs) {
-        if (in.type() == typeid(KeyInput)) {
-            const auto &txin = boost::get<KeyInput>(in);
-            std::unordered_set<Crypto::FHash>& kei_image_set = m_spent_key_images[txin.keyImage];
+    for (const auto &in : tx.vInputs) {
+        if (in.type() == typeid(FKeyInput)) {
+            const auto &txin = boost::get<FKeyInput>(in);
+            std::unordered_set<Crypto::FHash>& kei_image_set = m_spent_key_images[txin.sKeyImage];
             if (!(keptByBlock || kei_image_set.size() == 0)) {
                 logger(ERROR, BRIGHT_RED)
-                    << "internal error: keptByBlock=" << keptByBlock
-                    << ",  kei_image_set.size()=" << kei_image_set.size() << ENDL
-                    << "txin.keyImage=" << txin.keyImage << ENDL
+						<< "internal error: keptByBlock=" << keptByBlock
+						<< ",  kei_image_set.size()=" << kei_image_set.size() << ENDL
+						<< "txin.keyImage=" << txin.sKeyImage << ENDL
                     << "tx_id=" << id;
                 return false;
             }
@@ -813,10 +813,10 @@ bool tx_memory_pool::addTransactionInputs(
                     << "internal error: try to insert duplicate Iterator in key_image set";
                 return false;
             }
-        } else if (in.type() == typeid(MultiSignatureInput)) {
+        } else if (in.type() == typeid(FMultiSignatureInput)) {
             if (!keptByBlock) {
-                const auto &msig = boost::get<MultiSignatureInput>(in);
-                auto r = m_spentOutputs.insert(GlobalOutput(msig.amount, msig.outputIndex));
+                const auto &msig = boost::get<FMultiSignatureInput>(in);
+                auto r = m_spentOutputs.insert(GlobalOutput(msig.uAmount, msig.uOutputIndex));
                 (void)r;
                 assert(r.second);
             }
@@ -826,17 +826,17 @@ bool tx_memory_pool::addTransactionInputs(
     return true;
 }
 
-bool tx_memory_pool::haveSpentInputs(const Transaction &tx) const
+bool tx_memory_pool::haveSpentInputs(const FTransaction &tx) const
 {
-    for (const auto& in : tx.inputs) {
-        if (in.type() == typeid(KeyInput)) {
-            const auto &tokey_in = boost::get<KeyInput>(in);
-            if (m_spent_key_images.count(tokey_in.keyImage)) {
+    for (const auto& in : tx.vInputs) {
+        if (in.type() == typeid(FKeyInput)) {
+            const auto &tokey_in = boost::get<FKeyInput>(in);
+            if (m_spent_key_images.count(tokey_in.sKeyImage)) {
                 return true;
             }
-        } else if (in.type() == typeid(MultiSignatureInput)) {
-            const auto &msig = boost::get<MultiSignatureInput>(in);
-            if (m_spentOutputs.count(GlobalOutput(msig.amount, msig.outputIndex))) {
+        } else if (in.type() == typeid(FMultiSignatureInput)) {
+            const auto &msig = boost::get<FMultiSignatureInput>(in);
+            if (m_spentOutputs.count(GlobalOutput(msig.uAmount, msig.uOutputIndex))) {
                 return true;
             }
         }
@@ -863,7 +863,7 @@ void tx_memory_pool::buildIndices()
         m_timestampIndex.add(it->receiveTime, it->id);
 
         std::vector<TransactionExtraField> txExtraFields;
-        parseTransactionExtra(it->tx.extra, txExtraFields);
+        parseTransactionExtra(it->tx.vExtra, txExtraFields);
         TransactionExtraTTL ttl;
         if (findTransactionExtraFieldByType(txExtraFields, ttl)) {
             if (ttl.ttl != 0) {

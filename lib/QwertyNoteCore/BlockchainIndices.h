@@ -42,8 +42,8 @@ class PaymentIdIndex
 public:
     explicit PaymentIdIndex(bool enabled);
 
-    bool add(const Transaction &transaction);
-    bool remove(const Transaction &transaction);
+    bool add(const FTransaction &transaction);
+    bool remove(const FTransaction &transaction);
     bool find(const Crypto::FHash &paymentId, std::vector<Crypto::FHash> &transactionHashes);
     std::vector<Crypto::FHash> find(const Crypto::FHash &paymentId);
     void clear();
@@ -122,8 +122,8 @@ class GeneratedTransactionsIndex
 public:
     explicit GeneratedTransactionsIndex(bool enabled);
 
-    bool add(const Block &block);
-    bool remove(const Block &block);
+    bool add(const FBlock &block);
+    bool remove(const FBlock &block);
     bool find(uint32_t height, uint64_t &generatedTransactions);
     void clear();
 
@@ -147,8 +147,8 @@ class OrphanBlocksIndex
 public:
     explicit OrphanBlocksIndex(bool enabled);
 
-    bool add(const Block &block);
-    bool remove(const Block &block);
+    bool add(const FBlock &block);
+    bool remove(const FBlock &block);
     bool find(uint32_t height, std::vector<Crypto::FHash> &blockHashes);
     void clear();
 

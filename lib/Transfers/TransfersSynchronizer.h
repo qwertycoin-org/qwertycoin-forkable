@@ -60,9 +60,9 @@ public:
 
     // ITransfersSynchronizer
     ITransfersSubscription &addSubscription(const FAccountSubscription &acc) override;
-    bool removeSubscription(const AccountPublicAddress &acc) override;
-    void getSubscriptions(std::vector<AccountPublicAddress> &subscriptions) override;
-    ITransfersSubscription *getSubscription(const AccountPublicAddress &acc) override;
+    bool removeSubscription(const FAccountPublicAddress &acc) override;
+    void getSubscriptions(std::vector<FAccountPublicAddress> &subscriptions) override;
+    ITransfersSubscription *getSubscription(const FAccountPublicAddress &acc) override;
     std::vector<Crypto::FHash> getViewKeyKnownBlocks(const Crypto::FPublicKey &publicViewKey)override;
 
     void subscribeConsumerNotifications(const Crypto::FPublicKey &viewPublicKey,
@@ -70,7 +70,7 @@ public:
     void unsubscribeConsumerNotifications(const Crypto::FPublicKey &viewPublicKey,
                                           ITransfersSynchronizerObserver *observer);
 
-    void addPublicKeysSeen(const AccountPublicAddress &acc,
+    void addPublicKeysSeen(const FAccountPublicAddress &acc,
                            const Crypto::FHash &transactionHash,
                            const Crypto::FPublicKey &outputKey);
     void markTransactionSafe(const Crypto::FHash &transactionHash);

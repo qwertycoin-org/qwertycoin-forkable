@@ -58,19 +58,19 @@ namespace QwertyNote {
 class BlockWithTransactions : public IBlock
 {
 public:
-    const Block &getBlock() const override { return block; }
+    const FBlock &getBlock() const override { return block; }
 
     size_t getTransactionCount() const override { return transactions.size(); }
 
-    const Transaction &getTransaction(size_t index) const override
+    const FTransaction &getTransaction(size_t index) const override
     {
         assert(index < transactions.size());
         return transactions[index];
     }
 
 private:
-    Block block;
-    std::vector<Transaction> transactions;
+    FBlock block;
+    std::vector<FTransaction> transactions;
 
     friend class core;
 };
@@ -139,18 +139,18 @@ void core::get_blockchain_top(uint32_t &height, Crypto::FHash &top_id)
     top_id = m_blockchain.getTailId(height);
 }
 
-bool core::get_blocks(uint32_t start_offset, uint32_t count, std::list<Block> &blocks,
-                      std::list<Transaction> &txs)
+bool core::get_blocks(uint32_t start_offset, uint32_t count, std::list<FBlock> &blocks,
+                      std::list<FTransaction> &txs)
 {
     return m_blockchain.getBlocks(start_offset, count, blocks, txs);
 }
 
-bool core::get_blocks(uint32_t start_offset, uint32_t count, std::list<Block> &blocks)
+bool core::get_blocks(uint32_t start_offset, uint32_t count, std::list<FBlock> &blocks)
 {
     return m_blockchain.getBlocks(start_offset, count, blocks);
 }
 
-void core::getTransactions(const std::vector<Crypto::FHash> &txs_ids, std::list<Transaction> &txs,
+void core::getTransactions(const std::vector<Crypto::FHash> &txs_ids, std::list<FTransaction> &txs,
 						   std::list<Crypto::FHash> &missed_txs, bool checkTxPool)
 {
     m_blockchain.getTransactions(txs_ids, txs, missed_txs, checkTxPool);
@@ -158,12 +158,12 @@ void core::getTransactions(const std::vector<Crypto::FHash> &txs_ids, std::list<
 
 bool core::getTransactionsWithOutputGlobalIndexes(
 		const std::vector<Crypto::FHash> &txsIds, std::list<Crypto::FHash> &missedTxs,
-		std::vector<std::pair<Transaction, std::vector<uint32_t>>> &txs)
+		std::vector<std::pair<FTransaction, std::vector<uint32_t>>> &txs)
 {
     return m_blockchain.getTransactionsWithOutputGlobalIndexes(txsIds, missedTxs, txs);
 }
 
-bool core::getAlternativeBlocks(std::list<Block> &blocks)
+bool core::getAlternativeBlocks(std::list<FBlock> &blocks)
 {
     return m_blockchain.getAlternativeBlocks(blocks);
 }
@@ -212,7 +212,7 @@ bool core::init(const CoreConfig &config, const MinerConfig &minerConfig, bool l
     return load_state_data();
 }
 
-bool core::set_genesis_block(const Block &b)
+bool core::set_genesis_block(const FBlock &b)
 {
     return m_blockchain.resetAndSetGenesisBlock(b);
 }
@@ -239,7 +239,7 @@ size_t core::addChain(const std::vector<const IBlock *> &chain)
     for (const IBlock *block : chain) {
         bool allTransactionsAdded = true;
         for (size_t txNumber = 0; txNumber < block->getTransactionCount(); ++txNumber) {
-            const Transaction &tx = block->getTransaction(txNumber);
+            const FTransaction &tx = block->getTransaction(txNumber);
 
             Crypto::FHash txHash = NULL_HASH;
             size_t blobSize = 0;
@@ -292,7 +292,7 @@ bool core::handle_incoming_tx(const BinaryArray &tx_blob, tx_verification_contex
 
     Crypto::FHash tx_hash = NULL_HASH;
     Crypto::FHash tx_prefixt_hash = NULL_HASH;
-    Transaction tx;
+    FTransaction tx;
 
     if (!parse_tx_from_blob(tx, tx_hash, tx_prefixt_hash, tx_blob)) {
         logger(INFO) << "WRONG TRANSACTION BLOB, Failed to parse, rejected";
@@ -321,13 +321,13 @@ bool core::get_stat_info(core_stat_info &st_inf)
     return true;
 }
 
-bool core::check_tx_mixin(const Transaction &tx, uint32_t height)
+bool core::check_tx_mixin(const FTransaction &tx, uint32_t height)
 {
     size_t inputIndex = 0;
-    for (const auto &txin : tx.inputs) {
-        assert(inputIndex < tx.signatures.size());
-        if (txin.type() == typeid(KeyInput)) {
-            uint64_t txMixin = boost::get<KeyInput>(txin).outputIndexes.size();
+    for (const auto &txin : tx.vInputs) {
+        assert(inputIndex < tx.vSignatures.size());
+        if (txin.type() == typeid(FKeyInput)) {
+            uint64_t txMixin = boost::get<FKeyInput>(txin).vOutputIndexes.size();
             if (txMixin > QwertyNote::parameters::MAX_TX_MIXIN_SIZE) {
                 logger(ERROR) << "Transaction " << getObjectHash(tx)
                               << " has too large mixIn count, rejected";
@@ -343,8 +343,8 @@ bool core::check_tx_mixin(const Transaction &tx, uint32_t height)
     return true;
 }
 
-bool core::check_tx_fee(const Transaction &tx, size_t blobSize, tx_verification_context &tvc,
-                        uint32_t height, bool loose_check)
+bool core::check_tx_fee(const FTransaction &tx, size_t blobSize, tx_verification_context &tvc,
+						uint32_t height, bool loose_check)
 {
     uint64_t inputs_amount = 0;
     if (!getInputsMoneyAmount(tx, inputs_amount)) {
@@ -371,7 +371,7 @@ bool core::check_tx_fee(const Transaction &tx, size_t blobSize, tx_verification_
 
     if (!isFusionTransaction) {
         std::vector<TransactionExtraField> txExtraFields;
-        parseTransactionExtra(tx.extra, txExtraFields);
+        parseTransactionExtra(tx.vExtra, txExtraFields);
         TransactionExtraTTL ttl;
 
         if (!findTransactionExtraFieldByType(txExtraFields, ttl)) {
@@ -395,12 +395,12 @@ bool core::check_tx_fee(const Transaction &tx, size_t blobSize, tx_verification_
     return true;
 }
 
-bool core::check_tx_unmixable(const Transaction &tx, uint32_t height)
+bool core::check_tx_unmixable(const FTransaction &tx, uint32_t height)
 {
-    for (const auto &out : tx.outputs) {
-        if (!is_valid_decomposed_amount(out.amount)
+    for (const auto &out : tx.vOutputs) {
+        if (!is_valid_decomposed_amount(out.uAmount)
             && height > QwertyNote::parameters::UPGRADE_HEIGHT_V1) {
-            logger(ERROR) << "Invalid decomposed output amount " << out.amount
+            logger(ERROR) << "Invalid decomposed output amount " << out.uAmount
                           << " for tx id= " << getObjectHash(tx);
             return false;
         }
@@ -408,23 +408,23 @@ bool core::check_tx_unmixable(const Transaction &tx, uint32_t height)
     return true;
 }
 
-bool core::check_tx_semantic(const Transaction &tx, bool keeped_by_block)
+bool core::check_tx_semantic(const FTransaction &tx, bool keeped_by_block)
 {
-    if (tx.inputs.empty()) {
+    if (tx.vInputs.empty()) {
         logger(ERROR) << "tx with empty inputs, rejected for tx id= " << getObjectHash(tx);
         return false;
     }
 
-    if (tx.inputs.size() != tx.signatures.size()) {
+    if (tx.vInputs.size() != tx.vSignatures.size()) {
         logger(ERROR) << "tx signatures size doesn't match inputs size, rejected for tx id= "
                       << getObjectHash(tx);
         return false;
     }
 
-    for (size_t i = 0; i < tx.inputs.size(); ++i) {
-        if (tx.inputs[i].type() == typeid(KeyInput)) {
-            if (boost::get<KeyInput>(tx.inputs[i]).outputIndexes.size()
-                != tx.signatures[i].size()) {
+    for (size_t i = 0; i < tx.vInputs.size(); ++i) {
+        if (tx.vInputs[i].type() == typeid(FKeyInput)) {
+            if (boost::get<FKeyInput>(tx.vInputs[i]).vOutputIndexes.size()
+                != tx.vSignatures[i].size()) {
                 logger(ERROR) << "tx signatures count doesn't match outputIndexes count for input "
                               << i << ", rejected for tx id= " << getObjectHash(tx);
                 return false;
@@ -474,26 +474,26 @@ bool core::check_tx_semantic(const Transaction &tx, bool keeped_by_block)
     return true;
 }
 
-bool core::check_tx_inputs_keyimages_diff(const Transaction &tx)
+bool core::check_tx_inputs_keyimages_diff(const FTransaction &tx)
 {
     std::unordered_set<Crypto::FKeyImage> ki;
     std::set<std::pair<uint64_t, uint32_t>> outputsUsage;
-    for (const auto &input : tx.inputs) {
-        if (input.type() == typeid(KeyInput)) {
-            const KeyInput &in = boost::get<KeyInput>(input);
-            if (!ki.insert(in.keyImage).second) {
+    for (const auto &input : tx.vInputs) {
+        if (input.type() == typeid(FKeyInput)) {
+            const FKeyInput &in = boost::get<FKeyInput>(input);
+            if (!ki.insert(in.sKeyImage).second) {
                 logger(ERROR) << "Transaction has identical key images";
                 return false;
             }
 
-            if (in.outputIndexes.empty()) {
+            if (in.vOutputIndexes.empty()) {
                 logger(ERROR) << "Transaction's input uses empty output";
                 return false;
             }
 
             // Additional key_image check.
             // Fix discovered by Monero Lab and suggested by "fluffypony" (bitcointalk.org)
-            if (!(scalarMultKey(in.keyImage, Crypto::EllipticCurveScalar2KeyImage(Crypto::L))
+            if (!(scalarMultKey(in.sKeyImage, Crypto::EllipticCurveScalar2KeyImage(Crypto::L))
                   == Crypto::EllipticCurveScalar2KeyImage(Crypto::I))) {
                 logger(ERROR) << "Transaction uses key image not in the valid domain";
                 return false;
@@ -501,8 +501,8 @@ bool core::check_tx_inputs_keyimages_diff(const Transaction &tx)
 
             // outputIndexes are packed here, first is absolute, others are offsets to previous,
             // so first can be zero, others can't
-            auto i = std::find(++std::begin(in.outputIndexes), std::end(in.outputIndexes), 0);
-            if (i != std::end(in.outputIndexes)) {
+            auto i = std::find(++std::begin(in.vOutputIndexes), std::end(in.vOutputIndexes), 0);
+            if (i != std::end(in.vOutputIndexes)) {
                 logger(ERROR) << "Transaction has identical output indexes";
                 return false;
             }
@@ -517,7 +517,7 @@ size_t core::get_blockchain_total_transactions()
     return m_blockchain.getTotalTransactions();
 }
 
-bool core::add_new_tx(const Transaction &tx, const Crypto::FHash &tx_hash, size_t blob_size,
+bool core::add_new_tx(const FTransaction &tx, const Crypto::FHash &tx_hash, size_t blob_size,
 					  tx_verification_context &tvc, bool keeped_by_block)
 {
     // Locking on m_mempool and m_blockchain closes possibility to add tx
@@ -538,8 +538,8 @@ bool core::add_new_tx(const Transaction &tx, const Crypto::FHash &tx_hash, size_
     return m_mempool.add_tx(tx, tx_hash, blob_size, tvc, keeped_by_block);
 }
 
-bool core::get_block_template(Block &b, const AccountPublicAddress &adr, difficulty_type &diffic,
-                              uint32_t &height, const BinaryArray &ex_nonce)
+bool core::get_block_template(FBlock &b, const FAccountPublicAddress &adr, difficulty_type &diffic,
+							  uint32_t &height, const BinaryArray &ex_nonce)
 {
     size_t median_size;
     uint64_t already_generated_coins;
@@ -548,43 +548,43 @@ bool core::get_block_template(Block &b, const AccountPublicAddress &adr, difficu
         LockedBlockchainStorage blockchainLock(m_blockchain);
         height = m_blockchain.getCurrentBlockchainHeight();
 
-        b = boost::value_initialized<Block>();
-        b.majorVersion = m_blockchain.getBlockMajorVersionForHeight(height);
+        b = boost::value_initialized<FBlock>();
+        b.uMajorVersion = m_blockchain.getBlockMajorVersionForHeight(height);
 
-        if (b.majorVersion == BLOCK_MAJOR_VERSION_1) {
-            b.minorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_1)
-                            == UpgradeDetectorBase::UNDEF_HEIGHT
+        if (b.uMajorVersion == BLOCK_MAJOR_VERSION_1) {
+            b.uMinorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_1)
+							  == UpgradeDetectorBase::UNDEF_HEIGHT
                     ? BLOCK_MINOR_VERSION_1
                     : BLOCK_MINOR_VERSION_0;
-        } else if (b.majorVersion == BLOCK_MAJOR_VERSION_2) {
-            b.minorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_2)
-                            == UpgradeDetectorBase::UNDEF_HEIGHT
+        } else if (b.uMajorVersion == BLOCK_MAJOR_VERSION_2) {
+            b.uMinorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_2)
+							  == UpgradeDetectorBase::UNDEF_HEIGHT
                     ? BLOCK_MINOR_VERSION_1
                     : BLOCK_MINOR_VERSION_0;
-        } else if (b.majorVersion == BLOCK_MAJOR_VERSION_3) {
-            b.minorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_3)
-                            == UpgradeDetectorBase::UNDEF_HEIGHT
+        } else if (b.uMajorVersion == BLOCK_MAJOR_VERSION_3) {
+            b.uMinorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_3)
+							  == UpgradeDetectorBase::UNDEF_HEIGHT
                     ? BLOCK_MINOR_VERSION_1
                     : BLOCK_MINOR_VERSION_0;
-        } else if (b.majorVersion == BLOCK_MAJOR_VERSION_4) {
-            b.minorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_4)
-                            == UpgradeDetectorBase::UNDEF_HEIGHT
+        } else if (b.uMajorVersion == BLOCK_MAJOR_VERSION_4) {
+            b.uMinorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_4)
+							  == UpgradeDetectorBase::UNDEF_HEIGHT
                     ? BLOCK_MINOR_VERSION_1
                     : BLOCK_MINOR_VERSION_0;
-        } else if (b.majorVersion == BLOCK_MAJOR_VERSION_5) {
-            b.minorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_5)
-                            == UpgradeDetectorBase::UNDEF_HEIGHT
+        } else if (b.uMajorVersion == BLOCK_MAJOR_VERSION_5) {
+            b.uMinorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_5)
+							  == UpgradeDetectorBase::UNDEF_HEIGHT
                     ? BLOCK_MINOR_VERSION_1
                     : BLOCK_MINOR_VERSION_0;
-        } else if (b.majorVersion >= BLOCK_MAJOR_VERSION_6) {
-            b.minorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_6)
-                            == UpgradeDetectorBase::UNDEF_HEIGHT
+        } else if (b.uMajorVersion >= BLOCK_MAJOR_VERSION_6) {
+            b.uMinorVersion = m_currency.upgradeHeight(BLOCK_MAJOR_VERSION_6)
+							  == UpgradeDetectorBase::UNDEF_HEIGHT
                     ? BLOCK_MINOR_VERSION_1
                     : BLOCK_MINOR_VERSION_0;
         }
 
-        b.previousBlockHash = get_tail_id();
-        b.timestamp = time(nullptr);
+        b.sPreviousBlockHash = get_tail_id();
+        b.uTimestamp = time(nullptr);
 
         // Don't generate a block template with invalid timestamp
         // Fix by Jagerman
@@ -597,12 +597,12 @@ bool core::get_block_template(Block &b, const AccountPublicAddress &adr, difficu
                 timestamps.push_back(m_blockchain.getBlockTimestamp(offset));
             }
             uint64_t median_ts = Common::medianValue(timestamps);
-            if (b.timestamp < median_ts) {
-                b.timestamp = median_ts;
+            if (b.uTimestamp < median_ts) {
+                b.uTimestamp = median_ts;
             }
         }
 
-        diffic = m_blockchain.getDifficultyForNextBlock(b.timestamp);
+        diffic = m_blockchain.getDifficultyForNextBlock(b.uTimestamp);
         if (!(diffic)) {
             logger(ERROR, BRIGHT_RED) << "difficulty overhead.";
             return false;
@@ -624,14 +624,14 @@ bool core::get_block_template(Block &b, const AccountPublicAddress &adr, difficu
     uint64_t blockTarget = QwertyNote::parameters::DIFFICULTY_TARGET;
 
     if (height > QwertyNote::parameters::UPGRADE_HEIGHT_V1) {
-        getBlockHeight(b.previousBlockHash, previousBlockHeight);
+        getBlockHeight(b.sPreviousBlockHash, previousBlockHeight);
         uint64_t prev_timestamp = getBlockTimestamp(previousBlockHeight);
-        if (prev_timestamp > b.timestamp) {
+        if (prev_timestamp > b.uTimestamp) {
             logger(ERROR, BRIGHT_RED) << "incorrect timestamp, prev = " << prev_timestamp
-                                      << ",  new = " << b.timestamp;
+                                      << ",  new = " << b.uTimestamp;
             return false;
         }
-        blockTarget = b.timestamp - getBlockTimestamp(previousBlockHeight);
+        blockTarget = b.uTimestamp - getBlockTimestamp(previousBlockHeight);
     }
 
     // two-phase miner transaction generation: we don't know exact block size until we prepare
@@ -639,25 +639,25 @@ bool core::get_block_template(Block &b, const AccountPublicAddress &adr, difficu
     // generated with fake amount of money, and with phase we know think we know expected block size
 
     // make blocks coin-base tx looks close to real coinbase tx to get truthful blob size
-    bool r = m_currency.constructMinerTx(b.majorVersion, height, median_size,
-                                         already_generated_coins, txs_size, fee, adr,
-                                         b.baseTransaction, ex_nonce, 14, blockTarget);
+    bool r = m_currency.constructMinerTx(b.uMajorVersion, height, median_size,
+										 already_generated_coins, txs_size, fee, adr,
+										 b.sBaseTransaction, ex_nonce, 14, blockTarget);
     if (!r) {
         logger(ERROR, BRIGHT_RED) << "Failed to construct miner tx, first chance";
         return false;
     }
 
-    size_t cumulative_size = txs_size + getObjectBinarySize(b.baseTransaction);
+    size_t cumulative_size = txs_size + getObjectBinarySize(b.sBaseTransaction);
     for (size_t try_count = 0; try_count != 10; ++try_count) {
-        r = m_currency.constructMinerTx(b.majorVersion, height, median_size,
-                                        already_generated_coins, cumulative_size, fee, adr,
-                                        b.baseTransaction, ex_nonce, 14, blockTarget);
+        r = m_currency.constructMinerTx(b.uMajorVersion, height, median_size,
+										already_generated_coins, cumulative_size, fee, adr,
+										b.sBaseTransaction, ex_nonce, 14, blockTarget);
 
         if (!(r)) {
             logger(ERROR, BRIGHT_RED) << "Failed to construct miner tx, second chance";
             return false;
         }
-        size_t coinbase_blob_size = getObjectBinarySize(b.baseTransaction);
+        size_t coinbase_blob_size = getObjectBinarySize(b.sBaseTransaction);
         if (coinbase_blob_size > cumulative_size - txs_size) {
             cumulative_size = txs_size + coinbase_blob_size;
             continue;
@@ -665,20 +665,20 @@ bool core::get_block_template(Block &b, const AccountPublicAddress &adr, difficu
 
         if (coinbase_blob_size < cumulative_size - txs_size) {
             size_t delta = cumulative_size - txs_size - coinbase_blob_size;
-            b.baseTransaction.extra.insert(b.baseTransaction.extra.end(), delta, 0);
+            b.sBaseTransaction.vExtra.insert(b.sBaseTransaction.vExtra.end(), delta, 0);
             // here  could be 1 byte difference, because of extra field counter is varint,
             // and it can become from 1-byte len to 2-bytes len.
-            if (cumulative_size != txs_size + getObjectBinarySize(b.baseTransaction)) {
-                if (cumulative_size + 1 != txs_size + getObjectBinarySize(b.baseTransaction)) {
+            if (cumulative_size != txs_size + getObjectBinarySize(b.sBaseTransaction)) {
+                if (cumulative_size + 1 != txs_size + getObjectBinarySize(b.sBaseTransaction)) {
                     logger(ERROR, BRIGHT_RED)
                             << "unexpected case: cumulative_size=" << cumulative_size
                             << " + 1 is not equal txs_cumulative_size=" << txs_size
                             << " + get_object_blobsize(b.baseTransaction)="
-                            << getObjectBinarySize(b.baseTransaction);
+                            << getObjectBinarySize(b.sBaseTransaction);
                     return false;
                 }
-                b.baseTransaction.extra.resize(b.baseTransaction.extra.size() - 1);
-                if (cumulative_size != txs_size + getObjectBinarySize(b.baseTransaction)) {
+                b.sBaseTransaction.vExtra.resize(b.sBaseTransaction.vExtra.size() - 1);
+                if (cumulative_size != txs_size + getObjectBinarySize(b.sBaseTransaction)) {
                     // fuck, not lucky, -1 makes varint-counter size smaller,
                     // in that case we continue to grow with cumulative_size
                     logger(TRACE, BRIGHT_RED)
@@ -688,15 +688,15 @@ bool core::get_block_template(Block &b, const AccountPublicAddress &adr, difficu
                     continue;
                 }
                 logger(DEBUGGING, BRIGHT_GREEN)
-                        << "Setting extra for block: " << b.baseTransaction.extra.size()
+                        << "Setting extra for block: " << b.sBaseTransaction.vExtra.size()
                         << ", try_count=" << try_count;
             }
         }
-        if (cumulative_size != txs_size + getObjectBinarySize(b.baseTransaction)) {
+        if (cumulative_size != txs_size + getObjectBinarySize(b.sBaseTransaction)) {
             logger(ERROR, BRIGHT_RED) << "unexpected case: cumulative_size=" << cumulative_size
                                       << " is not equal txs_cumulative_size=" << txs_size
                                       << " + get_object_blobsize(b.baseTransaction)="
-                                      << getObjectBinarySize(b.baseTransaction);
+                                      << getObjectBinarySize(b.sBaseTransaction);
             return false;
         }
 
@@ -757,7 +757,7 @@ bool core::getTxOutputsGlobalIndexes(const Crypto::FHash &tx_id, std::vector<uin
     return m_blockchain.getTransactionOutputGlobalIndexes(tx_id, indexs);
 }
 
-bool core::getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, MultiSignatureOutput &out)
+bool core::getOutByMultiSigGlobalIndex(uint64_t amount, uint64_t gindex, FMultiSignatureOutput &out)
 {
     return m_blockchain.getOutByMultiSigGlobalIndex(amount, gindex, out);
 }
@@ -773,7 +773,7 @@ void core::update_block_template_and_resume_mining()
     m_miner->resume();
 }
 
-bool core::handle_block_found(Block &b)
+bool core::handle_block_found(FBlock &b)
 {
     block_verification_context bvc = boost::value_initialized<block_verification_context>();
     handle_incoming_block(b, bvc, true, true);
@@ -799,7 +799,7 @@ void core::on_synchronized()
 
 bool core::getPoolChanges(const Crypto::FHash &tailBlockId,
                           const std::vector<Crypto::FHash> &knownTxsIds,
-                          std::vector<Transaction> &addedTxs,
+                          std::vector<FTransaction> &addedTxs,
                           std::vector<Crypto::FHash> &deletedTxsIds)
 {
     getPoolChanges(knownTxsIds, addedTxs, deletedTxsIds);
@@ -811,7 +811,7 @@ bool core::getPoolChangesLite(const Crypto::FHash &tailBlockId,
                               std::vector<TransactionPrefixInfo> &addedTxs,
                               std::vector<Crypto::FHash> &deletedTxsIds)
 {
-    std::vector<Transaction> added;
+    std::vector<FTransaction> added;
     bool returnStatus = getPoolChanges(tailBlockId, knownTxsIds, added, deletedTxsIds);
 
     for (const auto &tx : added) {
@@ -826,7 +826,7 @@ bool core::getPoolChangesLite(const Crypto::FHash &tailBlockId,
 }
 
 void core::getPoolChanges(const std::vector<Crypto::FHash> &knownTxsIds,
-                          std::vector<Transaction> &addedTxs,
+                          std::vector<FTransaction> &addedTxs,
                           std::vector<Crypto::FHash> &deletedTxsIds)
 {
     std::vector<Crypto::FHash> addedTxsIds;
@@ -847,7 +847,7 @@ bool core::handle_incoming_block_blob(const BinaryArray &block_blob,
         return false;
     }
 
-    Block b;
+    FBlock b;
     if (!fromBinaryArray(b, block_blob)) {
         logger(INFO) << "Failed to parse and validate new block";
         bvc.m_verification_failed = true;
@@ -857,8 +857,8 @@ bool core::handle_incoming_block_blob(const BinaryArray &block_blob,
     return handle_incoming_block(b, bvc, control_miner, relay_block);
 }
 
-bool core::handle_incoming_block(const Block &b, block_verification_context &bvc,
-                                 bool control_miner, bool relay_block)
+bool core::handle_incoming_block(const FBlock &b, block_verification_context &bvc,
+								 bool control_miner, bool relay_block)
 {
     if (control_miner) {
         pause_mining();
@@ -872,17 +872,17 @@ bool core::handle_incoming_block(const Block &b, block_verification_context &bvc
 
     if (relay_block && bvc.m_added_to_main_chain) {
         std::list<Crypto::FHash> missed_txs;
-        std::list<Transaction> txs;
-        m_blockchain.getTransactions(b.transactionHashes, txs, missed_txs);
+        std::list<FTransaction> txs;
+        m_blockchain.getTransactions(b.vTransactionHashes, txs, missed_txs);
         if (!missed_txs.empty() && getBlockIdByHeight(get_block_height(b)) != getBlockHash(b)) {
             logger(INFO) << "Block added, but it seems that reorganize just happened after that, "
                          << "do not relay this block";
         } else {
-            if (!(txs.size() == b.transactionHashes.size() && missed_txs.empty())) {
+            if (!(txs.size() == b.vTransactionHashes.size() && missed_txs.empty())) {
                 logger(ERROR, BRIGHT_RED)
                         << "can't find some transactions in found block:" << getBlockHash(b)
                         << " txs.size()=" << txs.size()
-                        << ", b.transactionHashes.size()=" << b.transactionHashes.size()
+                        << ", b.transactionHashes.size()=" << b.vTransactionHashes.size()
                         << ", missed_txs.size()" << missed_txs.size();
                 return false;
             }
@@ -923,23 +923,23 @@ bool core::have_block(const Crypto::FHash &id)
     return m_blockchain.haveBlock(id);
 }
 
-bool core::parse_tx_from_blob(Transaction &tx, Crypto::FHash &tx_hash, Crypto::FHash &tx_prefix_hash,
+bool core::parse_tx_from_blob(FTransaction &tx, Crypto::FHash &tx_hash, Crypto::FHash &tx_prefix_hash,
 							  const BinaryArray &blob)
 {
     return parseAndValidateTransactionFromBinaryArray(blob, tx, tx_hash, tx_prefix_hash);
 }
 
-bool core::check_tx_syntax(const Transaction &tx)
+bool core::check_tx_syntax(const FTransaction &tx)
 {
     return true;
 }
 
-std::vector<Transaction> core::getPoolTransactions()
+std::vector<FTransaction> core::getPoolTransactions()
 {
-    std::list<Transaction> txs;
+    std::list<FTransaction> txs;
     m_mempool.get_transactions(txs);
 
-    std::vector<Transaction> result;
+    std::vector<FTransaction> result;
     for (auto &tx : txs) {
         result.emplace_back(std::move(tx));
     }
@@ -981,7 +981,7 @@ Crypto::FHash core::getBlockIdByHeight(uint32_t height)
     }
 }
 
-bool core::getBlockByHash(const Crypto::FHash &h, Block &blk)
+bool core::getBlockByHash(const Crypto::FHash &h, FBlock &blk)
 {
     return m_blockchain.getBlockByHash(h, blk);
 }
@@ -1085,7 +1085,7 @@ bool core::queryBlocks(const std::vector<Crypto::FHash> &knownBlockIds, uint64_t
         return true;
     }
 
-    std::list<Block> blocks;
+    std::list<FBlock> blocks;
     lbs->getBlocks(startFullOffset, blocksLeft, blocks);
 
     for (auto &b : blocks) {
@@ -1093,11 +1093,11 @@ bool core::queryBlocks(const std::vector<Crypto::FHash> &knownBlockIds, uint64_t
 
         item.block_id = getBlockHash(b);
 
-        if (b.timestamp >= timestamp) {
+        if (b.uTimestamp >= timestamp) {
             // query transactions
-            std::list<Transaction> txs;
+            std::list<FTransaction> txs;
             std::list<Crypto::FHash> missedTxs;
-            lbs->getTransactions(b.transactionHashes, txs, missedTxs);
+            lbs->getTransactions(b.vTransactionHashes, txs, missedTxs);
 
             // fill uData
             BlockCompleteEntry &completeEntry = item;
@@ -1186,7 +1186,7 @@ bool core::queryBlocksLite(const std::vector<Crypto::FHash> &knownBlockIds, uint
         return true;
     }
 
-    std::list<Block> blocks;
+    std::list<FBlock> blocks;
     lbs->getBlocks(resFullOffset, blocksLeft, blocks);
 
     for (auto &b : blocks) {
@@ -1194,10 +1194,10 @@ bool core::queryBlocksLite(const std::vector<Crypto::FHash> &knownBlockIds, uint
 
         item.blockId = getBlockHash(b);
 
-        if (b.timestamp >= timestamp) {
-            std::list<Transaction> txs;
+        if (b.uTimestamp >= timestamp) {
+            std::list<FTransaction> txs;
             std::list<Crypto::FHash> missedTxs;
-            lbs->getTransactions(b.transactionHashes, txs, missedTxs);
+            lbs->getTransactions(b.vTransactionHashes, txs, missedTxs);
 
             item.block = asString(toBinaryArray(b));
 
@@ -1246,7 +1246,7 @@ bool core::queryBlocksDetailed(const std::vector<Crypto::FHash> &knownBlockHashe
         return true;
     }
 
-    std::list<Block> blocks;
+    std::list<FBlock> blocks;
     lbs->getBlocks(startFullOffset, blocksLeft, blocks);
 
     for (auto &b : blocks) {
@@ -1254,11 +1254,11 @@ bool core::queryBlocksDetailed(const std::vector<Crypto::FHash> &knownBlockHashe
 
         item.block_id = getBlockHash(b);
 
-        if (b.timestamp >= timestamp) {
+        if (b.uTimestamp >= timestamp) {
             // query transactions
-            std::list<Transaction> txs;
+            std::list<FTransaction> txs;
             std::list<Crypto::FHash> missedTxs;
-            lbs->getTransactions(b.transactionHashes, txs, missedTxs);
+            lbs->getTransactions(b.vTransactionHashes, txs, missedTxs);
 
             // fill uData
             BlockCompleteEntry &completeEntry = item;
@@ -1298,7 +1298,7 @@ bool core::getBlockReward(uint8_t blockMajorVersion, size_t medianSize, size_t c
                                      blockTarget);
 }
 
-bool core::scanOutputkeysForIndices(const KeyInput &txInToKey,
+bool core::scanOutputkeysForIndices(const FKeyInput &txInToKey,
                                     std::list<std::pair<Crypto::FHash, size_t>> &outputReferences)
 {
     struct outputs_visitor {
@@ -1307,8 +1307,8 @@ bool core::scanOutputkeysForIndices(const KeyInput &txInToKey,
         {
         }
 
-        bool handle_output(const Transaction &tx, const TransactionOutput &out,
-                           size_t transactionOutputIndex)
+        bool handle_output(const FTransaction &tx, const FTransactionOutput &out,
+						   size_t transactionOutputIndex)
         {
             m_resultsCollector.push_back(std::make_pair(getObjectHash(tx), transactionOutputIndex));
             return true;
@@ -1340,7 +1340,7 @@ bool core::getBlockContainingTx(const Crypto::FHash &txId, Crypto::FHash &blockI
     return m_blockchain.getBlockContainingTransaction(txId, blockId, blockHeight);
 }
 
-bool core::getMultisigOutputReference(const MultiSignatureInput &txInMultisig,
+bool core::getMultisigOutputReference(const FMultiSignatureInput &txInMultisig,
                                       std::pair<Crypto::FHash, size_t> &outputReference)
 {
     return m_blockchain.getMultisigOutputReference(txInMultisig, outputReference);
@@ -1351,14 +1351,14 @@ bool core::getGeneratedTransactionsNumber(uint32_t height, uint64_t &generatedTr
     return m_blockchain.getGeneratedTransactionsNumber(height, generatedTransactions);
 }
 
-bool core::getOrphanBlocksByHeight(uint32_t height, std::vector<Block> &blocks)
+bool core::getOrphanBlocksByHeight(uint32_t height, std::vector<FBlock> &blocks)
 {
     std::vector<Crypto::FHash> blockHashes;
     if (!m_blockchain.getOrphanBlockIdsByHeight(height, blockHashes)) {
         return false;
     }
     for (const Crypto::FHash &hash : blockHashes) {
-        Block blk;
+        FBlock blk;
         if (!getBlockByHash(hash, blk)) {
             return false;
         }
@@ -1368,7 +1368,7 @@ bool core::getOrphanBlocksByHeight(uint32_t height, std::vector<Block> &blocks)
 }
 
 bool core::getBlocksByTimestamp(uint64_t timestampBegin, uint64_t timestampEnd,
-                                uint32_t blocksNumberLimit, std::vector<Block> &blocks,
+                                uint32_t blocksNumberLimit, std::vector<FBlock> &blocks,
                                 uint32_t &blocksNumberWithinTimestamps)
 {
     std::vector<Crypto::FHash> blockHashes;
@@ -1377,7 +1377,7 @@ bool core::getBlocksByTimestamp(uint64_t timestampBegin, uint64_t timestampEnd,
         return false;
     }
     for (const Crypto::FHash &hash : blockHashes) {
-        Block blk;
+        FBlock blk;
         if (!getBlockByHash(hash, blk)) {
             return false;
         }
@@ -1388,7 +1388,7 @@ bool core::getBlocksByTimestamp(uint64_t timestampBegin, uint64_t timestampEnd,
 
 bool core::getPoolTransactionsByTimestamp(uint64_t timestampBegin, uint64_t timestampEnd,
                                           uint32_t transactionsNumberLimit,
-                                          std::vector<Transaction> &transactions,
+                                          std::vector<FTransaction> &transactions,
                                           uint64_t &transactionsNumberWithinTimestamps)
 {
     std::vector<Crypto::FHash> poolTransactionHashes;
@@ -1398,7 +1398,7 @@ bool core::getPoolTransactionsByTimestamp(uint64_t timestampBegin, uint64_t time
         return false;
     }
 
-    std::list<Transaction> txs;
+    std::list<FTransaction> txs;
     std::list<Crypto::FHash> missed_txs;
 
     getTransactions(poolTransactionHashes, txs, missed_txs, true);
@@ -1412,7 +1412,7 @@ bool core::getPoolTransactionsByTimestamp(uint64_t timestampBegin, uint64_t time
 }
 
 bool core::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
-                                      std::vector<Transaction> &transactions)
+                                      std::vector<FTransaction> &transactions)
 {
     std::vector<Crypto::FHash> blockchainTransactionHashes;
     m_blockchain.getTransactionIdsByPaymentId(paymentId, blockchainTransactionHashes);
@@ -1420,7 +1420,7 @@ bool core::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
     std::vector<Crypto::FHash> poolTransactionHashes;
     m_mempool.getTransactionIdsByPaymentId(paymentId, poolTransactionHashes);
 
-    std::list<Transaction> txs;
+    std::list<FTransaction> txs;
     std::list<Crypto::FHash> missed_txs;
 
     if (!poolTransactionHashes.empty()) {
@@ -1499,10 +1499,10 @@ uint8_t core::getBlockMajorVersionForHeight(uint32_t height) const
     return m_blockchain.getBlockMajorVersionForHeight(height);
 }
 
-bool core::getPaymentId(const Transaction &transaction, Crypto::FHash &paymentId)
+bool core::getPaymentId(const FTransaction &transaction, Crypto::FHash &paymentId)
 {
     std::vector<TransactionExtraField> txExtraFields;
-    parseTransactionExtra(transaction.extra, txExtraFields);
+    parseTransactionExtra(transaction.vExtra, txExtraFields);
     TransactionExtraNonce extraNonce;
     if (!findTransactionExtraFieldByType(txExtraFields, extraNonce)) {
         return false;
@@ -1516,9 +1516,9 @@ void core::setBlocksToFind(uint64_t blocksToFind)
     m_blocksToFind = blocksToFind;
 }
 
-bool core::handleIncomingTransaction(const Transaction &tx, const Crypto::FHash &txHash,
-                                     size_t blobSize, tx_verification_context &tvc,
-                                     bool keptByBlock, uint32_t height, bool loose_check)
+bool core::handleIncomingTransaction(const FTransaction &tx, const Crypto::FHash &txHash,
+									 size_t blobSize, tx_verification_context &tvc,
+									 bool keptByBlock, uint32_t height, bool loose_check)
 {
     if (!check_tx_syntax(tx)) {
         logger(INFO) << "WRONG TRANSACTION BLOB, Failed to check tx " << txHash
@@ -1594,10 +1594,10 @@ std::unique_ptr<IBlock> core::getBlock(const Crypto::FHash &blockId)
         return std::unique_ptr<BlockWithTransactions>(nullptr);
     }
 
-    blockPtr->transactions.reserve(blockPtr->block.transactionHashes.size());
+    blockPtr->transactions.reserve(blockPtr->block.vTransactionHashes.size());
     std::vector<Crypto::FHash> missedTxs;
-    lbs->getTransactions(blockPtr->block.transactionHashes, blockPtr->transactions, missedTxs,
-                         true);
+    lbs->getTransactions(blockPtr->block.vTransactionHashes, blockPtr->transactions, missedTxs,
+						 true);
 
     // if can't find transaction for blockchain block -> error
     assert(missedTxs.empty() || !lbs->isBlockInMainChain(blockId));
@@ -1610,14 +1610,14 @@ std::unique_ptr<IBlock> core::getBlock(const Crypto::FHash &blockId)
     return std::move(blockPtr);
 }
 
-bool core::getMixin(const Transaction &transaction, uint64_t &mixin)
+bool core::getMixin(const FTransaction &transaction, uint64_t &mixin)
 {
     mixin = 0;
-    for (const TransactionInput &txin : transaction.inputs) {
-        if (txin.type() != typeid(KeyInput)) {
+    for (const FTransactionInput &txin : transaction.vInputs) {
+        if (txin.type() != typeid(FKeyInput)) {
             continue;
         }
-        uint64_t currentMixin = boost::get<KeyInput>(txin).outputIndexes.size();
+        uint64_t currentMixin = boost::get<FKeyInput>(txin).vOutputIndexes.size();
         if (currentMixin > mixin) {
             mixin = currentMixin;
         }

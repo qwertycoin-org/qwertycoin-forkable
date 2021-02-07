@@ -96,7 +96,7 @@ public:
     struct TransactionDetails : public TransactionCheckInfo
     {
         Crypto::FHash id;
-        Transaction tx;
+        FTransaction tx;
         size_t blobSize;
         uint64_t fee;
         bool keptByBlock;
@@ -155,13 +155,13 @@ public:
 
     bool have_tx(const Crypto::FHash &id) const;
     bool add_tx(
-        const Transaction &tx,
+        const FTransaction &tx,
         const Crypto::FHash &id,
         size_t blobSize,
         tx_verification_context &tvc,
         bool keeped_by_block);
-    bool add_tx(const Transaction &tx, tx_verification_context& tvc, bool keeped_by_block);
-    bool take_tx(const Crypto::FHash &id, Transaction &tx, size_t &blobSize, uint64_t &fee);
+    bool add_tx(const FTransaction &tx, tx_verification_context& tvc, bool keeped_by_block);
+    bool take_tx(const Crypto::FHash &id, FTransaction &tx, size_t &blobSize, uint64_t &fee);
 
     bool on_blockchain_inc(uint64_t new_block_height, const Crypto::FHash &top_block_id);
     bool on_blockchain_dec(uint64_t new_block_height, const Crypto::FHash &top_block_id);
@@ -171,14 +171,14 @@ public:
     std::unique_lock<std::recursive_mutex> obtainGuard() const;
 
     bool fill_block_template(
-        Block &bl,
-        size_t median_size,
-        size_t maxCumulativeSize,
-        uint64_t already_generated_coins,
-        size_t &total_size,
-        uint64_t &fee);
+			FBlock &bl,
+			size_t median_size,
+			size_t maxCumulativeSize,
+			uint64_t already_generated_coins,
+			size_t &total_size,
+			uint64_t &fee);
 
-    void get_transactions(std::list<Transaction> &txs) const;
+    void get_transactions(std::list<FTransaction> &txs) const;
     void get_difference(
         const std::vector<Crypto::FHash> &known_tx_ids,
         std::vector<Crypto::FHash> &new_tx_ids,
@@ -220,13 +220,13 @@ public:
 
 private:
     // double spending checking
-    bool addTransactionInputs(const Crypto::FHash &id, const Transaction &tx, bool keptByBlock);
-    bool haveSpentInputs(const Transaction &tx) const;
-    bool removeTransactionInputs(const Crypto::FHash &id, const Transaction &tx, bool keptByBlock);
+    bool addTransactionInputs(const Crypto::FHash &id, const FTransaction &tx, bool keptByBlock);
+    bool haveSpentInputs(const FTransaction &tx) const;
+    bool removeTransactionInputs(const Crypto::FHash &id, const FTransaction &tx, bool keptByBlock);
 
     tx_container_t::iterator removeTransaction(tx_container_t::iterator i);
     bool removeExpiredTransactions();
-    bool is_transaction_ready_to_go(const Transaction &tx, TransactionCheckInfo &txd) const;
+    bool is_transaction_ready_to_go(const FTransaction &tx, TransactionCheckInfo &txd) const;
 
     void buildIndices();
 

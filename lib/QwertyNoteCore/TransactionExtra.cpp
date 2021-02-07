@@ -452,8 +452,8 @@ static_assert(sizeof(sender_key_data) == 34, "Invalid structure size");
 bool tx_extra_message::encrypt(
     size_t index,
     const std::string &message,
-    const AccountPublicAddress *recipient,
-    const KeyPair &txkey)
+    const FAccountPublicAddress *recipient,
+    const FKeyPair &txkey)
 {
     size_t mlen = message.size();
     std::unique_ptr<char[]> buf(new char[mlen + TX_EXTRA_MESSAGE_CHECKSUM_SIZE]);
@@ -462,8 +462,8 @@ bool tx_extra_message::encrypt(
     mlen += TX_EXTRA_MESSAGE_CHECKSUM_SIZE;
     if (recipient) {
         message_key_data key_data;
-        if(!generateKeyDerivation(recipient->spendPublicKey, txkey.secretKey,
-                                   key_data.derivation)){
+        if(!generateKeyDerivation(recipient->sSpendPublicKey, txkey.sSecretKey,
+								  key_data.derivation)){
             return false;
         }
         key_data.magic1 = 0x80;
@@ -529,8 +529,8 @@ bool tx_extra_message::serialize(ISerializer &s)
 bool tx_extra_sender::encrypt(
     size_t index,
     const std::string &sender,
-    const AccountPublicAddress *recipient,
-    const KeyPair &txkey)
+    const FAccountPublicAddress *recipient,
+    const FKeyPair &txkey)
 {
     size_t mlen = sender.size();
     std::unique_ptr<char[]> buf(new char[mlen + TX_EXTRA_SENDER_CHECKSUM_SIZE]);
@@ -539,8 +539,8 @@ bool tx_extra_sender::encrypt(
     mlen += TX_EXTRA_SENDER_CHECKSUM_SIZE;
     if (recipient) {
         sender_key_data key_data;
-        if(!generateKeyDerivation(recipient->spendPublicKey, txkey.secretKey,
-                                   key_data.derivation)){
+        if(!generateKeyDerivation(recipient->sSpendPublicKey, txkey.sSecretKey,
+								  key_data.derivation)){
             std::cout << "Encrypt returned false" << std::endl;
             return false;
         }
