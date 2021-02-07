@@ -27,80 +27,92 @@ namespace Crypto {
 
 #pragma pack(push, 1)
 
-struct FEllipticCurvePoint {
-    uint8_t uData[32];
-};
+	struct FEllipticCurvePoint
+	{
+		uint8_t uData[32];
+	};
 
-struct FEllipticCurveScalar {
-    uint8_t uData[32];
-};
+	struct FEllipticCurveScalar
+	{
+		uint8_t uData[32];
+	};
 
-struct FHash {
-    uint8_t uData[32];
-};
+	struct FHash
+	{
+		uint8_t uData[32];
+	};
 
 // This structure can be used to store Hashes in ordered containers
 // like std::set<FHash, FHashCompare>
-struct FHashCompare {
-    bool operator()(const FHash &lh, const FHash &rh) const
-    {
-        return memcmp(lh.uData, rh.uData, 32) > 0;
-    }
-};
+	struct FHashCompare
+	{
+		bool operator() (const FHash &lh, const FHash &rh) const
+		{
+			return memcmp(lh.uData, rh.uData, 32) > 0;
+		}
+	};
 
-struct FPublicKey : public FEllipticCurvePoint {
-};
+	struct FPublicKey : public FEllipticCurvePoint
+	{
+	};
 
-struct FSecretKey : public FEllipticCurveScalar {
-    ~FSecretKey() { sodiumMemZero(uData, sizeof(uData)); }
-};
+	struct FSecretKey : public FEllipticCurveScalar
+	{
+		~FSecretKey ()
+		{
+			sodiumMemZero(uData, sizeof(uData));
+		}
+	};
 
-struct FKeyDerivation : public FEllipticCurvePoint {
-};
+	struct FKeyDerivation : public FEllipticCurvePoint
+	{
+	};
 
-struct FKeyImage : public FEllipticCurvePoint {
-};
+	struct FKeyImage : public FEllipticCurvePoint
+	{
+	};
 
-struct FSignature {
-    FEllipticCurveScalar c, r;
-};
+	struct FSignature
+	{
+		FEllipticCurveScalar c, r;
+	};
 
 #pragma pack(pop)
 
-static_assert(sizeof(FEllipticCurvePoint) == 32
-			  && sizeof(FEllipticCurveScalar) == 32,
-              "Invalid structure size");
+	static_assert(sizeof(FEllipticCurvePoint) == 32
+				  && sizeof(FEllipticCurveScalar) == 32,
+				  "Invalid structure size");
 
-static_assert(sizeof(FHash) == 32
-			  && sizeof(FPublicKey) == 32
-			  && sizeof(FSecretKey) == 32
-			  && sizeof(FKeyDerivation) == 32
-			  && sizeof(FKeyImage) == 32
-			  && sizeof(FSignature) == 64,
-              "Invalid structure size");
+	static_assert(sizeof(FHash) == 32
+				  && sizeof(FPublicKey) == 32
+				  && sizeof(FSecretKey) == 32
+				  && sizeof(FKeyDerivation) == 32
+				  && sizeof(FKeyImage) == 32
+				  && sizeof(FSignature) == 64,
+				  "Invalid structure size");
 
-// identity (a zero elliptic curve point)
-const struct FEllipticCurveScalar I = {{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
+// Identity (a zero elliptic curve point)
+	const struct FEllipticCurveScalar I = {{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+												   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+												   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+												   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
-// curve order
-const struct FEllipticCurveScalar L = {{0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
-                                         0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10 } };
+// Curve order
+	const struct FEllipticCurveScalar L = {{0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
+												   0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14,
+												   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+												   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10}};
 
-// zero scalar
-const struct FEllipticCurveScalar Z = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
+// Zero scalar
+	const struct FEllipticCurveScalar Z = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+												   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+												   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+												   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
-// curve basepoint
-const struct FEllipticCurveScalar G = {{0x58, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
-                                         0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
-                                         0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
-                                         0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66 } };
+// Curve basepoint
+	const struct FEllipticCurveScalar G = {{0x58, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
+												   0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
+												   0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
+												   0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66}};
 
-} // namespace Crypto
+} // Namespace Crypto
