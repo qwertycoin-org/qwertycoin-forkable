@@ -30,9 +30,9 @@ class TransfersSubscription : public IObservableImpl <ITransfersObserver, ITrans
 public:
     TransfersSubscription(const QwertyNote::Currency &currency,
                           Logging::ILogger &logger,
-                          const AccountSubscription &sub);
+                          const FAccountSubscription &sub);
 
-    SynchronizationStart getSyncStart();
+    FSynchronizationStart getSyncStart();
     void onBlockchainDetach(uint32_t height);
     void onError(const std::error_code &ec, uint32_t height);
     bool advanceHeight(uint32_t height);
@@ -54,7 +54,7 @@ public:
 private:
     Logging::LoggerRef logger;
     TransfersContainer transfers;
-    AccountSubscription subscription;
+    FAccountSubscription subscription;
 };
 
 } // namespace QwertyNote

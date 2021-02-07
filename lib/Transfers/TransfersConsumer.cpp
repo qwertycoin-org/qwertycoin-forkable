@@ -134,23 +134,23 @@ TransfersConsumer::TransfersConsumer(
     updateSyncStart();
 }
 
-ITransfersSubscription& TransfersConsumer::addSubscription(const AccountSubscription &subscription)
+ITransfersSubscription& TransfersConsumer::addSubscription(const FAccountSubscription &subscription)
 {
-    if (subscription.keys.viewSecretKey != m_viewSecret) {
+    if (subscription.sKeys.viewSecretKey != m_viewSecret) {
         throw std::runtime_error("TransfersConsumer: view secret key mismatch");
     }
 
-    auto &res = m_subscriptions[subscription.keys.address.spendPublicKey];
+    auto &res = m_subscriptions[subscription.sKeys.address.spendPublicKey];
 
     if (res.get() == nullptr) {
         res.reset(new TransfersSubscription(m_currency, m_logger.getLogger(), subscription));
-        m_spendKeys.insert(subscription.keys.address.spendPublicKey);
+        m_spendKeys.insert(subscription.sKeys.address.spendPublicKey);
         if (m_subscriptions.size() == 1) {
             m_syncStart = res->getSyncStart();
         } else {
             auto subStart = res->getSyncStart();
-            m_syncStart.height = std::min(m_syncStart.height, subStart.height);
-            m_syncStart.timestamp = std::min(m_syncStart.timestamp, subStart.timestamp);
+            m_syncStart.uHeight = std::min(m_syncStart.uHeight, subStart.uHeight);
+            m_syncStart.uTimestamp = std::min(m_syncStart.uTimestamp, subStart.uTimestamp);
         }
     }
 
@@ -201,21 +201,21 @@ void TransfersConsumer::initTransactionPool(
 
 void TransfersConsumer::updateSyncStart()
 {
-    SynchronizationStart start;
+    FSynchronizationStart start;
 
-    start.height =   std::numeric_limits<uint64_t>::max();
-    start.timestamp = std::numeric_limits<uint64_t>::max();
+    start.uHeight =   std::numeric_limits<uint64_t>::max();
+    start.uTimestamp = std::numeric_limits<uint64_t>::max();
 
     for (const auto &kv : m_subscriptions) {
         auto subStart = kv.second->getSyncStart();
-        start.height = std::min(start.height, subStart.height);
-        start.timestamp = std::min(start.timestamp, subStart.timestamp);
+        start.uHeight = std::min(start.uHeight, subStart.uHeight);
+        start.uTimestamp = std::min(start.uTimestamp, subStart.uTimestamp);
     }
 
     m_syncStart = start;
 }
 
-SynchronizationStart TransfersConsumer::getSyncStart()
+FSynchronizationStart TransfersConsumer::getSyncStart()
 {
     return m_syncStart;
 }
@@ -263,7 +263,7 @@ bool TransfersConsumer::onNewBlocks(const CompleteBlock *blocks,uint32_t startHe
             }
 
             // filter by syncStartTimestamp
-            if (m_syncStart.timestamp && block->timestamp < m_syncStart.timestamp) {
+            if (m_syncStart.uTimestamp && block->timestamp < m_syncStart.uTimestamp) {
                 continue;
             }
 

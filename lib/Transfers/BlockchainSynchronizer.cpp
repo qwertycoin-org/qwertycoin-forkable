@@ -518,8 +518,8 @@ BlockchainSynchronizer::GetBlocksRequest BlockchainSynchronizer::getCommonHistor
         }
 
         auto consumerStart = it->first->getSyncStart();
-        syncStart.timestamp = std::min(syncStart.timestamp, consumerStart.timestamp);
-        syncStart.height = std::min(syncStart.height, consumerStart.height);
+        syncStart.uTimestamp = std::min(syncStart.uTimestamp, consumerStart.uTimestamp);
+        syncStart.uHeight = std::min(syncStart.uHeight, consumerStart.uHeight);
     }
 
     m_logger(DEBUGGING) << "Shortest chain size " << shortest->second->getHeight();
@@ -529,7 +529,7 @@ BlockchainSynchronizer::GetBlocksRequest BlockchainSynchronizer::getCommonHistor
 
     m_logger(DEBUGGING)
         << "Common history: start block index "
-        << request.syncStart.height
+        << request.syncStart.uHeight
         << ", sparse chain size "
         << request.knownBlocks.size();
 
@@ -550,7 +550,7 @@ void BlockchainSynchronizer::startBlockchainSync()
 
             m_node.queryBlocks(
                 std::move(req.knownBlocks),
-                req.syncStart.timestamp,
+                req.syncStart.uTimestamp,
                 response.newBlocks,
                 response.startHeight,
                 [&queryBlocksCompleted](std::error_code ec) {

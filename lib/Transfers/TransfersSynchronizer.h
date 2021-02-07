@@ -59,7 +59,7 @@ public:
     void initTransactionPool(const std::unordered_set<Crypto::FHash> &uncommitedTransactions);
 
     // ITransfersSynchronizer
-    ITransfersSubscription &addSubscription(const AccountSubscription &acc) override;
+    ITransfersSubscription &addSubscription(const FAccountSubscription &acc) override;
     bool removeSubscription(const AccountPublicAddress &acc) override;
     void getSubscriptions(std::vector<AccountPublicAddress> &subscriptions) override;
     ITransfersSubscription *getSubscription(const AccountPublicAddress &acc) override;

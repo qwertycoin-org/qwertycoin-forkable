@@ -56,7 +56,7 @@ class IBlockchainConsumer : public TObservable<IBlockchainConsumerObserver>
 public:
     virtual ~IBlockchainConsumer() = default;
 
-    virtual SynchronizationStart getSyncStart() = 0;
+    virtual FSynchronizationStart getSyncStart() = 0;
     virtual const std::unordered_set<Crypto::FHash> &getKnownPoolTxIds() const = 0;
     virtual void onBlockchainDetach(uint32_t height) = 0;
     virtual bool onNewBlocks(const CompleteBlock *blocks, uint32_t startHeight, uint32_t count) = 0;

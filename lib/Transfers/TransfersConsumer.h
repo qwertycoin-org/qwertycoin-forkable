@@ -47,7 +47,7 @@ public:
                       Logging::ILogger &logger,
                       const Crypto::FSecretKey &viewSecret);
 
-    ITransfersSubscription& addSubscription(const AccountSubscription &subscription);
+    ITransfersSubscription& addSubscription(const FAccountSubscription &subscription);
     bool removeSubscription(const AccountPublicAddress &address); // true if no subscribers left
     ITransfersSubscription *getSubscription(const AccountPublicAddress &acc);
     void getSubscriptions(std::vector<AccountPublicAddress> &subscriptions);
@@ -56,7 +56,7 @@ public:
     void addPublicKeysSeen(const Crypto::FHash &transactionHash, const Crypto::FPublicKey &outputKey);
 
     // IBlockchainConsumer
-    SynchronizationStart getSyncStart() override;
+    FSynchronizationStart getSyncStart() override;
     void onBlockchainDetach(uint32_t height) override;
     bool onNewBlocks(const CompleteBlock *blocks, uint32_t startHeight, uint32_t count) override;
     std::error_code onPoolUpdated(
@@ -111,7 +111,7 @@ private:
     void updateSyncStart();
 
 private:
-    SynchronizationStart m_syncStart;
+    FSynchronizationStart m_syncStart;
     const Crypto::FSecretKey m_viewSecret;
     // map { spend public key -> subscription }
     std::unordered_map<Crypto::FPublicKey, std::unique_ptr<TransfersSubscription>> m_subscriptions;

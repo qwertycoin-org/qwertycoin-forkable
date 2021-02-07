@@ -1040,14 +1040,14 @@ void WalletGreen::subscribeWallets()
         for (auto it = index.begin(); it != index.end(); ++it) {
             const auto &wallet = *it;
 
-            AccountSubscription sub;
-            sub.keys.address.viewPublicKey = m_viewPublicKey;
-            sub.keys.address.spendPublicKey = wallet.spendPublicKey;
-            sub.keys.viewSecretKey = m_viewSecretKey;
-            sub.keys.spendSecretKey = wallet.spendSecretKey;
-            sub.transactionSpendableAge = m_transactionSoftLockTime;
-            sub.syncStart.height = 0;
-            sub.syncStart.timestamp = std::max(
+            FAccountSubscription sub;
+            sub.sKeys.address.viewPublicKey = m_viewPublicKey;
+            sub.sKeys.address.spendPublicKey = wallet.spendPublicKey;
+            sub.sKeys.viewSecretKey = m_viewSecretKey;
+            sub.sKeys.spendSecretKey = wallet.spendSecretKey;
+            sub.uTransactionSpendableAge = m_transactionSoftLockTime;
+            sub.sSyncStart.uHeight = 0;
+            sub.sSyncStart.uTimestamp = std::max(
                 static_cast<uint64_t>(wallet.creationTimestamp),
                 ACCOUNT_CREATE_TIME_ACCURACY
                 ) - ACCOUNT_CREATE_TIME_ACCURACY;
@@ -1452,14 +1452,14 @@ std::string WalletGreen::addWallet(const Crypto::FPublicKey &spendPublicKey,
     incNextIv();
 
     try {
-        AccountSubscription sub;
-        sub.keys.address.viewPublicKey = m_viewPublicKey;
-        sub.keys.address.spendPublicKey = spendPublicKey;
-        sub.keys.viewSecretKey = m_viewSecretKey;
-        sub.keys.spendSecretKey = spendSecretKey;
-        sub.transactionSpendableAge = m_transactionSoftLockTime;
-        sub.syncStart.height = 0;
-        sub.syncStart.timestamp = std::max(
+        FAccountSubscription sub;
+        sub.sKeys.address.viewPublicKey = m_viewPublicKey;
+        sub.sKeys.address.spendPublicKey = spendPublicKey;
+        sub.sKeys.viewSecretKey = m_viewSecretKey;
+        sub.sKeys.spendSecretKey = spendSecretKey;
+        sub.uTransactionSpendableAge = m_transactionSoftLockTime;
+        sub.sSyncStart.uHeight = 0;
+        sub.sSyncStart.uTimestamp = std::max(
             creationTimestamp,
             ACCOUNT_CREATE_TIME_ACCURACY
             ) - ACCOUNT_CREATE_TIME_ACCURACY;

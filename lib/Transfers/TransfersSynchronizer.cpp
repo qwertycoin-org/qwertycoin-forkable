@@ -64,18 +64,18 @@ void TransfersSynchronizer::initTransactionPool(
     }
 }
 
-ITransfersSubscription& TransfersSynchronizer::addSubscription(const AccountSubscription& acc) {
-    auto it = m_consumers.find(acc.keys.address.viewPublicKey);
+ITransfersSubscription& TransfersSynchronizer::addSubscription(const FAccountSubscription& acc) {
+    auto it = m_consumers.find(acc.sKeys.address.viewPublicKey);
 
     if (it == m_consumers.end()) {
         std::unique_ptr<TransfersConsumer> consumer(
-            new TransfersConsumer(m_currency, m_node, m_logger.getLogger(), acc.keys.viewSecretKey)
+            new TransfersConsumer(m_currency, m_node, m_logger.getLogger(), acc.sKeys.viewSecretKey)
         );
 
         m_sync.addConsumer(consumer.get());
         consumer->addObserver(this);
         it = m_consumers.insert(std::make_pair(
-            acc.keys.address.viewPublicKey,
+            acc.sKeys.address.viewPublicKey,
             std::move(consumer))
         ).first;
     }

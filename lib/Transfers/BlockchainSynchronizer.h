@@ -46,11 +46,11 @@ class BlockchainSynchronizer : public IObservableImpl<
     {
         GetBlocksRequest()
         {
-            syncStart.timestamp = 0;
-            syncStart.height = 0;
+            syncStart.uTimestamp = 0;
+            syncStart.uHeight = 0;
         }
 
-        SynchronizationStart syncStart;
+        FSynchronizationStart syncStart;
         std::vector<Crypto::FHash> knownBlocks;
     };
 

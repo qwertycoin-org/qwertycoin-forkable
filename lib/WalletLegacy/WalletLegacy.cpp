@@ -306,12 +306,12 @@ void WalletLegacy::initAndLoad(std::istream &source, const std::string &password
 
 void WalletLegacy::initSync()
 {
-    AccountSubscription sub;
-    sub.keys = reinterpret_cast<const AccountKeys &>(m_account.getAccountKeys());
-    sub.transactionSpendableAge = m_currency.transactionSpendableAge();
-    sub.safeTransactionSpendableAge = m_currency.safeTransactionSpendableAge();
-    sub.syncStart.height = m_transactionsCache.getConsolidateHeight();
-    sub.syncStart.timestamp = m_account.get_createtime() - ACCOUNT_CREATE_TIME_ACCURACY;
+    FAccountSubscription sub;
+    sub.sKeys = reinterpret_cast<const AccountKeys &>(m_account.getAccountKeys());
+    sub.uTransactionSpendableAge = m_currency.transactionSpendableAge();
+    sub.uSafeTransactionSpendableAge = m_currency.safeTransactionSpendableAge();
+    sub.sSyncStart.uHeight = m_transactionsCache.getConsolidateHeight();
+    sub.sSyncStart.uTimestamp = m_account.getCreateTime() - ACCOUNT_CREATE_TIME_ACCURACY;
 
     auto &subObject = m_transfersSync.addSubscription(sub);
     m_transferDetails = &subObject.getContainer();

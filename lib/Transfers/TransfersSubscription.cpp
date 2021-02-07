@@ -25,16 +25,16 @@ namespace QwertyNote {
 
 TransfersSubscription::TransfersSubscription(const QwertyNote::Currency &currency,
                                              Logging::ILogger &logger,
-                                             const AccountSubscription &sub)
+                                             const FAccountSubscription &sub)
     : logger(logger, "TransfersSubscription"),
-      transfers(currency, logger, sub.transactionSpendableAge, sub.safeTransactionSpendableAge),
+      transfers(currency, logger, sub.uTransactionSpendableAge, sub.uSafeTransactionSpendableAge),
       subscription(sub)
 {
 }
 
-SynchronizationStart TransfersSubscription::getSyncStart()
+FSynchronizationStart TransfersSubscription::getSyncStart()
 {
-    return subscription.syncStart;
+    return subscription.sSyncStart;
 }
 
 void TransfersSubscription::onBlockchainDetach(uint32_t height)
@@ -60,7 +60,7 @@ bool TransfersSubscription::advanceHeight(uint32_t height)
 
 const AccountKeys& TransfersSubscription::getKeys() const
 {
-    return subscription.keys;
+    return subscription.sKeys;
 }
 
 bool TransfersSubscription::addTransaction(
@@ -82,7 +82,7 @@ bool TransfersSubscription::addTransaction(
 
 AccountPublicAddress TransfersSubscription::getAddress()
 {
-    return subscription.keys.address;
+    return subscription.sKeys.address;
 }
 
 ITransfersContainer& TransfersSubscription::getContainer()
