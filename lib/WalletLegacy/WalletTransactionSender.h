@@ -69,7 +69,7 @@ public:
         TransactionId &transactionId,
         std::deque<std::shared_ptr<WalletLegacyEvent>> &events,
 	    const std::vector<WalletLegacyTransfer> &transfers,
-	    const std::list<TransactionOutputInformation> &fusionInputs,
+	    const std::list<FTransactionOutputInformation> &fusionInputs,
 	    uint64_t fee,
 	    const std::string &extra = "",
 	    uint64_t mixIn = 0,
@@ -83,7 +83,7 @@ private:
         std::deque<std::shared_ptr<WalletLegacyEvent>> &events);
 
   void prepareInputs(
-      const std::list<TransactionOutputInformation> &selectedTransfers,
+      const std::list<FTransactionOutputInformation> &selectedTransfers,
       std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &outs,
       std::vector<TransactionSourceEntry> &sources,
       uint64_t mixIn);
@@ -119,11 +119,11 @@ private:
       uint64_t neededMoney,
       bool addDust,
       uint64_t dust,
-      std::list<TransactionOutputInformation> &selectedTransfers);
+      std::list<FTransactionOutputInformation> &selectedTransfers);
   uint64_t selectDustTransfersToSend(
       uint64_t neededMoney,
       uint64_t dust,
-      std::list<TransactionOutputInformation> &selectedTransfers);
+      std::list<FTransactionOutputInformation> &selectedTransfers);
 
 private:
     const Currency &m_currency;

@@ -158,7 +158,7 @@ public:
     virtual size_t getTransferCount() = 0;
     virtual size_t getUnlockedOutputsCount() = 0;
 
-    virtual std::list<TransactionOutputInformation> selectAllOldOutputs(uint32_t height) = 0;
+    virtual std::list<FTransactionOutputInformation> selectAllOldOutputs(uint32_t height) = 0;
 
     virtual TransactionId findTransactionByTransferId(TransferId transferId) = 0;
 
@@ -201,7 +201,7 @@ public:
         uint64_t mixIn = 0,
         uint64_t unlockTimestamp = 0) = 0;
     virtual TransactionId sendFusionTransaction(
-        const std::list<TransactionOutputInformation> &fusionInputs,
+        const std::list<FTransactionOutputInformation> &fusionInputs,
         uint64_t fee,
         const std::string &extra = "",
         uint64_t mixIn = 0,
@@ -209,7 +209,7 @@ public:
     virtual std::error_code cancelTransaction(size_t transferId) = 0;
 
     virtual size_t estimateFusion(const uint64_t &threshold) = 0;
-    virtual std::list<TransactionOutputInformation> selectFusionTransfersToSend(
+    virtual std::list<FTransactionOutputInformation> selectFusionTransfersToSend(
         uint64_t threshold,
         size_t minInputCount,
         size_t maxInputCount) = 0;

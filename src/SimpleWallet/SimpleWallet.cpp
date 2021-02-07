@@ -3162,7 +3162,7 @@ bool simple_wallet::optimize(const std::vector<std::string> &args)
         fail_msg_writer() << "Fusion transaction mixin is too big " << mixIn;
     }
 
-    std::list<TransactionOutputInformation> fusionInputs = m_wallet->selectFusionTransfersToSend(
+    std::list<FTransactionOutputInformation> fusionInputs = m_wallet->selectFusionTransfersToSend(
         fusionThreshold,
         m_currency.fusionTxMinInputCount(),
         estimatedFusionInputsCount
@@ -3306,7 +3306,7 @@ bool simple_wallet::consolidate(const std::vector<std::string> &args)
         return true;
     }
 
-    std::list<TransactionOutputInformation> oldInputs = m_wallet->selectAllOldOutputs(heightThreshold);
+    std::list<FTransactionOutputInformation> oldInputs = m_wallet->selectAllOldOutputs(heightThreshold);
 
     if (oldInputs.empty()) {
         // nothing to consolidate
@@ -3323,7 +3323,7 @@ bool simple_wallet::consolidate(const std::vector<std::string> &args)
     );
     while (!oldInputs.empty())
     {
-        std::list<TransactionOutputInformation> transferInputs;
+        std::list<FTransactionOutputInformation> transferInputs;
         size_t to_send = std::min(estimatedFusionInputsCount, oldInputs.size());
         auto to_send_end = oldInputs.begin();
         std::advance(to_send_end, to_send);

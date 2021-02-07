@@ -220,7 +220,7 @@ public:
     virtual uint32_t getBlockCount() const  = 0;
     virtual std::vector<WalletTransactionWithTransfers> getUnconfirmedTransactions() const = 0;
     virtual std::vector<size_t> getDelayedTransactionIds() const = 0;
-    virtual std::vector<TransactionOutputInformation> getTransfers(
+    virtual std::vector<FTransactionOutputInformation> getTransfers(
         size_t index,
         uint32_t flags) const = 0;
 

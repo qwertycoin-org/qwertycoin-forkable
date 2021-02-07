@@ -84,7 +84,7 @@ struct SpentOutputDescriptorHasher
     }
 };
 
-struct TransactionOutputInformationIn : public TransactionOutputInformation
+struct TransactionOutputInformationIn : public FTransactionOutputInformation
 {
     Crypto::FKeyImage keyImage; // WARNING: Used only for TransactionTypes::OutputType::Key!
 };
@@ -92,26 +92,26 @@ struct TransactionOutputInformationIn : public TransactionOutputInformation
 struct TransactionOutputInformationEx : public TransactionOutputInformationIn
 {
     SpentOutputDescriptor getSpentOutputDescriptor() const { return SpentOutputDescriptor(*this); }
-    const Crypto::FHash& getTransactionHash() const { return transactionHash; }
+    const Crypto::FHash& getTransactionHash() const { return sTransactionHash; }
 
     void serialize(QwertyNote::ISerializer &s)
     {
-        s(reinterpret_cast<uint8_t &>(type), "type");
-        s(amount, "");
-        serializeGlobalOutputIndex(s, globalOutputIndex, "");
-        s(outputInTransaction, "");
-        s(transactionPublicKey, "");
+        s(reinterpret_cast<uint8_t &>(sOutputType), "sOutputType");
+        s(uAmount, "");
+        serializeGlobalOutputIndex(s, uGlobalOutputIndex, "");
+        s(uOutputInTransaction, "");
+        s(sTransactionPublicKey, "");
         s(keyImage, "");
         s(unlockTime, "");
         serializeBlockHeight(s, blockHeight, "");
         s(transactionIndex, "");
-        s(transactionHash, "");
+        s(sTransactionHash, "");
         s(visible, "");
 
-        if (type == TransactionTypes::OutputType::Key) {
-            s(outputKey, "");
-        } else if (type == TransactionTypes::OutputType::Multisignature) {
-            s(requiredSignatures, "");
+        if (sOutputType == TransactionTypes::OutputType::Key) {
+            s(sOutputKey, "");
+        } else if (sOutputType == TransactionTypes::OutputType::Multisignature) {
+            s(uRequiredSignatures, "");
         }
     }
 
@@ -180,22 +180,22 @@ public:
     size_t transactionsCount() const override;
     uint64_t balance(uint32_t flags) const override;
     void getOutputs(
-        std::vector<TransactionOutputInformation> &transfers,
+        std::vector<FTransactionOutputInformation> &transfers,
         uint32_t flags) const override;
     bool getTransactionInformation(
-        const Crypto::FHash &transactionHash,
-        TransactionInformation &info,
-        uint64_t *amountIn = nullptr,
-        uint64_t *amountOut = nullptr) const override;
-    std::vector<TransactionOutputInformation> getTransactionOutputs(
+			const Crypto::FHash &transactionHash,
+			FTransactionInformation &info,
+			uint64_t *amountIn = nullptr,
+			uint64_t *amountOut = nullptr) const override;
+    std::vector<FTransactionOutputInformation> getTransactionOutputs(
         const Crypto::FHash &transactionHash,
         uint32_t flags) const override;
     // only type flags are feasible for this function
-    std::vector<TransactionOutputInformation> getTransactionInputs(
+    std::vector<FTransactionOutputInformation> getTransactionInputs(
         const Crypto::FHash &transactionHash,
         uint32_t flags) const override;
     void getUnconfirmedTransactions(std::vector<Crypto::FHash> &transactions) const override;
-    std::vector<TransactionSpentOutputInformation> getSpentOutputs() const override;
+    std::vector<FTransactionSpentOutputInformation> getSpentOutputs() const override;
     void markTransactionSafe(const Crypto::FHash &transactionHash) override;
     void getSafeTransactions(std::vector<Crypto::FHash> &transactions) const override;
 
@@ -209,13 +209,13 @@ private:
     struct SpentOutputDescriptorIndex { };
 
     typedef boost::multi_index_container<
-        TransactionInformation,
+        FTransactionInformation,
         boost::multi_index::indexed_by<
             boost::multi_index::hashed_unique<
-                BOOST_MULTI_INDEX_MEMBER(TransactionInformation, Crypto::FHash, transactionHash)
+                BOOST_MULTI_INDEX_MEMBER(FTransactionInformation, Crypto::FHash, sTransactionHash)
             >,
             boost::multi_index::ordered_non_unique<
-                BOOST_MULTI_INDEX_MEMBER(TransactionInformation, uint32_t, blockHeight)
+                BOOST_MULTI_INDEX_MEMBER(FTransactionInformation, uint32_t, uBlockHeight)
             >
         >
     > TransactionMultiIndex;

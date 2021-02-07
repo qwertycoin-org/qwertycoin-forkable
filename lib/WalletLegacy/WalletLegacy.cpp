@@ -358,16 +358,16 @@ void WalletLegacy::doLoad(std::istream &source)
         }
 
         // Read all output keys cache
-        std::vector<TransactionOutputInformation> allTransfers;
+        std::vector<FTransactionOutputInformation> allTransfers;
         m_transferDetails->getOutputs(allTransfers, ITransfersContainer::IncludeAll);
         auto message = "Loaded " + std::to_string(allTransfers.size()) + " known transfer(s)\r\n";
         m_loggerGroup("WalletLegacy", INFO, boost::posix_time::second_clock::local_time(), message);
         for (auto &o : allTransfers) {
-            if (o.type != TransactionTypes::OutputType::Invalid) {
+            if (o.sOutputType != TransactionTypes::OutputType::Invalid) {
                 m_transfersSync.addPublicKeysSeen(
                     m_account.getAccountKeys().address,
-                    o.transactionHash,
-                    o.outputKey
+                    o.sTransactionHash,
+                    o.sOutputKey
                 );
             }
         }
@@ -660,7 +660,7 @@ uint64_t WalletLegacy::dustBalance()
     std::unique_lock<std::mutex> lock(m_cacheMutex);
     throwIfNotInitialised();
 
-    std::vector<TransactionOutputInformation> outputs;
+    std::vector<FTransactionOutputInformation> outputs;
     m_transferDetails->getOutputs(outputs, ITransfersContainer::IncludeKeyUnlocked);
 
     uint64_t money = 0;
@@ -669,8 +669,8 @@ uint64_t WalletLegacy::dustBalance()
         const auto &out = outputs[i];
         if (!m_transactionsCache.isUsed(out)) {
             if (/*out.amount < m_currency.defaultDustThreshold() &&*/
-                !is_valid_decomposed_amount(out.amount)) {
-                money += out.amount;
+                !is_valid_decomposed_amount(out.uAmount)) {
+                money += out.uAmount;
             }
         }
     }
@@ -720,20 +720,20 @@ bool WalletLegacy::getTransfer(TransferId transferId, WalletLegacyTransfer &tran
 
 size_t WalletLegacy::getUnlockedOutputsCount()
 {
-    std::vector<TransactionOutputInformation> outputs;
+    std::vector<FTransactionOutputInformation> outputs;
     m_transferDetails->getOutputs(outputs, ITransfersContainer::IncludeKeyUnlocked);
 
     return outputs.size();
 }
 
-std::list<TransactionOutputInformation> WalletLegacy::selectAllOldOutputs(uint32_t height)
+std::list<FTransactionOutputInformation> WalletLegacy::selectAllOldOutputs(uint32_t height)
 {
-    std::vector<TransactionOutputInformation> outputs;
+    std::vector<FTransactionOutputInformation> outputs;
     m_transferDetails->getOutputs(outputs, ITransfersContainer::IncludeKeyUnlocked);
 
-    std::list<TransactionOutputInformation> result;
+    std::list<FTransactionOutputInformation> result;
     for (const auto& toi: outputs) {
-        TransactionId id = m_transactionsCache.findTransactionByHash(toi.transactionHash);
+        TransactionId id = m_transactionsCache.findTransactionByHash(toi.sTransactionHash);
         if (id == QwertyNote::WALLET_LEGACY_INVALID_TRANSACTION_ID)
             continue;
         WalletLegacyTransaction& tx = m_transactionsCache.getTransaction(id);
@@ -747,7 +747,7 @@ std::list<TransactionOutputInformation> WalletLegacy::selectAllOldOutputs(uint32
 size_t WalletLegacy::estimateFusion(const uint64_t &threshold)
 {
     size_t fusionReadyCount = 0;
-    std::vector<TransactionOutputInformation> outputs;
+    std::vector<FTransactionOutputInformation> outputs;
     m_transferDetails->getOutputs(outputs, ITransfersContainer::IncludeKeyUnlocked);
     std::array<size_t, std::numeric_limits<uint64_t>::digits10 + 1> bucketSizes;
     bucketSizes.fill(0);
@@ -755,7 +755,7 @@ size_t WalletLegacy::estimateFusion(const uint64_t &threshold)
     for (auto &out : outputs) {
         uint8_t powerOfTen = 0;
         if (m_currency.isAmountApplicableInFusionTransactionInput(
-            out.amount,
+            out.uAmount,
             threshold,
             powerOfTen,
             m_node.getLastKnownBlockHeight())) {
@@ -773,21 +773,21 @@ size_t WalletLegacy::estimateFusion(const uint64_t &threshold)
     return fusionReadyCount;
 }
 
-std::list<TransactionOutputInformation> WalletLegacy::selectFusionTransfersToSend(
+std::list<FTransactionOutputInformation> WalletLegacy::selectFusionTransfersToSend(
     uint64_t threshold,
     size_t minInputCount,
     size_t maxInputCount)
 {
-    std::list<TransactionOutputInformation> selectedOutputs;
-    std::vector<TransactionOutputInformation> outputs;
-    std::vector<TransactionOutputInformation> allFusionReadyOuts;
+    std::list<FTransactionOutputInformation> selectedOutputs;
+    std::vector<FTransactionOutputInformation> outputs;
+    std::vector<FTransactionOutputInformation> allFusionReadyOuts;
     m_transferDetails->getOutputs(outputs, ITransfersContainer::IncludeKeyUnlocked);
     std::array<size_t, std::numeric_limits<uint64_t>::digits10 + 1> bucketSizes;
     bucketSizes.fill(0);
     for (auto &out : outputs) {
         uint8_t powerOfTen = 0;
         if (m_currency.isAmountApplicableInFusionTransactionInput(
-            out.amount,
+            out.uAmount,
             threshold,
             powerOfTen,
             m_node.getLastKnownBlockHeight())) {
@@ -825,20 +825,20 @@ std::list<TransactionOutputInformation> WalletLegacy::selectFusionTransfersToSen
 
     uint64_t upperBound = selectedBucket == std::numeric_limits<uint64_t>::digits10 ? UINT64_MAX
                                                                                     : lowerBound*10;
-    std::vector<TransactionOutputInformation> selectedOuts;
+    std::vector<FTransactionOutputInformation> selectedOuts;
     selectedOuts.reserve(bucketSizes[selectedBucket]);
     for (size_t outIndex = 0; outIndex < allFusionReadyOuts.size(); ++outIndex) {
-        if (allFusionReadyOuts[outIndex].amount >= lowerBound
-            && allFusionReadyOuts[outIndex].amount < upperBound) {
+        if (allFusionReadyOuts[outIndex].uAmount >= lowerBound
+            && allFusionReadyOuts[outIndex].uAmount < upperBound) {
             selectedOuts.push_back(std::move(allFusionReadyOuts[outIndex]));
         }
     }
 
     assert(selectedOuts.size() >= minInputCount);
 
-    auto outputsSortingFunction = [](const TransactionOutputInformation &l,
-                                     const TransactionOutputInformation &r) {
-        return l.amount < r.amount;
+    auto outputsSortingFunction = [](const FTransactionOutputInformation &l,
+                                     const FTransactionOutputInformation &r) {
+        return l.uAmount < r.uAmount;
     };
     if (selectedOuts.size() <= maxInputCount) {
         std::sort(selectedOuts.begin(), selectedOuts.end(), outputsSortingFunction);
@@ -847,7 +847,7 @@ std::list<TransactionOutputInformation> WalletLegacy::selectFusionTransfersToSen
     }
 
     ShuffleGenerator<size_t> generator(selectedOuts.size());
-    std::vector<TransactionOutputInformation> trimmedSelectedOuts;
+    std::vector<FTransactionOutputInformation> trimmedSelectedOuts;
     trimmedSelectedOuts.reserve(maxInputCount);
     for (size_t i = 0; i < maxInputCount; ++i) {
         trimmedSelectedOuts.push_back(std::move(selectedOuts[generator()]));
@@ -969,7 +969,7 @@ TransactionId WalletLegacy::sendDustTransaction(
 }
 
 TransactionId WalletLegacy::sendFusionTransaction(
-    const std::list<TransactionOutputInformation> &fusionInputs,
+    const std::list<FTransactionOutputInformation> &fusionInputs,
     uint64_t fee,
     const std::string &extra,
     uint64_t mixIn,
@@ -983,7 +983,7 @@ TransactionId WalletLegacy::sendFusionTransaction(
     WalletLegacyTransfer destination;
     destination.amount = 0;
     for (auto &out : fusionInputs) {
-        destination.amount += out.amount;
+        destination.amount += out.uAmount;
     }
     destination.amount -= fee;
     destination.address = getAddress();
@@ -1120,7 +1120,7 @@ void WalletLegacy::onTransactionUpdated(ITransfersSubscription *object, const FH
 {
     std::shared_ptr<WalletLegacyEvent> event;
 
-    TransactionInformation txInfo;
+    FTransactionInformation txInfo;
     uint64_t amountIn;
     uint64_t amountOut;
     if (m_transferDetails->getTransactionInformation(transactionHash,txInfo,&amountIn,&amountOut)) {
@@ -1296,10 +1296,10 @@ bool WalletLegacy::getTxProof(
 }
 
 bool compareTransactionOutputInformationByAmount(
-    const TransactionOutputInformation &a,
-    const TransactionOutputInformation &b)
+    const FTransactionOutputInformation &a,
+    const FTransactionOutputInformation &b)
 {
-    return a.amount < b.amount;
+    return a.uAmount < b.uAmount;
 }
 
 std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::string &message)
@@ -1320,7 +1320,7 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
     }
 
     // Determine which outputs to include in the proof.
-    std::vector<TransactionOutputInformation> selected_transfers;
+    std::vector<FTransactionOutputInformation> selected_transfers;
     m_transferDetails->getOutputs(selected_transfers, ITransfersContainer::IncludeAllUnlocked);
 
     // Minimize the number of outputs included in the proof,
@@ -1329,13 +1329,13 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
     std::sort(selected_transfers.begin(),
               selected_transfers.end(),
               compareTransactionOutputInformationByAmount);
-    while (selected_transfers.size() >= 2 && selected_transfers[1].amount >= reserve) {
+    while (selected_transfers.size() >= 2 && selected_transfers[1].uAmount >= reserve) {
         selected_transfers.erase(selected_transfers.begin());
     }
     size_t sz = 0;
     uint64_t total = 0;
     while (total < reserve) {
-        total += selected_transfers[sz].amount;
+        total += selected_transfers[sz].uAmount;
         ++sz;
     }
     selected_transfers.resize(sz);
@@ -1350,14 +1350,14 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
     for (size_t i = 0; i < selected_transfers.size(); ++i) {
         // have to repeat this to get key image as we don't store m_key_image
         // prefix_data.append((const char*)&m_transfers[selected_transfers[i]].m_key_image, sizeof(Crypto::key_image));
-        const TransactionOutputInformation &td = selected_transfers[i];
+        const FTransactionOutputInformation &td = selected_transfers[i];
 
         // derive ephemeral secret key
         Crypto::FKeyImage ki;
         const bool r = QwertyNote::generate_key_image_helper(
             m_account.getAccountKeys(),
-            td.transactionPublicKey,
-            td.outputInTransaction,
+            td.sTransactionPublicKey,
+            td.uOutputInTransaction,
             ephemeral,
             ki
         );
@@ -1377,13 +1377,13 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
     std::vector<RESERVE_PROOF_ENTRY> proofs(selected_transfers.size());
 
     for (size_t i = 0; i < selected_transfers.size(); ++i) {
-        const TransactionOutputInformation &td = selected_transfers[i];
+        const FTransactionOutputInformation &td = selected_transfers[i];
         RESERVE_PROOF_ENTRY &proof = proofs[i];
         proof.key_image = kimages[i];
-        proof.txid = td.transactionHash;
-        proof.index_in_tx = td.outputInTransaction;
+        proof.txid = td.sTransactionHash;
+        proof.index_in_tx = td.uOutputInTransaction;
 
-        auto txPubKey = td.transactionPublicKey;
+        auto txPubKey = td.sTransactionPublicKey;
 
         for (int j = 0; j < 2; ++i)	{
             Crypto::FKeyImage sk = Crypto::scalarMultKey(
@@ -1407,8 +1407,8 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
 
         const bool r = QwertyNote::generate_key_image_helper(
             m_account.getAccountKeys(),
-            td.transactionPublicKey,
-            td.outputInTransaction,
+            td.sTransactionPublicKey,
+            td.uOutputInTransaction,
             ephemeral,
             ki
         );
@@ -1416,7 +1416,7 @@ std::string WalletLegacy::getReserveProof(const uint64_t &reserve, const std::st
             throw std::runtime_error("Failed to generate key image");
         }
 
-        if (ephemeral.publicKey != td.outputKey) {
+        if (ephemeral.publicKey != td.sOutputKey) {
             throw std::runtime_error("Derived public key doesn't agree with the stored one");
         }
 

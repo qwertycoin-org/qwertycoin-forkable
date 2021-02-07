@@ -670,13 +670,13 @@ void WalletGreen::load(const std::string &path,
         for (auto &addr : subscriptionList) {
             auto sub = m_synchronizer.getSubscription(addr);
             if (sub != nullptr) {
-                std::vector<TransactionOutputInformation> allTransfers;
+                std::vector<FTransactionOutputInformation> allTransfers;
                 ITransfersContainer *container = &sub->getContainer();
                 container->getOutputs(allTransfers, ITransfersContainer::IncludeAll);
                 m_logger(INFO, BRIGHT_WHITE) << "Known Transfers " << allTransfers.size();
                 for (auto &o : allTransfers) {
-                    if (o.type != TransactionTypes::OutputType::Invalid) {
-                        m_synchronizer.addPublicKeysSeen(addr, o.transactionHash, o.outputKey);
+                    if (o.sOutputType != TransactionTypes::OutputType::Invalid) {
+                        m_synchronizer.addPublicKeysSeen(addr, o.sTransactionHash, o.sOutputKey);
                     }
                 }
             }
@@ -2298,7 +2298,7 @@ void WalletGreen::updateTransactionStateAndPushEvent(size_t transactionId,
 }
 
 bool WalletGreen::updateWalletTransactionInfo(size_t transactionId,
-                                              const QwertyNote::TransactionInformation &info,
+                                              const QwertyNote::FTransactionInformation &info,
                                               int64_t totalAmount)
 {
     auto &txIdIndex = m_transactions.get<RandomAccessIndex>();
@@ -2309,13 +2309,13 @@ bool WalletGreen::updateWalletTransactionInfo(size_t transactionId,
     bool r = txIdIndex.modify(
         it,
         [this, transactionId, &info, totalAmount, &updated](WalletTransaction &transaction) {
-        if (transaction.blockHeight != info.blockHeight) {
-            transaction.blockHeight = info.blockHeight;
+        if (transaction.blockHeight != info.uBlockHeight) {
+            transaction.blockHeight = info.uBlockHeight;
             updated = true;
         }
 
-        if (transaction.timestamp != info.timestamp) {
-            transaction.timestamp = info.timestamp;
+        if (transaction.timestamp != info.uTimestamp) {
+            transaction.timestamp = info.uTimestamp;
             updated = true;
         }
 
@@ -2337,12 +2337,12 @@ bool WalletGreen::updateWalletTransactionInfo(size_t transactionId,
         }
 
         // Fix LegacyWallet error. Some old versions didn't fill extra field.
-        if (transaction.extra.empty() && !info.extra.empty()) {
-            transaction.extra = Common::asString(info.extra);
+        if (transaction.extra.empty() && !info.vExtra.empty()) {
+            transaction.extra = Common::asString(info.vExtra);
             updated = true;
         }
 
-        bool isBase = info.totalAmountIn == 0;
+        bool isBase = info.uTotalAmountIn == 0;
         if (transaction.isBase != isBase) {
             transaction.isBase = isBase;
             updated = true;
@@ -2362,27 +2362,27 @@ bool WalletGreen::updateWalletTransactionInfo(size_t transactionId,
     return updated;
 }
 
-size_t WalletGreen::insertBlockchainTransaction(const TransactionInformation &info,
+size_t WalletGreen::insertBlockchainTransaction(const FTransactionInformation &info,
                                                 int64_t txBalance)
 {
     auto &index = m_transactions.get<RandomAccessIndex>();
 
     WalletTransaction tx;
     tx.state = WalletTransactionState::SUCCEEDED;
-    tx.timestamp = info.timestamp;
-    tx.blockHeight = info.blockHeight;
-    tx.hash = info.transactionHash;
-    tx.isBase = info.totalAmountIn == 0;
+    tx.timestamp = info.uTimestamp;
+    tx.blockHeight = info.uBlockHeight;
+    tx.hash = info.sTransactionHash;
+    tx.isBase = info.uTotalAmountIn == 0;
     if (tx.isBase) {
         tx.fee = 0;
     } else {
-        tx.fee = info.totalAmountIn - info.totalAmountOut;
+        tx.fee = info.uTotalAmountIn - info.uTotalAmountOut;
     }
 
-    tx.unlockTime = info.unlockTime;
-    tx.extra.assign(reinterpret_cast<const char *>(info.extra.data()), info.extra.size());
+    tx.unlockTime = info.uUnlockTime;
+    tx.extra.assign(reinterpret_cast<const char *>(info.vExtra.data()), info.vExtra.size());
     tx.totalAmount = txBalance;
-    tx.creationTime = info.timestamp;
+    tx.creationTime = info.uTimestamp;
 
     size_t txId = index.size();
     index.push_back(std::move(tx));
@@ -2876,7 +2876,7 @@ void WalletGreen::requestMixinOuts(
 {
     std::vector<uint64_t> amounts;
     for (const auto &out: selectedTransfers) {
-        amounts.push_back(out.out.amount);
+        amounts.push_back(out.out.uAmount);
     }
 
     System::Event requestFinished(m_dispatcher);
@@ -2921,12 +2921,12 @@ uint64_t WalletGreen::selectTransfers(uint64_t neededMoney,
 {
     uint64_t foundMoney = 0;
 
-    typedef std::pair<WalletRecord *, TransactionOutputInformation> OutputData;
+    typedef std::pair<WalletRecord *, FTransactionOutputInformation> OutputData;
     std::vector<OutputData> dustOutputs;
     std::vector<OutputData> walletOuts;
     for (auto walletIt = wallets.begin(); walletIt != wallets.end(); ++walletIt) {
         for (auto outIt = walletIt->outs.begin(); outIt != walletIt->outs.end(); ++outIt) {
-            if (outIt->amount > dustThreshold) {
+            if (outIt->uAmount > dustThreshold) {
                 walletOuts.emplace_back(
                     std::piecewise_construct,
                     std::forward_as_tuple(walletIt->wallet),
@@ -2945,7 +2945,7 @@ uint64_t WalletGreen::selectTransfers(uint64_t neededMoney,
     ShuffleGenerator<size_t> indexGenerator(walletOuts.size());
     while (foundMoney < neededMoney && !indexGenerator.empty()) {
         auto &out = walletOuts[indexGenerator()];
-        foundMoney += out.second.amount;
+        foundMoney += out.second.uAmount;
         selectedTransfers.emplace_back(OutputToTransfer{
             std::move(out.second), std::move(out.first)
         });
@@ -2956,7 +2956,7 @@ uint64_t WalletGreen::selectTransfers(uint64_t neededMoney,
         ShuffleGenerator<size_t> dustIndexGenerator(dustOutputsSize);
         do {
             auto &out = dustOutputs[dustIndexGenerator()];
-            foundMoney += out.second.amount;
+            foundMoney += out.second.uAmount;
             selectedTransfers.emplace_back(OutputToTransfer{
                 std::move(out.second), std::move(out.first)
             });
@@ -3054,7 +3054,7 @@ void WalletGreen::prepareInputs(
     size_t i = 0;
     for (const auto &input: selectedTransfers) {
         TransactionTypes::InputKeyInfo keyInfo;
-        keyInfo.amount = input.out.amount;
+        keyInfo.amount = input.out.uAmount;
 
         if(mixinResult.size()) {
             std::sort(
@@ -3065,7 +3065,7 @@ void WalletGreen::prepareInputs(
                 }
             );
             for (auto &fakeOut : mixinResult[i].outs) {
-                if (input.out.globalOutputIndex == fakeOut.global_amount_index) {
+                if (input.out.uGlobalOutputIndex == fakeOut.global_amount_index) {
                     continue;
                 }
 
@@ -3084,20 +3084,20 @@ void WalletGreen::prepareInputs(
             keyInfo.outputs.begin(),
             keyInfo.outputs.end(),
             [&](const TransactionTypes::GlobalOutput &a) {
-            return a.outputIndex >= input.out.globalOutputIndex;
+            return a.outputIndex >= input.out.uGlobalOutputIndex;
         });
 
         TransactionTypes::GlobalOutput realOutput;
-        realOutput.outputIndex = input.out.globalOutputIndex;
-        realOutput.targetKey = reinterpret_cast<const FPublicKey&>(input.out.outputKey);
+        realOutput.outputIndex = input.out.uGlobalOutputIndex;
+        realOutput.targetKey = reinterpret_cast<const FPublicKey&>(input.out.sOutputKey);
 
         auto insertedIn = keyInfo.outputs.insert(insertIn, realOutput);
 
         keyInfo.realOutput.transactionPublicKey =
-            reinterpret_cast<const FPublicKey &>(input.out.transactionPublicKey);
+            reinterpret_cast<const FPublicKey &>(input.out.sTransactionPublicKey);
         keyInfo.realOutput.transactionIndex =
             static_cast<size_t>(insertedIn - keyInfo.outputs.begin());
-        keyInfo.realOutput.outputInTransaction = input.out.outputInTransaction;
+        keyInfo.realOutput.outputInTransaction = input.out.uOutputInTransaction;
 
         // Important! outputs in selectedTransfers and in keysInfo must have the same order!
         InputInfo inputInfo;
@@ -3227,14 +3227,14 @@ std::vector<size_t> WalletGreen::getDelayedTransactionIds() const
     return result;
 }
 
-std::vector<TransactionOutputInformation> WalletGreen::getTransfers(size_t index,
+std::vector<FTransactionOutputInformation> WalletGreen::getTransfers(size_t index,
                                                                     uint32_t flags) const
 {
     throwIfNotInitialized();
     throwIfStopped();
     throwIfTrackingMode();
 
-    std::vector<TransactionOutputInformation> allTransfers;
+    std::vector<FTransactionOutputInformation> allTransfers;
     auto &walletsIndex = m_walletsContainer.get<RandomAccessIndex>();
     for (const auto &wallet : walletsIndex) {
         if (wallet.actualBalance == 0) {
@@ -3448,7 +3448,7 @@ void WalletGreen::onTransactionUpdated(
 {
     assert(!containers.empty());
 
-    TransactionInformation info;
+    FTransactionInformation info;
     std::vector<ContainerAmounts> containerAmountsList;
     containerAmountsList.reserve(containers.size());
     for (auto container : containers) {
@@ -3478,18 +3478,18 @@ void WalletGreen::onTransactionUpdated(
 }
 
 void WalletGreen::transactionUpdated(
-    const TransactionInformation &transactionInfo,
+    const FTransactionInformation &transactionInfo,
     const std::vector<ContainerAmounts> &containerAmountsList)
 {
     System::EventLock lk(m_readyEvent);
 
     m_logger(DEBUGGING)
-        << "transactionUpdated event, hash " << transactionInfo.transactionHash
-        << ", block " << transactionInfo.blockHeight
-        << ", totalAmountIn " << m_currency.formatAmount(transactionInfo.totalAmountIn)
-        << ", totalAmountOut " << m_currency.formatAmount(transactionInfo.totalAmountOut)
-        << (transactionInfo.paymentId == NULL_HASH
-            ? "" : ", paymentId " + podToHex(transactionInfo.paymentId));
+        << "transactionUpdated event, hash " << transactionInfo.sTransactionHash
+        << ", block " << transactionInfo.uBlockHeight
+        << ", totalAmountIn " << m_currency.formatAmount(transactionInfo.uTotalAmountIn)
+        << ", totalAmountOut " << m_currency.formatAmount(transactionInfo.uTotalAmountOut)
+        << (transactionInfo.sPaymentId == NULL_HASH
+            ? "" : ", paymentId " + podToHex(transactionInfo.sPaymentId));
 
     if (m_state == WalletState::NOT_INITIALIZED) {
         return;
@@ -3509,7 +3509,7 @@ void WalletGreen::transactionUpdated(
 
     size_t transactionId;
     auto &hashIndex = m_transactions.get<TransactionIndex>();
-    auto it = hashIndex.find(transactionInfo.transactionHash);
+    auto it = hashIndex.find(transactionInfo.sTransactionHash);
     if (it != hashIndex.end()) {
         transactionId = std::distance(
             m_transactions.get<RandomAccessIndex>().begin(),
@@ -3522,7 +3522,7 @@ void WalletGreen::transactionUpdated(
         m_fusionTxsCache.emplace(transactionId, isFusionTransaction(*it));
     }
 
-    if (transactionInfo.blockHeight != QwertyNote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
+    if (transactionInfo.uBlockHeight != QwertyNote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
         // In some cases a transaction can be included to a block but not removed
         // from m_uncommitedTransactions. Fix it.
         m_uncommitedTransactions.erase(transactionId);
@@ -3532,13 +3532,13 @@ void WalletGreen::transactionUpdated(
     for (auto containerAmounts : containerAmountsList) {
         updateBalance(containerAmounts.container);
 
-        if (transactionInfo.blockHeight != QwertyNote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
+        if (transactionInfo.uBlockHeight != QwertyNote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
             uint32_t unlockHeight = std::max(
-                transactionInfo.blockHeight + m_transactionSoftLockTime,
-                static_cast<uint32_t>(transactionInfo.unlockTime)
+					transactionInfo.uBlockHeight + m_transactionSoftLockTime,
+                static_cast<uint32_t>(transactionInfo.uUnlockTime)
             );
             insertUnlockTransactionJob(
-                transactionInfo.transactionHash,
+                transactionInfo.sTransactionHash,
                 unlockHeight,
                 containerAmounts.container
             );
@@ -3548,8 +3548,8 @@ void WalletGreen::transactionUpdated(
     bool transfersUpdated = updateTransactionTransfers(
         transactionId,
         containerAmountsList,
-        -static_cast<int64_t>(transactionInfo.totalAmountIn),
-        static_cast<int64_t>(transactionInfo.totalAmountOut)
+        -static_cast<int64_t>(transactionInfo.uTotalAmountIn),
+        static_cast<int64_t>(transactionInfo.uTotalAmountOut)
     );
     updated |= transfersUpdated;
 
@@ -3943,7 +3943,7 @@ size_t WalletGreen::createFusionTransaction(
             fusionInputs.begin(),
             fusionInputs.end(),
             static_cast<uint64_t>(0), [] (uint64_t amount, const OutputToTransfer &input) {
-            return amount + input.out.amount;
+            return amount + input.out.uAmount;
         });
 
         transactionAmount = inputsAmount;
@@ -4021,7 +4021,7 @@ bool WalletGreen::isFusionTransaction(const WalletTransaction &walletTx) const
     uint64_t outputsSum = 0;
     std::vector<uint64_t> outputsAmounts;
     std::vector<uint64_t> inputsAmounts;
-    TransactionInformation txInfo;
+    FTransactionInformation txInfo;
     bool gotTx = false;
     const auto &walletsIndex = m_walletsContainer.get<RandomAccessIndex>();
     for (const WalletRecord &wallet : walletsIndex) {
@@ -4029,24 +4029,24 @@ bool WalletGreen::isFusionTransaction(const WalletTransaction &walletTx) const
             walletTx.hash,
             ITransfersContainer::IncludeTypeKey | ITransfersContainer::IncludeStateAll
         );
-        for (const TransactionOutputInformation &output : c1) {
-            if (outputsAmounts.size() <= output.outputInTransaction) {
-                outputsAmounts.resize(output.outputInTransaction + 1, 0);
+        for (const FTransactionOutputInformation &output : c1) {
+            if (outputsAmounts.size() <= output.uOutputInTransaction) {
+                outputsAmounts.resize(output.uOutputInTransaction + 1, 0);
             }
 
-            assert(output.amount != 0);
-            assert(outputsAmounts[output.outputInTransaction] == 0);
-            outputsAmounts[output.outputInTransaction] = output.amount;
-            outputsSum += output.amount;
+            assert(output.uAmount != 0);
+            assert(outputsAmounts[output.uOutputInTransaction] == 0);
+            outputsAmounts[output.uOutputInTransaction] = output.uAmount;
+            outputsSum += output.uAmount;
         }
 
         auto c2 = wallet.container->getTransactionInputs(
             walletTx.hash,
             ITransfersContainer::IncludeTypeKey
         );
-        for (const TransactionOutputInformation &input : c2) {
-            inputsSum += input.amount;
-            inputsAmounts.push_back(input.amount);
+        for (const FTransactionOutputInformation &input : c2) {
+            inputsSum += input.uAmount;
+            inputsAmounts.push_back(input.uAmount);
         }
 
         if (!gotTx) {
@@ -4059,12 +4059,12 @@ bool WalletGreen::isFusionTransaction(const WalletTransaction &walletTx) const
     }
 
     if (outputsSum != inputsSum
-        || outputsSum != txInfo.totalAmountOut
-        || inputsSum != txInfo.totalAmountIn) {
+        || outputsSum != txInfo.uTotalAmountOut
+        || inputsSum != txInfo.uTotalAmountIn) {
         return false;
     } else {
         // size = 0 here because can't get real size of tx in wallet.
-        return m_currency.isFusionTransaction(inputsAmounts, outputsAmounts, 0, txInfo.blockHeight);
+        return m_currency.isFusionTransaction(inputsAmounts, outputsAmounts, 0, txInfo.uBlockHeight);
     }
 }
 
@@ -4087,7 +4087,7 @@ IFusionManager::EstimateResult WalletGreen::estimate(
         for (auto &out : walletOuts[walletIndex].outs) {
             uint8_t powerOfTen = 0;
             bool b = m_currency.isAmountApplicableInFusionTransactionInput(
-                out.amount,
+                out.uAmount,
                 threshold,
                 powerOfTen,
                 m_node.getLastKnownBlockHeight()
@@ -4124,7 +4124,7 @@ std::vector<WalletGreen::OutputToTransfer> WalletGreen::pickRandomFusionInputs(
         for (auto &out : walletOuts[walletIndex].outs) {
             uint8_t powerOfTen = 0;
             bool b = m_currency.isAmountApplicableInFusionTransactionInput(
-                out.amount,
+                out.uAmount,
                 threshold,
                 powerOfTen,
                 m_node.getLastKnownBlockHeight()
@@ -4169,8 +4169,8 @@ std::vector<WalletGreen::OutputToTransfer> WalletGreen::pickRandomFusionInputs(
     std::vector<WalletGreen::OutputToTransfer> selectedOuts;
     selectedOuts.reserve(bucketSizes[selectedBucket]);
     for (size_t outIndex = 0; outIndex < allFusionReadyOuts.size(); ++outIndex) {
-        if (allFusionReadyOuts[outIndex].out.amount >= lowerBound
-            && allFusionReadyOuts[outIndex].out.amount < upperBound) {
+        if (allFusionReadyOuts[outIndex].out.uAmount >= lowerBound
+            && allFusionReadyOuts[outIndex].out.uAmount < upperBound) {
             selectedOuts.push_back(std::move(allFusionReadyOuts[outIndex]));
         }
     }
@@ -4178,7 +4178,7 @@ std::vector<WalletGreen::OutputToTransfer> WalletGreen::pickRandomFusionInputs(
     assert(selectedOuts.size() >= minInputCount);
 
     auto outputsSortingFunction = [](const OutputToTransfer& l, const OutputToTransfer& r) {
-        return l.out.amount < r.out.amount;
+        return l.out.uAmount < r.out.uAmount;
     };
     if (selectedOuts.size() <= maxInputCount) {
         std::sort(selectedOuts.begin(), selectedOuts.end(), outputsSortingFunction);

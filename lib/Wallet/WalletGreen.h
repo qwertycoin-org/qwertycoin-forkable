@@ -113,7 +113,7 @@ public:
     uint32_t getBlockCount() const override;
     std::vector<WalletTransactionWithTransfers> getUnconfirmedTransactions() const override;
     std::vector<size_t> getDelayedTransactionIds() const override;
-    std::vector<TransactionOutputInformation> getTransfers(
+    std::vector<FTransactionOutputInformation> getTransfers(
         size_t index,
         uint32_t flags) const override;
 
@@ -203,7 +203,7 @@ protected:
 
     struct OutputToTransfer
     {
-        TransactionOutputInformation out;
+        FTransactionOutputInformation out;
         WalletRecord *wallet;
     };
 
@@ -216,7 +216,7 @@ protected:
     struct WalletOuts
     {
         WalletRecord *wallet;
-        std::vector<TransactionOutputInformation> outs;
+        std::vector<FTransactionOutputInformation> outs;
     };
 
     typedef std::pair<
@@ -257,7 +257,7 @@ protected:
         const Crypto::FHash &transactionHash,
         const std::vector<ITransfersContainer*> &containers) override;
     void transactionUpdated(
-        const TransactionInformation &transactionInfo,
+        const FTransactionInformation &transactionInfo,
         const std::vector<ContainerAmounts> &containerAmountsList);
 
     void onTransactionDeleted(
@@ -401,7 +401,7 @@ protected:
         bool isFusion,
         bool send);
 
-    size_t insertBlockchainTransaction(const TransactionInformation &info, int64_t txBalance);
+    size_t insertBlockchainTransaction(const FTransactionInformation &info, int64_t txBalance);
     size_t insertOutgoingTransactionAndPushEvent(
         const Crypto::FHash &transactionHash,
         uint64_t fee,
@@ -411,7 +411,7 @@ protected:
     void updateTransactionStateAndPushEvent(size_t transactionId, WalletTransactionState state);
     bool updateWalletTransactionInfo(
         size_t transactionId,
-        const QwertyNote::TransactionInformation &info,
+        const QwertyNote::FTransactionInformation &info,
         int64_t totalAmount);
     bool updateTransactionTransfers(
         size_t transactionId,

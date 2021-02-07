@@ -29,9 +29,9 @@ using namespace Crypto;
 
 namespace QwertyNote {
 
-inline TransactionOutputId getOutputId(const TransactionOutputInformation &out)
+inline TransactionOutputId getOutputId(const FTransactionOutputInformation &out)
 {
-    return std::make_pair(out.transactionPublicKey, out.outputInTransaction);
+    return std::make_pair(out.sTransactionPublicKey, out.uOutputInTransaction);
 }
 
 WalletUnconfirmedTransactions::WalletUnconfirmedTransactions(uint64_t uncofirmedTransactionLiveTime)
@@ -76,7 +76,7 @@ void WalletUnconfirmedTransactions::add(
     const Transaction &tx,
     TransactionId transactionId,
     uint64_t amount,
-    const std::list<TransactionOutputInformation> &usedOutputs,
+    const std::list<FTransactionOutputInformation> &usedOutputs,
     Crypto::FSecretKey &tx_key)
 {
     UnconfirmedTransferDetails &utd = m_unconfirmedTxs[getObjectHash(tx)];
@@ -94,7 +94,7 @@ void WalletUnconfirmedTransactions::add(
         auto id = getOutputId(out);
         utd.usedOutputs.push_back(id);
         m_usedOutputs.insert(id);
-        outsAmount += out.amount;
+        outsAmount += out.uAmount;
     }
 
     utd.outsAmount = outsAmount;
@@ -130,7 +130,7 @@ uint64_t WalletUnconfirmedTransactions::countUnconfirmedTransactionsAmount() con
     return amount;
 }
 
-bool WalletUnconfirmedTransactions::isUsed(const TransactionOutputInformation &out) const
+bool WalletUnconfirmedTransactions::isUsed(const FTransactionOutputInformation &out) const
 {
     return m_usedOutputs.find(getOutputId(out)) != m_usedOutputs.end();
 }

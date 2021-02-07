@@ -252,7 +252,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendFusionRequest(
     TransactionId &transactionId,
     std::deque<std::shared_ptr<WalletLegacyEvent>> &events,
     const std::vector<WalletLegacyTransfer> &transfers,
-    const std::list<TransactionOutputInformation> &fusionInputs,
+    const std::list<FTransactionOutputInformation> &fusionInputs,
     uint64_t fee,
     const std::string &extra,
     uint64_t mixIn,
@@ -267,7 +267,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendFusionRequest(
     std::shared_ptr<SendTransactionContext> context = std::make_shared<SendTransactionContext>();
 
     for (auto &out : fusionInputs) {
-        context->foundMoney += out.amount;
+        context->foundMoney += out.uAmount;
     }
     throwIf(context->foundMoney < neededMoney, error::WRONG_AMOUNT);
     context->selectedTransfers = fusionInputs;
@@ -298,7 +298,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeGetRandomOutsRequest
     std::vector<uint64_t> amounts;
 
     for (const auto &td : context->selectedTransfers) {
-        amounts.push_back(td.amount);
+        amounts.push_back(td.uAmount);
     }
 
     return std::make_shared<WalletGetRandomOutsByAmountsRequest>(
@@ -521,7 +521,7 @@ void WalletTransactionSender::digitSplitStrategy(
 }
 
 void WalletTransactionSender::prepareInputs(
-    const std::list<TransactionOutputInformation> &selectedTransfers,
+    const std::list<FTransactionOutputInformation> &selectedTransfers,
     std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> &outs,
     std::vector<TransactionSourceEntry> &sources,
     uint64_t mixIn)
@@ -532,7 +532,7 @@ void WalletTransactionSender::prepareInputs(
         sources.resize(sources.size() + 1);
         TransactionSourceEntry &src = sources.back();
 
-        src.amount = td.amount;
+        src.amount = td.uAmount;
 
         // paste mixin transaction
         if(!outs.empty()) {
@@ -545,7 +545,7 @@ void WalletTransactionSender::prepareInputs(
                 }
             );
             for (auto &daemon_oe : outs[i].outs) {
-                if(td.globalOutputIndex == daemon_oe.global_amount_index) {
+                if(td.uGlobalOutputIndex == daemon_oe.global_amount_index) {
                     continue;
                 }
 
@@ -565,19 +565,19 @@ void WalletTransactionSender::prepareInputs(
             src.outputs.begin(),
             src.outputs.end(),
             [&](const TransactionSourceEntry::OutputEntry &a) {
-                return a.first >= td.globalOutputIndex;
+                return a.first >= td.uGlobalOutputIndex;
             }
         );
 
         TransactionSourceEntry::OutputEntry real_oe;
-        real_oe.first = td.globalOutputIndex;
-        real_oe.second = td.outputKey;
+        real_oe.first = td.uGlobalOutputIndex;
+        real_oe.second = td.sOutputKey;
 
         auto interted_it = src.outputs.insert(it_to_insert, real_oe);
 
-        src.realTransactionPublicKey = td.transactionPublicKey;
+        src.realTransactionPublicKey = td.sTransactionPublicKey;
         src.realOutput = interted_it - src.outputs.begin();
-        src.realOutputIndexInTransaction = td.outputInTransaction;
+        src.realOutputIndexInTransaction = td.uOutputInTransaction;
         ++i;
     }
 }
@@ -626,20 +626,20 @@ uint64_t WalletTransactionSender::selectTransfersToSend(
     uint64_t neededMoney,
     bool addDust,
     uint64_t dust,
-    std::list<TransactionOutputInformation> &selectedTransfers)
+    std::list<FTransactionOutputInformation> &selectedTransfers)
 {
     std::vector<size_t> unusedTransfers;
     std::vector<size_t> unusedDust;
     std::vector<size_t> unusedUnmixable;
 
-    std::vector<TransactionOutputInformation> outputs;
+    std::vector<FTransactionOutputInformation> outputs;
     m_transferDetails.getOutputs(outputs, ITransfersContainer::IncludeKeyUnlocked);
 
     for (size_t i = 0; i < outputs.size(); ++i) {
         const auto &out = outputs[i];
         if (!m_transactionsCache.isUsed(out)) {
-            if (is_valid_decomposed_amount(out.amount)) {
-                if (dust < out.amount) {
+            if (is_valid_decomposed_amount(out.uAmount)) {
+                if (dust < out.uAmount) {
                     unusedTransfers.push_back(i);
                 } else {
                     unusedDust.push_back(i);
@@ -665,7 +665,7 @@ uint64_t WalletTransactionSender::selectTransfersToSend(
                                            : popRandomValue(uRNG, unusedDust);
         }
         selectedTransfers.push_back(outputs[idx]);
-        foundMoney += outputs[idx].amount;
+        foundMoney += outputs[idx].uAmount;
     }
 
     return foundMoney;
@@ -674,28 +674,28 @@ uint64_t WalletTransactionSender::selectTransfersToSend(
 uint64_t WalletTransactionSender::selectDustTransfersToSend(
     uint64_t neededMoney,
     uint64_t dust,
-    std::list<TransactionOutputInformation> &selectedTransfers)
+    std::list<FTransactionOutputInformation> &selectedTransfers)
 {
     std::vector<size_t> unusedTransfers;
     std::vector<size_t> unusedDust;
     std::vector<size_t> unusedUnmixable;
     uint64_t neededUnmixable = 0;
 
-    std::vector<TransactionOutputInformation> outputs;
+    std::vector<FTransactionOutputInformation> outputs;
     m_transferDetails.getOutputs(outputs, ITransfersContainer::IncludeKeyUnlocked);
 
     for (size_t i = 0; i < outputs.size(); ++i) {
         const auto &out = outputs[i];
         if (!m_transactionsCache.isUsed(out)) {
-            if (is_valid_decomposed_amount(out.amount)) {
-                if (dust < out.amount) {
+            if (is_valid_decomposed_amount(out.uAmount)) {
+                if (dust < out.uAmount) {
                     unusedTransfers.push_back(i);
                 } else {
                     unusedDust.push_back(i);
                 }
             } else {
                 unusedUnmixable.push_back(i);
-                neededUnmixable += out.amount;
+                neededUnmixable += out.uAmount;
             }
         }
     }
@@ -708,7 +708,7 @@ uint64_t WalletTransactionSender::selectDustTransfersToSend(
             size_t idx;
             std::mt19937 uRNG = Random::generator();
             idx = popRandomValue(uRNG, unusedUnmixable);
-            foundMoney += outputs[idx].amount;
+            foundMoney += outputs[idx].uAmount;
             selectedTransfers.push_back(outputs[idx]);
         }
     }
@@ -720,7 +720,7 @@ uint64_t WalletTransactionSender::selectDustTransfersToSend(
             std::mt19937 uRNG = Random::generator();
             idx = popRandomValue(uRNG, unusedDust);
             selectedTransfers.push_back(outputs[idx]);
-            foundMoney += outputs[idx].amount;
+            foundMoney += outputs[idx].uAmount;
         }
     }
 
@@ -731,7 +731,7 @@ uint64_t WalletTransactionSender::selectDustTransfersToSend(
             std::mt19937 uRNG = Random::generator();
             idx = popRandomValue(uRNG, unusedTransfers);
             selectedTransfers.push_back(outputs[idx]);
-            foundMoney += outputs[idx].amount;
+            foundMoney += outputs[idx].uAmount;
         }
     }
 

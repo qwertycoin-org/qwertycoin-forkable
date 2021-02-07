@@ -680,7 +680,7 @@ void WalletSerializerV1::updateTransactionsBaseStatus()
     for (; begin != end; ++begin) {
         transactions.modify(begin, [this](WalletTransaction& tx) {
             auto &wallets = m_walletsContainer.get<RandomAccessIndex>();
-            TransactionInformation txInfo;
+            FTransactionInformation txInfo;
             auto it = std::find_if(std::begin(wallets),
                                    std::end(wallets),
                                    [&](const WalletRecord &rec) {
@@ -688,7 +688,7 @@ void WalletSerializerV1::updateTransactionsBaseStatus()
                 return rec.container->getTransactionInformation(tx.hash, txInfo);
             });
 
-            tx.isBase = it != std::end(wallets) && txInfo.totalAmountIn == 0;
+            tx.isBase = it != std::end(wallets) && txInfo.uTotalAmountIn == 0;
         });
     }
 }

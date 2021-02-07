@@ -908,7 +908,7 @@ bool wallet_rpc_server::on_send_fusion(
     }
 
     try {
-        std::list<TransactionOutputInformation> fusionInputs = m_wallet.selectFusionTransfersToSend(
+        std::list<FTransactionOutputInformation> fusionInputs = m_wallet.selectFusionTransfersToSend(
             req.threshold,
             m_currency.fusionTxMinInputCount(),
             estimatedFusionInputsCount

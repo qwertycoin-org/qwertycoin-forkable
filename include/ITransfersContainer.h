@@ -33,52 +33,48 @@ namespace QwertyNote {
 
 const uint32_t UNCONFIRMED_TRANSACTION_GLOBAL_OUTPUT_INDEX = std::numeric_limits<uint32_t>::max();
 
-struct TransactionInformation
-{
-    Crypto::FHash transactionHash;
-    Crypto::FPublicKey publicKey;
-    uint32_t blockHeight;
-    uint64_t timestamp;
-    uint64_t unlockTime;
-    uint64_t totalAmountIn;
-    uint64_t totalAmountOut;
-    std::vector<uint8_t> extra;
-    Crypto::FHash paymentId;
+struct FTransactionInformation {
+	uint32_t uBlockHeight;
+	uint64_t uTimestamp;
+	uint64_t uUnlockTime;
+	uint64_t uTotalAmountIn;
+	uint64_t uTotalAmountOut;
+    std::vector<uint8_t> vExtra;
+	Crypto::FHash sPaymentId;
+	Crypto::FHash sTransactionHash;
+	Crypto::FPublicKey sPublicKey;
 };
 
-struct TransactionOutputInformation
-{
+struct FTransactionOutputInformation {
     // output info
-    TransactionTypes::OutputType type;
-    uint64_t amount;
-    uint32_t globalOutputIndex;
-    uint32_t outputInTransaction;
+	uint32_t uOutputInTransaction;
+	uint32_t uGlobalOutputIndex;
+	uint64_t uAmount;
+    TransactionTypes::OutputType sOutputType;
 
     // transaction info
-    Crypto::FHash transactionHash;
-    Crypto::FPublicKey transactionPublicKey;
+    Crypto::FHash sTransactionHash;
+    Crypto::FPublicKey sTransactionPublicKey;
 
     union
     {
-        Crypto::FPublicKey outputKey; // Type: Key
-        uint32_t requiredSignatures; // Type: Multisignature
+		uint32_t uRequiredSignatures; // Type: Multisignature
+    	Crypto::FPublicKey sOutputKey; // Type: Key
     };
 };
 
-struct TransactionSpentOutputInformation: public TransactionOutputInformation
-{
-    uint32_t spendingBlockHeight;
-    uint64_t timestamp;
-    Crypto::FHash spendingTransactionHash;
-    Crypto::FKeyImage keyImage; // WARNING: Used only for TransactionTypes::OutputType::Key
-    uint32_t inputInTransaction;
+struct FTransactionSpentOutputInformation: public FTransactionOutputInformation {
+    uint32_t uSpendingBlockHeight;
+	uint32_t uInputInTransaction;
+    uint64_t uTimestamp;
+    Crypto::FHash sSpendingTransactionHash;
+    Crypto::FKeyImage sKeyImage; // WARNING: Used only for TransactionTypes::OutputType::Key
 };
 
 class ITransfersContainer : public IStreamSerializable
 {
 public:
-    enum Flags : uint32_t
-    {
+    enum Flags : uint32_t {
         // state
         IncludeStateUnlocked = 0x01,
         IncludeStateLocked = 0x02,
@@ -93,40 +89,45 @@ public:
         IncludeStateAll = 0xff,
         IncludeTypeAll = 0xff00,
 
-        IncludeKeyUnlocked = IncludeTypeKey | IncludeStateUnlocked,
-        IncludeKeyNotUnlocked = IncludeTypeKey | IncludeStateLocked | IncludeStateSoftLocked,
+        IncludeKeyUnlocked = IncludeTypeKey
+        					 | IncludeStateUnlocked,
+        IncludeKeyNotUnlocked = IncludeTypeKey
+        						| IncludeStateLocked
+        						| IncludeStateSoftLocked,
 
-        IncludeAllLocked = IncludeTypeAll | IncludeStateLocked | IncludeStateSoftLocked,
-        IncludeAllUnlocked = IncludeTypeAll | IncludeStateUnlocked,
-        IncludeAll = IncludeTypeAll | IncludeStateAll,
+        IncludeAllLocked = IncludeTypeAll
+        				   | IncludeStateLocked
+        				   | IncludeStateSoftLocked,
+        IncludeAllUnlocked = IncludeTypeAll
+        					 | IncludeStateUnlocked,
+        IncludeAll = IncludeTypeAll
+        			 | IncludeStateAll,
 
         IncludeDefault = IncludeKeyUnlocked
     };
 
     virtual size_t transfersCount() const = 0;
     virtual size_t transactionsCount() const = 0;
-    virtual uint64_t balance(uint32_t flags = IncludeDefault) const = 0;
-    virtual void getOutputs(
-        std::vector<TransactionOutputInformation> &transfers,
-        uint32_t flags = IncludeDefault) const = 0;
-    virtual bool getTransactionInformation(
-        const Crypto::FHash &transactionHash,
-        TransactionInformation &info,
-        uint64_t *amountIn = nullptr,
-        uint64_t *amountOut = nullptr) const = 0;
-    virtual std::vector<TransactionOutputInformation> getTransactionOutputs(
-        const Crypto::FHash &transactionHash,
-        uint32_t flags = IncludeDefault) const = 0;
+    virtual uint64_t balance(uint32_t uFlags = IncludeDefault) const = 0;
+    virtual void getOutputs(std::vector<FTransactionOutputInformation> &vTransfers,
+        					uint32_t uFlags = IncludeDefault) const = 0;
+    virtual bool getTransactionInformation(const Crypto::FHash &sTransactionHash,
+										   FTransactionInformation &sInfo,
+										   uint64_t *uAmountIn = nullptr,
+										   uint64_t *uAmountOut = nullptr) const = 0;
+    virtual std::vector<FTransactionOutputInformation> getTransactionOutputs(
+        const Crypto::FHash &sTransactionHash,
+        uint32_t uFlags = IncludeDefault) const = 0;
 
     //only type flags are feasible for this function
-    virtual std::vector<TransactionOutputInformation> getTransactionInputs(
-        const Crypto::FHash &transactionHash,
-        uint32_t flags) const = 0;
+    virtual std::vector<FTransactionOutputInformation> getTransactionInputs(
+        const Crypto::FHash &sTransactionHash,
+        uint32_t uFlags) const = 0;
 
-    virtual void getUnconfirmedTransactions(std::vector<Crypto::FHash> &transactions) const = 0;
-    virtual std::vector<TransactionSpentOutputInformation> getSpentOutputs() const = 0;
-    virtual void markTransactionSafe(const Crypto::FHash &transactionHash) = 0;
-    virtual void getSafeTransactions(std::vector<Crypto::FHash> &transactions) const = 0;
+    virtual void getUnconfirmedTransactions(std::vector<Crypto::FHash> &vTransactions) const = 0;
+    virtual std::vector<FTransactionSpentOutputInformation> getSpentOutputs() const = 0;
+    virtual void markTransactionSafe(const Crypto::FHash &sTransactionHash) = 0;
+    virtual void getSafeTransactions(std::vector<Crypto::FHash> &vTransactions) const = 0;
 };
 
 } // namespace QwertyNote

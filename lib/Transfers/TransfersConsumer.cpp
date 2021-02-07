@@ -477,10 +477,10 @@ std::error_code TransfersConsumer::createTransfers(
 
         TransactionOutputInformationIn info;
 
-        info.type = outType;
-        info.transactionPublicKey = txPubKey;
-        info.outputInTransaction = idx;
-        info.globalOutputIndex = (blockInfo.height == WALLET_UNCONFIRMED_TRANSACTION_HEIGHT)
+        info.sOutputType = outType;
+        info.sTransactionPublicKey = txPubKey;
+        info.uOutputInTransaction = idx;
+        info.uGlobalOutputIndex = (blockInfo.height == WALLET_UNCONFIRMED_TRANSACTION_HEIGHT)
                                  ? UNCONFIRMED_TRANSACTION_GLOBAL_OUTPUT_INDEX : globalIdxs[idx];
 
         if (outType == TransactionTypes::OutputType::Key) {
@@ -518,8 +518,8 @@ std::error_code TransfersConsumer::createTransfers(
                 }
                 temp_keys.push_back(out.key);
             }
-            info.amount = amount;
-            info.outputKey = out.key;
+            info.uAmount = amount;
+            info.sOutputKey = out.key;
         } else if (outType == TransactionTypes::OutputType::Multisignature) {
             uint64_t amount;
             MultiSignatureOutput out;
@@ -546,8 +546,8 @@ std::error_code TransfersConsumer::createTransfers(
                     temp_keys.push_back(key);
                 }
             }
-            info.amount = amount;
-            info.requiredSignatures = out.requiredSignatureCount;
+            info.uAmount = amount;
+            info.uRequiredSignatures = out.requiredSignatureCount;
         }
 
         transfers.push_back(info);
@@ -661,19 +661,19 @@ void TransfersConsumer::processOutputs(
     bool &contains,
     bool &updated)
 {
-    TransactionInformation subscribtionTxInfo;
+    FTransactionInformation subscribtionTxInfo;
     contains = sub.getContainer().getTransactionInformation(tx.getTransactionHash(),
                                                             subscribtionTxInfo);
     updated = false;
 
     if (contains) {
-        if (subscribtionTxInfo.blockHeight == WALLET_UNCONFIRMED_TRANSACTION_HEIGHT
+        if (subscribtionTxInfo.uBlockHeight == WALLET_UNCONFIRMED_TRANSACTION_HEIGHT
             && blockInfo.height != WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
             // pool->blockchain
             sub.markTransactionConfirmed(blockInfo, tx.getTransactionHash(), globalIdxs);
             updated = true;
         } else {
-            assert(subscribtionTxInfo.blockHeight == blockInfo.height);
+            assert(subscribtionTxInfo.uBlockHeight == blockInfo.height);
         }
     } else {
         updated = sub.addTransaction(blockInfo, tx, transfers);

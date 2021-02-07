@@ -63,12 +63,12 @@ public:
         TransactionId transactionId,
         const QwertyNote::Transaction &tx,
         uint64_t amount,
-        const std::list<TransactionOutputInformation> &usedOutputs,
+        const std::list<FTransactionOutputInformation> &usedOutputs,
         Crypto::FSecretKey &tx_key);
     void updateTransactionSendingState(TransactionId transactionId, std::error_code ec);
 
     std::shared_ptr<WalletLegacyEvent> onTransactionUpdated(
-        const TransactionInformation &txInfo,
+        const FTransactionInformation &txInfo,
         int64_t txBalance);
     std::shared_ptr<WalletLegacyEvent> onTransactionDeleted(const Crypto::FHash &transactionHash);
 
@@ -80,7 +80,7 @@ public:
     bool getTransfer(TransferId transferId, WalletLegacyTransfer &transfer) const;
     WalletLegacyTransfer& getTransfer(TransferId transferId);
 
-    bool isUsed(const TransactionOutputInformation &out) const;
+    bool isUsed(const FTransactionOutputInformation &out) const;
     void reset();
 
     std::vector<TransactionId> deleteOutdatedTransactions();

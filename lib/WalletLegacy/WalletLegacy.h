@@ -108,7 +108,7 @@ public:
     size_t getTransferCount() override;
     size_t getUnlockedOutputsCount() override;
 
-    std::list<TransactionOutputInformation> selectAllOldOutputs(uint32_t height) override;
+    std::list<FTransactionOutputInformation> selectAllOldOutputs(uint32_t height) override;
 
     TransactionId findTransactionByTransferId(TransferId transferId) override;
 
@@ -151,7 +151,7 @@ public:
         uint64_t mixIn = 0,
         uint64_t unlockTimestamp = 0) override;
     TransactionId sendFusionTransaction(
-        const std::list<TransactionOutputInformation> &fusionInputs,
+        const std::list<FTransactionOutputInformation> &fusionInputs,
         uint64_t fee,
         const std::string &extra = "",
         uint64_t mixIn = 0,
@@ -159,7 +159,7 @@ public:
     std::error_code cancelTransaction(size_t transactionId) override;
 
     size_t estimateFusion(const uint64_t &threshold) override;
-    std::list<TransactionOutputInformation> selectFusionTransfersToSend(
+    std::list<FTransactionOutputInformation> selectFusionTransfersToSend(
         uint64_t threshold,
         size_t minInputCount,
         size_t maxInputCount) override;

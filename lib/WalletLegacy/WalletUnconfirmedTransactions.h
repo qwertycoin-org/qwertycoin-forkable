@@ -95,13 +95,13 @@ public:
     void add(const QwertyNote::Transaction &tx,
              TransactionId transactionId,
              uint64_t amount,
-             const std::list<TransactionOutputInformation> &usedOutputs,
+             const std::list<FTransactionOutputInformation> &usedOutputs,
              Crypto::FSecretKey &tx_key);
     void updateTransactionId(const Crypto::FHash &hash, TransactionId id);
 
     uint64_t countUnconfirmedOutsAmount() const;
     uint64_t countUnconfirmedTransactionsAmount() const;
-    bool isUsed(const TransactionOutputInformation &out) const;
+    bool isUsed(const FTransactionOutputInformation &out) const;
     void reset();
 
     std::vector<TransactionId> deleteOutdatedTransactions();

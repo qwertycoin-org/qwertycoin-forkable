@@ -56,7 +56,7 @@ struct SendTransactionContext
     TransactionId transactionId;
     std::vector<QwertyNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> outs;
     uint64_t foundMoney;
-    std::list<TransactionOutputInformation> selectedTransfers;
+    std::list<FTransactionOutputInformation> selectedTransfers;
     TxDustPolicy dustPolicy;
     uint64_t mixIn;
     std::vector<tx_message_entry> messages;

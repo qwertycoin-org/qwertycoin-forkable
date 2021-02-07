@@ -205,7 +205,7 @@ void WalletUserTransactionsCache::updateTransaction(
     TransactionId transactionId,
     const QwertyNote::Transaction &tx,
     uint64_t amount,
-    const std::list<TransactionOutputInformation> &usedOutputs,
+    const std::list<FTransactionOutputInformation> &usedOutputs,
     Crypto::FSecretKey &tx_key)
 {
     // update extra field from created transaction
@@ -231,35 +231,35 @@ void WalletUserTransactionsCache::updateTransactionSendingState(
 }
 
 std::shared_ptr<WalletLegacyEvent> WalletUserTransactionsCache::onTransactionUpdated(
-    const TransactionInformation &txInfo,
+    const FTransactionInformation &txInfo,
     int64_t txBalance)
 {
     std::shared_ptr<WalletLegacyEvent> event;
 
     TransactionId id = QwertyNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
 
-    if (!m_unconfirmedTransactions.findTransactionId(txInfo.transactionHash, id)) {
-        id = findTransactionByHash(txInfo.transactionHash);
+    if (!m_unconfirmedTransactions.findTransactionId(txInfo.sTransactionHash, id)) {
+        id = findTransactionByHash(txInfo.sTransactionHash);
     } else {
-        m_unconfirmedTransactions.erase(txInfo.transactionHash);
+        m_unconfirmedTransactions.erase(txInfo.sTransactionHash);
     }
 
-    bool isCoinbase = txInfo.totalAmountIn == 0;
+    bool isCoinbase = txInfo.uTotalAmountIn == 0;
 
     if (id == QwertyNote::WALLET_LEGACY_INVALID_TRANSACTION_ID) {
         WalletLegacyTransaction transaction;
         transaction.firstTransferId = WALLET_LEGACY_INVALID_TRANSFER_ID;
         transaction.transferCount = 0;
         transaction.totalAmount = txBalance;
-        transaction.fee = isCoinbase ? 0 : txInfo.totalAmountIn - txInfo.totalAmountOut;
+        transaction.fee = isCoinbase ? 0 : txInfo.uTotalAmountIn - txInfo.uTotalAmountOut;
         transaction.sentTime = 0;
-        transaction.hash = txInfo.transactionHash;
-        transaction.blockHeight = txInfo.blockHeight;
+        transaction.hash = txInfo.sTransactionHash;
+        transaction.blockHeight = txInfo.uBlockHeight;
         transaction.isCoinbase = isCoinbase;
-        transaction.timestamp = txInfo.timestamp;
-        transaction.extra.assign(txInfo.extra.begin(), txInfo.extra.end());
+        transaction.timestamp = txInfo.uTimestamp;
+        transaction.extra.assign(txInfo.vExtra.begin(), txInfo.vExtra.end());
         transaction.state = WalletLegacyTransactionState::Active;
-        transaction.unlockTime = txInfo.unlockTime;
+        transaction.unlockTime = txInfo.uUnlockTime;
         transaction.secretKey = NULL_SECRET_KEY;
 
         id = insertTransaction(std::move(transaction));
@@ -267,8 +267,8 @@ std::shared_ptr<WalletLegacyEvent> WalletUserTransactionsCache::onTransactionUpd
         event = std::make_shared<WalletExternalTransactionCreatedEvent>(id);
     } else {
         WalletLegacyTransaction &tr = getTransaction(id);
-        tr.blockHeight = txInfo.blockHeight;
-        tr.timestamp = txInfo.timestamp;
+        tr.blockHeight = txInfo.uBlockHeight;
+        tr.timestamp = txInfo.uTimestamp;
         tr.state = WalletLegacyTransactionState::Active;
         // notification event
         event = std::make_shared<WalletTransactionUpdatedEvent>(id);
@@ -412,7 +412,7 @@ TransactionId WalletUserTransactionsCache::findTransactionByHash(const FHash &ha
     return std::distance(m_transactions.begin(), it);
 }
 
-bool WalletUserTransactionsCache::isUsed(const TransactionOutputInformation &out) const
+bool WalletUserTransactionsCache::isUsed(const FTransactionOutputInformation &out) const
 {
     return m_unconfirmedTransactions.isUsed(out);
 }
