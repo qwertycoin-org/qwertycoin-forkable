@@ -177,7 +177,7 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
         );
     } else {
         if (!Crypto::checkKey(account.getAccountKeys().sAddress.sSpendPublicKey)) {
-            throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
+            throw std::system_error(make_error_code(QwertyNote::Error::WRONG_PASSWORD));
         }
     }
 
@@ -231,7 +231,7 @@ void WalletLegacySerializer::loadKeys(QwertyNote::ISerializer &serializer)
     try {
         keys.serialize(serializer, "keys");
     } catch (const std::runtime_error &) {
-        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
+        throw std::system_error(make_error_code(QwertyNote::Error::WRONG_PASSWORD));
     }
 
     QwertyNote::FAccountKeys acc;

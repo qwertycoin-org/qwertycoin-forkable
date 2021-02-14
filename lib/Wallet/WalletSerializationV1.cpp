@@ -316,7 +316,7 @@ void WalletSerializerV1::load(const Crypto::Chacha8Key &key, Common::IInputStrea
     QwertyNote::WALLET_LEGACY_SERIALIZATION_VERSION = version;
 
     if (version > SERIALIZATION_VERSION) {
-        throw std::system_error(make_error_code(error::WRONG_VERSION));
+        throw std::system_error(make_error_code(Error::WRONG_VERSION));
     } else if (version > 2) {
         loadWallet(source, key, version);
     } else {
@@ -418,7 +418,7 @@ void WalletSerializerV1::loadWalletV1Keys(QwertyNote::BinaryInputStreamSerialize
     try {
         keys.serialize(serializer, "keys");
     } catch (const std::runtime_error &) {
-        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
+        throw std::system_error(make_error_code(QwertyNote::Error::WRONG_PASSWORD));
     }
 
     m_viewPublicKey = keys.viewPublicKey;
@@ -467,7 +467,7 @@ void WalletSerializerV1::loadKeys(Common::IInputStream &source, CryptoContext &c
         loadPublicKey(source, cryptoContext);
         loadSecretKey(source, cryptoContext);
     } catch (const std::runtime_error &) {
-        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
+        throw std::system_error(make_error_code(QwertyNote::Error::WRONG_PASSWORD));
     }
 }
 
@@ -520,7 +520,7 @@ void WalletSerializerV1::loadWallets(Common::IInputStream &source, CryptoContext
         } else if ((isTrackingMode && dto.spendSecretKey != NULL_SECRET_KEY)
                    || (!isTrackingMode && dto.spendSecretKey == NULL_SECRET_KEY)) {
             throw std::system_error(
-                make_error_code(error::BAD_ADDRESS),
+                make_error_code(Error::BAD_ADDRESS),
                 "All addresses must be whether tracking or not"
             );
         }
@@ -532,7 +532,7 @@ void WalletSerializerV1::loadWallets(Common::IInputStream &source, CryptoContext
         } else {
             if (!Crypto::checkKey(dto.spendPublicKey)) {
                 throw std::system_error(
-                    make_error_code(error::WRONG_PASSWORD),
+                    make_error_code(Error::WRONG_PASSWORD),
                     "Public spend key is incorrect"
                 );
             }
@@ -787,7 +787,7 @@ void WalletSerializerV1::addWalletV1Details(const std::vector<WalletLegacyTransa
             size_t lastTr = firstTr + tx.transferCount;
 
             if (lastTr > trs.size()) {
-                throw std::system_error(make_error_code(error::INTERNAL_WALLET_ERROR));
+                throw std::system_error(make_error_code(Error::INTERNAL_WALLET_ERROR));
             }
 
             for (; firstTr < lastTr; firstTr++) {

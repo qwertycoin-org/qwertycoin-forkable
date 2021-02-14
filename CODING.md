@@ -105,6 +105,7 @@
 - `Float` variable are prefixed by `f`
 - `Double` variables are prefixed by `d`
 - `Vector` variables are prefixed by `v` (v for vector)
+- `List` variables are prefixed by `l` (l for list)  
 - `Int` variables are prefixed by `i`
 - `UInt` variables are prefixed by `u` (u for unsigned)
 - Own created variables are prefixed by `s`
@@ -238,11 +239,13 @@ namespace NameOfNamespace {
 } // NameOfNamespace
 
 // Structs
-struct FNameOfStruct {
+struct FNameOfStruct
+{
 };
 
 // Enum
-enum ENameOfEnum {
+enum ENameOfEnum
+{
 };
 
 // Loops (For, While)

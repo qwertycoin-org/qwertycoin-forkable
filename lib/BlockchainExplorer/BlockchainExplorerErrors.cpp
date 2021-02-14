@@ -20,36 +20,37 @@
 
 namespace QwertyNote {
 
-namespace error {
+    namespace Error {
 
-BlockchainExplorerErrorCategory BlockchainExplorerErrorCategory::INSTANCE;
+        QBlockchainExplorerErrorCategory QBlockchainExplorerErrorCategory::INSTANCE;
 
-const char *BlockchainExplorerErrorCategory::name() const noexcept
-{
-    return "BlockchainExplorerErrorCategory";
-}
+        const char *QBlockchainExplorerErrorCategory::name () const noexcept
+        {
+            return "QBlockchainExplorerErrorCategory";
+        }
 
-std::string BlockchainExplorerErrorCategory::message(int ev) const
-{
-    switch (ev) {
-    case static_cast<int>(BlockchainExplorerErrorCodes::NOT_INITIALIZED):
-        return "Object was not initialized";
-    case static_cast<int>(BlockchainExplorerErrorCodes::ALREADY_INITIALIZED):
-        return "Object has been already initialized";
-    case static_cast<int>(BlockchainExplorerErrorCodes::INTERNAL_ERROR):
-        return "Internal error";
-    case static_cast<int>(BlockchainExplorerErrorCodes::REQUEST_ERROR):
-        return "Error in request parameters";
-    default:
-        return "Unknown error";
-    }
-}
+        std::string QBlockchainExplorerErrorCategory::message (int ev) const
+        {
+            switch (ev) {
+                case static_cast<int>(EBlockchainExplorerErrorCodes::NOT_INITIALIZED):
+                    return "Object was not initialized";
+                case static_cast<int>(EBlockchainExplorerErrorCodes::ALREADY_INITIALIZED):
+                    return "Object has been already initialized";
+                case static_cast<int>(EBlockchainExplorerErrorCodes::INTERNAL_ERROR):
+                    return "Internal error";
+                case static_cast<int>(EBlockchainExplorerErrorCodes::REQUEST_ERROR):
+                    return "Error in request parameters";
+                default:
+                    return "Unknown error";
+            }
+        }
 
-std::error_condition BlockchainExplorerErrorCategory::default_error_condition(int ev) const noexcept
-{
-    return std::error_condition{ev, *this};
-}
+        std::error_condition
+        QBlockchainExplorerErrorCategory::default_error_condition (int iEc) const noexcept
+        {
+            return std::error_condition {iEc, *this};
+        }
 
-} //namespace error
+    } //namespace error
 
 } //namespace QwertyNote

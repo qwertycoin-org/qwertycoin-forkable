@@ -40,11 +40,11 @@ uint64_t countNeededMoney(uint64_t fee, const std::vector<WalletLegacyTransfer> 
 {
     uint64_t needed_money = fee;
     for (auto &transfer: transfers) {
-        throwIf(transfer.amount == 0, error::ZERO_DESTINATION);
-        throwIf(transfer.amount < 0, error::WRONG_AMOUNT);
+        throwIf(transfer.amount == 0, Error::ZERO_DESTINATION);
+        throwIf(transfer.amount < 0, Error::WRONG_AMOUNT);
 
         needed_money += transfer.amount;
-        throwIf(static_cast<int64_t>(needed_money) < transfer.amount, error::SUM_OVERFLOW);
+        throwIf(static_cast<int64_t>(needed_money) < transfer.amount, Error::SUM_OVERFLOW);
     }
 
     return needed_money;
@@ -96,8 +96,8 @@ void constructTx(
         nullLog
     );
 
-    throwIf(!r, error::INTERNAL_WALLET_ERROR);
-    throwIf(getObjectBinarySize(tx) >= sizeLimit, error::TRANSACTION_SIZE_TOO_BIG);
+    throwIf(!r, Error::INTERNAL_WALLET_ERROR);
+    throwIf(getObjectBinarySize(tx) >= sizeLimit, Error::TRANSACTION_SIZE_TOO_BIG);
 }
 
 std::shared_ptr<WalletLegacyEvent> makeCompleteEvent(
@@ -143,7 +143,7 @@ void WalletTransactionSender::validateTransfersAddresses(
 {
     for (const WalletLegacyTransfer &tr : transfers) {
         if (!validateDestinationAddress(tr.address)) {
-            throw std::system_error(make_error_code(error::BAD_ADDRESS));
+            throw std::system_error(make_error_code(Error::BAD_ADDRESS));
         }
     }
 }
@@ -162,7 +162,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendRequest(
 {
     using namespace QwertyNote;
 
-    throwIf(transfers.empty(), error::ZERO_DESTINATION);
+    throwIf(transfers.empty(), Error::ZERO_DESTINATION);
     validateTransfersAddresses(transfers);
     uint64_t neededMoney = countNeededMoney(fee, transfers);
 
@@ -173,7 +173,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendRequest(
         mixIn == 0,
         context->dustPolicy.dustThreshold,
         context->selectedTransfers);
-    throwIf(context->foundMoney < neededMoney, error::WRONG_AMOUNT);
+    throwIf(context->foundMoney < neededMoney, Error::WRONG_AMOUNT);
 
     transactionId = m_transactionsCache.addNewTransaction(
         neededMoney,
@@ -192,7 +192,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendRequest(
         FAccountPublicAddress address;
         bool extracted = m_currency.parseAccountAddressString(message.address, address);
         if (!extracted) {
-            throw std::system_error(make_error_code(error::BAD_ADDRESS));
+            throw std::system_error(make_error_code(Error::BAD_ADDRESS));
         }
 
         context->messages.push_back({message.message, true, address });
@@ -217,7 +217,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendDustRequest(
 {
     using namespace QwertyNote;
 
-    throwIf(transfers.empty(), error::ZERO_DESTINATION);
+    throwIf(transfers.empty(), Error::ZERO_DESTINATION);
     validateTransfersAddresses(transfers);
     uint64_t neededMoney = countNeededMoney(fee, transfers);
 
@@ -228,7 +228,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendDustRequest(
         m_currency.defaultDustThreshold(),
         context->selectedTransfers
     );
-    throwIf(context->foundMoney < neededMoney, error::WRONG_AMOUNT);
+    throwIf(context->foundMoney < neededMoney, Error::WRONG_AMOUNT);
 
     transactionId = m_transactionsCache.addNewTransaction(
         neededMoney,
@@ -260,7 +260,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendFusionRequest(
 {
     using namespace QwertyNote;
 
-    throwIf(transfers.empty(), error::ZERO_DESTINATION);
+    throwIf(transfers.empty(), Error::ZERO_DESTINATION);
     validateTransfersAddresses(transfers);
     uint64_t neededMoney = countNeededMoney(fee, transfers);
 
@@ -269,7 +269,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::makeSendFusionRequest(
     for (auto &out : fusionInputs) {
         context->foundMoney += out.uAmount;
     }
-    throwIf(context->foundMoney < neededMoney, error::WRONG_AMOUNT);
+    throwIf(context->foundMoney < neededMoney, Error::WRONG_AMOUNT);
     context->selectedTransfers = fusionInputs;
 
     transactionId = m_transactionsCache.addNewTransaction(
@@ -323,7 +323,7 @@ void WalletTransactionSender::sendTransactionRandomOutsByAmount(
     std::error_code ec)
 {
     if (m_isStoping) {
-        ec = make_error_code(error::TX_CANCELLED);
+        ec = make_error_code(Error::TX_CANCELLED);
     }
 
     if (ec) {
@@ -343,7 +343,7 @@ void WalletTransactionSender::sendTransactionRandomOutsByAmount(
         events.push_back(makeCompleteEvent(
             m_transactionsCache,
             context->transactionId,
-            make_error_code(error::MIXIN_COUNT_TOO_BIG)
+            make_error_code(Error::MIXIN_COUNT_TOO_BIG)
         ));
         return;
     }
@@ -362,7 +362,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::doSendTransaction(
         events.push_back(makeCompleteEvent(
             m_transactionsCache,
             context->transactionId,
-            make_error_code(error::TX_CANCELLED))
+            make_error_code(Error::TX_CANCELLED))
         );
         return std::shared_ptr<WalletRequest>();
     }
@@ -432,7 +432,7 @@ std::shared_ptr<WalletRequest> WalletTransactionSender::doSendTransaction(
         events.push_back(makeCompleteEvent(
             m_transactionsCache,
             context->transactionId,
-            make_error_code(error::INTERNAL_WALLET_ERROR))
+            make_error_code(Error::INTERNAL_WALLET_ERROR))
         );
     }
 
@@ -471,7 +471,7 @@ void WalletTransactionSender::splitDestinations(
         dust
     );
 
-    throwIf(dustPolicy.dustThreshold < dust, error::INTERNAL_WALLET_ERROR);
+    throwIf(dustPolicy.dustThreshold < dust, Error::INTERNAL_WALLET_ERROR);
     if (0 != dust && !dustPolicy.addToFee) {
         splittedDests.push_back(TransactionDestinationEntry(dust, dustPolicy.addrForDust));
     }
@@ -493,7 +493,7 @@ void WalletTransactionSender::digitSplitStrategy(
 
         FAccountPublicAddress addr;
         if (!m_currency.parseAccountAddressString(de.address, addr)) {
-            throw std::system_error(make_error_code(error::BAD_ADDRESS));
+            throw std::system_error(make_error_code(Error::BAD_ADDRESS));
         }
 
         decompose_amount_into_digits(

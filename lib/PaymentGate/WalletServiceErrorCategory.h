@@ -25,7 +25,7 @@
 
 namespace QwertyNote {
 
-namespace error {
+namespace Error {
 
 enum class WalletServiceErrorCode
 {
@@ -81,17 +81,17 @@ private:
 
 } // namespace QwertyNote
 
-inline std::error_code make_error_code(QwertyNote::error::WalletServiceErrorCode e)
+inline std::error_code make_error_code(QwertyNote::Error::WalletServiceErrorCode e)
 {
     return std::error_code{
         static_cast<int>(e),
-                             QwertyNote::error::WalletServiceErrorCategory::INSTANCE
+                             QwertyNote::Error::WalletServiceErrorCategory::INSTANCE
     };
 }
 
 namespace std {
 
 template <>
-struct is_error_code_enum<QwertyNote::error::WalletServiceErrorCode>: public true_type {};
+struct is_error_code_enum<QwertyNote::Error::WalletServiceErrorCode>: public true_type {};
 
 } // namespace std

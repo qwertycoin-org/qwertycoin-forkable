@@ -112,27 +112,27 @@ public:
 											  FMultiSignatureOutput &out,
 											  const UCallback &callback) override;
     void getBlocks(const std::vector<uint32_t> &blockHeights,
-                   std::vector<std::vector<BlockDetails>> &blocks,
+                   std::vector<std::vector<FBlockDetails>> &blocks,
                    const UCallback &callback) override;
     void getBlocks(const std::vector<Crypto::FHash> &blockHashes,
-                   std::vector<BlockDetails> &blocks,
+                   std::vector<FBlockDetails> &blocks,
                    const UCallback &callback) override;
     void getBlocks(uint64_t timestampBegin,
                    uint64_t timestampEnd,
                    uint32_t blocksNumberLimit,
-                   std::vector<BlockDetails> &blocks,
+                   std::vector<FBlockDetails> &blocks,
                    uint32_t &blocksNumberWithinTimestamps,
                    const UCallback &callback) override;
     void getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
-                         std::vector<TransactionDetails> &transactions,
+                         std::vector<FTransactionDetails> &transactions,
                          const UCallback &callback) override;
     void getTransactionsByPaymentId(const Crypto::FHash &paymentId,
-                                    std::vector<TransactionDetails> &transactions,
+                                    std::vector<FTransactionDetails> &transactions,
                                     const UCallback &callback) override;
     void getPoolTransactions(uint64_t timestampBegin,
                              uint64_t timestampEnd,
                              uint32_t transactionsNumberLimit,
-                             std::vector<TransactionDetails> &transactions,
+                             std::vector<FTransactionDetails> &transactions,
                              uint64_t &transactionsNumberWithinTimestamps,
                              const UCallback &callback) override;
     void isSynchronized(bool &syncStatus, const UCallback &callback) override;

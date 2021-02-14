@@ -73,7 +73,7 @@ InProcessNode::~InProcessNode()
 bool InProcessNode::addObserver(INodeObserver *observer)
 {
     if (state != INITIALIZED) {
-        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
     }
 
     return observerManager.add(observer);
@@ -82,7 +82,7 @@ bool InProcessNode::addObserver(INodeObserver *observer)
 bool InProcessNode::removeObserver(INodeObserver *observer)
 {
     if (state != INITIALIZED) {
-        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
     }
 
     return observerManager.remove(observer);
@@ -94,7 +94,7 @@ void InProcessNode::init(const UCallback &callback)
     std::error_code ec;
 
     if (state != NOT_INITIALIZED) {
-        ec = make_error_code(QwertyNote::error::ALREADY_INITIALIZED);
+        ec = make_error_code(QwertyNote::Error::ALREADY_INITIALIZED);
     } else {
         protocol.addObserver(this);
         core.addObserver(this);
@@ -147,7 +147,7 @@ void InProcessNode::getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -179,18 +179,18 @@ std::error_code InProcessNode::doGetNewBlocks(
     {
         std::unique_lock<std::mutex> lock(mutex);
         if (state != INITIALIZED) {
-            return make_error_code(QwertyNote::error::NOT_INITIALIZED);
+            return make_error_code(QwertyNote::Error::NOT_INITIALIZED);
         }
     }
 
     try {
         // TODO code duplication see RpcServer::on_get_blocks()
         if (knownBlockIds.empty()) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
 
         if (knownBlockIds.back() != core.getBlockIdByHeight(0)) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
 
         uint32_t totalBlockCount;
@@ -220,7 +220,7 @@ std::error_code InProcessNode::doGetNewBlocks(
     } catch (std::system_error &e) {
         return e.code();
     } catch (std::exception &) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
 
     return std::error_code();
@@ -233,7 +233,7 @@ void InProcessNode::getTransactionOutsGlobalIndices(const Crypto::FHash &transac
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -263,19 +263,19 @@ std::error_code InProcessNode::doGetTransactionOutsGlobalIndices(
     {
         std::unique_lock<std::mutex> lock(mutex);
         if (state != INITIALIZED) {
-            return make_error_code(QwertyNote::error::NOT_INITIALIZED);
+            return make_error_code(QwertyNote::Error::NOT_INITIALIZED);
         }
     }
 
     try {
         bool r = core.getTxOutputsGlobalIndexes(transactionHash, outsGlobalIndices);
         if(!r) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
     } catch (std::system_error &e) {
         return e.code();
     } catch (std::exception &) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
 
     return std::error_code{};
@@ -290,7 +290,7 @@ void InProcessNode::getRandomOutsByAmounts(
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -324,7 +324,7 @@ std::error_code InProcessNode::doGetRandomOutsByAmounts(
     {
         std::unique_lock<std::mutex> lock(mutex);
         if (state != INITIALIZED) {
-            return make_error_code(QwertyNote::error::NOT_INITIALIZED);
+            return make_error_code(QwertyNote::Error::NOT_INITIALIZED);
         }
     }
 
@@ -335,14 +335,14 @@ std::error_code InProcessNode::doGetRandomOutsByAmounts(
         req.outs_count = outsCount;
 
         if(!core.get_random_outs_for_amounts(req, res)) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
 
         result = std::move(res.outs);
     } catch (std::system_error& e) {
         return e.code();
     } catch (std::exception&) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
 
     return std::error_code();
@@ -355,7 +355,7 @@ void InProcessNode::relayTransaction(const QwertyNote::FTransaction &transaction
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -381,7 +381,7 @@ std::error_code InProcessNode::doRelayTransaction(const QwertyNote::FTransaction
     {
         std::unique_lock<std::mutex> lock(mutex);
         if (state != INITIALIZED) {
-            return make_error_code(QwertyNote::error::NOT_INITIALIZED);
+            return make_error_code(QwertyNote::Error::NOT_INITIALIZED);
         }
     }
 
@@ -391,15 +391,15 @@ std::error_code InProcessNode::doRelayTransaction(const QwertyNote::FTransaction
             = boost::value_initialized<QwertyNote::tx_verification_context>();
 
         if (!core.handle_incoming_tx(transactionBinaryArray, tvc, false, false)) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
 
         if(tvc.m_verification_failed) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
 
         if(!tvc.m_should_be_relayed) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
 
         QwertyNote::NOTIFY_NEW_TRANSACTIONS::request r;
@@ -408,7 +408,7 @@ std::error_code InProcessNode::doRelayTransaction(const QwertyNote::FTransaction
     } catch (std::system_error &e) {
         return e.code();
     } catch (std::exception &) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
 
     return std::error_code{};
@@ -419,7 +419,7 @@ size_t InProcessNode::getPeerCount() const
     {
         std::unique_lock<std::mutex> lock(mutex);
         if (state != INITIALIZED) {
-            throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+            throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
         }
     }
 
@@ -430,7 +430,7 @@ uint32_t InProcessNode::getLocalBlockCount() const
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
-        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
     }
 
     return lastLocalBlockHeaderInfo.uIndex + 1;
@@ -446,7 +446,7 @@ uint32_t InProcessNode::getKnownBlockCount() const
     {
         std::unique_lock<std::mutex> lock(mutex);
         if (state != INITIALIZED) {
-            throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+            throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
         }
     }
 
@@ -457,7 +457,7 @@ uint32_t InProcessNode::getLastLocalBlockHeight() const
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
-        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
     }
 
     return lastLocalBlockHeaderInfo.uIndex;
@@ -468,7 +468,7 @@ uint32_t InProcessNode::getLastKnownBlockHeight() const
     {
         std::unique_lock<std::mutex> lock(mutex);
         if (state != INITIALIZED) {
-            throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+            throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
         }
     }
 
@@ -479,7 +479,7 @@ uint64_t InProcessNode::getLastLocalBlockTimestamp() const
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
-        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
     }
 
     return lastLocalBlockHeaderInfo.uTimestamp;
@@ -496,7 +496,7 @@ FBlockHeaderInfo InProcessNode::getLastLocalBlockHeaderInfo() const
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
-        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
     }
 
     return lastLocalBlockHeaderInfo;
@@ -589,7 +589,7 @@ void InProcessNode::queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -627,7 +627,7 @@ std::error_code InProcessNode::doQueryBlocksLite(std::vector<Crypto::FHash> &&kn
     std::vector<QwertyNote::BlockShortInfo> entries;
 
     if (!core.queryBlocksLite(knownBlockIds, timestamp, startHeight, currentHeight, fullOffset, entries)) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
 
     for (const auto &entry: entries) {
@@ -668,7 +668,7 @@ void InProcessNode::getPoolSymmetricDifference(
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -718,7 +718,7 @@ void InProcessNode::getMultisignatureOutputByGlobalIndex(uint64_t amount,
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -746,13 +746,13 @@ void InProcessNode::getOutByMSigGIndexAsync(uint64_t amount,
 }
 
 void InProcessNode::getBlocks(const std::vector<uint32_t> &blockHeights,
-                              std::vector<std::vector<BlockDetails>> &blocks,
+                              std::vector<std::vector<FBlockDetails>> &blocks,
                               const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -760,7 +760,7 @@ void InProcessNode::getBlocks(const std::vector<uint32_t> &blockHeights,
     ioService.post(std::bind(
         static_cast<void(InProcessNode::*)(
             const std::vector<uint32_t> &,
-            std::vector<std::vector<BlockDetails>> &,
+            std::vector<std::vector<FBlockDetails>> &,
             const UCallback &)>(&InProcessNode::getBlocksAsync),
         this,
         std::cref(blockHeights),
@@ -770,14 +770,14 @@ void InProcessNode::getBlocks(const std::vector<uint32_t> &blockHeights,
 }
 
 void InProcessNode::getBlocksAsync(const std::vector<uint32_t> &blockHeights,
-                                   std::vector<std::vector<BlockDetails>> &blocks,
+                                   std::vector<std::vector<FBlockDetails>> &blocks,
                                    const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
         static_cast<
         std::error_code(InProcessNode::*)(
             const std::vector<uint32_t> &,
-            std::vector<std::vector<BlockDetails>> &)>(&InProcessNode::doGetBlocks),
+            std::vector<std::vector<FBlockDetails>> &)>(&InProcessNode::doGetBlocks),
         this,
         std::cref(blockHeights),
         std::ref(blocks)
@@ -786,7 +786,7 @@ void InProcessNode::getBlocksAsync(const std::vector<uint32_t> &blockHeights,
 }
 
 std::error_code InProcessNode::doGetBlocks(const std::vector<uint32_t> &blockHeights,
-                                           std::vector<std::vector<BlockDetails>> &blocks)
+                                           std::vector<std::vector<FBlockDetails>> &blocks)
 {
     try {
         uint32_t topHeight = 0;
@@ -794,31 +794,31 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<uint32_t> &blockHei
         core.get_blockchain_top(topHeight, topHash);
         for (const uint32_t &height : blockHeights) {
             if (height > topHeight) {
-                return make_error_code(QwertyNote::error::REQUEST_ERROR);
+                return make_error_code(QwertyNote::Error::REQUEST_ERROR);
             }
             Crypto::FHash hash = core.getBlockIdByHeight(height);
             FBlock block;
             if (!core.getBlockByHash(hash, block)) {
-                return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+                return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
             }
-            BlockDetails blockDetails;
+            FBlockDetails blockDetails;
             if (!blockchainExplorerDataBuilder.fillBlockDetails(block,
                                                                 blockDetails,
                                                                 false)) {
-                return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+                return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
             }
-            std::vector<BlockDetails> blocksOnSameHeight;
+            std::vector<FBlockDetails> blocksOnSameHeight;
             blocksOnSameHeight.push_back(std::move(blockDetails));
 
             // getting orphans
             std::vector<FBlock> orphanBlocks;
             core.getOrphanBlocksByHeight(height, orphanBlocks);
             for (const FBlock &orphanBlock : orphanBlocks) {
-                BlockDetails orphanBlockDetails;
+                FBlockDetails orphanBlockDetails;
                 if (!blockchainExplorerDataBuilder.fillBlockDetails(orphanBlock,
                                                                     orphanBlockDetails,
                                                                     false)) {
-                    return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+                    return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
                 }
                 blocksOnSameHeight.push_back(std::move(orphanBlockDetails));
             }
@@ -827,20 +827,20 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<uint32_t> &blockHei
     } catch (std::system_error &e) {
         return e.code();
     } catch (std::exception &) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
 
     return std::error_code{};
 }
 
 void InProcessNode::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
-                              std::vector<BlockDetails> &blocks,
+                              std::vector<FBlockDetails> &blocks,
                               const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -848,7 +848,7 @@ void InProcessNode::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
     ioService.post(std::bind(
         static_cast<void(InProcessNode::*)(
             const std::vector<Crypto::FHash> &,
-            std::vector<BlockDetails> &,
+            std::vector<FBlockDetails> &,
             const UCallback &)>(&InProcessNode::getBlocksAsync),
         this,
         std::cref(blockHashes),
@@ -858,13 +858,13 @@ void InProcessNode::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
 }
 
 void InProcessNode::getBlocksAsync(const std::vector<Crypto::FHash> &blockHashes,
-                                   std::vector<BlockDetails> &blocks,
+                                   std::vector<FBlockDetails> &blocks,
                                    const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
         static_cast<std::error_code(InProcessNode::*)(
             const std::vector<Crypto::FHash> &,
-            std::vector<BlockDetails> &)>(&InProcessNode::doGetBlocks),
+            std::vector<FBlockDetails> &)>(&InProcessNode::doGetBlocks),
         this,
         std::cref(blockHashes),
         std::ref(blocks)
@@ -873,26 +873,26 @@ void InProcessNode::getBlocksAsync(const std::vector<Crypto::FHash> &blockHashes
 }
 
 std::error_code InProcessNode::doGetBlocks(const std::vector<Crypto::FHash> &blockHashes,
-                                           std::vector<BlockDetails> &blocks)
+                                           std::vector<FBlockDetails> &blocks)
 {
     try {
         for (const Crypto::FHash& hash : blockHashes) {
             FBlock block;
             if (!core.getBlockByHash(hash, block)) {
-                return make_error_code(QwertyNote::error::REQUEST_ERROR);
+                return make_error_code(QwertyNote::Error::REQUEST_ERROR);
             }
-            BlockDetails blockDetails;
+            FBlockDetails blockDetails;
             if (!blockchainExplorerDataBuilder.fillBlockDetails(block,
                                                                 blockDetails,
                                                                 false)) {
-                return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+                return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
             }
             blocks.push_back(std::move(blockDetails));
         }
     } catch (std::system_error &e) {
         return e.code();
     } catch (std::exception &) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
     return std::error_code{};
 }
@@ -900,14 +900,14 @@ std::error_code InProcessNode::doGetBlocks(const std::vector<Crypto::FHash> &blo
 void InProcessNode::getBlocks(uint64_t timestampBegin,
                               uint64_t timestampEnd,
                               uint32_t blocksNumberLimit,
-                              std::vector<BlockDetails> &blocks,
+                              std::vector<FBlockDetails> &blocks,
                               uint32_t &blocksNumberWithinTimestamps,
                               const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -917,7 +917,7 @@ void InProcessNode::getBlocks(uint64_t timestampBegin,
             uint64_t,
             uint64_t,
             uint32_t,
-            std::vector<BlockDetails> &,
+            std::vector<FBlockDetails> &,
             uint32_t &,
             const UCallback&)>(&InProcessNode::getBlocksAsync),
         this,
@@ -933,7 +933,7 @@ void InProcessNode::getBlocks(uint64_t timestampBegin,
 void InProcessNode::getBlocksAsync(uint64_t timestampBegin,
                                    uint64_t timestampEnd,
                                    uint32_t blocksNumberLimit,
-                                   std::vector<BlockDetails> &blocks,
+                                   std::vector<FBlockDetails> &blocks,
                                    uint32_t &blocksNumberWithinTimestamps,
                                    const UCallback &callback)
 {
@@ -942,7 +942,7 @@ void InProcessNode::getBlocksAsync(uint64_t timestampBegin,
             uint64_t,
             uint64_t,
             uint32_t,
-            std::vector<BlockDetails> &,
+            std::vector<FBlockDetails> &,
             uint32_t &)>(&InProcessNode::doGetBlocks),
         this,
         timestampBegin,
@@ -958,7 +958,7 @@ void InProcessNode::getBlocksAsync(uint64_t timestampBegin,
 std::error_code InProcessNode::doGetBlocks(uint64_t timestampBegin,
                                            uint64_t timestampEnd,
                                            uint32_t blocksNumberLimit,
-                                           std::vector<BlockDetails> &blocks,
+                                           std::vector<FBlockDetails> &blocks,
                                            uint32_t &blocksNumberWithinTimestamps)
 {
     try {
@@ -968,34 +968,34 @@ std::error_code InProcessNode::doGetBlocks(uint64_t timestampBegin,
                                        blocksNumberLimit,
                                        rawBlocks,
                                        blocksNumberWithinTimestamps)) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
         for (const FBlock &rawBlock : rawBlocks) {
-            BlockDetails block;
+            FBlockDetails block;
             if (!blockchainExplorerDataBuilder.fillBlockDetails(rawBlock,
                                                                 block,
                                                                 false)) {
-                return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+                return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
             }
             blocks.push_back(std::move(block));
         }
     } catch (std::system_error &e) {
         return e.code();
     } catch (std::exception &) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
 
     return std::error_code{};
 }
 
 void InProcessNode::getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
-                                    std::vector<TransactionDetails> &transactions,
+                                    std::vector<FTransactionDetails> &transactions,
                                     const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -1003,7 +1003,7 @@ void InProcessNode::getTransactions(const std::vector<Crypto::FHash> &transactio
     ioService.post(std::bind(
         static_cast<void(InProcessNode::*)(
             const std::vector<Crypto::FHash> &,
-            std::vector<TransactionDetails> &,
+            std::vector<FTransactionDetails> &,
             const UCallback &)>(&InProcessNode::getTransactionsAsync),
         this,
         std::cref(transactionHashes),
@@ -1013,13 +1013,13 @@ void InProcessNode::getTransactions(const std::vector<Crypto::FHash> &transactio
 }
 
 void InProcessNode::getTransactionsAsync(const std::vector<Crypto::FHash> &transactionHashes,
-                                         std::vector<TransactionDetails> &transactions,
+                                         std::vector<FTransactionDetails> &transactions,
                                          const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
         static_cast<std::error_code(InProcessNode::*)(
             const std::vector<Crypto::FHash> &,
-            std::vector<TransactionDetails> &)>(&InProcessNode::doGetTransactions),
+            std::vector<FTransactionDetails> &)>(&InProcessNode::doGetTransactions),
         this,
         std::cref(transactionHashes),
         std::ref(transactions)
@@ -1029,26 +1029,26 @@ void InProcessNode::getTransactionsAsync(const std::vector<Crypto::FHash> &trans
 }
 
 std::error_code InProcessNode::doGetTransactions(const std::vector<Crypto::FHash> &transactionHashes,
-                                                 std::vector<TransactionDetails> &transactions)
+                                                 std::vector<FTransactionDetails> &transactions)
 {
     try {
         std::list<FTransaction> txs;
         std::list<Crypto::FHash> missed_txs;
         core.getTransactions(transactionHashes, txs, missed_txs, true);
         if (!missed_txs.empty()) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
         for (const FTransaction &tx : txs) {
-            TransactionDetails transactionDetails;
+            FTransactionDetails transactionDetails;
             if (!blockchainExplorerDataBuilder.fillTransactionDetails(tx, transactionDetails)) {
-                return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+                return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
             }
             transactions.push_back(std::move(transactionDetails));
         }
     } catch (std::system_error &e) {
         return e.code();
     } catch (std::exception &) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
 
     return std::error_code{};
@@ -1057,14 +1057,14 @@ std::error_code InProcessNode::doGetTransactions(const std::vector<Crypto::FHash
 void InProcessNode::getPoolTransactions(uint64_t timestampBegin,
                                         uint64_t timestampEnd,
                                         uint32_t transactionsNumberLimit,
-                                        std::vector<TransactionDetails> &transactions,
+                                        std::vector<FTransactionDetails> &transactions,
                                         uint64_t &transactionsNumberWithinTimestamps,
                                         const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -1084,7 +1084,7 @@ void InProcessNode::getPoolTransactions(uint64_t timestampBegin,
 void InProcessNode::getPoolTransactionsAsync(uint64_t timestampBegin,
                                              uint64_t timestampEnd,
                                              uint32_t transactionsNumberLimit,
-                                             std::vector<TransactionDetails> &transactions,
+                                             std::vector<FTransactionDetails> &transactions,
                                              uint64_t &transactionsNumberWithinTimestamps,
                                              const UCallback &callback)
 {
@@ -1105,7 +1105,7 @@ std::error_code InProcessNode::doGetPoolTransactions(
     uint64_t timestampBegin,
     uint64_t timestampEnd,
     uint32_t transactionsNumberLimit,
-    std::vector<TransactionDetails> &transactions,
+    std::vector<FTransactionDetails> &transactions,
     uint64_t &transactionsNumberWithinTimestamps)
 {
     try {
@@ -1115,32 +1115,32 @@ std::error_code InProcessNode::doGetPoolTransactions(
                                                  transactionsNumberLimit,
                                                  rawTransactions,
                                                  transactionsNumberWithinTimestamps)) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
         for (const FTransaction& rawTransaction : rawTransactions) {
-            TransactionDetails transactionDetails;
+            FTransactionDetails transactionDetails;
             if (!blockchainExplorerDataBuilder.fillTransactionDetails(rawTransaction,
                                                                       transactionDetails)) {
-                return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+                return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
             }
             transactions.push_back(std::move(transactionDetails));
         }
     } catch (std::system_error &e) {
         return e.code();
     } catch (std::exception &) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
     return std::error_code{};
 }
 
 void InProcessNode::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
-                                               std::vector<TransactionDetails> &transactions,
+                                               std::vector<FTransactionDetails> &transactions,
                                                const UCallback &callback)
 {
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }
@@ -1156,7 +1156,7 @@ void InProcessNode::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
 
 void InProcessNode::getTransactionsByPaymentIdAsync(
     const Crypto::FHash &paymentId,
-    std::vector<TransactionDetails> &transactions,
+    std::vector<FTransactionDetails> &transactions,
     const UCallback &callback)
 {
     std::error_code ec = core.executeLocked(std::bind(
@@ -1171,25 +1171,25 @@ void InProcessNode::getTransactionsByPaymentIdAsync(
 
 std::error_code InProcessNode::doGetTransactionsByPaymentId(
     const Crypto::FHash &paymentId,
-    std::vector<TransactionDetails> &transactions)
+    std::vector<FTransactionDetails> &transactions)
 {
     try {
         std::vector<FTransaction> rawTransactions;
         if (!core.getTransactionsByPaymentId(paymentId, rawTransactions)) {
-            return make_error_code(QwertyNote::error::REQUEST_ERROR);
+            return make_error_code(QwertyNote::Error::REQUEST_ERROR);
         }
         for (const FTransaction &rawTransaction : rawTransactions) {
-            TransactionDetails transactionDetails;
+            FTransactionDetails transactionDetails;
             if (!blockchainExplorerDataBuilder.fillTransactionDetails(rawTransaction,
                                                                       transactionDetails)) {
-                return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+                return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
             }
             transactions.push_back(std::move(transactionDetails));
         }
     } catch (std::system_error &e) {
         return e.code();
     } catch (std::exception &) {
-        return make_error_code(QwertyNote::error::INTERNAL_NODE_ERROR);
+        return make_error_code(QwertyNote::Error::INTERNAL_NODE_ERROR);
     }
 
     return std::error_code{};
@@ -1200,7 +1200,7 @@ void InProcessNode::isSynchronized(bool &syncStatus, const UCallback &callback)
     std::unique_lock<std::mutex> lock(mutex);
     if (state != INITIALIZED) {
         lock.unlock();
-        callback(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        callback(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
 
         return;
     }

@@ -29,135 +29,105 @@
 
 namespace QwertyNote {
 
-enum class TransactionRemoveReason : uint8_t
-{
-    INCLUDED_IN_BLOCK = 0,
-    TIMEOUT = 1
-};
+    enum class ETransactionRemoveReason : uint8_t
+    {
+        IncludedInBlock = 0,
+        Timeout = 1
+    };
 
-struct TransactionOutputToKeyDetails
-{
-    Crypto::FPublicKey txOutKey;
-};
+    struct FTransactionOutputReferenceDetails
+    {
+        uint64_t uNumber;
+        Crypto::FHash sTransactionHash;
+    };
 
-struct TransactionOutputMultiSignatureDetails
-{
-    std::vector<Crypto::FPublicKey> keys;
-    uint32_t requiredSignatures;
-};
+    struct FBaseInputDetails
+    {
+        uint64_t uAmount;
+        FBaseInput sBaseInput;
+    };
 
-struct TransactionOutputReferenceDetails
-{
-    Crypto::FHash transactionHash;
-    size_t number;
-};
+    struct FKeyInputDetails
+    {
+        uint64_t uMixin;
+        std::vector <FTransactionOutputReferenceDetails> vKeyOutputs;
+        FKeyInput sKeyInput;
+    };
 
-struct TransactionInputGenerateDetails
-{
-    uint32_t height;
-};
+    struct FMultiSignatureInputDetails
+    {
+        FMultiSignatureInput sMultiSignatureInput;
+        FTransactionOutputReferenceDetails sTransactionOutputReference;
+    };
 
-struct TransactionInputToKeyDetails
-{
-    Crypto::FKeyImage keyImage;
-    uint64_t mixin;
-    std::vector<TransactionOutputReferenceDetails> outputs;
-    std::vector<uint32_t> outputIndexes;
-};
+    typedef boost::variant <
+        FBaseInputDetails,
+        FKeyInputDetails,
+        FMultiSignatureInputDetails>
+        FTransactionInputDetails;
 
-struct TransactionInputMultiSignatureDetails
-{
-    uint32_t signatures;
-    TransactionOutputReferenceDetails output;
-};
+    struct FTransactionOutputDetails
+    {
+        uint64_t uGlobalIndex;
+        FTransactionOutput sTransactionsOutput;
+    };
 
-struct BaseInputDetails
-{
-    FBaseInput input;
-    uint64_t amount;
-};
+    struct FTransactionExtraDetails
+    {
+        uint32_t uSize = 0;
+        std::vector <size_t> vPadding;
+        std::vector <Crypto::FPublicKey> vPublicKeys;
+        BinaryArray vNonce;
+        BinaryArray vRaw;
+    };
 
-struct KeyInputDetails
-{
-    FKeyInput input;
-    uint64_t mixin;
-    std::vector<TransactionOutputReferenceDetails> outputs;
-};
+    struct FTransactionDetails
+    {
+        bool bHasPaymentId = false;
+        bool bInBlockchain = false;
+        uint8_t uVersion = 0;
+        uint32_t uBlockHeight = 0;
+        uint64_t uSize = 0;
+        uint64_t uFee = 0;
+        uint64_t uTotalInputsAmount = 0;
+        uint64_t uTotalOutputsAmount = 0;
+        uint64_t uMixin = 0;
+        uint64_t uUnlockTime = 0;
+        uint64_t uTimestamp = 0;
+        std::vector <std::vector <Crypto::FSignature>> vSignatures;
+        std::vector <FTransactionInputDetails> vTxInputDetails;
+        std::vector <FTransactionOutputDetails> vTxOutputDetails;
+        Crypto::FHash sBlockHash;
+        Crypto::FHash sTransactionHash;
+        Crypto::FHash sPaymentId;
+        FTransactionExtraDetails sTransactionExtra;
+    };
 
-struct MultiSignatureInputDetails
-{
-    FMultiSignatureInput input;
-    TransactionOutputReferenceDetails output;
-};
-
-typedef boost::variant<
-    BaseInputDetails,
-    KeyInputDetails,
-    MultiSignatureInputDetails>
-        TransactionInputDetails;
-
-struct TransactionOutputDetails
-{
-    FTransactionOutput output;
-    uint64_t globalIndex;
-};
-
-struct TransactionExtraDetails
-{
-    std::vector<size_t> padding;
-    std::vector<Crypto::FPublicKey> publicKey;
-    BinaryArray nonce;
-    BinaryArray raw;
-    size_t size = 0;
-};
-
-struct TransactionDetails
-{
-    Crypto::FHash hash;
-    uint64_t size = 0;
-    uint64_t fee = 0;
-    uint64_t totalInputsAmount = 0;
-    uint64_t totalOutputsAmount = 0;
-    uint64_t mixin = 0;
-    uint64_t unlockTime = 0;
-    uint64_t timestamp = 0;
-    uint8_t version = 0;
-    Crypto::FHash paymentId;
-    bool hasPaymentId = false;
-    bool inBlockchain = false;
-    Crypto::FHash blockHash;
-    uint32_t blockHeight = 0;
-    TransactionExtraDetails extra;
-    std::vector<std::vector<Crypto::FSignature>> signatures;
-    std::vector<TransactionInputDetails> inputs;
-    std::vector<TransactionOutputDetails> outputs;
-};
-
-struct BlockDetails
-{
-    uint8_t majorVersion = 0;
-    uint8_t minorVersion = 0;
-    uint64_t timestamp = 0;
-    Crypto::FHash prevBlockHash;
-    Crypto::FHash proofOfWork;
-    uint32_t nonce = 0;
-    bool isOrphaned = false;
-    uint32_t height = 0;
-    uint32_t depth = 0;
-    Crypto::FHash hash;
-    uint64_t difficulty = 0;
-    uint64_t cumulativeDifficulty = 0;
-    uint64_t reward = 0;
-    uint64_t baseReward = 0;
-    uint64_t blockSize = 0;
-    uint64_t transactionsCumulativeSize = 0;
-    uint64_t alreadyGeneratedCoins = 0;
-    uint64_t alreadyGeneratedTransactions = 0;
-    uint64_t sizeMedian = 0;
-    uint64_t effectiveSizeMedian = 0;
-    double penalty = 0.0;
-    uint64_t totalFeeAmount = 0;
-    std::vector<TransactionDetails> transactions;
-};
+    struct FBlockDetails
+    {
+        bool bIsOrphaned = false;
+        double dPenalty = 0.0;
+        uint8_t uMajorVersion = 0;
+        uint8_t uMinorVersion = 0;
+        uint64_t uTimestamp = 0;
+        uint32_t uNonce = 0;
+        uint32_t uHeight = 0;
+        uint32_t uDepth = 0;
+        uint64_t uDifficulty = 0;
+        uint64_t uCumulativeDifficulty = 0;
+        uint64_t uReward = 0;
+        uint64_t uBaseReward = 0;
+        uint64_t uBlockSize = 0;
+        uint64_t uTransactionsCumulativeSize = 0;
+        uint64_t uAlreadyGeneratedCoins = 0;
+        uint64_t uAlreadyGeneratedTransactions = 0;
+        uint64_t uSizeMedian = 0;
+        uint64_t uEffectiveSizeMedian = 0;
+        uint64_t uTotalFeeAmount = 0;
+        std::vector <FTransactionDetails> vTransactions;
+        Crypto::FHash sPrevBlockHash;
+        Crypto::FHash sBlockHash;
+        Crypto::FHash sProofOfWork;
+    };
 
 } // namespace QwertyNote

@@ -177,32 +177,32 @@ namespace QwertyNote {
 														   const UCallback &sCallback) = 0;
 
 		virtual void getBlocks (const std::vector <uint32_t> &vBlockHeights,
-								std::vector <std::vector <BlockDetails>> &vBlocks,
+								std::vector <std::vector <FBlockDetails>> &vBlocks,
 								const UCallback &vCallback) = 0;
 
 		virtual void getBlocks (const std::vector <Crypto::FHash> &vBlockHashes,
-								std::vector <BlockDetails> &vBlocks,
+								std::vector <FBlockDetails> &vBlocks,
 								const UCallback &sCallback) = 0;
 
 		virtual void getBlocks (uint64_t uTimestampBegin,
 								uint64_t uTimestampEnd,
 								uint32_t uBlocksNumberLimit,
-								std::vector <BlockDetails> &vBlocks,
+								std::vector <FBlockDetails> &vBlocks,
 								uint32_t &uBlocksNumberWithinTimestamps,
 								const UCallback &sCallback) = 0;
 
 		virtual void getTransactions (const std::vector <Crypto::FHash> &vTransactionHashes,
-									  std::vector <TransactionDetails> &vTransactions,
+									  std::vector <FTransactionDetails> &vTransactions,
 									  const UCallback &sCallback) = 0;
 
 		virtual void getTransactionsByPaymentId (const Crypto::FHash &sPaymentId,
-												 std::vector <TransactionDetails> &vTransactions,
+												 std::vector <FTransactionDetails> &vTransactions,
 												 const UCallback &sCallback) = 0;
 
 		virtual void getPoolTransactions (uint64_t uTimestampBegin,
 										  uint64_t uTimestampEnd,
 										  uint32_t uTransactionsNumberLimit,
-										  std::vector <TransactionDetails> &vTransactions,
+										  std::vector <FTransactionDetails> &vTransactions,
 										  uint64_t &uTransactionsNumberWithinTimestamps,
 										  const UCallback &sCallback) = 0;
 

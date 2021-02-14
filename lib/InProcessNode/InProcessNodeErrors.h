@@ -23,7 +23,7 @@
 
 namespace QwertyNote {
 
-namespace error {
+namespace Error {
 
 enum InProcessNodeErrorCodes
 {
@@ -78,10 +78,10 @@ private:
 
 } // namespace QwertyNote
 
-inline std::error_code make_error_code(QwertyNote::error::InProcessNodeErrorCodes e)
+inline std::error_code make_error_code(QwertyNote::Error::InProcessNodeErrorCodes e)
 {
     return std::error_code{
         static_cast<int>(e),
-                             QwertyNote::error::InProcessNodeErrorCategory::INSTANCE
+                             QwertyNote::Error::InProcessNodeErrorCategory::INSTANCE
     };
 }

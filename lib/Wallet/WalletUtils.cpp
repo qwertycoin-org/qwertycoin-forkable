@@ -30,7 +30,7 @@ void throwIfKeysMissmatch(const Crypto::FSecretKey &secretKey,
     Crypto::FPublicKey pub;
     bool r = Crypto::secretKeyToPublicKey(secretKey, pub);
     if (!r || expectedPublicKey != pub) {
-        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD), message);
+        throw std::system_error(make_error_code(QwertyNote::Error::WRONG_PASSWORD), message);
     }
 }
 

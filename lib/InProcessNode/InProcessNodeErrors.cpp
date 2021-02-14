@@ -20,7 +20,7 @@
 
 namespace QwertyNote {
 
-namespace error {
+namespace Error {
 
 InProcessNodeErrorCategory InProcessNodeErrorCategory::INSTANCE;
 

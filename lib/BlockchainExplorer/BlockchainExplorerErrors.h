@@ -23,37 +23,37 @@
 
 namespace QwertyNote {
 
-namespace error {
+    namespace Error {
 
-enum class BlockchainExplorerErrorCodes : int
-{
-    NOT_INITIALIZED = 1,
-    ALREADY_INITIALIZED,
-    INTERNAL_ERROR,
-    REQUEST_ERROR
-};
+        enum class EBlockchainExplorerErrorCodes : int
+        {
+            NOT_INITIALIZED = 1,
+            ALREADY_INITIALIZED,
+            INTERNAL_ERROR,
+            REQUEST_ERROR
+        };
 
-class BlockchainExplorerErrorCategory : public std::error_category
-{
-    BlockchainExplorerErrorCategory() = default;
+        class QBlockchainExplorerErrorCategory : public std::error_category
+        {
+            QBlockchainExplorerErrorCategory () = default;
 
-public:
-    static BlockchainExplorerErrorCategory INSTANCE;
+        public:
+            static QBlockchainExplorerErrorCategory INSTANCE;
 
-    const char *name() const noexcept override;
+            const char *name () const noexcept override;
 
-    std::string message(int ev) const override;
+            std::string message (int ev) const override;
 
-    std::error_condition default_error_condition(int ev) const noexcept override;
-};
+            std::error_condition default_error_condition (int iEc) const noexcept override;
+        };
 
-} //namespace error
+    } //namespace error
 
 } //namespace QwertyNote
 
-inline std::error_code make_error_code(QwertyNote::error::BlockchainExplorerErrorCodes e)
+inline std::error_code make_error_code (QwertyNote::Error::EBlockchainExplorerErrorCodes e)
 {
     using namespace QwertyNote;
 
-    return std::error_code{static_cast<int>(e), error::BlockchainExplorerErrorCategory::INSTANCE};
+    return std::error_code {static_cast<int>(e), Error::QBlockchainExplorerErrorCategory::INSTANCE};
 }

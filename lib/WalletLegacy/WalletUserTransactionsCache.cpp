@@ -221,7 +221,7 @@ void WalletUserTransactionsCache::updateTransactionSendingState(
 {
     auto &txInfo = m_transactions.at(transactionId);
     if (ec) {
-        txInfo.state = ec.value() == error::TX_CANCELLED ? WalletLegacyTransactionState::Cancelled
+        txInfo.state = ec.value() == Error::TX_CANCELLED ? WalletLegacyTransactionState::Cancelled
                                                          : WalletLegacyTransactionState::Failed;
         m_unconfirmedTransactions.erase(txInfo.hash);
     } else {

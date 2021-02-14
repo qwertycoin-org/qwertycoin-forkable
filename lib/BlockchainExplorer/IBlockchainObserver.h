@@ -22,17 +22,26 @@
 
 namespace QwertyNote {
 
-class IBlockchainObserver
-{
-    typedef std::pair<Crypto::FHash, TransactionRemoveReason> RemovedTransactionDetails;
+    class IBlockchainObserver
+    {
+        typedef std::pair <Crypto::FHash, ETransactionRemoveReason> RemovedTransactionDetails;
 
-public:
-    virtual ~IBlockchainObserver() = default;
-    virtual void blockchainSynchronized(const BlockDetails &topBlock) {}
-    virtual void blockchainUpdated(const std::vector<BlockDetails> &newBlocks,
-                                   const std::vector<BlockDetails> &orphanedBlocks) {}
-    virtual void poolUpdated(const std::vector<TransactionDetails> &newTransactions,
-                             const std::vector<RemovedTransactionDetails> &removedTransactions) {}
-};
+    public:
+        virtual ~IBlockchainObserver () = default;
+
+        virtual void blockchainSynchronized (const FBlockDetails &sTopBlock)
+        {
+        }
+
+        virtual void blockchainUpdated (const std::vector <FBlockDetails> &vNewBlocks,
+                                        const std::vector <FBlockDetails> &vOrphanedBlocks)
+        {
+        }
+
+        virtual void poolUpdated (const std::vector <FTransactionDetails> &vNewTransactions,
+                                  const std::vector <RemovedTransactionDetails> &vRemovedTransactions)
+        {
+        }
+    };
 
 } // namespace QwertyNote

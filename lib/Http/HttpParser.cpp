@@ -27,10 +27,10 @@ void throwIfNotGood(std::istream &stream)
 {
     if (!stream.good()) {
         if (stream.eof()) {
-            throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::END_OF_STREAM
+            throw std::system_error(make_error_code(QwertyNote::Error::HttpParserErrorCodes::END_OF_STREAM
             ));
         } else {
-            throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::STREAM_NOT_GOOD
+            throw std::system_error(make_error_code(QwertyNote::Error::HttpParserErrorCodes::STREAM_NOT_GOOD
             ));
         }
     }
@@ -52,7 +52,7 @@ HttpResponse::HTTP_STATUS HttpParser::parseResponseStatusFromString(const std::s
       return QwertyNote::HttpResponse::STATUS_500;
   } else {
       throw std::system_error(
-          make_error_code(QwertyNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL),
+          make_error_code(QwertyNote::Error::HttpParserErrorCodes::UNEXPECTED_SYMBOL),
           "Unknown HTTP status code is given"
       );
   }
@@ -140,7 +140,7 @@ void HttpParser::readWord(std::istream &stream, std::string &word)
     if (c == '\r') {
         stream.get(c);
         if (c != '\n') {
-            throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
+            throw std::system_error(make_error_code(QwertyNote::Error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
             ));
         }
     }
@@ -173,7 +173,7 @@ bool HttpParser::readHeader(std::istream &stream, std::string &name, std::string
             }
 
             if (name.empty()) {
-                throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::EMPTY_HEADER
+                throw std::system_error(make_error_code(QwertyNote::Error::HttpParserErrorCodes::EMPTY_HEADER
                 ));
             }
 
@@ -197,7 +197,7 @@ bool HttpParser::readHeader(std::istream &stream, std::string &name, std::string
 
     stream.get(c);
     if (c != '\n') {
-        throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
+        throw std::system_error(make_error_code(QwertyNote::Error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
         ));
     }
 
@@ -207,7 +207,7 @@ bool HttpParser::readHeader(std::istream &stream, std::string &name, std::string
     if (c == '\r') {
         stream.get(c).get(c);
         if (c != '\n') {
-            throw std::system_error(make_error_code(QwertyNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
+            throw std::system_error(make_error_code(QwertyNote::Error::HttpParserErrorCodes::UNEXPECTED_SYMBOL
             ));
         }
 

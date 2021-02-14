@@ -35,103 +35,115 @@
 
 namespace QwertyNote {
 
-class BlockchainExplorer : public IBlockchainExplorer, public INodeObserver
-{
-    class PoolUpdateGuard
+    class QBlockchainExplorer : public IBlockchainExplorer, public INodeObserver
     {
-    public:
-        PoolUpdateGuard();
-
-        bool beginUpdate();
-        bool endUpdate();
-
-    private:
-        enum class State
+        class QPoolUpdateGuard
         {
-            NONE,
-            UPDATING,
-            UPDATE_REQUIRED
+        public:
+            QPoolUpdateGuard ();
+
+            bool beginUpdate ();
+
+            bool endUpdate ();
+
+        private:
+            enum class EState
+            {
+                NONE,
+                UPDATING,
+                UPDATE_REQUIRED
+            };
+
+            std::atomic <EState> mState;
         };
 
-        std::atomic<State> m_state;
+        enum EState
+        {
+            NOT_INITIALIZED,
+            INITIALIZED
+        };
+    public:
+        QBlockchainExplorer (INode &sNode, Logging::ILogger &sLogger);
+
+        QBlockchainExplorer (const QBlockchainExplorer &) = delete;
+
+        QBlockchainExplorer (QBlockchainExplorer &&) = delete;
+
+        ~QBlockchainExplorer () override = default;
+
+        void init () override;
+
+        void shutdown () override;
+
+        bool addObserver (IBlockchainObserver *sObserver) override;
+
+        bool removeObserver (IBlockchainObserver *sObserver) override;
+
+        bool getBlocks (const std::vector <uint32_t> &vBlockHeights,
+                        std::vector <std::vector <FBlockDetails>> &vBlocks) override;
+
+        bool getBlocks (const std::vector <Crypto::FHash> &vBlockHashes,
+                        std::vector <FBlockDetails> &vBlocks) override;
+
+        bool getBlocks (uint64_t uTimestampBegin,
+                        uint64_t uTimestampEnd,
+                        uint32_t uBlocksNumberLimit,
+                        std::vector <FBlockDetails> &vBlocks,
+                        uint32_t &uBlocksNumberWithinTimestamps) override;
+
+        bool getBlockchainTop (FBlockDetails &sTopBlock) override;
+
+        bool getPoolState (const std::vector <Crypto::FHash> &sCallback,
+                           Crypto::FHash sKnownBlockchainTop,
+                           bool &bIsBlockchainActual,
+                           std::vector <FTransactionDetails> &vNewTransactions,
+                           std::vector <Crypto::FHash> &vRemovedTransactions) override;
+
+        bool getPoolTransactions (uint64_t uTimestampBegin,
+                                  uint64_t uTimestampEnd,
+                                  uint32_t uTransactionsNumberLimit,
+                                  std::vector <FTransactionDetails> &vTransactions,
+                                  uint64_t &uTransactionsNumberWithinTimestamps) override;
+
+        bool getTransactions (const std::vector <Crypto::FHash> &vTransactionHashes,
+                              std::vector <FTransactionDetails> &vTransactions) override;
+
+        bool getTransactionsByPaymentId (const Crypto::FHash &sPaymentId,
+                                         std::vector <FTransactionDetails> &vTransactions) override;
+
+        uint64_t getRewardBlocksWindow () override;
+
+        uint64_t getFullRewardMaxBlockSize (uint8_t uMajorVersion) override;
+
+        bool isSynchronized () override;
+
+        void poolChanged () override;
+
+        void blockchainSynchronized (uint32_t sEc) override;
+
+        void localBlockchainUpdated (uint32_t sEc) override;
+
+        QBlockchainExplorer &operator= (const QBlockchainExplorer &) = delete;
+
+        QBlockchainExplorer &operator= (QBlockchainExplorer &&) = delete;
+
+    private:
+        void poolUpdateEndHandler ();
+
+        std::atomic <EState> mState;
+        std::atomic <bool> mSynchronized;
+        std::atomic <uint32_t> mObserversCounter;
+        std::mutex mMutex;
+        std::unordered_set <Crypto::FHash> mKnownPoolState;
+
+        uint32_t mKnownBlockchainTopHeight;
+
+        FBlockDetails mKnownBlockchainTop;
+        INode &mNode;
+        Logging::LoggerRef mLogger;
+        QPoolUpdateGuard mPoolUpdateGuard;
+        Tools::ObserverManager <IBlockchainObserver> mObserverManager;
+        WalletAsyncContextCounter mAsyncContextCounter;
     };
-
-    enum State
-    {
-        NOT_INITIALIZED,
-        INITIALIZED
-    };
-public:
-    BlockchainExplorer(INode &node, Logging::ILogger &logger);
-    BlockchainExplorer(const BlockchainExplorer &) = delete;
-    BlockchainExplorer(BlockchainExplorer &&) = delete;
-    ~BlockchainExplorer() override = default;
-
-    void init() override;
-    void shutdown() override;
-
-    bool addObserver(IBlockchainObserver *observer) override;
-    bool removeObserver(IBlockchainObserver *observer) override;
-
-    bool getBlocks(const std::vector<uint32_t> &blockHeights,
-                   std::vector<std::vector<BlockDetails>> &blocks) override;
-    bool getBlocks(const std::vector<Crypto::FHash> &blockHashes,
-                   std::vector<BlockDetails> &blocks) override;
-    bool getBlocks(uint64_t timestampBegin,
-                   uint64_t timestampEnd,
-                   uint32_t blocksNumberLimit,
-                   std::vector<BlockDetails> &blocks,
-                   uint32_t &blocksNumberWithinTimestamps) override;
-
-    bool getBlockchainTop(BlockDetails &topBlock) override;
-
-    bool getPoolState(const std::vector<Crypto::FHash> &knownPoolTransactionHashes,
-                      Crypto::FHash knownBlockchainTop,
-                      bool &isBlockchainActual,
-                      std::vector<TransactionDetails> &newTransactions,
-                      std::vector<Crypto::FHash> &removedTransactions) override;
-    bool getPoolTransactions(uint64_t timestampBegin,
-                             uint64_t timestampEnd,
-                             uint32_t transactionsNumberLimit,
-                             std::vector<TransactionDetails> &transactions,
-                             uint64_t &transactionsNumberWithinTimestamps) override;
-    bool getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
-                         std::vector<TransactionDetails> &transactions) override;
-    bool getTransactionsByPaymentId(const Crypto::FHash &paymentId,
-                                    std::vector<TransactionDetails> &transactions) override;
-
-    uint64_t getRewardBlocksWindow() override;
-    uint64_t getFullRewardMaxBlockSize(uint8_t majorVersion) override;
-
-    bool isSynchronized() override;
-
-    void poolChanged() override;
-    void blockchainSynchronized(uint32_t topHeight) override;
-    void localBlockchainUpdated(uint32_t height) override;
-
-    BlockchainExplorer &operator=(const BlockchainExplorer &) = delete;
-    BlockchainExplorer &operator=(BlockchainExplorer &&) = delete;
-
-private:
-    void poolUpdateEndHandler();
-
-private:
-    BlockDetails knownBlockchainTop;
-    uint32_t knownBlockchainTopHeight;
-    std::unordered_set<Crypto::Hash> knownPoolState;
-
-    std::atomic<State> state;
-    std::atomic<bool> synchronized;
-    std::atomic<uint32_t> observersCounter;
-    Tools::ObserverManager<IBlockchainObserver> observerManager;
-
-    std::mutex mutex;
-
-    INode &node;
-    Logging::LoggerRef logger;
-
-    WalletAsyncContextCounter asyncContextCounter;
-    PoolUpdateGuard poolUpdateGuard;
-};
 
 } // namespace QwertyNote

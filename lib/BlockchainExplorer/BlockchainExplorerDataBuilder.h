@@ -26,31 +26,38 @@
 
 namespace QwertyNote {
 
-class BlockchainExplorerDataBuilder
-{
-public:
-    BlockchainExplorerDataBuilder(ICore &core, IQwertyNoteProtocolQuery &protocol);
-    BlockchainExplorerDataBuilder(const BlockchainExplorerDataBuilder &) = delete;
-    BlockchainExplorerDataBuilder(BlockchainExplorerDataBuilder &&) = delete;
+    class QBlockchainExplorerDataBuilder
+    {
+    public:
+        QBlockchainExplorerDataBuilder (ICore &sCore, IQwertyNoteProtocolQuery &sProtocol);
 
-    bool fillBlockDetails(const FBlock &block, BlockDetails &blockDetails,
-                          bool calculatePoW = false);
-    bool fillTransactionDetails(const FTransaction &tx, TransactionDetails &txRpcInfo,
-                                uint64_t timestamp = 0);
+        QBlockchainExplorerDataBuilder (const QBlockchainExplorerDataBuilder &) = delete;
 
-    static bool getPaymentId(const FTransaction &transaction, Crypto::FHash &paymentId);
+        QBlockchainExplorerDataBuilder (QBlockchainExplorerDataBuilder &&) = delete;
 
-    BlockchainExplorerDataBuilder &operator=(const BlockchainExplorerDataBuilder &) = delete;
-    BlockchainExplorerDataBuilder &operator=(BlockchainExplorerDataBuilder &&) = delete;
+        bool fillBlockDetails (const FBlock &sBlock, FBlockDetails &sBlockDetails,
+                               bool bCalculatePoW = false);
 
-private:
-    static bool getMixin(const FTransaction &transaction, uint64_t &mixin);
-    static bool fillTxExtra(const std::vector<uint8_t> &rawExtra,
-                            TransactionExtraDetails &extraDetails);
-    static size_t median(std::vector<size_t> &v);
+        bool fillTransactionDetails (const FTransaction &sTransaction,
+                                     FTransactionDetails &sTransactionDetails,
+                                     uint64_t uTimestamp = 0);
 
-    ICore &m_core;
-    IQwertyNoteProtocolQuery &mProtocol; // Not used, but why we have it here?
-};
+        static bool getPaymentId (const FTransaction &sTransaction, Crypto::FHash &sPaymentId);
+
+        QBlockchainExplorerDataBuilder &operator= (const QBlockchainExplorerDataBuilder &) = delete;
+
+        QBlockchainExplorerDataBuilder &operator= (QBlockchainExplorerDataBuilder &&) = delete;
+
+    private:
+        static bool getMixin (const FTransaction &sTransaction, uint64_t &uMixin);
+
+        static bool fillTxExtra (const std::vector <uint8_t> &vRawExtra,
+                                 FTransactionExtraDetails &sExtraDetails);
+
+        static size_t median (std::vector <size_t> &vSizes);
+
+        ICore &mCore;
+        IQwertyNoteProtocolQuery &mProtocol; // Not used, but why we have it here?
+    };
 
 } // namespace QwertyNote

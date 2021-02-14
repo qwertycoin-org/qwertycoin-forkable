@@ -47,7 +47,7 @@ bool PaymentIdIndex::add(const FTransaction &transaction)
 
     Crypto::FHash paymentId;
     Crypto::FHash transactionHash = getObjectHash(transaction);
-    if (!BlockchainExplorerDataBuilder::getPaymentId(transaction, paymentId)) {
+    if (!QBlockchainExplorerDataBuilder::getPaymentId(transaction, paymentId)) {
         return false;
     }
 
@@ -64,7 +64,7 @@ bool PaymentIdIndex::remove(const FTransaction &transaction)
 
     Crypto::FHash paymentId;
     Crypto::FHash transactionHash = getObjectHash(transaction);
-    if (!BlockchainExplorerDataBuilder::getPaymentId(transaction, paymentId)) {
+    if (!QBlockchainExplorerDataBuilder::getPaymentId(transaction, paymentId)) {
         return false;
     }
 

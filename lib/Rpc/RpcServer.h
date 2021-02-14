@@ -44,7 +44,7 @@ class core;
 
 class NodeServer;
 
-class BlockchainExplorer;
+class QBlockchainExplorer;
 
 class IQwertyNoteProtocolQuery;
 
@@ -268,7 +268,7 @@ private:
 
 private:
     static std::unordered_map<std::string, RpcHandler<HandlerFunction>> s_handlers;
-    QwertyNote::BlockchainExplorerDataBuilder blockchainExplorerDataBuilder;
+    QwertyNote::QBlockchainExplorerDataBuilder blockchainExplorerDataBuilder;
     Logging::LoggerRef logger;
     core &m_core;
     NodeServer &m_p2p;

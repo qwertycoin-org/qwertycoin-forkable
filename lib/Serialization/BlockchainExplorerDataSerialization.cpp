@@ -42,17 +42,17 @@ namespace {
 
 struct BinaryVariantTagGetter : boost::static_visitor<uint8_t>
 {
-    uint8_t operator()(const QwertyNote::BaseInputDetails)
+    uint8_t operator()(const QwertyNote::FBaseInputDetails)
     {
         return static_cast<uint8_t>(SerializationTag::Base);
     }
 
-    uint8_t operator()(const QwertyNote::KeyInputDetails)
+    uint8_t operator()(const QwertyNote::FKeyInputDetails)
     {
         return static_cast<uint8_t>(SerializationTag::Key);
     }
 
-    uint8_t operator()(const QwertyNote::MultiSignatureInputDetails)
+    uint8_t operator()(const QwertyNote::FMultiSignatureInputDetails)
     {
         return static_cast<uint8_t>(SerializationTag::Multisignature);
     }
@@ -79,23 +79,23 @@ struct VariantSerializer : boost::static_visitor<>
 void getVariantValue(
         QwertyNote::ISerializer &serializer,
     uint8_t tag,
-    boost::variant<BaseInputDetails, KeyInputDetails, MultiSignatureInputDetails> in)
+    boost::variant<FBaseInputDetails, FKeyInputDetails, FMultiSignatureInputDetails> in)
 {
     switch (static_cast<SerializationTag>(tag)) {
     case SerializationTag::Base: {
-        BaseInputDetails v;
+        FBaseInputDetails v;
         serializer(v, "uData");
         in = v;
         break;
     }
     case SerializationTag::Key: {
-        KeyInputDetails v;
+        FKeyInputDetails v;
         serializer(v, "uData");
         in = v;
         break;
     }
     case SerializationTag::Multisignature: {
-        MultiSignatureInputDetails v;
+        FMultiSignatureInputDetails v;
         serializer(v, "uData");
         in = v;
         break;
@@ -113,38 +113,38 @@ bool serializePod(T &v, Common::StringView name, QwertyNote::ISerializer &serial
 
 } // namespace
 
-void serialize(TransactionOutputDetails &output, ISerializer &serializer)
+void serialize(FTransactionOutputDetails &output, ISerializer &serializer)
 {
-    serializer(output.output, "output");
-    serializer(output.globalIndex, "globalIndex");
+    serializer(output.sTransactionsOutput, "output");
+    serializer(output.uGlobalIndex, "globalIndex");
 }
 
-void serialize(TransactionOutputReferenceDetails &outputReference, ISerializer &serializer)
+void serialize(FTransactionOutputReferenceDetails &outputReference, ISerializer &serializer)
 {
-    serializePod(outputReference.transactionHash, "transactionHash", serializer);
-    serializer(outputReference.number, "number");
+    serializePod(outputReference.sTransactionHash, "transactionHash", serializer);
+    serializer(outputReference.uNumber, "number");
 }
 
-void serialize(BaseInputDetails &inputBase, ISerializer &serializer)
+void serialize(FBaseInputDetails &inputBase, ISerializer &serializer)
 {
-    serializer(inputBase.input, "input");
-    serializer(inputBase.amount, "amount");
+    serializer(inputBase.sBaseInput, "input");
+    serializer(inputBase.uAmount, "amount");
 }
 
-void serialize(KeyInputDetails &inputToKey, ISerializer &serializer)
+void serialize(FKeyInputDetails &inputToKey, ISerializer &serializer)
 {
-    serializer(inputToKey.input, "input");
-    serializer(inputToKey.mixin, "mixin");
-    serializer(inputToKey.outputs, "outputs");
+    serializer(inputToKey.sKeyInput, "input");
+    serializer(inputToKey.uMixin, "mixin");
+    serializer(inputToKey.vKeyOutputs, "outputs");
 }
 
-void serialize(MultiSignatureInputDetails &inputMultisig, ISerializer &serializer)
+void serialize(FMultiSignatureInputDetails &inputMultisig, ISerializer &serializer)
 {
-    serializer(inputMultisig.input, "input");
-    serializer(inputMultisig.output, "output");
+    serializer(inputMultisig.sMultiSignatureInput, "input");
+    serializer(inputMultisig.sTransactionOutputReference, "output");
 }
 
-void serialize(TransactionInputDetails &input, ISerializer &serializer)
+void serialize(FTransactionInputDetails &input, ISerializer &serializer)
 {
     if (serializer.type() == ISerializer::OUTPUT) {
         BinaryVariantTagGetter tagGetter;
@@ -161,85 +161,85 @@ void serialize(TransactionInputDetails &input, ISerializer &serializer)
     }
 }
 
-void serialize(TransactionExtraDetails &extra, ISerializer &serializer)
+void serialize(FTransactionExtraDetails &extra, ISerializer &serializer)
 {
-    serializePod(extra.publicKey, "publicKey", serializer);
-    serializer(extra.nonce, "nonce");
-    serializeAsBinary(extra.raw, "raw", serializer);
-    serializer(extra.size, "size");
+    serializePod(extra.vPublicKeys, "publicKey", serializer);
+    serializer(extra.vNonce, "nonce");
+    serializeAsBinary(extra.vRaw, "raw", serializer);
+    serializer(extra.uSize, "size");
 }
 
-void serialize(TransactionDetails &transaction, ISerializer &serializer)
+void serialize(FTransactionDetails &transaction, ISerializer &serializer)
 {
-    serializePod(transaction.hash, "hash", serializer);
-    serializer(transaction.size, "size");
-    serializer(transaction.fee, "fee");
-    serializer(transaction.totalInputsAmount, "totalInputsAmount");
-    serializer(transaction.totalOutputsAmount, "totalOutputsAmount");
-    serializer(transaction.mixin, "mixin");
-    serializer(transaction.unlockTime, "unlockTime");
-    serializer(transaction.timestamp, "timestamp");
-    serializer(transaction.version, "version");
-    serializePod(transaction.paymentId, "paymentId", serializer);
-    serializer(transaction.inBlockchain, "inBlockchain");
-    serializePod(transaction.blockHash, "blockHash", serializer);
-    serializer(transaction.blockHeight, "blockIndex");
-    serializer(transaction.extra, "extra");
-    serializer(transaction.inputs, "inputs");
-    serializer(transaction.outputs, "outputs");
+    serializePod(transaction.sTransactionHash, "hash", serializer);
+    serializer(transaction.uSize, "size");
+    serializer(transaction.uFee, "fee");
+    serializer(transaction.uTotalInputsAmount, "totalInputsAmount");
+    serializer(transaction.uTotalOutputsAmount, "totalOutputsAmount");
+    serializer(transaction.uMixin, "mixin");
+    serializer(transaction.uUnlockTime, "unlockTime");
+    serializer(transaction.uTimestamp, "timestamp");
+    serializer(transaction.uVersion, "version");
+    serializePod(transaction.sPaymentId, "paymentId", serializer);
+    serializer(transaction.bInBlockchain, "inBlockchain");
+    serializePod(transaction.sBlockHash, "blockHash", serializer);
+    serializer(transaction.uBlockHeight, "blockIndex");
+    serializer(transaction.sTransactionExtra, "extra");
+    serializer(transaction.vTxInputDetails, "inputs");
+    serializer(transaction.vTxOutputDetails, "outputs");
 
     if (serializer.type() == ISerializer::OUTPUT) {
         std::vector<std::pair<size_t, Crypto::FSignature>> signaturesForSerialization;
-        signaturesForSerialization.reserve(transaction.signatures.size());
+        signaturesForSerialization.reserve(transaction.vSignatures.size());
         size_t ctr = 0;
-        for (const auto &signaturesV : transaction.signatures) {
+        for (const auto &signaturesV : transaction.vSignatures) {
             for (auto signature : signaturesV) {
                 signaturesForSerialization.emplace_back(ctr, std::move(signature));
             }
             ++ctr;
         }
-        size_t size = transaction.signatures.size();
+        size_t size = transaction.vSignatures.size();
         serializer(size, "signaturesSize");
         serializer(signaturesForSerialization, "signatures");
     } else {
         size_t size = 0;
         serializer(size, "signaturesSize");
-        transaction.signatures.resize(size);
+        transaction.vSignatures.resize(size);
 
         std::vector<std::pair<size_t, Crypto::FSignature>> signaturesForSerialization;
         serializer(signaturesForSerialization, "signatures");
 
         for (const auto &signatureWithIndex : signaturesForSerialization) {
-            transaction.signatures[signatureWithIndex.first].push_back(signatureWithIndex.second);
+            transaction.vSignatures[signatureWithIndex.first].push_back(signatureWithIndex.second);
         }
     }
 }
 
-void serialize(BlockDetails &block, ISerializer &serializer)
+void serialize(FBlockDetails &block, ISerializer &serializer)
 {
-    serializer(block.majorVersion, "majorVersion");
-    serializer(block.minorVersion, "minorVersion");
-    serializer(block.timestamp, "timestamp");
-    serializePod(block.prevBlockHash, "prevBlockHash", serializer);
-    serializePod(block.proofOfWork, "proofOfWork", serializer);
-    serializer(block.nonce, "nonce");
-    serializer(block.isOrphaned, "isOrphaned");
-    serializer(block.height, "index");
-    serializer(block.depth, "depth");
-    serializePod(block.hash, "hash", serializer);
-    serializer(block.difficulty, "difficulty");
-    serializer(block.cumulativeDifficulty, "cumulativeDifficulty");
-    serializer(block.reward, "reward");
-    serializer(block.baseReward, "baseReward");
-    serializer(block.blockSize, "blockSize");
-    serializer(block.transactionsCumulativeSize, "transactionsCumulativeSize");
-    serializer(block.alreadyGeneratedCoins, "alreadyGeneratedCoins");
-    serializer(block.alreadyGeneratedTransactions, "alreadyGeneratedTransactions");
-    serializer(block.sizeMedian, "sizeMedian");
-    serializer(block.effectiveSizeMedian, "effectiveSizeMedian");
-    serializer(block.penalty, "penalty");
-    serializer(block.totalFeeAmount, "totalFeeAmount");
-    serializer(block.transactions, "transactions");
+    serializer(block.uMajorVersion, "majorVersion");
+    serializer(block.uMinorVersion, "minorVersion");
+    serializer(block.uTimestamp, "timestamp");
+    serializePod(block.sPrevBlockHash, "prevBlockHash", serializer);
+    serializePod(block.sProofOfWork, "proofOfWork", serializer);
+    serializer(block.uNonce, "nonce");
+    serializer(block.bIsOrphaned, "isOrphaned");
+    serializer(block.uHeight, "index");
+    serializer(block.uDepth, "depth");
+    serializePod(block.sBlockHash, "hash", serializer);
+    serializer(block.uDifficulty, "difficulty");
+    serializer(block.uCumulativeDifficulty, "cumulativeDifficulty");
+    serializer(block.uReward, "reward");
+    serializer(block.uBaseReward, "baseReward");
+    serializer(block.uBlockSize, "blockSize");
+    serializer(block.uTransactionsCumulativeSize, "transactionsCumulativeSize");
+    serializer(block.uAlreadyGeneratedCoins, "alreadyGeneratedCoins");
+    serializer(block.uAlreadyGeneratedTransactions, "alreadyGeneratedTransactions");
+    serializer(block.uSizeMedian, "sizeMedian");
+    serializer(block.uEffectiveSizeMedian, "effectiveSizeMedian");
+    serializer(block.dPenalty, "penalty");
+    serializer(block.uTotalFeeAmount, "totalFeeAmount");
+    serializer(block.vTransactions, "transactions");
 }
 
 } // namespace QwertyNote

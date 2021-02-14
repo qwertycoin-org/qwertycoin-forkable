@@ -34,6 +34,7 @@
 #include <io.h>
 #include <windns.h>
 #include <Rpc.h>
+#include <sstream>
 #else
 #include <arpa/nameser.h>
 #include <resolv.h>

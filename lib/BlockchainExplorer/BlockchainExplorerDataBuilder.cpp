@@ -31,378 +31,418 @@
 
 namespace QwertyNote {
 
-BlockchainExplorerDataBuilder::BlockchainExplorerDataBuilder(ICore &core,
-															 IQwertyNoteProtocolQuery &protocol)
-    : mCore(core), mProtocol(protocol)
-{
-}
-
-bool BlockchainExplorerDataBuilder::fillBlockDetails(const FBlock &block,
-                                                     BlockDetails &blockDetails,
-                                                     bool calculatePoW)
-{
-    Crypto::FHash hash = getBlockHash(block);
-
-    blockDetails.majorVersion = block.uMajorVersion;
-    blockDetails.minorVersion = block.uMinorVersion;
-    blockDetails.timestamp = block.uTimestamp;
-    blockDetails.prevBlockHash = block.sPreviousBlockHash;
-    blockDetails.nonce = block.uNonce;
-    blockDetails.hash = hash;
-
-    blockDetails.reward = 0;
-    for (const FTransactionOutput &out : block.sBaseTransaction.vOutputs) {
-        blockDetails.reward += out.uAmount;
+    QBlockchainExplorerDataBuilder::QBlockchainExplorerDataBuilder (ICore &sCore,
+                                                                    IQwertyNoteProtocolQuery &sProtocol)
+        : mCore(sCore), mProtocol(sProtocol)
+    {
     }
 
-    if (block.sBaseTransaction.vInputs.front().type() != typeid(FBaseInput)) {
-        return false;
-    }
+    bool QBlockchainExplorerDataBuilder::fillBlockDetails (const FBlock &sBlock,
+                                                           FBlockDetails &sBlockDetails,
+                                                           bool bCalculatePoW)
+    {
+        Crypto::FHash sHash = getBlockHash(sBlock);
 
-    blockDetails.height = boost::get<FBaseInput>(block.sBaseTransaction.vInputs.front()).uBlockIndex;
+        sBlockDetails.uMajorVersion = sBlock.uMajorVersion;
+        sBlockDetails.uMinorVersion = sBlock.uMinorVersion;
+        sBlockDetails.uTimestamp = sBlock.uTimestamp;
+        sBlockDetails.sPrevBlockHash = sBlock.sPreviousBlockHash;
+        sBlockDetails.uNonce = sBlock.uNonce;
+        sBlockDetails.sBlockHash = sHash;
 
-    Crypto::FHash tmpHash = mCore.getBlockIdByHeight(blockDetails.height);
-    blockDetails.isOrphaned = hash != tmpHash;
+        sBlockDetails.uReward = 0;
+        for (const FTransactionOutput &sOut : sBlock.sBaseTransaction.vOutputs) {
+            sBlockDetails.uReward += sOut.uAmount;
+        }
 
-    blockDetails.proofOfWork = boost::value_initialized<Crypto::FHash>();
-    if (calculatePoW) {
-        Crypto::CnContext context;
-        if (!getBlockLongHash(context, block, blockDetails.proofOfWork)) {
+        if (sBlock.sBaseTransaction.vInputs.front().type() != typeid(FBaseInput)) {
             return false;
         }
-    }
 
-    if (!m_core.getBlockDifficulty(blockDetails.height, blockDetails.difficulty)) {
-        return false;
-    }
+        sBlockDetails.uHeight = boost::get <FBaseInput>(sBlock.sBaseTransaction.vInputs.front())
+            .uBlockIndex;
 
-    std::vector<size_t> blocksSizes;
-    if (!m_core.getBackwardBlocksSizes(blockDetails.height, blocksSizes,
-                                       parameters::CRYPTONOTE_REWARD_BLOCKS_WINDOW)) {
-        return false;
-    }
-    blockDetails.sizeMedian = median(blocksSizes);
+        Crypto::FHash sTmpHash = mCore.getBlockIdByHeight(sBlockDetails.uHeight);
+        sBlockDetails.bIsOrphaned = sHash != sTmpHash;
 
-    size_t blockGrantedFullRewardZone =
+        sBlockDetails.sProofOfWork = boost::value_initialized <Crypto::FHash>();
+        if (bCalculatePoW) {
+            Crypto::CnContext sContext;
+            if (!getBlockLongHash(sContext, sBlock, sBlockDetails.sProofOfWork)) {
+                return false;
+            }
+        }
+
+        if (!mCore.getBlockDifficulty(sBlockDetails.uHeight, sBlockDetails.uDifficulty)) {
+            return false;
+        }
+
+        std::vector <size_t> sBlocksSizes;
+        if (!mCore.getBackwardBlocksSizes(sBlockDetails.uHeight, sBlocksSizes,
+                                          parameters::CRYPTONOTE_REWARD_BLOCKS_WINDOW)) {
+            return false;
+        }
+        sBlockDetails.uSizeMedian = median(sBlocksSizes);
+
+        size_t blockGrantedFullRewardZone =
             QwertyNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
-    blockDetails.effectiveSizeMedian =
-            std::max(blockDetails.sizeMedian, (uint64_t)blockGrantedFullRewardZone);
+        sBlockDetails.uEffectiveSizeMedian =
+            std::max(sBlockDetails.uSizeMedian, (uint64_t) blockGrantedFullRewardZone);
 
-    size_t blockSize = 0;
-    if (!m_core.getBlockSize(hash, blockSize)) {
-        return false;
-    }
-    blockDetails.transactionsCumulativeSize = blockSize;
-
-    size_t blockBlobSize = getObjectBinarySize(block);
-    size_t minerTxBlobSize = getObjectBinarySize(block.sBaseTransaction);
-    blockDetails.blockSize =
-            blockBlobSize + blockDetails.transactionsCumulativeSize - minerTxBlobSize;
-
-    if (!m_core.getAlreadyGeneratedCoins(hash, blockDetails.alreadyGeneratedCoins)) {
-        return false;
-    }
-
-    if (!m_core.getGeneratedTransactionsNumber(blockDetails.height,
-                                               blockDetails.alreadyGeneratedTransactions)) {
-        return false;
-    }
-
-    uint64_t prevBlockGeneratedCoins = 0;
-    uint32_t previousBlockHeight = 0;
-    uint64_t blockTarget = QwertyNote::parameters::DIFFICULTY_TARGET;
-
-    if (blockDetails.height > 0) {
-        if (!m_core.getAlreadyGeneratedCoins(block.previousBlockHash, prevBlockGeneratedCoins)) {
+        size_t sBlockSize = 0;
+        if (!mCore.getBlockSize(sHash, sBlockSize)) {
             return false;
         }
-    }
+        sBlockDetails.uTransactionsCumulativeSize = sBlockSize;
 
-    if (blockDetails.height > QwertyNote::parameters::UPGRADE_HEIGHT_V1) {
-        m_core.getBlockHeight(block.previousBlockHash, previousBlockHeight);
-        blockTarget = block.timestamp - m_core.getBlockTimestamp(previousBlockHeight);
-    }
+        size_t sBlockBlobSize = getObjectBinarySize(sBlock);
+        size_t sMinerTxBlobSize = getObjectBinarySize(sBlock.sBaseTransaction);
+        sBlockDetails.uBlockSize = sBlockBlobSize +
+                                   sBlockDetails.uTransactionsCumulativeSize -
+                                   sMinerTxBlobSize;
 
-    uint64_t maxReward = 0;
-    uint64_t currentReward = 0;
-    int64_t emissionChange = 0;
-    if (!m_core.getBlockReward(block.majorVersion, blockDetails.sizeMedian, 0,
-                               prevBlockGeneratedCoins, 0, maxReward, emissionChange,
-                               blockDetails.height, blockTarget)) {
-        return false;
-    }
-
-    if (!m_core.getBlockReward(block.majorVersion, blockDetails.sizeMedian,
-                               blockDetails.transactionsCumulativeSize, prevBlockGeneratedCoins, 0,
-                               currentReward, emissionChange, blockDetails.height, blockTarget)) {
-        return false;
-    }
-
-    blockDetails.baseReward = maxReward;
-    if (maxReward == 0 && currentReward == 0) {
-        blockDetails.penalty = static_cast<double>(0);
-    } else {
-        if (maxReward < currentReward) {
+        if (!mCore.getAlreadyGeneratedCoins(sHash, sBlockDetails.uAlreadyGeneratedCoins)) {
             return false;
         }
-        const uint64_t deltaReward = maxReward - currentReward;
-        blockDetails.penalty = static_cast<double>(deltaReward) / static_cast<double>(maxReward);
-    }
 
-    blockDetails.transactions.reserve(block.vTransactionHashes.size() + 1);
-    TransactionDetails transactionDetails;
-    if (!fillTransactionDetails(block.sBaseTransaction, transactionDetails, block.uTimestamp)) {
-        return false;
-    }
-    blockDetails.transactions.push_back(std::move(transactionDetails));
-
-    std::list<FTransaction> found;
-    std::list<Crypto::FHash> missed;
-    m_core.getTransactions(block.transactionHashes, found, missed, blockDetails.isOrphaned);
-    if (found.size() != block.vTransactionHashes.size()) {
-        return false;
-    }
-
-    blockDetails.totalFeeAmount = 0;
-
-    for (const FTransaction &tx : found) {
-        TransactionDetails txDetails;
-        if (!fillTransactionDetails(tx, txDetails, block.uTimestamp)) {
+        if (!mCore.getGeneratedTransactionsNumber(sBlockDetails.uHeight,
+                                                  sBlockDetails.uAlreadyGeneratedTransactions)) {
             return false;
         }
-        blockDetails.totalFeeAmount += txDetails.fee;
-        blockDetails.transactions.push_back(std::move(txDetails));
-    }
 
-    return true;
-}
+        uint32_t uPreviousBlockHeight = 0;
+        uint64_t uPrevBlockGeneratedCoins = 0;
+        uint64_t uBlockTarget = QwertyNote::parameters::DIFFICULTY_TARGET;
 
-bool BlockchainExplorerDataBuilder::fillTransactionDetails(const FTransaction &transaction,
-                                                           TransactionDetails &transactionDetails,
-                                                           uint64_t timestamp)
-{
-    Crypto::FHash hash = getObjectHash(transaction);
-    transactionDetails.hash = hash;
-    transactionDetails.version = transaction.uVersion;
-    transactionDetails.timestamp = timestamp;
-
-    Crypto::FHash blockHash{};
-    uint32_t blockHeight;
-
-    if (!m_core.getBlockContainingTx(hash, blockHash, blockHeight)) {
-        transactionDetails.inBlockchain = false;
-        transactionDetails.blockHeight = boost::value_initialized<uint32_t>();
-        transactionDetails.blockHash = boost::value_initialized<Crypto::FHash>();
-    } else {
-        transactionDetails.inBlockchain = true;
-        transactionDetails.blockHeight = blockHeight;
-        transactionDetails.blockHash = blockHash;
-        if (timestamp == 0) {
-            Block block;
-            if (!m_core.getBlockByHash(blockHash, block)) {
+        if (sBlockDetails.uHeight > 0) {
+            if (!mCore.getAlreadyGeneratedCoins(sBlock.sPreviousBlockHash,
+                                                uPrevBlockGeneratedCoins)) {
                 return false;
             }
-            transactionDetails.timestamp = block.uTimestamp;
         }
-    }
 
-    transactionDetails.size = getObjectBinarySize(transaction);
-    transactionDetails.unlockTime = transaction.uUnlockTime;
-    transactionDetails.totalOutputsAmount = getOutsMoneyAmount(transaction);
+        if (sBlockDetails.uHeight > QwertyNote::parameters::UPGRADE_HEIGHT_V1) {
+            mCore.getBlockHeight(sBlock.sPreviousBlockHash, uPreviousBlockHeight);
+            uBlockTarget = sBlock.uTimestamp - mCore.getBlockTimestamp(uPreviousBlockHeight);
+        }
 
-    uint64_t inputsAmount;
-    if (!getInputsMoneyAmount(transaction, inputsAmount)) {
-        return false;
-    }
-    transactionDetails.totalInputsAmount = inputsAmount;
+        int64_t iEmissionChange = 0;
+        uint64_t uCurrentReward = 0;
+        uint64_t uMaxReward = 0;
 
-    if (!transaction.vInputs.empty() && transaction.vInputs.front().type() == typeid(FBaseInput)) {
-        // it's gen transaction
-        transactionDetails.fee = 0;
-        transactionDetails.mixin = 0;
-    } else {
-        uint64_t fee;
-        if (!getTxFee(transaction, fee)) {
+        if (!mCore.getBlockReward(sBlock.uMajorVersion,
+                                  sBlockDetails.uSizeMedian,
+                                  0,
+                                  uPrevBlockGeneratedCoins,
+                                  0,
+                                  uMaxReward,
+                                  iEmissionChange,
+                                  sBlockDetails.uHeight,
+                                  uBlockTarget)) {
             return false;
         }
-        transactionDetails.fee = fee;
-        uint64_t mixin;
-        if (!getMixin(transaction, mixin)) {
+
+        if (!mCore.getBlockReward(sBlock.uMajorVersion,
+                                  sBlockDetails.uSizeMedian,
+                                  sBlockDetails.uTransactionsCumulativeSize,
+                                  uPrevBlockGeneratedCoins,
+                                  0,
+                                  uCurrentReward,
+                                  iEmissionChange,
+                                  sBlockDetails.uHeight,
+                                  uBlockTarget)) {
             return false;
         }
-        transactionDetails.mixin = mixin;
-    }
 
-    Crypto::FHash paymentId {};
-    if (getPaymentId(transaction, paymentId)) {
-        transactionDetails.paymentId = paymentId;
-    } else {
-        transactionDetails.paymentId = boost::value_initialized<Crypto::FHash>();
-    }
-
-    fillTxExtra(transaction.vExtra, transactionDetails.extra);
-
-    transactionDetails.signatures.reserve(transaction.vSignatures.size());
-
-    for (const std::vector<Crypto::FSignature> &signatures : transaction.vSignatures) {
-        std::vector<Crypto::FSignature> signaturesDetails;
-        signaturesDetails.reserve(signatures.size());
-        for (const Crypto::FSignature &signature : signatures) {
-            signaturesDetails.push_back(std::move(signature));
-        }
-        transactionDetails.signatures.push_back(std::move(signaturesDetails));
-    }
-
-    transactionDetails.inputs.reserve(transaction.vInputs.size());
-    for (const FTransactionInput &txIn : transaction.vInputs) {
-        TransactionInputDetails txInDetails;
-
-        if (txIn.type() == typeid(FBaseInput)) {
-            BaseInputDetails txInGenDetails {};
-            txInGenDetails.input.uBlockIndex = boost::get<FBaseInput>(txIn).uBlockIndex;
-            txInGenDetails.amount = 0;
-
-            for (const FTransactionOutput &out : transaction.vOutputs) {
-                txInGenDetails.amount += out.uAmount;
-            }
-
-            txInDetails = txInGenDetails;
-        } else if (txIn.type() == typeid(FKeyInput)) {
-            KeyInputDetails txInToKeyDetails;
-            const FKeyInput &txInToKey = boost::get<FKeyInput>(txIn);
-            txInToKeyDetails.input = txInToKey;
-            std::list<std::pair<Crypto::FHash, size_t>> outputReferences;
-
-            if (!m_core.scanOutputkeysForIndices(txInToKey, outputReferences)) {
-                return false;
-            }
-
-            txInToKeyDetails.mixin = txInToKey.vOutputIndexes.size();
-
-            for (const auto &r : outputReferences) {
-                TransactionOutputReferenceDetails d {};
-                d.number = r.second;
-                d.transactionHash = r.first;
-                txInToKeyDetails.outputs.push_back(d);
-            }
-            txInDetails = txInToKeyDetails;
-
-        } else if (txIn.type() == typeid(FMultiSignatureInput)) {
-            MultiSignatureInputDetails txInMultiSigDetails {};
-            const FMultiSignatureInput &txInMultiSig = boost::get<FMultiSignatureInput>(txIn);
-            txInMultiSigDetails.input = txInMultiSig;
-            std::pair<Crypto::FHash, size_t> outputReference;
-
-            if (!m_core.getMultisigOutputReference(txInMultiSig, outputReference)) {
-                return false;
-            }
-
-            txInMultiSigDetails.output.number = outputReference.second;
-            txInMultiSigDetails.output.transactionHash = outputReference.first;
-            txInDetails = txInMultiSigDetails;
+        sBlockDetails.uBaseReward = uMaxReward;
+        if (uMaxReward == 0 && uCurrentReward == 0) {
+            sBlockDetails.dPenalty = static_cast<double>(0);
         } else {
+            if (uMaxReward < uCurrentReward) {
+                return false;
+            }
+            const uint64_t deltaReward = uMaxReward - uCurrentReward;
+            sBlockDetails.dPenalty = static_cast<double>(deltaReward) /
+                                     static_cast<double>(uMaxReward);
+        }
+
+        sBlockDetails.vTransactions.reserve(sBlock.vTransactionHashes.size() + 1);
+        FTransactionDetails sTransactionDetails;
+        if (!fillTransactionDetails(sBlock.sBaseTransaction,
+                                    sTransactionDetails,
+                                    sBlock.uTimestamp)) {
             return false;
         }
-        transactionDetails.inputs.push_back(std::move(txInDetails));
-    }
+        sBlockDetails.vTransactions.push_back(std::move(sTransactionDetails));
 
-    transactionDetails.outputs.reserve(transaction.vOutputs.size());
-    std::vector<uint32_t> globalIndices;
-    globalIndices.reserve(transaction.vOutputs.size());
-    if (!transactionDetails.inBlockchain
-        || !m_core.getTxOutputsGlobalIndexes(hash, globalIndices)) {
-        for (size_t i = 0; i < transaction.vOutputs.size(); ++i) {
-            globalIndices.push_back(0);
-        }
-    }
+        std::list <FTransaction> lFoundTxs;
+        std::list <Crypto::FHash> lMissedTxs;
+        mCore.getTransactions(sBlock.vTransactionHashes,
+                              lFoundTxs,
+                              lMissedTxs,
+                              sBlockDetails.bIsOrphaned);
 
-    typedef boost::tuple<FTransactionOutput, uint32_t> outputWithIndex;
-    auto range = boost::combine(transaction.vOutputs, globalIndices);
-    for (const outputWithIndex &txOutput : range) {
-        TransactionOutputDetails txOutDetails;
-        txOutDetails.globalIndex = txOutput.get<1>();
-        txOutDetails.output.uAmount = txOutput.get<0>().uAmount;
-        txOutDetails.output.sTarget = txOutput.get<0>().sTarget;
-        transactionDetails.outputs.push_back(std::move(txOutDetails));
-    }
-
-    return true;
-}
-
-bool BlockchainExplorerDataBuilder::getPaymentId(const FTransaction &transaction,
-                                                 Crypto::FHash &paymentId)
-{
-    std::vector<TransactionExtraField> txExtraFields;
-    parseTransactionExtra(transaction.vExtra, txExtraFields);
-
-    TransactionExtraNonce extraNonce;
-
-    if (!findTransactionExtraFieldByType(txExtraFields, extraNonce)) {
-        return false;
-    }
-
-    return getPaymentIdFromTransactionExtraNonce(extraNonce.nonce, paymentId);
-}
-
-bool BlockchainExplorerDataBuilder::getMixin(const FTransaction &transaction, uint64_t &mixin)
-{
-    mixin = 0;
-
-    for (const FTransactionInput &txIn : transaction.vInputs) {
-        if (txIn.type() != typeid(FKeyInput)) {
-            continue;
+        if (lFoundTxs.size() != sBlock.vTransactionHashes.size()) {
+            return false;
         }
 
-        uint64_t currentMixin = boost::get<FKeyInput>(txIn).vOutputIndexes.size();
-        if (currentMixin > mixin) {
-            mixin = currentMixin;
+        sBlockDetails.uTotalFeeAmount = 0;
+
+        for (const FTransaction &sTx : lFoundTxs) {
+            FTransactionDetails txDetails;
+
+            if (!fillTransactionDetails(sTx, txDetails, sBlock.uTimestamp)) {
+                return false;
+            }
+
+            sBlockDetails.uTotalFeeAmount += txDetails.uFee;
+            sBlockDetails.vTransactions.push_back(std::move(txDetails));
+        }
+
+        return true;
+    }
+
+    bool QBlockchainExplorerDataBuilder::fillTransactionDetails (const FTransaction &sTransaction,
+                                                                 FTransactionDetails &sTransactionDetails,
+                                                                 uint64_t uTimestamp)
+    {
+        Crypto::FHash sHash = getObjectHash(sTransaction);
+        sTransactionDetails.sTransactionHash = sHash;
+        sTransactionDetails.uVersion = sTransaction.uVersion;
+        sTransactionDetails.uTimestamp = uTimestamp;
+
+        Crypto::FHash sBlockHash {};
+        uint32_t uBlockHeight;
+
+        if (!mCore.getBlockContainingTx(sHash, sBlockHash, uBlockHeight)) {
+            sTransactionDetails.bInBlockchain = false;
+            sTransactionDetails.uBlockHeight = boost::value_initialized <uint32_t>();
+            sTransactionDetails.sBlockHash = boost::value_initialized <Crypto::FHash>();
+        } else {
+            sTransactionDetails.bInBlockchain = true;
+            sTransactionDetails.uBlockHeight = uBlockHeight;
+            sTransactionDetails.sBlockHash = sBlockHash;
+
+            if (uTimestamp == 0) {
+                FBlock block;
+
+                if (!mCore.getBlockByHash(sBlockHash, block)) {
+                    return false;
+                }
+
+                sTransactionDetails.uTimestamp = block.uTimestamp;
+            }
+        }
+
+        sTransactionDetails.uSize = getObjectBinarySize(sTransaction);
+        sTransactionDetails.uUnlockTime = sTransaction.uUnlockTime;
+        sTransactionDetails.uTotalOutputsAmount = getOutsMoneyAmount(sTransaction);
+
+        uint64_t uInputsAmount;
+
+        if (!getInputsMoneyAmount(sTransaction, uInputsAmount)) {
+            return false;
+        }
+
+        sTransactionDetails.uTotalInputsAmount = uInputsAmount;
+
+        if (!sTransaction.vInputs.empty() &&
+            sTransaction.vInputs.front().type() == typeid(FBaseInput)) {
+            // it's gen sTransaction
+            sTransactionDetails.uFee = 0;
+            sTransactionDetails.uMixin = 0;
+        } else {
+            uint64_t uFee;
+            if (!getTxFee(sTransaction, uFee)) {
+                return false;
+            }
+            sTransactionDetails.uFee = uFee;
+            uint64_t uMixin;
+
+            if (!getMixin(sTransaction, uMixin)) {
+                return false;
+            }
+
+            sTransactionDetails.uMixin = uMixin;
+        }
+
+        Crypto::FHash sPaymentId {};
+        if (getPaymentId(sTransaction, sPaymentId)) {
+            sTransactionDetails.sPaymentId = sPaymentId;
+        } else {
+            sTransactionDetails.sPaymentId = boost::value_initialized <Crypto::FHash>();
+        }
+
+        fillTxExtra(sTransaction.vExtra, sTransactionDetails.sTransactionExtra);
+
+        sTransactionDetails.vSignatures.reserve(sTransaction.vSignatures.size());
+
+        for (const std::vector <Crypto::FSignature> &vSignatures : sTransaction.vSignatures) {
+            std::vector <Crypto::FSignature> signaturesDetails;
+            signaturesDetails.reserve(vSignatures.size());
+
+            for (const Crypto::FSignature &signature : vSignatures) {
+                signaturesDetails.push_back(std::move(signature));
+            }
+
+            sTransactionDetails.vSignatures.push_back(std::move(signaturesDetails));
+        }
+
+        sTransactionDetails.vTxInputDetails.reserve(sTransaction.vInputs.size());
+
+        for (const FTransactionInput &sTxIn : sTransaction.vInputs) {
+            FTransactionInputDetails sTxInDetails;
+
+            if (sTxIn.type() == typeid(FBaseInput)) {
+                FBaseInputDetails sTxInGenDetails {};
+                sTxInGenDetails.sBaseInput.uBlockIndex = boost::get <FBaseInput>(sTxIn).uBlockIndex;
+                sTxInGenDetails.uAmount = 0;
+
+                for (const FTransactionOutput &sOut : sTransaction.vOutputs) {
+                    sTxInGenDetails.uAmount += sOut.uAmount;
+                }
+
+                sTxInDetails = sTxInGenDetails;
+            } else if (sTxIn.type() == typeid(FKeyInput)) {
+                FKeyInputDetails sTxInToKeyDetails;
+                const FKeyInput &sTxInToKey = boost::get <FKeyInput>(sTxIn);
+                sTxInToKeyDetails.sKeyInput = sTxInToKey;
+                std::list <std::pair <Crypto::FHash, size_t>> lOutputReferences;
+
+                if (!mCore.scanOutputkeysForIndices(sTxInToKey, lOutputReferences)) {
+                    return false;
+                }
+
+                sTxInToKeyDetails.uMixin = sTxInToKey.vOutputIndexes.size();
+
+                for (const auto &sOutputReference : lOutputReferences) {
+                    FTransactionOutputReferenceDetails sTxOutputDetail {};
+                    sTxOutputDetail.uNumber = sOutputReference.second;
+                    sTxOutputDetail.sTransactionHash = sOutputReference.first;
+                    sTxInToKeyDetails.vKeyOutputs.push_back(sTxOutputDetail);
+                }
+                sTxInDetails = sTxInToKeyDetails;
+
+            } else if (sTxIn.type() == typeid(FMultiSignatureInput)) {
+                FMultiSignatureInputDetails sTxInMultiSigDetails {};
+                const FMultiSignatureInput &sTxInMultiSig = boost::get <FMultiSignatureInput>(
+                    sTxIn);
+                sTxInMultiSigDetails.sMultiSignatureInput = sTxInMultiSig;
+                std::pair <Crypto::FHash, size_t> sOutputReference;
+
+                if (!mCore.getMultisigOutputReference(sTxInMultiSig, sOutputReference)) {
+                    return false;
+                }
+
+                sTxInMultiSigDetails.sTransactionOutputReference.uNumber = sOutputReference.second;
+                sTxInMultiSigDetails.sTransactionOutputReference.sTransactionHash = sOutputReference
+                    .first;
+                sTxInDetails = sTxInMultiSigDetails;
+            } else {
+                return false;
+            }
+
+            sTransactionDetails.vTxInputDetails.push_back(std::move(sTxInDetails));
+        }
+
+        sTransactionDetails.vTxOutputDetails.reserve(sTransaction.vOutputs.size());
+        std::vector <uint32_t> vGlobalIndices;
+        vGlobalIndices.reserve(sTransaction.vOutputs.size());
+        if (!sTransactionDetails.bInBlockchain
+            || !mCore.getTxOutputsGlobalIndexes(sHash, vGlobalIndices)) {
+            for (size_t i = 0; i < sTransaction.vOutputs.size(); ++i) {
+                vGlobalIndices.push_back(0);
+            }
+        }
+
+        typedef boost::tuple <FTransactionOutput, uint32_t> sOutputWithIndex;
+        auto sRange = boost::combine(sTransaction.vOutputs, vGlobalIndices);
+        for (const sOutputWithIndex &sTxOutput : sRange) {
+            FTransactionOutputDetails sTxOutDetails;
+            sTxOutDetails.uGlobalIndex = sTxOutput.get <1>();
+            sTxOutDetails.sTransactionsOutput.uAmount = sTxOutput.get <0>().uAmount;
+            sTxOutDetails.sTransactionsOutput.sTarget = sTxOutput.get <0>().sTarget;
+            sTransactionDetails.vTxOutputDetails.push_back(std::move(sTxOutDetails));
+        }
+
+        return true;
+    }
+
+    bool QBlockchainExplorerDataBuilder::getPaymentId (const FTransaction &sTransaction,
+                                                       Crypto::FHash &sPaymentId)
+    {
+        std::vector <TransactionExtraField> vTxExtraFields;
+        parseTransactionExtra(sTransaction.vExtra, vTxExtraFields);
+
+        TransactionExtraNonce sExtraNonce;
+
+        if (!findTransactionExtraFieldByType(vTxExtraFields, sExtraNonce)) {
+            return false;
+        }
+
+        return getPaymentIdFromTransactionExtraNonce(sExtraNonce.nonce, sPaymentId);
+    }
+
+    bool QBlockchainExplorerDataBuilder::getMixin (const FTransaction &sTransaction,
+                                                   uint64_t &uMixin)
+    {
+        uMixin = 0;
+
+        for (const FTransactionInput &sTxIn : sTransaction.vInputs) {
+            if (sTxIn.type() != typeid(FKeyInput)) {
+                continue;
+            }
+
+            uint64_t uCurrentMixin = boost::get <FKeyInput>(sTxIn).vOutputIndexes.size();
+            if (uCurrentMixin > uMixin) {
+                uMixin = uCurrentMixin;
+            }
+        }
+
+        return true;
+    }
+
+    bool QBlockchainExplorerDataBuilder::fillTxExtra (const std::vector <uint8_t> &vRawExtra,
+                                                      FTransactionExtraDetails &sExtraDetails)
+    {
+        sExtraDetails.vRaw = vRawExtra;
+
+        std::vector <TransactionExtraField> vTxExtraFields;
+        parseTransactionExtra(vRawExtra, vTxExtraFields);
+
+        for (const TransactionExtraField &sField : vTxExtraFields) {
+            if (typeid(TransactionExtraPadding) == sField.type()) {
+                sExtraDetails.vPadding.push_back(
+                    std::move(boost::get <TransactionExtraPadding>(sField).size));
+            } else if (typeid(TransactionExtraPublicKey) == sField.type()) {
+                sExtraDetails.vPublicKeys.push_back(
+                    std::move(boost::get <TransactionExtraPublicKey>(sField).publicKey));
+            } else if (typeid(TransactionExtraNonce) == sField.type()) {
+                sExtraDetails.vNonce = boost::get <TransactionExtraNonce>(sField).nonce;
+            }
+        }
+
+        return true;
+    }
+
+    size_t QBlockchainExplorerDataBuilder::median (std::vector <size_t> &vSizes)
+    {
+        if (vSizes.empty()) {
+            return boost::value_initialized <size_t>();
+        }
+
+        if (vSizes.size() == 1) {
+            return vSizes[0];
+        }
+
+        size_t n = (vSizes.size()) / 2;
+        std::sort(vSizes.begin(), vSizes.end());
+        // nth_element(vSizes.begin(), vSizes.begin()+n-1, vSizes.end());
+        if (vSizes.size() % 2) { // 1, 3, 5...
+            return vSizes[n];
+        } else { // 2, 4, 6...
+            return (vSizes[n - 1] + vSizes[n]) / 2;
         }
     }
-
-    return true;
-}
-
-bool BlockchainExplorerDataBuilder::fillTxExtra(const std::vector<uint8_t> &rawExtra,
-                                                TransactionExtraDetails &extraDetails)
-{
-    extraDetails.raw = rawExtra;
-
-    std::vector<TransactionExtraField> txExtraFields;
-    parseTransactionExtra(rawExtra, txExtraFields);
-
-    for (const TransactionExtraField &field : txExtraFields) {
-        if (typeid(TransactionExtraPadding) == field.type()) {
-            extraDetails.padding.push_back(
-                    std::move(boost::get<TransactionExtraPadding>(field).size));
-        } else if (typeid(TransactionExtraPublicKey) == field.type()) {
-            extraDetails.publicKey.push_back(
-                    std::move(boost::get<TransactionExtraPublicKey>(field).publicKey));
-        } else if (typeid(TransactionExtraNonce) == field.type()) {
-            extraDetails.nonce = boost::get<TransactionExtraNonce>(field).nonce;
-        }
-    }
-
-    return true;
-}
-
-size_t BlockchainExplorerDataBuilder::median(std::vector<size_t> &v)
-{
-    if (v.empty()) {
-        return boost::value_initialized<size_t>();
-    }
-
-    if (v.size() == 1) {
-        return v[0];
-    }
-
-    size_t n = (v.size()) / 2;
-    std::sort(v.begin(), v.end());
-    // nth_element(v.begin(), v.begin()+n-1, v.end());
-    if (v.size() % 2) { // 1, 3, 5...
-        return v[n];
-    } else { // 2, 4, 6...
-        return (v[n - 1] + v[n]) / 2;
-    }
-}
 
 } // namespace QwertyNote

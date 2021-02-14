@@ -26,7 +26,7 @@
 
 namespace QwertyNote {
 
-inline void throwIf(bool expr, QwertyNote::error::WalletErrorCodes ec)
+inline void throwIf(bool expr, QwertyNote::Error::WalletErrorCodes ec)
 {
     if (expr) {
         throw std::system_error(make_error_code(ec));

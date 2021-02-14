@@ -24,18 +24,18 @@
 
 namespace QwertyNote {
 
-void serialize(TransactionOutputDetails &output, ISerializer &serializer);
-void serialize(TransactionOutputReferenceDetails &outputReference, ISerializer &serializer);
+void serialize(FTransactionOutputDetails &output, ISerializer &serializer);
+void serialize(FTransactionOutputReferenceDetails &outputReference, ISerializer &serializer);
 
-void serialize(BaseInputDetails &inputBase, ISerializer &serializer);
-void serialize(KeyInputDetails &inputToKey, ISerializer &serializer);
-void serialize(MultiSignatureInputDetails &inputMultisig, ISerializer &serializer);
-void serialize(TransactionInputDetails &input, ISerializer &serializer);
+void serialize(FBaseInputDetails &inputBase, ISerializer &serializer);
+void serialize(FKeyInputDetails &inputToKey, ISerializer &serializer);
+void serialize(FMultiSignatureInputDetails &inputMultisig, ISerializer &serializer);
+void serialize(FTransactionInputDetails &input, ISerializer &serializer);
 
-void serialize(TransactionExtraDetails &extra, ISerializer &serializer);
+void serialize(FTransactionExtraDetails &extra, ISerializer &serializer);
 // void serialize(TransactionExtraDetails2 &extra, ISerializer &serializer);
-void serialize(TransactionDetails &transaction, ISerializer &serializer);
+void serialize(FTransactionDetails &transaction, ISerializer &serializer);
 
-void serialize(BlockDetails &block, ISerializer &serializer);
+void serialize(FBlockDetails &block, ISerializer &serializer);
 
 } // namespace QwertyNote

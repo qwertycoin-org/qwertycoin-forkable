@@ -98,27 +98,27 @@ public:
 											  const UCallback &callback) override;
 
     void getBlocks(const std::vector<uint32_t> &blockHeights,
-                   std::vector<std::vector<BlockDetails>> &blocks,
+                   std::vector<std::vector<FBlockDetails>> &blocks,
                    const UCallback &callback) override;
     void getBlocks(const std::vector<Crypto::FHash> &blockHashes,
-                   std::vector<BlockDetails> &blocks,
+                   std::vector<FBlockDetails> &blocks,
                    const UCallback &callback) override;
     void getBlocks(uint64_t timestampBegin,
                    uint64_t timestampEnd,
                    uint32_t blocksNumberLimit,
-                   std::vector<BlockDetails> &blocks,
+                   std::vector<FBlockDetails> &blocks,
                    uint32_t &blocksNumberWithinTimestamps,
                    const UCallback &callback) override;
     void getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
-                         std::vector<TransactionDetails> &transactions,
+                         std::vector<FTransactionDetails> &transactions,
                          const UCallback &callback) override;
     void getTransactionsByPaymentId(const Crypto::FHash &paymentId,
-                                    std::vector<TransactionDetails> &transactions,
+                                    std::vector<FTransactionDetails> &transactions,
                                     const UCallback &callback) override;
     void getPoolTransactions(uint64_t timestampBegin,
                              uint64_t timestampEnd,
                              uint32_t transactionsNumberLimit,
-                             std::vector<TransactionDetails> &transactions,
+                             std::vector<FTransactionDetails> &transactions,
                              uint64_t &transactionsNumberWithinTimestamps,
                              const UCallback &callback) override;
     void isSynchronized(bool &syncStatus, const UCallback &callback) override;
@@ -184,52 +184,52 @@ private:
 								 const UCallback &callback);
 
     void getBlocksAsync(const std::vector<uint32_t> &blockHeights,
-                        std::vector<std::vector<BlockDetails>> &blocks,
+                        std::vector<std::vector<FBlockDetails>> &blocks,
                         const UCallback &callback);
     std::error_code doGetBlocks(const std::vector<uint32_t> &blockHeights,
-                                std::vector<std::vector<BlockDetails>> &blocks);
+                                std::vector<std::vector<FBlockDetails>> &blocks);
 
     void getBlocksAsync(const std::vector<Crypto::FHash> &blockHashes,
-                        std::vector<BlockDetails> &blocks,
+                        std::vector<FBlockDetails> &blocks,
                         const UCallback &callback);
     std::error_code doGetBlocks(const std::vector<Crypto::FHash> &blockHashes,
-                                std::vector<BlockDetails> &blocks);
+                                std::vector<FBlockDetails> &blocks);
 
     void getBlocksAsync(uint64_t timestampBegin,
                         uint64_t timestampEnd,
                         uint32_t blocksNumberLimit,
-                        std::vector<BlockDetails> &blocks,
+                        std::vector<FBlockDetails> &blocks,
                         uint32_t &blocksNumberWithinTimestamps,
                         const UCallback &callback);
     std::error_code doGetBlocks(uint64_t timestampBegin,
                                 uint64_t timestampEnd,
                                 uint32_t blocksNumberLimit,
-                                std::vector<BlockDetails> &blocks,
+                                std::vector<FBlockDetails> &blocks,
                                 uint32_t &blocksNumberWithinTimestamps);
 
     void getTransactionsAsync(const std::vector<Crypto::FHash> &transactionHashes,
-                              std::vector<TransactionDetails> &transactions,
+                              std::vector<FTransactionDetails> &transactions,
                               const UCallback &callback);
     std::error_code doGetTransactions(const std::vector<Crypto::FHash> &transactionHashes,
-                                      std::vector<TransactionDetails> &transactions);
+                                      std::vector<FTransactionDetails> &transactions);
 
     void getPoolTransactionsAsync(uint64_t timestampBegin,
                                   uint64_t timestampEnd,
                                   uint32_t transactionsNumberLimit,
-                                  std::vector<TransactionDetails> &transactions,
+                                  std::vector<FTransactionDetails> &transactions,
                                   uint64_t &transactionsNumberWithinTimestamps,
                                   const UCallback &callback);
     std::error_code doGetPoolTransactions(uint64_t timestampBegin,
                                           uint64_t timestampEnd,
                                           uint32_t transactionsNumberLimit,
-                                          std::vector<TransactionDetails> &transactions,
+                                          std::vector<FTransactionDetails> &transactions,
                                           uint64_t &transactionsNumberWithinTimestamps);
 
     void getTransactionsByPaymentIdAsync(const Crypto::FHash &paymentId,
-                                         std::vector<TransactionDetails> &transactions,
+                                         std::vector<FTransactionDetails> &transactions,
                                          const UCallback &callback);
     std::error_code doGetTransactionsByPaymentId(const Crypto::FHash &paymentId,
-                                                 std::vector<TransactionDetails> &transactions);
+                                                 std::vector<FTransactionDetails> &transactions);
 
     void isSynchronizedAsync(bool& syncStatus, const UCallback& callback);
 
@@ -252,7 +252,7 @@ private:
     std::unique_ptr<std::thread> workerThread;
     std::unique_ptr<boost::asio::io_service::work> work;
 
-    BlockchainExplorerDataBuilder blockchainExplorerDataBuilder;
+    QBlockchainExplorerDataBuilder blockchainExplorerDataBuilder;
 
     mutable std::mutex mutex;
 };

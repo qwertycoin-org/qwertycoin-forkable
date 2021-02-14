@@ -23,7 +23,7 @@
 
 namespace QwertyNote {
 
-namespace error {
+namespace Error {
 
 enum HttpParserErrorCodes
 {
@@ -72,10 +72,10 @@ private:
 
 } // namespace QwertyNote
 
-inline std::error_code make_error_code(QwertyNote::error::HttpParserErrorCodes e)
+inline std::error_code make_error_code(QwertyNote::Error::HttpParserErrorCodes e)
 {
   return std::error_code{
       static_cast<int>(e),
-                             QwertyNote::error::HttpParserErrorCategory::INSTANCE
+                             QwertyNote::Error::HttpParserErrorCategory::INSTANCE
   };
 }

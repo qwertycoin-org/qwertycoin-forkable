@@ -59,14 +59,14 @@ void loadKeysFromFile(const std::string &filename,
 
     if (!Common::loadFileToString(filename, buf)) {
         throw std::system_error(
-            make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR),
+            make_error_code(QwertyNote::Error::INTERNAL_WALLET_ERROR),
             "failed to load \"" + filename + '\"'
         );
     }
 
     if (!QwertyNote::fromBinaryArray(keys_file_data, Common::asBinaryArray(buf))) {
         throw std::system_error(
-            make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR),
+            make_error_code(QwertyNote::Error::INTERNAL_WALLET_ERROR),
             "failed to deserialize \"" + filename + '\"'
         );
     }
@@ -83,7 +83,7 @@ void loadKeysFromFile(const std::string &filename,
             &account_data[0]);
 
     if (!QwertyNote::loadFromBinaryKeyValue(account, account_data)) {
-        throw std::system_error(make_error_code(QwertyNote::error::WRONG_PASSWORD));
+        throw std::system_error(make_error_code(QwertyNote::Error::WRONG_PASSWORD));
     }
 
     const QwertyNote::FAccountKeys& keys = account.getAccountKeys();

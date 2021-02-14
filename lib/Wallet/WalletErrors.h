@@ -23,7 +23,7 @@
 
 namespace QwertyNote {
 
-namespace error {
+namespace Error {
 
 // custom error conditions enum type:
 enum WalletErrorCodes
@@ -156,16 +156,16 @@ private:
 
 } // namespace QwertyNote
 
-inline std::error_code make_error_code(QwertyNote::error::WalletErrorCodes e)
+inline std::error_code make_error_code(QwertyNote::Error::WalletErrorCodes e)
 {
     return std::error_code{static_cast<int>(e),
-                             QwertyNote::error::WalletErrorCategory::INSTANCE};
+                             QwertyNote::Error::WalletErrorCategory::INSTANCE};
 }
 
 namespace std {
 
 template <>
-struct is_error_code_enum<QwertyNote::error::WalletErrorCodes> : public true_type
+struct is_error_code_enum<QwertyNote::Error::WalletErrorCodes> : public true_type
 {
 };
 

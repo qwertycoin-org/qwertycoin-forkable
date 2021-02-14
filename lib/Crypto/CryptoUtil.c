@@ -16,7 +16,7 @@
 
 void sodiumMemZero(void *pnt, size_t length) {
 #ifdef _WIN32
-    SecureZeroMemory(pnt, len);
+    SecureZeroMemory(pnt, length);
 #else
     volatile unsigned char *volatile pnt_ = (volatile unsigned char *volatile)pnt;
     size_t i                              = (size_t)0U;

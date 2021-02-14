@@ -23,7 +23,7 @@
 
 namespace QwertyNote {
 
-namespace error {
+namespace Error {
 
 // custom error conditions enum type:
 enum NodeErrorCodes
@@ -83,7 +83,7 @@ private:
 
 } // namespace QwertyNote
 
-inline std::error_code make_error_code(QwertyNote::error::NodeErrorCodes e)
+inline std::error_code make_error_code(QwertyNote::Error::NodeErrorCodes e)
 {
-    return std::error_code{static_cast<int>(e), QwertyNote::error::NodeErrorCategory::INSTANCE};
+    return std::error_code{static_cast<int>(e), QwertyNote::Error::NodeErrorCategory::INSTANCE};
 }

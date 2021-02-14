@@ -888,7 +888,7 @@ struct COMMAND_RPC_GET_BLOCK_DETAILS_BY_HASH {
             KV_MEMBER(block);
         }
 
-        BlockDetails block;
+        FBlockDetails block;
         std::string status;
     };
 };
@@ -1043,7 +1043,7 @@ struct COMMAND_RPC_GET_TRANSACTIONS_POOL {
             KV_MEMBER(status);
         }
 
-        std::vector<TransactionDetails> transactions;
+        std::vector<FTransactionDetails> transactions;
         std::string status;
     };
 };
@@ -1276,7 +1276,7 @@ struct COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HEIGHTS {
             KV_MEMBER(blocks);
         }
 
-        std::vector<BlockDetails> blocks;
+        std::vector<FBlockDetails> blocks;
         std::string status;
     };
 };
@@ -1295,7 +1295,7 @@ struct COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HASHES {
             KV_MEMBER(blocks);
         }
 
-        std::vector<BlockDetails> blocks;
+        std::vector<FBlockDetails> blocks;
         std::string status;
     };
 };
@@ -1314,7 +1314,7 @@ struct COMMAND_RPC_GET_BLOCK_DETAILS_BY_HEIGHT {
             KV_MEMBER(block);
         }
 
-        BlockDetails block;
+        FBlockDetails block;
         std::string status;
     };
 };
@@ -1380,7 +1380,7 @@ struct COMMAND_RPC_GET_TRANSACTIONS_DETAILS_BY_HASHES {
             KV_MEMBER(transactions);
         }
 
-        std::vector<TransactionDetails> transactions;
+        std::vector<FTransactionDetails> transactions;
         std::string status;
     };
 };
@@ -1399,7 +1399,7 @@ struct COMMAND_RPC_GET_TRANSACTION_DETAILS_BY_HASH {
             KV_MEMBER(transaction);
         }
 
-        TransactionDetails transaction;
+        FTransactionDetails transaction;
         std::string status;
     };
 };

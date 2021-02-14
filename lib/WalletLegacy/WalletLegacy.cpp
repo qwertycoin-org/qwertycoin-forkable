@@ -216,7 +216,7 @@ void WalletLegacy::initAndGenerate(const std::string &password)
         std::unique_lock<std::mutex> stateLock(m_cacheMutex);
 
         if (m_state != NOT_INITIALIZED) {
-            throw std::system_error(make_error_code(error::ALREADY_INITIALIZED));
+            throw std::system_error(make_error_code(Error::ALREADY_INITIALIZED));
         }
 
         m_account.generate();
@@ -235,7 +235,7 @@ void WalletLegacy::initAndGenerateDeterministic(const std::string &password)
         std::unique_lock<std::mutex> stateLock(m_cacheMutex);
 
         if (m_state != NOT_INITIALIZED) {
-            throw std::system_error(make_error_code(error::ALREADY_INITIALIZED));
+            throw std::system_error(make_error_code(Error::ALREADY_INITIALIZED));
         }
 
         m_account.generateDeterministic();
@@ -256,7 +256,7 @@ Crypto::FSecretKey WalletLegacy::generateKey(
     std::unique_lock<std::mutex> stateLock(m_cacheMutex);
 
     if (m_state != NOT_INITIALIZED) {
-        throw std::system_error(make_error_code(error::ALREADY_INITIALIZED));
+        throw std::system_error(make_error_code(Error::ALREADY_INITIALIZED));
     }
 
     Crypto::FSecretKey retval = m_account.generateKey(recovery_param, recover, two_random);
@@ -275,7 +275,7 @@ void WalletLegacy::initWithKeys(const FAccountKeys &accountKeys, const std::stri
         std::unique_lock<std::mutex> stateLock(m_cacheMutex);
 
         if (m_state != NOT_INITIALIZED) {
-            throw std::system_error(make_error_code(error::ALREADY_INITIALIZED));
+            throw std::system_error(make_error_code(Error::ALREADY_INITIALIZED));
         }
 
         m_account.setAccountKeys(accountKeys);
@@ -293,7 +293,7 @@ void WalletLegacy::initAndLoad(std::istream &source, const std::string &password
     std::unique_lock<std::mutex> stateLock(m_cacheMutex);
 
     if (m_state != NOT_INITIALIZED) {
-        throw std::system_error(make_error_code(error::ALREADY_INITIALIZED));
+        throw std::system_error(make_error_code(Error::ALREADY_INITIALIZED));
     }
 
     m_password = password;
@@ -379,7 +379,7 @@ void WalletLegacy::doLoad(std::istream &source)
         runAtomic(m_cacheMutex, [this]() { this->m_state = WalletLegacy::NOT_INITIALIZED; });
         m_observerManager.notify(
             &IWalletLegacyObserver::initCompleted,
-            make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR)
+            make_error_code(QwertyNote::Error::INTERNAL_WALLET_ERROR)
         );
         return;
     }
@@ -484,7 +484,7 @@ void WalletLegacy::save(std::ostream &destination, bool saveDetailed, bool saveC
     if(m_isStopping) {
         m_observerManager.notify(
             &IWalletLegacyObserver::saveCompleted,
-            make_error_code(QwertyNote::error::OPERATION_CANCELLED)
+            make_error_code(QwertyNote::Error::OPERATION_CANCELLED)
         );
         return;
     }
@@ -492,7 +492,7 @@ void WalletLegacy::save(std::ostream &destination, bool saveDetailed, bool saveC
     {
         std::unique_lock<std::mutex> lock(m_cacheMutex);
 
-        throwIf(m_state != INITIALIZED, QwertyNote::error::WRONG_STATE);
+        throwIf(m_state != INITIALIZED, QwertyNote::Error::WRONG_STATE);
 
         m_state = SAVING;
     }
@@ -533,7 +533,7 @@ void WalletLegacy::doSave(std::ostream &destination, bool saveDetailed, bool sav
         runAtomic(m_cacheMutex, [this] () { this->m_state = WalletLegacy::INITIALIZED; });
         m_observerManager.notify(
             &IWalletLegacyObserver::saveCompleted,
-            make_error_code(QwertyNote::error::INTERNAL_WALLET_ERROR)
+            make_error_code(QwertyNote::Error::INTERNAL_WALLET_ERROR)
         );
         return;
     }
@@ -550,7 +550,7 @@ std::error_code WalletLegacy::changePassword(
     throwIfNotInitialised();
 
     if (m_password.compare(oldPassword)) {
-        return make_error_code(QwertyNote::error::WRONG_PASSWORD);
+        return make_error_code(QwertyNote::Error::WRONG_PASSWORD);
     }
 
     // we don't let the user to change the password while saving
@@ -1078,7 +1078,7 @@ void WalletLegacy::synchronizationCallback(WalletRequest::Callback callback, std
 
 std::error_code WalletLegacy::cancelTransaction(size_t transactionId)
 {
-    return make_error_code(QwertyNote::error::TX_CANCEL_IMPOSSIBLE);
+    return make_error_code(QwertyNote::Error::TX_CANCEL_IMPOSSIBLE);
 }
 
 void WalletLegacy::synchronizationProgressUpdated(uint32_t current, uint32_t total)
@@ -1153,7 +1153,7 @@ void WalletLegacy::onTransactionDeleted(ITransfersSubscription *object, const FH
 void WalletLegacy::throwIfNotInitialised()
 {
     if (m_state == NOT_INITIALIZED || m_state == LOADING) {
-        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
     }
     assert(m_transferDetails);
 }
@@ -1194,7 +1194,7 @@ void WalletLegacy::notifyIfBalanceChanged()
 void WalletLegacy::getAccountKeys(FAccountKeys &keys)
 {
     if (m_state == NOT_INITIALIZED) {
-        throw std::system_error(make_error_code(QwertyNote::error::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(QwertyNote::Error::NOT_INITIALIZED));
     }
 
     keys = m_account.getAccountKeys();

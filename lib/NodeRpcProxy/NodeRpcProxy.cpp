@@ -60,9 +60,9 @@ namespace {
 std::error_code interpretResponseStatus(const std::string &status)
 {
     if (CORE_RPC_STATUS_BUSY == status) {
-        return make_error_code(error::NODE_BUSY);
+        return make_error_code(Error::NODE_BUSY);
     } else if (CORE_RPC_STATUS_OK != status) {
-        return make_error_code(error::INTERNAL_NODE_ERROR);
+        return make_error_code(Error::INTERNAL_NODE_ERROR);
     } else {
         return std::error_code{};
     }
@@ -98,7 +98,7 @@ void NodeRpcProxy::init(const INode::UCallback &callback)
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (m_state != STATE_NOT_INITIALIZED) {
-        callback(make_error_code(error::ALREADY_INITIALIZED));
+        callback(make_error_code(Error::ALREADY_INITIALIZED));
         return;
     }
 
@@ -428,7 +428,7 @@ void NodeRpcProxy::relayTransaction(const QwertyNote::FTransaction &transaction,
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -443,7 +443,7 @@ void NodeRpcProxy::getRandomOutsByAmounts(
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -465,7 +465,7 @@ void NodeRpcProxy::getNewBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -486,7 +486,7 @@ void NodeRpcProxy::getTransactionOutsGlobalIndices(const Crypto::FHash &transact
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -508,7 +508,7 @@ void NodeRpcProxy::queryBlocks(std::vector<Crypto::FHash> &&knownBlockIds,
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -534,7 +534,7 @@ void NodeRpcProxy::getPoolSymmetricDifference(
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -560,7 +560,7 @@ void NodeRpcProxy::getMultisignatureOutputByGlobalIndex(uint64_t amount,
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -569,12 +569,12 @@ void NodeRpcProxy::getMultisignatureOutputByGlobalIndex(uint64_t amount,
 }
 
 void NodeRpcProxy::getBlocks(const std::vector<uint32_t> &blockHeights,
-                             std::vector<std::vector<BlockDetails>> &blocks,
+                             std::vector<std::vector<FBlockDetails>> &blocks,
                              const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -585,13 +585,13 @@ void NodeRpcProxy::getBlocks(const std::vector<uint32_t> &blockHeights,
 void NodeRpcProxy::getBlocks(uint64_t timestampBegin,
                              uint64_t timestampEnd,
                              uint32_t blocksNumberLimit,
-                             std::vector<BlockDetails> &blocks,
+                             std::vector<FBlockDetails> &blocks,
                              uint32_t &blocksNumberWithinTimestamps,
                              const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -600,12 +600,12 @@ void NodeRpcProxy::getBlocks(uint64_t timestampBegin,
 }
 
 void NodeRpcProxy::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
-                             std::vector<BlockDetails> &blocks,
+                             std::vector<FBlockDetails> &blocks,
                              const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -614,12 +614,12 @@ void NodeRpcProxy::getBlocks(const std::vector<Crypto::FHash> &blockHashes,
 }
 
 void NodeRpcProxy::getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
-                                   std::vector<TransactionDetails> &transactions,
+                                   std::vector<FTransactionDetails> &transactions,
                                    const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -630,13 +630,13 @@ void NodeRpcProxy::getTransactions(const std::vector<Crypto::FHash> &transaction
 void NodeRpcProxy::getPoolTransactions(uint64_t timestampBegin,
                                        uint64_t timestampEnd,
                                        uint32_t transactionsNumberLimit,
-                                       std::vector<TransactionDetails> &transactions,
+                                       std::vector<FTransactionDetails> &transactions,
                                        uint64_t &transactionsNumberWithinTimestamps,
                                        const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -645,12 +645,12 @@ void NodeRpcProxy::getPoolTransactions(uint64_t timestampBegin,
 }
 
 void NodeRpcProxy::getTransactionsByPaymentId(const Crypto::FHash &paymentId,
-                                              std::vector<TransactionDetails> &transactions,
+                                              std::vector<FTransactionDetails> &transactions,
                                               const UCallback &callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -663,7 +663,7 @@ void NodeRpcProxy::isSynchronized(bool &syncStatus, const UCallback &callback)
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_state != STATE_INITIALIZED) {
         syncStatus = false;
-        callback(make_error_code(error::NOT_INITIALIZED));
+        callback(make_error_code(Error::NOT_INITIALIZED));
         return;
     }
 
@@ -887,9 +887,9 @@ std::error_code NodeRpcProxy::binaryCommand(const std::string &url,
         invokeBinaryCommand(*m_httpClient, url, req, res);
         ec = interpretResponseStatus(res.status);
     } catch (const ConnectException &) {
-        ec = make_error_code(error::CONNECT_ERROR);
+        ec = make_error_code(Error::CONNECT_ERROR);
     } catch (const std::exception &) {
-        ec = make_error_code(error::NETWORK_ERROR);
+        ec = make_error_code(Error::NETWORK_ERROR);
     }
 
     return ec;
@@ -905,9 +905,9 @@ std::error_code NodeRpcProxy::jsonCommand(const std::string &url, const Request 
         invokeJsonCommand(*m_httpClient, url, req, res);
         ec = interpretResponseStatus(res.status);
     } catch (const ConnectException &) {
-        ec = make_error_code(error::CONNECT_ERROR);
+        ec = make_error_code(Error::CONNECT_ERROR);
     } catch (const std::exception &) {
-        ec = make_error_code(error::NETWORK_ERROR);
+        ec = make_error_code(Error::NETWORK_ERROR);
     }
 
     return ec;
@@ -918,7 +918,7 @@ std::error_code NodeRpcProxy::jsonRpcCommand(const std::string &method,
                                              const Request &req,
                                              Response &res)
 {
-    std::error_code ec = make_error_code(error::INTERNAL_NODE_ERROR);
+    std::error_code ec = make_error_code(Error::INTERNAL_NODE_ERROR);
 
     try {
         EventLock eventLock(*m_httpEvent);
@@ -946,9 +946,9 @@ std::error_code NodeRpcProxy::jsonRpcCommand(const std::string &method,
             }
         }
     } catch (const ConnectException &) {
-        ec = make_error_code(error::CONNECT_ERROR);
+        ec = make_error_code(Error::CONNECT_ERROR);
     } catch (const std::exception &) {
-        ec = make_error_code(error::NETWORK_ERROR);
+        ec = make_error_code(Error::NETWORK_ERROR);
     }
 
     return ec;

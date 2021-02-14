@@ -1260,7 +1260,6 @@ void CnSlowHash<MEMORY,ITER,POWVER>::explodeScratchpadSoft()
 extern "C" void blake256Hash(uint8_t *, const uint8_t *, uint64_t);
 extern "C" void groestl(const unsigned char*, unsigned long long, unsigned char*);
 extern "C" size_t jhHash(int, const unsigned char *, unsigned long long, unsigned char *);
-extern "C" size_t skeinHash(int, const unsigned char *, size_t, unsigned char *);
 
 template<size_t MEMORY, size_t ITER, size_t POWVER>
 void CnSlowHash<MEMORY,ITER,POWVER>::softwareHash(const void* in, size_t len, void* out)

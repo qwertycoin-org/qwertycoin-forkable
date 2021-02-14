@@ -102,33 +102,33 @@ public:
     }
 
     void getBlocks(const std::vector<uint32_t> &blockHeights,
-                   std::vector<std::vector<QwertyNote::BlockDetails>> &blocks,
+                   std::vector<std::vector<QwertyNote::FBlockDetails>> &blocks,
                    const UCallback &callback) override { }
 
     void getBlocks(const std::vector<Crypto::FHash> &blockHashes,
-                   std::vector<QwertyNote::BlockDetails> &blocks,
+                   std::vector<QwertyNote::FBlockDetails> &blocks,
                    const UCallback &callback) override { }
 
     void getBlocks(uint64_t timestampBegin,
                    uint64_t timestampEnd,
                    uint32_t blocksNumberLimit,
-                   std::vector<QwertyNote::BlockDetails> &blocks,
+                   std::vector<QwertyNote::FBlockDetails> &blocks,
                    uint32_t &blocksNumberWithinTimestamps,
                    const UCallback &callback) override { }
 
     void getTransactions(const std::vector<Crypto::FHash> &transactionHashes,
-                         std::vector<QwertyNote::TransactionDetails> &transactions,
+                         std::vector<QwertyNote::FTransactionDetails> &transactions,
                          const UCallback &callback) override { }
 
     void getPoolTransactions(uint64_t timestampBegin,
                              uint64_t timestampEnd,
                              uint32_t transactionsNumberLimit,
-                             std::vector<QwertyNote::TransactionDetails> &transactions,
+                             std::vector<QwertyNote::FTransactionDetails> &transactions,
                              uint64_t &transactionsNumberWithinTimestamps,
                              const UCallback &callback) override { }
 
     void getTransactionsByPaymentId(const Crypto::FHash &paymentId,
-                                    std::vector<QwertyNote::TransactionDetails> &transactions,
+                                    std::vector<QwertyNote::FTransactionDetails> &transactions,
                                     const UCallback &callback) override { }
 
     void getMultisignatureOutputByGlobalIndex(uint64_t amount,
