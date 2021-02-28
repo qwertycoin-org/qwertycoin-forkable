@@ -3,8 +3,9 @@
 // Licensed under the GNU General Public License, Version 3.
 // See the file LICENSE from this package for details.
 
-#include <string>
 #include <iostream>
+#include <string>
+
 #include <Breakpad/Breakpad.h>
 
 #if defined(__linux__) && !defined(__ANDROID__) // Linux
@@ -12,7 +13,9 @@
 #elif defined(__APPLE__) // macOS
 #include <client/mac/handler/exception_handler.h>
 #elif defined(_WIN32) || defined(WIN32) // Windows
+
 #include <client/windows/handler/exception_handler.h>
+
 #endif
 
 #if defined(__linux__) && !defined(__ANDROID__) // Linux
@@ -39,33 +42,35 @@ static bool exceptionHandlerCallback(
     return true;
 }
 #elif defined(_WIN32) || defined(WIN32) // Windows
-static bool exceptionHandlerCallback(
-    const wchar_t *minidumpPath,
-    const wchar_t *minidumpId,
-    void *context,
-    EXCEPTION_POINTERS *exinfo,
-    MDRawAssertionInfo *assertion,
-    bool succeeded)
+
+static bool exceptionHandlerCallback (
+    const wchar_t *cMinidumpPath,
+    const wchar_t *cMinidumpId,
+    void *sContext,
+    EXCEPTION_POINTERS *sExInfo,
+    MDRawAssertionInfo *sAssertion,
+    bool bSucceeded)
 {
     std::cout << "ERROR: Process crashed! Minidump created." << std::endl;
-    std::wcout << L"Minidump path: " << minidumpPath << L", id: " << minidumpId << std::endl;
+    std::wcout << L"Minidump path: " << cMinidumpPath << L", id: " << cMinidumpId << std::endl;
 
     return true;
 }
+
 #endif
 
-Qwertycoin::Breakpad::ExceptionHandler::ExceptionHandler(const std::string &dumpPath)
+Qwertycoin::Breakpad::QExceptionHandler::QExceptionHandler (const std::string &sDumpPath)
 {
 #if defined(_WIN32) || defined(WIN32) // Windows
-    const std::string defaultDumpPath = std::string("C:\\Windows\\Temp");
+    const std::string sDefaultDumpPath = std::string("C:\\Windows\\Temp");
 #else // Linux, macOS, etc.
-    const std::string defaultDumpPath = std::string("/tmp");
+    const std::string sDefaultDumpPath = std::string("/tmp");
 #endif
 
-    const std::string validDumpPath = !dumpPath.empty() ? dumpPath : defaultDumpPath;
+    const std::string validDumpPath = !sDumpPath.empty() ? sDumpPath : sDefaultDumpPath;
 
 #if defined(__linux__) && !defined(__ANDROID__) // Linux
-    m_exceptionHandler = new google_breakpad::ExceptionHandler(
+    mExceptionHandler = new google_breakpad::ExceptionHandler(
         google_breakpad::MinidumpDescriptor(validDumpPath),
         nullptr,
         exceptionHandlerCallback,
@@ -74,7 +79,7 @@ Qwertycoin::Breakpad::ExceptionHandler::ExceptionHandler(const std::string &dump
         -1
     );
 #elif defined(__APPLE__) // macOS
-    m_exceptionHandler = new google_breakpad::ExceptionHandler(
+    mExceptionHandler = new google_breakpad::ExceptionHandler(
         validDumpPath,
         nullptr,
         exceptionHandlerCallback,
@@ -85,7 +90,7 @@ Qwertycoin::Breakpad::ExceptionHandler::ExceptionHandler(const std::string &dump
 #elif defined(_WIN32) || defined(WIN32) // Windows
     std::wstring validDumpPathAsWString;
     validDumpPathAsWString.assign(validDumpPath.begin(), validDumpPath.end());
-    m_exceptionHandler = new google_breakpad::ExceptionHandler(
+    mExceptionHandler = new google_breakpad::ExceptionHandler(
         validDumpPathAsWString,
         nullptr,
         exceptionHandlerCallback,
@@ -93,15 +98,15 @@ Qwertycoin::Breakpad::ExceptionHandler::ExceptionHandler(const std::string &dump
         google_breakpad::ExceptionHandler::HANDLER_ALL
     );
 #else
-    m_exceptionHandler = nullptr;
+    mExceptionHandler = nullptr;
 #endif
 }
 
 Qwertycoin::Breakpad::ExceptionHandler::~ExceptionHandler()
 {
-    if (m_exceptionHandler) {
-        delete m_exceptionHandler;
-        m_exceptionHandler = nullptr;
+    if (mExceptionHandler) {
+        delete mExceptionHandler;
+        mExceptionHandler = nullptr;
     }
 }
 
@@ -110,7 +115,7 @@ Qwertycoin::Breakpad::ExceptionHandler::~ExceptionHandler()
 */
 void Qwertycoin::Breakpad::ExceptionHandler::dummyCrash()
 {
-    int *a = (int *)0x42;
+    int *a = (int *) 0x42;
     fprintf(stdout, "Going to crash...\n");
     fprintf(stdout, "A = %d", *a);
 }

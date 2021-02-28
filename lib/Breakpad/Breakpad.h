@@ -8,25 +8,26 @@
 #include <string>
 
 namespace google_breakpad {
-class ExceptionHandler;
+    class ExceptionHandler;
 } // namespace google_breakpad
 
 namespace Qwertycoin {
 
-namespace Breakpad {
+    namespace Breakpad {
 
-class ExceptionHandler
-{
-public:
-    explicit ExceptionHandler(const std::string &dumpPath = std::string());
-    virtual ~ExceptionHandler();
+        class QExceptionHandler
+        {
+        public:
+            explicit QExceptionHandler (const std::string &sDumpPath = std::string());
 
-    static void dummyCrash();
+            virtual ~QExceptionHandler ();
 
-private:
-    google_breakpad::ExceptionHandler *m_exceptionHandler = nullptr;
-};
+            static void dummyCrash ();
 
-} // namespace Breakpad
+        private:
+            google_breakpad::ExceptionHandler *mExceptionHandler = nullptr;
+        };
+
+    } // namespace Breakpad
 
 } // namespace Qwertycoin
