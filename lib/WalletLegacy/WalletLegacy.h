@@ -224,7 +224,7 @@ private:
     std::unique_ptr<WalletTransactionSender> m_sender;
 
     WalletAsyncContextCounter m_asyncContextCounter;
-    Tools::ObserverManager<QwertyNote::IWalletLegacyObserver> m_observerManager;
+    Tools::QObserverManager<QwertyNote::IWalletLegacyObserver> m_observerManager;
 
     std::unique_ptr<SyncStarter> m_onInitSyncStarter;
 };

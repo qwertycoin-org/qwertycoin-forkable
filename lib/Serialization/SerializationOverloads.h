@@ -34,7 +34,7 @@ namespace QwertyNote {
 
 template<typename T>
 typename std::enable_if<std::is_pod<T>::value>::type
-serializeAsBinary(std::vector<T> &value,Common::StringView name,
+serializeAsBinary(std::vector<T> &value,Common::QStringView name,
                   QwertyNote::ISerializer &serializer)
 {
     std::string blob;
@@ -54,7 +54,7 @@ serializeAsBinary(std::vector<T> &value,Common::StringView name,
 
 template<typename T>
 typename std::enable_if<std::is_pod<T>::value>::type
-serializeAsBinary(std::list<T> &value, Common::StringView name, QwertyNote::ISerializer &serializer)
+serializeAsBinary(std::list<T> &value, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     std::string blob;
     if (serializer.type() == ISerializer::INPUT) {
@@ -80,7 +80,7 @@ serializeAsBinary(std::list<T> &value, Common::StringView name, QwertyNote::ISer
 }
 
 template <typename Cont>
-bool serializeContainer(Cont &value, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serializeContainer(Cont &value, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     size_t size = value.size();
     if (!serializer.beginArray(size, name)) {
@@ -103,7 +103,7 @@ bool serializeContainer(Cont &value, Common::StringView name, QwertyNote::ISeria
 }
 
 template <typename E>
-bool serializeEnumClass(E &value, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serializeEnumClass(E &value, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     static_assert(std::is_enum<E>::value, "E must be an enum class");
 
@@ -122,20 +122,20 @@ bool serializeEnumClass(E &value, Common::StringView name, QwertyNote::ISerializ
 }
 
 template<typename T>
-bool serialize(std::vector<T> &value, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serialize(std::vector<T> &value, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializeContainer(value, name, serializer);
 }
 
 template<typename T>
-bool serialize(std::list<T> &value, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serialize(std::list<T> &value, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializeContainer(value, name, serializer);
 }
 
 template<typename MapT, typename ReserveOp>
 bool serializeMap(MapT &value,
-                  Common::StringView name, QwertyNote::ISerializer &serializer,
+                  Common::QStringView name, QwertyNote::ISerializer &serializer,
                   ReserveOp reserve)
 {
     size_t size = value.size();
@@ -177,7 +177,7 @@ bool serializeMap(MapT &value,
 }
 
 template<typename SetT>
-bool serializeSet(SetT &value, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serializeSet(SetT &value, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     size_t size = value.size();
 
@@ -208,14 +208,14 @@ bool serializeSet(SetT &value, Common::StringView name, QwertyNote::ISerializer 
 
 template<typename K, typename Hash>
 bool serialize(std::unordered_set<K, Hash> &value,
-               Common::StringView name,
+               Common::QStringView name,
                QwertyNote::ISerializer &serializer)
 {
     return serializeSet(value, name, serializer);
 }
 
 template<typename K, typename Cmp>
-bool serialize(std::set<K, Cmp> &value,Common::StringView name,
+bool serialize(std::set<K, Cmp> &value,Common::QStringView name,
                QwertyNote::ISerializer &serializer)
 {
     return serializeSet(value, name, serializer);
@@ -223,7 +223,7 @@ bool serialize(std::set<K, Cmp> &value,Common::StringView name,
 
 template<typename K, typename V, typename Hash>
 bool serialize(std::unordered_map<K, V, Hash> &value,
-               Common::StringView name,
+               Common::QStringView name,
                QwertyNote::ISerializer &serializer)
 {
     return serializeMap(value, name, serializer, [&value](size_t size) { value.reserve(size); });
@@ -231,7 +231,7 @@ bool serialize(std::unordered_map<K, V, Hash> &value,
 
 template<typename K, typename V, typename Hash>
 bool serialize(std::unordered_multimap<K, V, Hash> &value,
-               Common::StringView name,
+               Common::QStringView name,
                QwertyNote::ISerializer &serializer)
 {
     return serializeMap(value, name, serializer, [&value](size_t size) { value.reserve(size); });
@@ -239,7 +239,7 @@ bool serialize(std::unordered_multimap<K, V, Hash> &value,
 
 template<typename K, typename V, typename Hash>
 bool serialize(std::map<K, V, Hash> &value,
-               Common::StringView name,
+               Common::QStringView name,
                QwertyNote::ISerializer &serializer)
 {
     return serializeMap(value, name, serializer, [](size_t size) {});
@@ -247,14 +247,14 @@ bool serialize(std::map<K, V, Hash> &value,
 
 template<typename K, typename V, typename Hash>
 bool serialize(std::multimap<K, V, Hash> &value,
-               Common::StringView name,
+               Common::QStringView name,
                QwertyNote::ISerializer &serializer)
 {
     return serializeMap(value, name, serializer, [](size_t size) {});
 }
 
 template<size_t size>
-bool serialize(std::array<uint8_t, size> &value,Common::StringView name,
+bool serialize(std::array<uint8_t, size> &value,Common::QStringView name,
                QwertyNote::ISerializer &s)
 {
     return s.binary(value.data(), value.size(), name);
@@ -268,7 +268,7 @@ void serialize(std::pair<T1, T2> &value, ISerializer &s)
 }
 
 template <typename Element, typename Iterator>
-void writeSequence(Iterator begin, Iterator end, Common::StringView name, ISerializer &s)
+void writeSequence(Iterator begin, Iterator end, Common::QStringView name, ISerializer &s)
 {
     size_t size = std::distance(begin, end);
     s.beginArray(size, name);
@@ -279,7 +279,7 @@ void writeSequence(Iterator begin, Iterator end, Common::StringView name, ISeria
 }
 
 template <typename Element, typename Iterator>
-void readSequence(Iterator outputIterator, Common::StringView name, ISerializer &s)
+void readSequence(Iterator outputIterator, Common::QStringView name, ISerializer &s)
 {
     size_t size = 0;
 
@@ -300,11 +300,11 @@ void readSequence(Iterator outputIterator, Common::StringView name, ISerializer 
 /*!
     \brief convinience function since we change block height type.
 */
-void serializeBlockHeight(ISerializer &s, uint32_t &blockHeight, Common::StringView name);
+void serializeBlockHeight(ISerializer &s, uint32_t &blockHeight, Common::QStringView name);
 
 /*!
     \brief Convinience function since we change global output index type.
 */
-void serializeGlobalOutputIndex(ISerializer &s,uint32_t &globalOutputIndex,Common::StringView name);
+void serializeGlobalOutputIndex(ISerializer &s,uint32_t &globalOutputIndex,Common::QStringView name);
 
 } // namespace QwertyNote

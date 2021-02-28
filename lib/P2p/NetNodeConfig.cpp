@@ -28,49 +28,49 @@ namespace QwertyNote {
 
 namespace {
 
-const CommandLine::ArgDescriptor<std::string> arg_p2p_bind_ip = {
+const CommandLine::FArgDescriptor<std::string> arg_p2p_bind_ip = {
     "p2p-bind-ip",
     "Interface for p2p network protocol",
     "0.0.0.0"
 };
-const CommandLine::ArgDescriptor<uint16_t> arg_p2p_bind_port = {
+const CommandLine::FArgDescriptor<uint16_t> arg_p2p_bind_port = {
     "p2p-bind-port",
     "Port for p2p network protocol",
     P2P_DEFAULT_PORT
 };
-const CommandLine::ArgDescriptor<uint16_t> arg_p2p_external_port = {
+const CommandLine::FArgDescriptor<uint16_t> arg_p2p_external_port = {
     "p2p-external-port",
     "External port for p2p network protocol (if port forwarding used with NAT)",
     0
 };
-const CommandLine::ArgDescriptor<bool> arg_p2p_allow_local_ip = {
+const CommandLine::FArgDescriptor<bool> arg_p2p_allow_local_ip = {
     "allow-local-ip",
     "Allow local ip add to peer list, mostly in debug purposes"
 };
-const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_add_peer = {
+const CommandLine::FArgDescriptor<std::vector<std::string>> arg_p2p_add_peer = {
     "add-peer",
     "Manually add peer to local peerlist"
 };
-const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_add_priority_node = {
+const CommandLine::FArgDescriptor<std::vector<std::string>> arg_p2p_add_priority_node = {
     "add-priority-node",
     "Specify list of peers to connect to and attempt to keep the connection open"
 };
-const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_add_exclusive_node = {
+const CommandLine::FArgDescriptor<std::vector<std::string>> arg_p2p_add_exclusive_node = {
     "add-exclusive-node",
     "Specify list of peers to connect to only. "
     "If this option is given the options add-priority-node and seed-node are ignored"
 };
-const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_seed_node = {
+const CommandLine::FArgDescriptor<std::vector<std::string>> arg_p2p_seed_node = {
     "seed-node",
     "Connect to a node to retrieve peer addresses, and disconnect"
 };
-const CommandLine::ArgDescriptor<bool> arg_p2p_hide_my_port = {
+const CommandLine::FArgDescriptor<bool> arg_p2p_hide_my_port = {
     "hide-my-port",
     "Do not announce yourself as peerlist candidate",
     false,
     true
 };
-const CommandLine::ArgDescriptor<std::string> arg_p2p_exclusive_version = {
+const CommandLine::FArgDescriptor<std::string> arg_p2p_exclusive_version = {
     "exclusive-version",
     "Refuse connections from nodes not running the specified version (specify version in short format, i.e. 5.1.4)"
 };
@@ -82,7 +82,7 @@ bool parsePeerFromString(NetworkAddress &pe, const std::string &node_addr)
 
 bool parsePeersAndAddToContainer(
     const boost::program_options::variables_map &vm,
-    const CommandLine::ArgDescriptor<std::vector<std::string>> &arg,
+    const CommandLine::FArgDescriptor<std::vector<std::string>> &arg,
     std::vector<NetworkAddress> &container)
 {
     std::vector<std::string> peers = CommandLine::getArg(vm, arg);
@@ -128,33 +128,33 @@ void NetNodeConfig::initOptions(boost::program_options::options_description &des
 
 bool NetNodeConfig::init(const boost::program_options::variables_map &vm)
 {
-    if (vm.count(arg_p2p_bind_ip.name) != 0
-        && (!vm[arg_p2p_bind_ip.name].defaulted() || bindIp.empty())) {
+    if (vm.count(arg_p2p_bind_ip.cName) != 0
+        && (!vm[arg_p2p_bind_ip.cName].defaulted() || bindIp.empty())) {
         bindIp = CommandLine::getArg(vm, arg_p2p_bind_ip);
     }
 
-    if (vm.count(arg_p2p_bind_port.name) != 0
-        && (!vm[arg_p2p_bind_port.name].defaulted() || bindPort == 0)) {
+    if (vm.count(arg_p2p_bind_port.cName) != 0
+        && (!vm[arg_p2p_bind_port.cName].defaulted() || bindPort == 0)) {
         bindPort = CommandLine::getArg(vm, arg_p2p_bind_port);
     }
 
-    if (vm.count(arg_p2p_external_port.name) != 0
-        && (!vm[arg_p2p_external_port.name].defaulted() || externalPort == 0)) {
+    if (vm.count(arg_p2p_external_port.cName) != 0
+        && (!vm[arg_p2p_external_port.cName].defaulted() || externalPort == 0)) {
         externalPort = CommandLine::getArg(vm, arg_p2p_external_port);
     }
 
-    if (vm.count(arg_p2p_allow_local_ip.name) != 0
-        && (!vm[arg_p2p_allow_local_ip.name].defaulted() || !allowLocalIp)) {
+    if (vm.count(arg_p2p_allow_local_ip.cName) != 0
+        && (!vm[arg_p2p_allow_local_ip.cName].defaulted() || !allowLocalIp)) {
         allowLocalIp = CommandLine::getArg(vm, arg_p2p_allow_local_ip);
     }
 
-    if (vm.count(CommandLine::argDataDir.name) != 0
-        && (!vm[CommandLine::argDataDir.name].defaulted()
+    if (vm.count(CommandLine::sArgDataDir.cName) != 0
+        && (!vm[CommandLine::sArgDataDir.cName].defaulted()
             || configFolder == Tools::getDefaultDataDirectory())) {
-        configFolder = CommandLine::getArg(vm, CommandLine::argDataDir);
+        configFolder = CommandLine::getArg(vm, CommandLine::sArgDataDir);
     }
 
-  if (vm.count(arg_p2p_exclusive_version.name) != 0 && (!vm[arg_p2p_exclusive_version.name].defaulted() || exclusiveVersion.empty())) {
+  if (vm.count(arg_p2p_exclusive_version.cName) != 0 && (!vm[arg_p2p_exclusive_version.cName].defaulted() || exclusiveVersion.empty())) {
     exclusiveVersion = CommandLine::getArg(vm, arg_p2p_exclusive_version);
   }
 

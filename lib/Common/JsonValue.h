@@ -17,148 +17,146 @@
 
 namespace Common {
 
-class JsonValue
-{
-public:
-    typedef std::string Key;
-    typedef std::vector<JsonValue> Array;
-    typedef bool Bool;
-    typedef int64_t Integer;
-    typedef std::nullptr_t Nil;
-    typedef std::map<Key, JsonValue> Object;
-    typedef double Real;
-    typedef std::string String;
-
-    enum Type
+    class QJsonValue
     {
-        ARRAY,
-        BOOL,
-        INTEGER,
-        NIL,
-        OBJECT,
-        REAL,
-        STRING
-    };
+    public:
+        // Standard JS/JSON DataTypes
+        typedef bool Bool;
+        typedef int64_t Integer;
+        typedef std::string Key;
+        typedef std::vector <QJsonValue> Array;
+        typedef std::nullptr_t Nil;
+        typedef std::map <Key, QJsonValue> Object;
+        typedef double Real;
+        typedef std::string String;
 
-    JsonValue();
-    JsonValue(const JsonValue &other);
-    JsonValue(JsonValue &&other) noexcept;
-    JsonValue(Type valueType);
-    JsonValue(const Array &value);
-    JsonValue(Array &&value);
-    JsonValue(Bool value);
-    JsonValue(Integer value);
-    JsonValue(Nil value);
-    JsonValue(const Object &value);
-    JsonValue(Object &&value);
-    JsonValue(Real value);
-    JsonValue(const String &value);
-    JsonValue(String &&value);
+        enum EType
+        {
+            ARRAY,
+            BOOL,
+            INTEGER,
+            NIL,
+            OBJECT,
+            REAL,
+            STRING
+        };
 
-    template<size_t size>
-    JsonValue(const char(&value)[size])
-    {
-        new(valueString)String(value, size - 1);
-        type = STRING;
-    }
+        QJsonValue ();
+        QJsonValue (Bool bValue);
+        QJsonValue (Integer iValue);
+        QJsonValue (const QJsonValue &sOther);
+        QJsonValue (QJsonValue &&sOther) noexcept;
+        QJsonValue (EType sValueType);
+        QJsonValue (const Array &vValue);
+        QJsonValue (Array &&vValue);
+        QJsonValue (Nil sValue);
+        QJsonValue (const Object &sValue);
+        QJsonValue (Object &&sValue);
+        QJsonValue (Real sValue);
+        QJsonValue (const String &cValue);
+        QJsonValue (String &&cValue);
 
-    ~JsonValue();
-
-    JsonValue &operator=(const JsonValue &other);
-    JsonValue &operator=(JsonValue &&other) noexcept;
-    JsonValue &operator=(const Array &value);
-    JsonValue &operator=(Array &&value);
-    //JsonValue &operator=(Bool value);
-    JsonValue &operator=(Integer value);
-    JsonValue &operator=(Nil value);
-    JsonValue &operator=(const Object &value);
-    JsonValue &operator=(Object &&value);
-    JsonValue &operator=(Real value);
-    JsonValue &operator=(const String &value);
-    JsonValue &operator=(String &&value);
-
-    template<size_t size>
-    JsonValue &operator=(const char(&value)[size])
-    {
-        if (type != STRING) {
-            destructValue();
-            type = NIL;
-            new(valueString)String(value, size - 1);
-            type = STRING;
-        } else {
-            reinterpret_cast<String *>(valueString)->assign(value, size - 1);
+        template <size_t uSize>
+        QJsonValue (const char(&cValue)[uSize])
+        {
+            new(uValueString)String(cValue, uSize - 1);
+            sType = STRING;
         }
 
-        return *this;
-    }
+        ~QJsonValue ();
 
-    bool isArray() const;
-    bool isBool() const;
-    bool isInteger() const;
-    bool isNil() const;
-    bool isObject() const;
-    bool isReal() const;
-    bool isString() const;
+        QJsonValue &operator= (Bool bValue);
+        QJsonValue &operator= (Integer iValue);
+        QJsonValue &operator= (const QJsonValue &sOther);
+        QJsonValue &operator= (QJsonValue &&sOther) noexcept;
+        QJsonValue &operator= (const Array &vValue);
+        QJsonValue &operator= (Array &&vValue);
+        QJsonValue &operator= (Nil sValue);
+        QJsonValue &operator= (const Object &sValue);
+        QJsonValue &operator= (Object &&sValue);
+        QJsonValue &operator= (Real sValue);
+        QJsonValue &operator= (const String &cValue);
+        QJsonValue &operator= (String &&cValue);
+        QJsonValue &operator[] (size_t uIndex);
+        const QJsonValue &operator[] (size_t uIndex) const;
+        QJsonValue &operator() (const Key &sKey);
+        const QJsonValue &operator() (const Key &sKey) const;
 
-    Type getType() const;
-    Array &getArray();
-    const Array &getArray() const;
-    Bool getBool() const;
-    Integer getInteger() const;
-    Object &getObject();
-    const Object &getObject() const;
-    Real getReal() const;
-    String &getString();
-    const String &getString() const;
+        template <size_t uSize>
+        QJsonValue &operator= (const char(&cValue)[uSize])
+        {
+            if (sType != STRING) {
+                destructValue();
+                sType = NIL;
+                new(uValueString)String(cValue, uSize - 1);
+                sType = STRING;
+            } else {
+                reinterpret_cast<String *>(uValueString)->assign(cValue, uSize - 1);
+            }
 
-    size_t size() const;
+            return *this;
+        }
 
-    JsonValue &operator[](size_t index);
-    const JsonValue &operator[](size_t index) const;
-    JsonValue& pushBack(const JsonValue& value);
-    JsonValue& pushBack(JsonValue&& value);
+        friend std::ostream &operator<< (std::ostream &out, const QJsonValue &jsonValue);
+        friend std::istream &operator>> (std::istream &in, QJsonValue &jsonValue);
 
-    JsonValue &operator()(const Key &key);
-    const JsonValue &operator()(const Key &key) const;
-    bool contains(const Key &key) const;
-    JsonValue &insert(const Key &key, const JsonValue &value);
-    JsonValue &insert(const Key &key, JsonValue &&value);
+        bool contains (const Key &key) const;
+        bool isArray () const;
+        bool isBool () const;
+        bool isInteger () const;
+        bool isNil () const;
+        bool isObject () const;
+        bool isReal () const;
+        bool isString () const;
+        Bool getBool () const;
 
-    // sets or creates value, returns reference to self
-    JsonValue &set(const Key& key, const JsonValue &value);
-    JsonValue &set(const Key& key, JsonValue &&value);
+        size_t erase (const Key &key);
+        size_t size () const;
+        Integer getInteger () const;
 
-    size_t erase(const Key &key);
+        std::string toString () const;
+        String &getString ();
+        const String &getString () const;
 
-    static JsonValue fromString(const std::string &source);
-    static JsonValue fromStringWithWhiteSpaces(const std::string &source);
-    std::string toString() const;
+        EType getType () const;
 
-    friend std::ostream &operator<<(std::ostream &out, const JsonValue &jsonValue);
-    friend std::istream &operator>>(std::istream &in, JsonValue &jsonValue);
+        Array &getArray ();
+        const Array &getArray () const;
 
-private:
-    void destructValue();
+        Object &getObject ();
+        const Object &getObject () const;
 
-    void readArray(std::istream& in);
-    void readTrue(std::istream& in);
-    void readFalse(std::istream& in);
-    void readNull(std::istream& in);
-    void readNumber(std::istream& in, char c);
-    void readObject(std::istream& in);
-    void readString(std::istream& in);
+        Real getReal () const;
 
-private:
-    Type type;
-    union
-    {
-        uint8_t valueArray[sizeof(Array)];
-        Bool valueBool;
-        Integer valueInteger;
-        uint8_t valueObject[sizeof(Object)];
-        Real valueReal;
-        uint8_t valueString[sizeof(std::string)];
+        static QJsonValue fromString (const std::string &source);
+        static QJsonValue fromStringWithWhiteSpaces (const std::string &source);
+        QJsonValue &insert (const Key &key, const QJsonValue &value);
+        QJsonValue &insert (const Key &key, QJsonValue &&value);
+        QJsonValue &pushBack (const QJsonValue &value);
+        QJsonValue &pushBack (QJsonValue &&value);
+        // sets or creates value, returns reference to self
+        QJsonValue &set (const Key &key, const QJsonValue &value);
+        QJsonValue &set (const Key &key, QJsonValue &&value);
+
+    private:
+        void destructValue ();
+        void readArray (std::istream &in);
+        void readTrue (std::istream &in);
+        void readFalse (std::istream &in);
+        void readNull (std::istream &in);
+        void readNumber (std::istream &in, char c);
+        void readObject (std::istream &in);
+        void readString (std::istream &in);
+
+        EType sType;
+        union
+        {
+            uint8_t uValueArray[sizeof(Array)];
+            Bool bValueBool;
+            Integer iValueInteger;
+            uint8_t uValueObject[sizeof(Object)];
+            Real sValueReal;
+            uint8_t uValueString[sizeof(std::string)];
+        };
     };
-};
-
 } // namespace Common

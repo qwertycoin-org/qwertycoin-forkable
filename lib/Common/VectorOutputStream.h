@@ -25,17 +25,17 @@
 
 namespace Common {
 
-class VectorOutputStream : public IOutputStream
-{
-public:
-    explicit VectorOutputStream(std::vector<uint8_t> &out);
+    class QVectorOutputStream : public IOutputStream
+    {
+    public:
+        explicit QVectorOutputStream (std::vector <uint8_t> &vOut);
 
-    size_t writeSome(const void *data, size_t size) override;
+        size_t writeSome (const void *data, size_t uSize) override;
 
-    VectorOutputStream &operator=(const VectorOutputStream &) = delete;
+        QVectorOutputStream &operator= (const QVectorOutputStream &) = delete;
 
-private:
-    std::vector<uint8_t> &out;
-};
+    private:
+        std::vector <uint8_t> &mOutStream;
+    };
 
 } // namespace Common

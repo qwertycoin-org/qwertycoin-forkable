@@ -24,17 +24,17 @@
 
 namespace Common {
 
-class StdInputStream : public IInputStream
-{
-public:
-    explicit StdInputStream(std::istream &in);
+    class QStdInputStream : public IInputStream
+    {
+    public:
+        explicit QStdInputStream (std::istream &in);
 
-    size_t readSome(void *data, size_t size) override;
+        size_t readSome (void *data, size_t uSize) override;
 
-    StdInputStream &operator=(const StdInputStream &) = delete;
+        QStdInputStream &operator= (const QStdInputStream &) = delete;
 
-private:
-    std::istream &in;
-};
+    private:
+        std::istream &mIStream;
+    };
 
 } // namespace Common

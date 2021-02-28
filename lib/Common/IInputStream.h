@@ -27,7 +27,7 @@ class IInputStream
 public:
     virtual ~IInputStream() = default;
 
-    virtual size_t readSome(void *data, size_t size) = 0;
+    virtual size_t readSome(void *data, size_t uSize) = 0;
 };
 
 } // namespace Common

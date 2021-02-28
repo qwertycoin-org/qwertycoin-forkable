@@ -230,7 +230,7 @@ private:
 
     void buildIndices();
 
-    Tools::ObserverManager<ITxPoolObserver> m_observerManager;
+    Tools::QObserverManager<ITxPoolObserver> m_observerManager;
     const QwertyNote::Currency &m_currency;
     QwertyNote::ICore &m_core;
     OnceInTimeInterval m_txCheckInterval;

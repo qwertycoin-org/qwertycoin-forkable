@@ -142,7 +142,7 @@ namespace QwertyNote {
         INode &mNode;
         Logging::LoggerRef mLogger;
         QPoolUpdateGuard mPoolUpdateGuard;
-        Tools::ObserverManager <IBlockchainObserver> mObserverManager;
+        Tools::QObserverManager <IBlockchainObserver> mObserverManager;
         WalletAsyncContextCounter mAsyncContextCounter;
     };
 

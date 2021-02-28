@@ -23,9 +23,9 @@
 
 namespace Logging {
 
-using Common::JsonValue;
+using Common::QJsonValue;
 
-void LoggerManager::configure(const JsonValue &val)
+void LoggerManager::configure(const QJsonValue &val)
 {
     std::unique_lock<std::mutex> lock(reconfigureLock);
     loggers.clear();

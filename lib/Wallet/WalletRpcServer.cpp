@@ -49,23 +49,23 @@ using namespace Logging;
 
 namespace Tools {
 
-const CommandLine::ArgDescriptor<uint16_t> wallet_rpc_server::arg_rpc_bind_port = {
+const CommandLine::FArgDescriptor<uint16_t> wallet_rpc_server::arg_rpc_bind_port = {
     "rpc-bind-port",
     "Starts wallet as RPC server for wallet operations, sets bind port for server.",
     0,
     true
 };
-const CommandLine::ArgDescriptor<std::string> wallet_rpc_server::arg_rpc_bind_ip = {
+const CommandLine::FArgDescriptor<std::string> wallet_rpc_server::arg_rpc_bind_ip = {
     "rpc-bind-ip",
     "Specify IP to bind RPC server to.",
     "127.0.0.1"
 };
-const CommandLine::ArgDescriptor<std::string> wallet_rpc_server::arg_rpc_user = {
+const CommandLine::FArgDescriptor<std::string> wallet_rpc_server::arg_rpc_user = {
     "rpc-user",
     "Username to use with the RPC server. If empty, no server authorization will be done.",
     ""
 };
-const CommandLine::ArgDescriptor<std::string> wallet_rpc_server::arg_rpc_password = {
+const CommandLine::FArgDescriptor<std::string> wallet_rpc_server::arg_rpc_password = {
     "rpc-password",
     "Password to use with the RPC server. If empty, no server authorization will be done.",
     ""
@@ -570,9 +570,9 @@ bool wallet_rpc_server::on_query_key(
     if (req.key_type.compare("paperwallet") == 0) {
         FAccountKeys keys;
         m_wallet.getAccountKeys(keys);
-        res.key = Tools::Base58::encodeAddr(
-                parameters::ADDRESS_BASE58_PREFIX,
-                std::string(reinterpret_cast<char *>(&keys), sizeof(keys)));
+        res.key = Tools::Base58::encodeAddress(
+            parameters::ADDRESS_BASE58_PREFIX,
+            std::string(reinterpret_cast<char *>(&keys), sizeof(keys)));
     }
 
     return true;

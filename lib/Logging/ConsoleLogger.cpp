@@ -23,7 +23,7 @@
 
 namespace Logging {
 
-using Common::Console::Color;
+using Common::Console::EColor;
 
 ConsoleLogger::ConsoleLogger(Level level)
     : CommonLogger(level)
@@ -37,24 +37,24 @@ void ConsoleLogger::doLogString(const std::string &message)
     bool changedColor = false;
     std::string color;
 
-    static std::unordered_map<std::string, Color> colorMapping = {
-        { BLUE, Color::Blue },
-        { GREEN, Color::Green },
-        { RED, Color::Red },
-        { YELLOW, Color::Yellow },
-        { WHITE, Color::White },
-        { CYAN, Color::Cyan },
-        { MAGENTA, Color::Magenta },
+    static std::unordered_map<std::string, EColor> colorMapping = {
+        { BLUE,           EColor::Blue },
+        { GREEN,          EColor::Green },
+        { RED,            EColor::Red },
+        { YELLOW,         EColor::Yellow },
+        { WHITE,          EColor::White },
+        { CYAN,           EColor::Cyan },
+        { MAGENTA,        EColor::Magenta },
 
-        { BRIGHT_BLUE, Color::BrightBlue },
-        { BRIGHT_GREEN, Color::BrightGreen },
-        { BRIGHT_RED, Color::BrightRed },
-        { BRIGHT_YELLOW, Color::BrightYellow },
-        { BRIGHT_WHITE, Color::BrightWhite },
-        { BRIGHT_CYAN, Color::BrightCyan },
-        { BRIGHT_MAGENTA, Color::BrightMagenta },
+        { BRIGHT_BLUE,    EColor::BrightBlue },
+        { BRIGHT_GREEN,   EColor::BrightGreen },
+        { BRIGHT_RED,     EColor::BrightRed },
+        { BRIGHT_YELLOW,  EColor::BrightYellow },
+        { BRIGHT_WHITE,   EColor::BrightWhite },
+        { BRIGHT_CYAN,    EColor::BrightCyan },
+        { BRIGHT_MAGENTA, EColor::BrightMagenta },
 
-        { DEFAULT, Color::Default }
+        { DEFAULT,        EColor::Default }
     };
 
     for(size_t charPos = 0; charPos < message.size(); ++charPos) {
@@ -63,7 +63,7 @@ void ConsoleLogger::doLogString(const std::string &message)
             color += message[charPos];
             if (readingText) {
                 auto it = colorMapping.find(color);
-                Common::Console::setTextColor(it == colorMapping.end() ? Color::Default : it->second);
+                Common::Console::setTextColor(it == colorMapping.end() ? EColor::Default : it->second);
                 changedColor = true;
                 color.clear();
             }
@@ -75,7 +75,7 @@ void ConsoleLogger::doLogString(const std::string &message)
     }
 
     if (changedColor) {
-        Common::Console::setTextColor(Color::Default);
+        Common::Console::setTextColor(EColor::Default);
     }
 }
 

@@ -26,169 +26,191 @@
 
 namespace Common {
 
-std::string asString(const void *data, size_t size);
-std::string asString(const std::vector<uint8_t> &data);
+    std::string asString (const void *data, size_t uSize);
+    std::string asString (const std::vector <uint8_t> &vData);
 
-std::vector<uint8_t> asBinaryArray(const std::string &data);
+    std::vector <uint8_t> asBinaryArray (const std::string &cData);
 
-// Returns value of hex 'character', throws on error
-uint8_t fromHex(char character);
+    // Returns value of hex 'cCharacter', throws on error
+    uint8_t fromHex (char cCharacter);
 
-// Assigns value of hex 'character' to 'value', returns false on error, does not throw
-bool fromHex(char character, uint8_t &value);
+    // Assigns uValue of hex 'cCharacter' to 'uValue', returns false on error, does not throw
+    bool fromHex (char cCharacter, uint8_t &uValue);
 
-// Assigns values of hex 'text' to buffer 'data' up to 'bufferSize',
-// returns actual data size, throws on error
-size_t fromHex(const std::string &text, void *data, size_t bufferSize);
+    /**
+     * Assigns values of hex 'cText' to mBuffer 'gData' up to 'mBufferSize',
+     * returns actual gData uSize, throws on error
+     *
+     * @param cText
+     * @param data
+     * @param uBufferSize
+     * @return
+     */
+    size_t fromHex (const std::string &cText, void *data, size_t uBufferSize);
 
-// Assigns values of hex 'text' to buffer 'data' up to 'bufferSize',
-// assigns actual data size to 'size', returns false on error, does not throw
-bool fromHex(const std::string &text, void *data, size_t bufferSize, size_t &size);
+    /**
+     * Assigns values of hex 'cText' to mBuffer 'gData' up to 'mBufferSize',
+     * assigns actual gData uSize to 'uSize', returns false on error, does not throw
+     *
+     * @param cText
+     * @param data
+     * @param uBufferSize
+     * @param uSize
+     * @return
+     */
+    bool fromHex (const std::string &cText, void *data, size_t uBufferSize, size_t &uSize);
 
-// Returns values of hex 'text', throws on error
-std::vector<uint8_t> fromHex(const std::string &text);
+    // Returns values of hex 'cText', throws on error
+    std::vector <uint8_t> fromHex (const std::string &cText);
 
-// Appends values of hex 'text' to 'data', returns false on error, does not throw
-bool fromHex(const std::string &text, std::vector<uint8_t> &data);
+    // Appends values of hex 'cText' to 'gData', returns false on error, does not throw
+    bool fromHex (const std::string &cText, std::vector <uint8_t> &vData);
 
-template <typename T>
-bool podFromHex(const std::string &text, T &val)
-{
-    size_t outSize;
+    template <typename T>
+    bool podFromHex (const std::string &cText, T &val)
+    {
+        size_t uOutSize;
 
-    return fromHex(text, &val, sizeof(val), outSize) && outSize == sizeof(val);
-}
-
-// Returns hex representation of ('data', 'size'), does not throw
-std::string toHex(const void *data, size_t size);
-
-// Appends hex representation of ('data', 'size') to 'text', does not throw
-void toHex(const void *data, size_t size, std::string &text);
-
-// Returns hex representation of 'data', does not throw
-std::string toHex(const std::vector<uint8_t> &data);
-
-// Appends hex representation of 'data' to 'text', does not throw
-void toHex(const std::vector<uint8_t> &data, std::string &text);
-
-template<class T>
-std::string podToHex(const T &s)
-{
-    return toHex(&s, sizeof(s));
-}
-
-bool startsWith(const std::string &str1, const std::string &str2);
-bool ends_with(const std::string &str1, const std::string &str2);
-
-inline bool split_string_helper(
-    const std::string &str,
-    size_t pos,
-    const std::string &, std::string &head)
-{
-    head = str.substr(pos);
-    return true;
-}
-
-template<class... Parts>
-inline bool split_string_helper(
-    const std::string &str,
-    size_t pos,
-    const std::string &separator,
-    std::string &head,
-    Parts &... parts)
-{
-    size_t pos2 = str.find(separator, pos);
-    if (pos2 == std::string::npos)
-    return false;
-    head = str.substr(pos, pos2 - pos);
-    return split_string_helper(str, pos2 + 1, separator, parts...);
-}
-
-template<class... Parts>
-inline bool split_string(const std::string &str, const std::string &separator, Parts &... parts) {
-return split_string_helper(str, 0, separator, parts...);
-}
-
-std::string extract(std::string &text, char delimiter);
-std::string extract(const std::string &text, char delimiter, size_t &offset);
-
-template<typename T>
-T fromString(const std::string &text)
-{
-    T value;
-
-    std::istringstream stream(text);
-    stream >> value;
-
-    if (stream.fail()) {
-        throw std::runtime_error("fromString: unable to parse value");
+        return fromHex(cText, &val, sizeof(val), uOutSize) && uOutSize == sizeof(val);
     }
 
-    return value;
-}
+    // Returns hex representation of ('gData', 'uSize'), does not throw
+    std::string toHex (const void *data, size_t uSize);
 
-template<typename T>
-bool fromString(const std::string &text, T &value)
-{
-    std::istringstream stream(text);
-    stream >> value;
+    // Appends hex representation of ('gData', 'uSize') to 'cText', does not throw
+    void toHex (const void *data, size_t uSize, std::string &cText);
 
-    return !stream.fail();
-}
+    // Returns hex representation of 'gData', does not throw
+    std::string toHex (const std::vector <uint8_t> &vData);
 
-template<typename T>
-std::vector<T> fromDelimitedString(const std::string &source, char delimiter)
-{
-    std::vector<T> data;
-    for (size_t offset = 0; offset != source.size();) {
-        data.emplace_back(fromString<T>(extract(source, delimiter, offset)));
+    // Appends hex representation of 'gData' to 'cText', does not throw
+    void toHex (const std::vector <uint8_t> &vData, std::string &cText);
+
+    template <class T>
+    std::string podToHex (const T &data)
+    {
+        return toHex(&data, sizeof(data));
     }
 
-    return data;
-}
+    bool startsWith (const std::string &cStr1, const std::string &cStr2);
+    bool endsWith (const std::string &cStr1, const std::string &cStr2);
 
-template<typename T>
-bool fromDelimitedString(const std::string &source, char delimiter, std::vector<T> &data)
-{
-    for (size_t offset = 0; offset != source.size();) {
-        T value;
-        if (!fromString<T>(extract(source, delimiter, offset), value)) {
+    inline bool splitStringHelper (const std::string &cStr,
+                                   size_t uPosition,
+                                   const std::string &,
+                                   std::string &cHead)
+    {
+        cHead = cStr.substr(uPosition);
+
+        return true;
+    }
+
+    template <class... Parts>
+    inline bool splitStringHelper (const std::string &cStr,
+                                   size_t uPosition,
+                                   const std::string &cSeparator,
+                                   std::string &cHead,
+                                   Parts &... sParts)
+    {
+        size_t pos2 = cStr.find(cSeparator, uPosition);
+        if (pos2 == std::string::npos) {
             return false;
         }
+        cHead = cStr.substr(uPosition, pos2 - uPosition);
 
-        data.emplace_back(value);
+        return splitStringHelper(cStr, pos2 + 1, cSeparator, sParts...);
     }
 
-    return true;
-}
+    template <class... Parts>
+    inline bool splitString (const std::string &str,
+                             const std::string &separator,
+                             Parts &... parts)
+    {
+        return splitStringHelper(str, 0, separator, parts...);
+    }
 
-template<typename T>
-std::string toString(const T &value)
-{
-    std::ostringstream stream;
-    stream << value;
+    std::string extract (std::string &cText, char cDelimiter);
+    std::string extract (const std::string &cText, char cDelimiter, size_t &uOffset);
 
-    return stream.str();
-}
+    template <typename T>
+    T fromString (const std::string &cText)
+    {
+        T value;
 
-template<typename T>
-void toString(const T &value, std::string &text)
-{
-    std::ostringstream stream;
-    stream << value;
-    text += stream.str();
-}
+        std::istringstream stream(cText);
+        stream >> value;
 
-bool loadFileToString(const std::string &filepath, std::string &buf);
-bool saveStringToFile(const std::string &filepath, const std::string &buf);
+        if (stream.fail()) {
+            throw std::runtime_error("fromString: unable to parse value");
+        }
 
-std::string base64Encode(std::string const &encodableString);
-std::string base64Decode(std::string const &encoded_string);
+        return value;
+    }
 
-std::string ipAddressToString(uint32_t ip);
-uint32_t stringToIpAddress(const std::string &addr);
-bool parseIpAddressAndPort(uint32_t &ip, uint32_t &port, const std::string &addr);
+    template <typename T>
+    bool fromString (const std::string &cText, T &value)
+    {
+        std::istringstream stream(cText);
+        stream >> value;
 
-std::string timeIntervalToString(uint64_t intervalInSeconds);
+        return !stream.fail();
+    }
+
+    template <typename T>
+    std::vector <T> fromDelimitedString (const std::string &cSource, char cDelimiter)
+    {
+        std::vector <T> vData;
+        for (size_t offset = 0; offset != cSource.size();) {
+            vData.emplace_back(fromString <T>(extract(cSource, cDelimiter, offset)));
+        }
+
+        return vData;
+    }
+
+    template <typename T>
+    bool fromDelimitedString (const std::string &cSource,
+                              char cDelimiter,
+                              std::vector <T> &vData)
+    {
+        for (size_t offset = 0; offset != cSource.size();) {
+            T value;
+            if (!fromString <T>(extract(cSource, cDelimiter, offset), value)) {
+                return false;
+            }
+
+            vData.emplace_back(value);
+        }
+
+        return true;
+    }
+
+    template <typename T>
+    std::string toString (const T &value)
+    {
+        std::ostringstream stream;
+        stream << value;
+
+        return stream.str();
+    }
+
+    template <typename T>
+    void toString (const T &value, std::string &cText)
+    {
+        std::ostringstream stream;
+        stream << value;
+        cText += stream.str();
+    }
+
+    bool loadFileToString (const std::string &cFilepath, std::string &cBuf);
+    bool saveStringToFile (const std::string &cFilepath, const std::string &cBuf);
+
+    std::string base64Encode (std::string const &cEncodableString);
+    std::string base64Decode (std::string const &cEncodedString);
+
+    std::string ipAddressToString (uint32_t uIp);
+    uint32_t stringToIpAddress (const std::string &cAddress);
+    bool parseIpAddressAndPort (uint32_t &uIp, uint32_t &uPort, const std::string &cAddress);
+
+    std::string timeIntervalToString (uint64_t uIntervalInSeconds);
 
 } // namespace Common

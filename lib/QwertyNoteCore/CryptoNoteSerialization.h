@@ -29,14 +29,14 @@ namespace CN = QwertyNote;
 
 namespace Crypto {
 
-bool serialize(FPublicKey &pubKey, Common::StringView name, CN::ISerializer &serializer);
-bool serialize(FSecretKey &secKey, Common::StringView name, CN::ISerializer &serializer);
-bool serialize(FHash &h, Common::StringView name, CN::ISerializer &serializer);
-bool serialize(Chacha8Iv &chacha, Common::StringView name, CN::ISerializer &serializer);
-bool serialize(FKeyImage& keyImage, Common::StringView name, CN::ISerializer &serializer);
-bool serialize(FSignature &sig, Common::StringView name, CN::ISerializer &serializer);
-bool serialize(FEllipticCurveScalar &ecScalar, Common::StringView name, CN::ISerializer &serializer);
-bool serialize(FEllipticCurvePoint &ecPoint, Common::StringView name, CN::ISerializer &serializer);
+bool serialize(FPublicKey &pubKey, Common::QStringView name, CN::ISerializer &serializer);
+bool serialize(FSecretKey &secKey, Common::QStringView name, CN::ISerializer &serializer);
+bool serialize(FHash &h, Common::QStringView name, CN::ISerializer &serializer);
+bool serialize(Chacha8Iv &chacha, Common::QStringView name, CN::ISerializer &serializer);
+bool serialize(FKeyImage& keyImage, Common::QStringView name, CN::ISerializer &serializer);
+bool serialize(FSignature &sig, Common::QStringView name, CN::ISerializer &serializer);
+bool serialize(FEllipticCurveScalar &ecScalar, Common::QStringView name, CN::ISerializer &serializer);
+bool serialize(FEllipticCurvePoint &ecPoint, Common::QStringView name, CN::ISerializer &serializer);
 
 } // namespace Crypto
 

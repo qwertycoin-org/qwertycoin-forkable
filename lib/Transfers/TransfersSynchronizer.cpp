@@ -241,7 +241,7 @@ void TransfersSynchronizer::save(std::ostream &os)
 {
     m_sync.save(os);
 
-    StdOutputStream stream(os);
+    QStdOutputStream stream(os);
     QwertyNote::BinaryOutputStreamSerializer s(stream);
     s(const_cast<uint32_t&>(TRANSFERS_STORAGE_ARCHIVE_VERSION), "version");
 
@@ -310,7 +310,7 @@ void TransfersSynchronizer::load(std::istream &is)
 {
     m_sync.load(is);
 
-    StdInputStream inputStream(is);
+    QStdInputStream inputStream(is);
     QwertyNote::BinaryInputStreamSerializer s(inputStream);
     uint32_t version = 0;
 

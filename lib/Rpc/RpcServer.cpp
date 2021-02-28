@@ -1412,28 +1412,28 @@ bool RpcServer::onGetHardwareInfo(const COMMAND_RPC_GET_HARDWARE_INFO::request &
             + std::to_string((unsigned int)fmod(uptime, 60.0)) + "s";
 
     // CPU
-    res.cpuInfo.coreCount = Tools::CPU::quantities().physical;
-    res.cpuInfo.threadCount = Tools::CPU::quantities().logical;
+    res.cpuInfo.coreCount = Tools::CPU::quantities().uPhysical;
+    res.cpuInfo.threadCount = Tools::CPU::quantities().uLogical;
     res.cpuInfo.architecture = Tools::CPU::architecture();
 
     // RAM
-    res.ramInfo.ramTotal = Tools::Memory::MemInfo::sysMem();
-    res.ramInfo.ramAvailable = Tools::Memory::MemInfo::freeSysMem();
-    res.ramInfo.ramUsageVirt = Tools::Memory::MemInfo::usedVirtMem();
-    res.ramInfo.ramUsagePhys = Tools::Memory::MemInfo::usedPhysMem();
-    res.ramInfo.ramUsageVirtMax = Tools::Memory::MemInfo::usedVirtMemMax();
-    res.ramInfo.ramUsagePhysMax = Tools::Memory::MemInfo::usedPhysMemMax();
+    res.ramInfo.ramTotal = Tools::Memory::QMemoryInfo::sysMem();
+    res.ramInfo.ramAvailable = Tools::Memory::QMemoryInfo::freeSysMem();
+    res.ramInfo.ramUsageVirt = Tools::Memory::QMemoryInfo::usedVirtMem();
+    res.ramInfo.ramUsagePhys = Tools::Memory::QMemoryInfo::usedPhysMem();
+    res.ramInfo.ramUsageVirtMax = Tools::Memory::QMemoryInfo::usedVirtMemMax();
+    res.ramInfo.ramUsagePhysMax = Tools::Memory::QMemoryInfo::usedPhysMemMax();
 
     // Space
     boost::filesystem::path configFolderPath(m_core.getConfigFolder());
     res.spaceInfo.freeSpace =
-            std::to_string(Tools::Storage::SpaceInfo::freeSpace(configFolderPath) / (1 << 20))
+            std::to_string(Tools::Storage::QSpaceInfo::freeSpace(configFolderPath) / (1 << 20))
             + " MB";
     res.spaceInfo.availableSpace =
-            std::to_string(Tools::Storage::SpaceInfo::availableSpace(configFolderPath) / (1 << 20))
+            std::to_string(Tools::Storage::QSpaceInfo::availableSpace(configFolderPath) / (1 << 20))
             + " MB";
     res.spaceInfo.capacitySpace =
-            std::to_string(Tools::Storage::SpaceInfo::capacitySpace(configFolderPath) / (1 << 20))
+            std::to_string(Tools::Storage::QSpaceInfo::capacitySpace(configFolderPath) / (1 << 20))
             + " MB";
 
     // other

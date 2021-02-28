@@ -26,61 +26,66 @@
 
 namespace Tools {
 
-template<typename OutputIt, typename T>
-typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, void>::type
-writeVarint(OutputIt &&dest, T i)
-{
-    while (i >= 0x80) {
-        *dest++ = (static_cast<char>(i) & 0x7f) | 0x80;
-        i >>= 7;
+    template <typename OutputIt, typename T>
+    typename std::enable_if <std::is_integral <T>::value &&
+                             std::is_unsigned <T>::value, void>::type writeVarint (OutputIt &&sDest,
+                                                                                   T i)
+    {
+        while (i >= 0x80) {
+            *sDest++ = (static_cast<char>(i) & 0x7f) | 0x80;
+            i >>= 7;
+        }
+        *sDest++ = static_cast<char>(i);
     }
-    *dest++ = static_cast<char>(i);
-}
 
-template<typename t_type>
-std::string getVarintData(const t_type &v)
-{
-    std::stringstream ss;
+    template <typename TType>
+    std::string getVarintData (const TType &v)
+    {
+        std::stringstream ss;
 
-    writeVarint(std::ostreambuf_iterator<char>(ss), v);
+        writeVarint(std::ostreambuf_iterator <char>(ss), v);
 
-    return ss.str();
-}
-
-template<int bits, typename InputIt, typename T>
-typename std::enable_if<std::is_integral<T>::value
-                        && std::is_unsigned<T>::value
-                        && 0 <= bits && bits <= std::numeric_limits<T>::digits,
-                        int>::type
-readVarint(InputIt &&first, InputIt &&last, T &i)
-{
-    int read = 0;
-    i = 0;
-    for (int shift = 0;; shift += 7) {
-        if (first == last) {
-            return read; // End of input.
-        }
-        unsigned char byte = *first++;
-        ++read;
-        if (shift + 7 >= bits && byte >= 1 << (bits - shift)) {
-            return -1; // Overflow.
-        }
-        if (byte == 0 && shift != 0) {
-            return -2; // Non-canonical representation.
-        }
-        i |= static_cast<T>(byte & 0x7f) << shift;
-        if ((byte & 0x80) == 0) {
-            break;
-        }
+        return ss.str();
     }
-    return read;
-}
 
-template<typename InputIt, typename T>
-int readVarint(InputIt &&first, InputIt &&last, T &i)
-{
-    return readVarint<std::numeric_limits<T>::digits, InputIt, T>(std::move(first), std::move(last),
-                                                                  i);
-}
+    template <int iBits, typename InputIt, typename T>
+    typename std::enable_if <std::is_integral <T>::value
+                             && std::is_unsigned <T>::value
+                             && 0 <= iBits && iBits <= std::numeric_limits <T>::digits,
+        int>::type
+    readVarint (InputIt &&sFirst, InputIt &&sLast, T &i)
+    {
+        int read = 0;
+        i = 0;
+        for (int shift = 0;; shift += 7) {
+            if (sFirst == sLast) {
+                return read; // End of input.
+            }
+
+            unsigned char byte = *sFirst++;
+            ++read;
+            if (shift + 7 >= iBits && byte >= 1 << (iBits - shift)) {
+                return -1; // Overflow.
+            }
+
+            if (byte == 0 && shift != 0) {
+                return -2; // Non-canonical representation.
+            }
+            i |= static_cast<T>(byte & 0x7f) << shift;
+
+            if ((byte & 0x80) == 0) {
+                break;
+            }
+        }
+        return read;
+    }
+
+    template <typename InputIt, typename T>
+    int readVarint (InputIt &&first, InputIt &&last, T &i)
+    {
+        return readVarint <std::numeric_limits <T>::digits, InputIt, T>(std::move(first),
+                                                                        std::move(last),
+                                                                        i);
+    }
 
 } // namespace Tools

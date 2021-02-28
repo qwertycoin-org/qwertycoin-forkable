@@ -286,7 +286,7 @@ void WalletGreen::clearCaches(bool clearTransactions, bool clearCachedData)
         if (!clearTransactions) {
             for (auto it = m_transactions.begin(); it != m_transactions.end(); ++it) {
                 m_transactions.modify(it, [](WalletTransaction &tx) {
-                    tx.state = WalletTransactionState::CANCELLED;
+                    tx.mState = WalletTransactionState::CANCELLED;
                     tx.blockHeight = WALLET_UNCONFIRMED_TRANSACTION_HEIGHT;
                 });
             }
@@ -318,7 +318,7 @@ void WalletGreen::decryptKeyPair(const EncryptedWalletRecord &cipher,
     std::array<char, sizeof(cipher.data)> buffer;
     chacha8(cipher.data, sizeof(cipher.data), key, cipher.iv, buffer.data());
 
-    MemoryInputStream stream(buffer.data(), buffer.size());
+    QMemoryInputStream stream(buffer.data(), buffer.size());
     BinaryInputStreamSerializer serializer(stream);
 
     serializer(publicKey, "publicKey");
@@ -343,7 +343,7 @@ EncryptedWalletRecord WalletGreen::encryptKeyPair(const FPublicKey &publicKey,
     EncryptedWalletRecord result;
 
     std::string serializedKeys;
-    StringOutputStream outputStream(serializedKeys);
+    QStringOutputStream outputStream(serializedKeys);
     BinaryOutputStreamSerializer serializer(outputStream);
 
     serializer(const_cast<FPublicKey&>(publicKey), "publicKey");
@@ -409,7 +409,7 @@ void WalletGreen::initWithKeys(const std::string &path,
 
     ContainerStorage newStorage(
         path,
-        Common::FileMappedVectorOpenMode::CREATE,
+        Common::EFileMappedVectorOpenMode::CREATE,
         sizeof(ContainerStoragePrefix)
     );
     ContainerStoragePrefix *prefix = reinterpret_cast<ContainerStoragePrefix*>(newStorage.prefix());
@@ -467,7 +467,7 @@ void WalletGreen::initWithKeysAndTimestamp(const std::string &path,
 
     ContainerStorage newStorage(
         path,
-        Common::FileMappedVectorOpenMode::CREATE,
+        Common::EFileMappedVectorOpenMode::CREATE,
         sizeof(ContainerStoragePrefix)
     );
     ContainerStoragePrefix *prefix = reinterpret_cast<ContainerStoragePrefix*>(newStorage.prefix());
@@ -542,7 +542,7 @@ void WalletGreen::exportWallet(const std::string &path,
 
     try {
         bool storageCreated = false;
-        Tools::ScopeExit failExitHandler([path, &storageCreated] {
+        Tools::QScopeExit failExitHandler([path, &storageCreated] {
             // Don't delete file if it has existed!
             if (storageCreated) {
                 boost::system::error_code ignore;
@@ -552,7 +552,7 @@ void WalletGreen::exportWallet(const std::string &path,
 
         ContainerStorage newStorage(
             path,
-            FileMappedVectorOpenMode::CREATE,
+            EFileMappedVectorOpenMode::CREATE,
             m_containerStorage.prefixSize()
         );
         storageCreated = true;
@@ -724,7 +724,7 @@ void WalletGreen::load(const std::string &path, const std::string &password)
 void WalletGreen::loadContainerStorage(const std::string &path)
 {
     try {
-        m_containerStorage.open(path,FileMappedVectorOpenMode::OPEN,sizeof(ContainerStoragePrefix));
+        m_containerStorage.open(path, EFileMappedVectorOpenMode::OPEN, sizeof(ContainerStoragePrefix));
 
         auto *prefix = reinterpret_cast<ContainerStoragePrefix *>(m_containerStorage.prefix());
         assert(prefix->version >= WalletSerializerV2::MIN_VERSION);
@@ -779,7 +779,7 @@ void WalletGreen::loadWalletCache(std::unordered_set<Crypto::FPublicKey> &addedK
         m_transactionSoftLockTime
     );
 
-    Common::MemoryInputStream containerStream(contanerData.data(), contanerData.size());
+    Common::QMemoryInputStream containerStream(contanerData.data(), contanerData.size());
     s.load(
         containerStream,
         reinterpret_cast<const ContainerStoragePrefix *>(m_containerStorage.prefix())->version
@@ -802,24 +802,24 @@ void WalletGreen::saveWalletCache(ContainerStorage &storage,
 
     if (saveLevel == WalletSaveLevel::SAVE_KEYS_AND_TRANSACTIONS) {
         filterOutTransactions(transactions, transfers, [](const WalletTransaction &tx) {
-            return tx.state == WalletTransactionState::CREATED
-                   || tx.state == WalletTransactionState::DELETED;
+            return tx.mState == WalletTransactionState::CREATED
+                   || tx.mState == WalletTransactionState::DELETED;
         });
 
         for (auto it = transactions.begin(); it != transactions.end(); ++it) {
             transactions.modify(it, [](WalletTransaction &tx) {
-                tx.state = WalletTransactionState::CANCELLED;
+                tx.mState = WalletTransactionState::CANCELLED;
                 tx.blockHeight = WALLET_UNCONFIRMED_TRANSACTION_HEIGHT;
             });
         }
     } else if (saveLevel == WalletSaveLevel::SAVE_ALL) {
         filterOutTransactions(transactions, transfers, [](const WalletTransaction &tx) {
-            return tx.state == WalletTransactionState::DELETED;
+            return tx.mState == WalletTransactionState::DELETED;
         });
     }
 
     std::string containerData;
-    Common::StringOutputStream containerStream(containerData);
+    Common::QStringOutputStream containerStream(containerData);
 
     WalletSerializerV2 s(
         *this,
@@ -855,7 +855,7 @@ void WalletGreen::copyContainerStorageKeys(ContainerStorage &src,
     dst.reserve(src.size());
 
     dst.setAutoFlush(false);
-    Tools::ScopeExit exitHandler([&dst] {
+    Tools::QScopeExit exitHandler([&dst] {
         dst.setAutoFlush(true);
         dst.flush();
     });
@@ -923,7 +923,7 @@ void WalletGreen::encryptAndSaveContainerData(ContainerStorage &storage,
     );
 
     std::string suffix;
-    Common::StringOutputStream suffixStream(suffix);
+    Common::QStringOutputStream suffixStream(suffix);
     BinaryOutputStreamSerializer suffixSerializer(suffixStream);
     suffixSerializer(suffixIv, "suffixIv");
     suffixSerializer(encryptedContainer, "encryptedContainer");
@@ -936,7 +936,7 @@ void WalletGreen::loadAndDecryptContainerData(ContainerStorage &storage,
                                               const Crypto::Chacha8Key &key,
                                               BinaryArray &containerData)
 {
-    Common::MemoryInputStream suffixStream(storage.suffix(), storage.suffixSize());
+    Common::QMemoryInputStream suffixStream(storage.suffix(), storage.suffixSize());
     BinaryInputStreamSerializer suffixSerializer(suffixStream);
     Crypto::Chacha8Iv suffixIv;
     BinaryArray encryptedContainer;
@@ -1090,7 +1090,7 @@ void WalletGreen::convertAndLoadWalletFile(const std::string &path,std::ifstream
         m_transactionSoftLockTime
     );
 
-    StdInputStream stream(walletFileStream);
+    QStdInputStream stream(walletFileStream);
     s.load(m_key, stream);
     walletFileStream.close();
 
@@ -1102,13 +1102,13 @@ void WalletGreen::convertAndLoadWalletFile(const std::string &path,std::ifstream
         bakPath = boost::filesystem::unique_path(path + ".%%%%-%%%%" + ".backup");
     }
 
-    Tools::ScopeExit tmpFileDeleter([&tmpPath] {
+    Tools::QScopeExit tmpFileDeleter([&tmpPath] {
         boost::system::error_code ignore;
         boost::filesystem::remove(tmpPath, ignore);
     });
 
     m_containerStorage.open(tmpPath.string(),
-                            Common::FileMappedVectorOpenMode::CREATE,
+                            Common::EFileMappedVectorOpenMode::CREATE,
                             sizeof(ContainerStoragePrefix));
     auto *prefix = reinterpret_cast<ContainerStoragePrefix *>(m_containerStorage.prefix());
     prefix->version = WalletSerializerV2::SERIALIZATION_VERSION;
@@ -1374,7 +1374,7 @@ std::vector<std::string> WalletGreen::doCreateAddressList(
                 m_containerStorage.setAutoFlush(false);
             }
 
-            Tools::ScopeExit exitHandler([this] {
+            Tools::QScopeExit exitHandler([this] {
                 if (!m_containerStorage.getAutoFlush()) {
                     m_containerStorage.setAutoFlush(true);
                     m_containerStorage.flush();
@@ -1668,7 +1668,7 @@ size_t WalletGreen::transfer(const TransactionParameters &transactionParameters,
                              Crypto::FSecretKey &txSecretKey)
 {
     size_t id = WALLET_INVALID_TRANSACTION_ID;
-    Tools::ScopeExit releaseContext([this, &id] {
+    Tools::QScopeExit releaseContext([this, &id] {
         m_dispatcher.yield();
 
         if (id != WALLET_INVALID_TRANSACTION_ID) {
@@ -2078,7 +2078,7 @@ size_t WalletGreen::doTransfer(const TransactionParameters &transactionParameter
 size_t WalletGreen::makeTransaction(const TransactionParameters &sendingTransaction)
 {
     size_t id = WALLET_INVALID_TRANSACTION_ID;
-    Tools::ScopeExit releaseContext([this, &id] {
+    Tools::QScopeExit releaseContext([this, &id] {
         m_dispatcher.yield();
 
         if (id != WALLET_INVALID_TRANSACTION_ID) {
@@ -2163,12 +2163,12 @@ void WalletGreen::commitTransaction(size_t transactionId)
 
     auto txIt = std::next(m_transactions.get<RandomAccessIndex>().begin(), transactionId);
     if (m_uncommitedTransactions.count(transactionId) == 0
-        || txIt->state != WalletTransactionState::CREATED) {
+        || txIt->mState != WalletTransactionState::CREATED) {
         m_logger(ERROR, BRIGHT_RED)
             << "Failed to commit transaction: bad transaction state. Transaction index "
             << transactionId
             << ", state "
-            << txIt->state;
+            << txIt->mState;
         throw std::system_error(make_error_code(Error::TX_TRANSFER_IMPOSSIBLE));
     }
 
@@ -2201,7 +2201,7 @@ void WalletGreen::commitTransaction(size_t transactionId)
 
 void WalletGreen::rollbackUncommitedTransaction(size_t transactionId)
 {
-    Tools::ScopeExit releaseContext([this] {
+    Tools::QScopeExit releaseContext([this] {
         m_dispatcher.yield();
     });
 
@@ -2221,12 +2221,12 @@ void WalletGreen::rollbackUncommitedTransaction(size_t transactionId)
     auto txIt = m_transactions.get<RandomAccessIndex>().begin();
     std::advance(txIt, transactionId);
     if (m_uncommitedTransactions.count(transactionId) == 0
-        || txIt->state != WalletTransactionState::CREATED) {
+        || txIt->mState != WalletTransactionState::CREATED) {
         m_logger(ERROR, BRIGHT_RED)
             << "Failed to rollback transaction: bad transaction state. Transaction index "
             << transactionId
             << ", state "
-            << txIt->state;
+            << txIt->mState;
         throw std::system_error(make_error_code(Error::TX_CANCEL_IMPOSSIBLE));
     }
 
@@ -2259,7 +2259,7 @@ size_t WalletGreen::insertOutgoingTransactionAndPushEvent(
     Crypto::FSecretKey &txSecretKey)
 {
     WalletTransaction insertTx;
-    insertTx.state = WalletTransactionState::CREATED;
+    insertTx.mState = WalletTransactionState::CREATED;
     insertTx.creationTime = static_cast<uint64_t>(time(nullptr));
     insertTx.unlockTime = unlockTimestamp;
     insertTx.blockHeight = QwertyNote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT;
@@ -2284,9 +2284,9 @@ void WalletGreen::updateTransactionStateAndPushEvent(size_t transactionId,
 {
     auto it = std::next(m_transactions.get<RandomAccessIndex>().begin(), transactionId);
 
-    if (it->state != state) {
+    if (it->mState != state) {
         m_transactions.get<RandomAccessIndex>().modify(it, [state](WalletTransaction &tx) {
-            tx.state = state;
+            tx.mState = state;
         });
 
         pushEvent(makeTransactionUpdatedEvent(transactionId));
@@ -2319,15 +2319,15 @@ bool WalletGreen::updateWalletTransactionInfo(size_t transactionId,
             updated = true;
         }
 
-        bool isSucceeded = transaction.state == WalletTransactionState::SUCCEEDED;
+        bool isSucceeded = transaction.mState == WalletTransactionState::SUCCEEDED;
         // If transaction was sent to daemon, it can not have CREATED and FAILED states,
         // its state can be SUCCEEDED, CANCELLED or DELETED.
-        bool wasSent = transaction.state != WalletTransactionState::CREATED
-                       && transaction.state != WalletTransactionState::FAILED;
+        bool wasSent = transaction.mState != WalletTransactionState::CREATED
+                       && transaction.mState != WalletTransactionState::FAILED;
         bool isConfirmed = transaction.blockHeight != WALLET_UNCONFIRMED_TRANSACTION_HEIGHT;
         if (!isSucceeded && (wasSent || isConfirmed)) {
             // transaction may be deleted first then added again
-            transaction.state = WalletTransactionState::SUCCEEDED;
+            transaction.mState = WalletTransactionState::SUCCEEDED;
             updated = true;
         }
 
@@ -2368,7 +2368,7 @@ size_t WalletGreen::insertBlockchainTransaction(const FTransactionInformation &i
     auto &index = m_transactions.get<RandomAccessIndex>();
 
     WalletTransaction tx;
-    tx.state = WalletTransactionState::SUCCEEDED;
+    tx.mState = WalletTransactionState::SUCCEEDED;
     tx.timestamp = info.uTimestamp;
     tx.blockHeight = info.uBlockHeight;
     tx.hash = info.sTransactionHash;
@@ -2817,7 +2817,7 @@ size_t WalletGreen::validateSaveAndSendTransaction(
         << ", hash " << transaction.getTransactionHash()
         << ", block " << m_transactions[transactionId].blockHeight
         << ", state " << m_transactions[transactionId].state;
-    Tools::ScopeExit rollbackTransactionInsertion([this, transactionId] {
+    Tools::QScopeExit rollbackTransactionInsertion([this, transactionId] {
         updateTransactionStateAndPushEvent(transactionId, WalletTransactionState::FAILED);
     });
 
@@ -2825,7 +2825,7 @@ size_t WalletGreen::validateSaveAndSendTransaction(
     pushBackOutgoingTransfers(transactionId, destinations);
 
     addUnconfirmedTransaction(transaction);
-    Tools::ScopeExit rollbackAddingUnconfirmedTransaction([this, &transaction] {
+    Tools::QScopeExit rollbackAddingUnconfirmedTransaction([this, &transaction] {
         try {
             removeUnconfirmedTransaction(transaction.getTransactionHash());
         } catch (...) {
@@ -2942,7 +2942,7 @@ uint64_t WalletGreen::selectTransfers(uint64_t neededMoney,
         }
     }
 
-    ShuffleGenerator<size_t> indexGenerator(walletOuts.size());
+    QShuffleGenerator<size_t> indexGenerator(walletOuts.size());
     while (foundMoney < neededMoney && !indexGenerator.empty()) {
         auto &out = walletOuts[indexGenerator()];
         foundMoney += out.second.uAmount;
@@ -2953,7 +2953,7 @@ uint64_t WalletGreen::selectTransfers(uint64_t neededMoney,
 
     if (dust && !dustOutputs.empty()) {
         auto dustOutputsSize = dustOutputs.size();
-        ShuffleGenerator<size_t> dustIndexGenerator(dustOutputsSize);
+        QShuffleGenerator<size_t> dustIndexGenerator(dustOutputsSize);
         do {
             auto &out = dustOutputs[dustIndexGenerator()];
             foundMoney += out.second.uAmount;
@@ -3197,7 +3197,7 @@ std::vector<WalletTransactionWithTransfers> WalletGreen::getUnconfirmedTransacti
         WALLET_UNCONFIRMED_TRANSACTION_HEIGHT
     );
     for (auto it = lowerBound; it != m_transactions.get<BlockHeightIndex>().end(); ++it) {
-        if (it->state != WalletTransactionState::SUCCEEDED) {
+        if (it->mState != WalletTransactionState::SUCCEEDED) {
             continue;
         }
 
@@ -4417,7 +4417,7 @@ std::vector<size_t> WalletGreen::deleteTransfersForAddress(
                 transaction.totalAmount -= deletedInputs + deletedOutputs;
 
                 if (!transfersLeft) {
-                    transaction.state = WalletTransactionState::DELETED;
+                    transaction.mState = WalletTransactionState::DELETED;
                     transaction.blockHeight = WALLET_UNCONFIRMED_TRANSACTION_HEIGHT;
                     m_logger(DEBUGGING)
                         << "Transaction state changed, ID " << transactionId

@@ -57,25 +57,27 @@ static inline uint64_t rol64(uint64_t x, int r)
 }
 #endif
 
-static inline uint64_t hiDword(uint64_t val)
+static inline uint64_t hiDword(uint64_t uValue)
 {
-    return val >> 32;
+    return uValue >> 32;
 }
 
-static inline uint64_t loDword(uint64_t val)
+static inline uint64_t loDword(uint64_t uValue)
 {
-    return val & 0xFFFFFFFF;
+    return uValue & 0xFFFFFFFF;
 }
 
-static inline uint64_t mul128(uint64_t multiplier, uint64_t multiplicand, uint64_t *productHi)
+static inline uint64_t mul128(uint64_t uMultiplier,
+                              uint64_t uMultiplicand,
+                              uint64_t *uProductHigh)
 {
-    // multiplier   = ab = a * 2^32 + b
-    // multiplicand = cd = c * 2^32 + d
+    // uMultiplier   = ab = a * 2^32 + b
+    // uMultiplicand = cd = c * 2^32 + d
     // ab * cd = a * c * 2^64 + (a * d + b * c) * 2^32 + b * d
-    uint64_t a = hiDword(multiplier);
-    uint64_t b = loDword(multiplier);
-    uint64_t c = hiDword(multiplicand);
-    uint64_t d = loDword(multiplicand);
+    uint64_t a = hiDword(uMultiplier);
+    uint64_t b = loDword(uMultiplier);
+    uint64_t c = hiDword(uMultiplicand);
+    uint64_t d = loDword(uMultiplicand);
 
     uint64_t ac = a * c;
     uint64_t ad = a * d;
@@ -85,45 +87,47 @@ static inline uint64_t mul128(uint64_t multiplier, uint64_t multiplicand, uint64
     uint64_t adbc = ad + bc;
     uint64_t adbcCarry = adbc < ad ? 1 : 0;
 
-    // multiplier * multiplicand = productHi * 2^64 + productLo
+    // uMultiplier * uMultiplicand = uProductHigh * 2^64 + productLo
     uint64_t productLo = bd + (adbc << 32);
     uint64_t productLoCarry = productLo < bd ? 1 : 0;
-    *productHi = ac + (adbc >> 32) + (adbcCarry << 32) + productLoCarry;
+    *uProductHigh = ac + (adbc >> 32) + (adbcCarry << 32) + productLoCarry;
 
-    assert(ac <= *productHi);
+    assert(ac <= *uProductHigh);
 
     return productLo;
 }
 
-static inline uint64_t divWithReminder(uint64_t dividend, uint32_t divisor, uint32_t *remainder)
+static inline uint64_t divWithReminder(uint64_t uDividend,
+                                       uint32_t uDivisor,
+                                       uint32_t *uRemainder)
 {
-    dividend |= ((uint64_t)*remainder) << 32;
-    *remainder = dividend % divisor;
+    uDividend |= ((uint64_t)*uRemainder) << 32;
+    *uRemainder = uDividend % uDivisor;
 
-    return dividend / divisor;
+    return uDividend / uDivisor;
 }
 
 // Long division with 2^32 base
-static inline uint32_t div128_32(uint64_t dividend_hi,
-                                 uint64_t dividend_lo,
-                                 uint32_t divisor,
-                                 uint64_t *quotient_hi,
-                                 uint64_t *quotient_lo)
+static inline uint32_t div128b32(uint64_t uDividendHigh,
+                                 uint64_t uDividendLow,
+                                 uint32_t uDivisor,
+                                 uint64_t *uQuotientHigh,
+                                 uint64_t *uQuotientLow)
 {
-    uint64_t dividendDwords[4];
-    uint32_t remainder = 0;
+    uint64_t uDividendDWords[4];
+    uint32_t uRemainder = 0;
 
-    dividendDwords[3] = hiDword(dividend_hi);
-    dividendDwords[2] = loDword(dividend_hi);
-    dividendDwords[1] = hiDword(dividend_lo);
-    dividendDwords[0] = loDword(dividend_lo);
+    uDividendDWords[3] = hiDword(uDividendHigh);
+    uDividendDWords[2] = loDword(uDividendHigh);
+    uDividendDWords[1] = hiDword(uDividendLow);
+    uDividendDWords[0] = loDword(uDividendLow);
 
-    *quotient_hi  = divWithReminder(dividendDwords[3], divisor, &remainder) << 32;
-    *quotient_hi |= divWithReminder(dividendDwords[2], divisor, &remainder);
-    *quotient_lo  = divWithReminder(dividendDwords[1], divisor, &remainder) << 32;
-    *quotient_lo |= divWithReminder(dividendDwords[0], divisor, &remainder);
+    *uQuotientHigh  = divWithReminder(uDividendDWords[3], uDivisor, &uRemainder) << 32;
+    *uQuotientHigh |= divWithReminder(uDividendDWords[2], uDivisor, &uRemainder);
+    *uQuotientLow  = divWithReminder(uDividendDWords[1], uDivisor, &uRemainder) << 32;
+    *uQuotientLow |= divWithReminder(uDividendDWords[0], uDivisor, &uRemainder);
 
-    return remainder;
+    return uRemainder;
 }
 
 #define IDENT32(x) ((uint32_t) (x))
@@ -182,64 +186,71 @@ static inline uint64_t swap64(uint64_t x)
 static inline void memInplaceIdent(void *mem UNUSED, size_t n UNUSED) { }
 #undef UNUSED
 
-static inline void memInplaceSwap32(void *mem, size_t n)
+static inline void memInplaceSwap32(void *memory, size_t n)
 {
     size_t i;
     for (i = 0; i < n; i++) {
-        ((uint32_t *) mem)[i] = swap32(((const uint32_t *) mem)[i]);
+        ((uint32_t *) memory)[i] = swap32(((const uint32_t *) memory)[i]);
     }
 }
 
-static inline void memInplaceSwap64(void *mem, size_t n)
+static inline void memInplaceSwap64(void *memory, size_t n)
 {
     size_t i;
     for (i = 0; i < n; i++) {
-        ((uint64_t *) mem)[i] = swap64(((const uint64_t *) mem)[i]);
+        ((uint64_t *) memory)[i] = swap64(((const uint64_t *) memory)[i]);
     }
 }
 
-static inline void memCpyIdent32(void *dst, const void *src, size_t n)
+static inline void memCpyIdent32(void *destination, const void *source, size_t n)
 {
-    memcpy(dst, src, 4 * n);
+    memcpy(destination, source, 4 * n);
 }
 
-static inline void memCpyIdent64(void *dst, const void *src, size_t n)
+static inline void memCpyIdent64(void *destination, const void *source, size_t n)
 {
-    memcpy(dst, src, 8 * n);
+    memcpy(destination, source, 8 * n);
 }
 
-static inline void memCpySwap32(void *dst, const void *src, size_t n)
+static inline void memCpySwap32(void *destination, const void *source, size_t n)
 {
     size_t i;
     for (i = 0; i < n; i++) {
-        ((uint32_t *) dst)[i] = swap32(((const uint32_t *) src)[i]);
+        ((uint32_t *) destination)[i] = swap32(((const uint32_t *) source)[i]);
     }
 }
 
-static inline void memCpySwap64(void *dst, const void *src, size_t n)
+static inline void memCpySwap64(void *destination, const void *source, size_t n)
 {
     size_t i;
     for (i = 0; i < n; i++) {
-        ((uint64_t *) dst)[i] = swap64(((const uint64_t *) src)[i]);
+        ((uint64_t *) destination)[i] = swap64(((const uint64_t *) source)[i]);
     }
 }
 
-// Calculate ln(p) of Poisson distribution
-// https://github.com/ryo-currency/ryo-writeups/blob/master/poisson-writeup.md
-// Original idea : https://stackoverflow.com/questions/30156803/implementing-poisson-distribution-in-c
-// Using logarithms avoids dealing with very large (k!) and very small (p < 10^-44) numbers
-// lam     - lambda parameter - in our case, how many blocks, on average, you would expect to see in the interval
-// k       - k parameter - in our case, how many blocks we have actually seen
-//           !!! k must not be zero
-// return  - ln(p)
-static inline double calcPoissonLn(double lam, uint64_t k)
+/**
+ * @brief Calculate ln(p) of Poisson distribution
+ * https://github.com/ryo-currency/ryo-writeups/blob/master/poisson-writeup.md
+ * Original idea : https://stackoverflow.com/questions/30156803/implementing-poisson-distribution-in-c
+ * Using logarithms avoids dealing with very large (uBlockAmount!) and very small (p < 10^-44) numbers
+ *
+ * dLambda       - dLambda parameter - in our case, how many blocks, on average,
+ *                 you would expect to see in the interval
+ * uBlockAmount  - uBlockAmount parameter - in our case, how many blocks we have actually seen
+ *                 !!! uBlockAmount must not be zero
+ *
+ * @param dLambda
+ * @param uBlockAmount
+ * @return ln(p)
+ */
+static inline double calcPoissonLn(double dLambda, uint64_t uBlockAmount)
 {
-    double logX = -lam + k * log(lam);
+    double dLogX = -dLambda + uBlockAmount * log(dLambda);
     do {
-        logX -= log(k); // this can be tabulated
-    } while (--k > 0);
+        dLogX -= log(uBlockAmount); // this can be tabulated
+    } while (--uBlockAmount > 0);
 
-    return logX;
+    return dLogX;
 }
 
 #if !defined(BYTE_ORDER) || !defined(LITTLE_ENDIAN) || !defined(BIG_ENDIAN)

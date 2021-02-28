@@ -28,273 +28,289 @@
 
 namespace Tools {
 
-namespace Base58 {
+    namespace Base58 {
 
-namespace {
+        namespace {
 
-const char alphabet[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-const size_t alphabetSize = sizeof(alphabet) - 1;
-const size_t encodedBlockSizes[] = {0, 2, 3, 5, 6, 7, 9, 10, 11};
-const size_t fullBlockSize = sizeof(encodedBlockSizes) / sizeof(encodedBlockSizes[0]) - 1;
-const size_t fullEncodedBlockSize = encodedBlockSizes[fullBlockSize];
-const size_t addrChecksumSize = 4;
+            const char cAlphabet[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+            const size_t uAlphabetSize = sizeof(cAlphabet) - 1;
+            const size_t uEncodedBlockSizes[] = {0, 2, 3, 5, 6, 7, 9, 10, 11};
+            const size_t uFullBlockSize =
+                sizeof(uEncodedBlockSizes) / sizeof(uEncodedBlockSizes[0]) - 1;
+            const size_t uFullEncodedBlockSize = uEncodedBlockSizes[uFullBlockSize];
+            const size_t uAddressChecksumSize = 4;
 
-struct ReverseAlphabet {
-    ReverseAlphabet()
-    {
-        m_data.resize(alphabet[alphabetSize - 1] - alphabet[0] + 1, -1);
+            struct FReverseAlphabet
+            {
+                FReverseAlphabet ()
+                {
+                    mData.resize(cAlphabet[uAlphabetSize - 1] - cAlphabet[0] + 1, -1);
 
-        for (size_t i = 0; i < alphabetSize; ++i) {
-            size_t idx = static_cast<size_t>(alphabet[i] - alphabet[0]);
-            m_data[idx] = static_cast<int8_t>(i);
+                    for (size_t i = 0; i < uAlphabetSize; ++i) {
+                        size_t idx = static_cast<size_t>(cAlphabet[i] - cAlphabet[0]);
+                        mData[idx] = static_cast<int8_t>(i);
+                    }
+                }
+
+                int operator() (char cLetter) const
+                {
+                    size_t uIndex = static_cast<size_t>(cLetter - cAlphabet[0]);
+
+                    return uIndex < mData.size() ? mData[uIndex] : -1;
+                }
+
+                static FReverseAlphabet pInstance;
+
+            private:
+                std::vector <int8_t> mData;
+            };
+
+            FReverseAlphabet FReverseAlphabet::pInstance;
+
+            struct FDecodedBlockSizes
+            {
+                FDecodedBlockSizes ()
+                {
+                    mData.resize(uEncodedBlockSizes[uFullBlockSize] + 1, -1);
+
+                    for (size_t i = 0; i <= uFullBlockSize; ++i) {
+                        mData[uEncodedBlockSizes[i]] = static_cast<int>(i);
+                    }
+                }
+
+                int operator() (size_t uEncodedBlockSize) const
+                {
+                    assert(uEncodedBlockSize <= uFullEncodedBlockSize);
+
+                    return mData[uEncodedBlockSize];
+                }
+
+                static FDecodedBlockSizes pInstance;
+
+            private:
+                std::vector <int> mData;
+            };
+
+            FDecodedBlockSizes FDecodedBlockSizes::pInstance;
+
+            uint64_t uint8BeTo64 (const uint8_t *uData, size_t uSize)
+            {
+                assert(1 <= uSize && uSize <= sizeof(uint64_t));
+
+                uint64_t uResult = 0;
+                switch (9 - uSize) {
+                    case 1:
+                        uResult |= *uData++;
+                        /* FALLTHROUGH */
+                    case 2:
+                        uResult <<= 8;
+                        uResult |= *uData++;
+                        /* FALLTHROUGH */
+                    case 3:
+                        uResult <<= 8;
+                        uResult |= *uData++;
+                        /* FALLTHROUGH */
+                    case 4:
+                        uResult <<= 8;
+                        uResult |= *uData++;
+                        /* FALLTHROUGH */
+                    case 5:
+                        uResult <<= 8;
+                        uResult |= *uData++;
+                        /* FALLTHROUGH */
+                    case 6:
+                        uResult <<= 8;
+                        uResult |= *uData++;
+                        /* FALLTHROUGH */
+                    case 7:
+                        uResult <<= 8;
+                        uResult |= *uData++;
+                        /* FALLTHROUGH */
+                    case 8:
+                        uResult <<= 8;
+                        uResult |= *uData;
+                        break;
+                    default:
+                        assert(false);
+                }
+
+                return uResult;
+            }
+
+            void uint64To8Be (uint64_t uNum, size_t uSize, uint8_t *uData)
+            {
+                assert(1 <= uSize && uSize <= sizeof(uint64_t));
+
+                uint64_t uNumBe = SWAP64BE(uNum);
+
+                memcpy(uData,
+                       reinterpret_cast<uint8_t *>(&uNumBe) + sizeof(uint64_t) - uSize,
+                       uSize);
+            }
+
+            void encodeBlock (const char *cBlock, size_t uSize, char *cResult)
+            {
+                assert(1 <= uSize && uSize <= uFullBlockSize);
+
+                uint64_t uNumber = uint8BeTo64(reinterpret_cast<const uint8_t *>(cBlock), uSize);
+                int i = static_cast<int>(uEncodedBlockSizes[uSize]) - 1;
+
+                while (0 < uNumber) {
+                    uint64_t uRemainder = uNumber % uAlphabetSize;
+                    uNumber /= uAlphabetSize;
+                    cResult[i] = cAlphabet[uRemainder];
+                    --i;
+                }
+            }
+
+            bool decodeBlock (const char *cBlock, size_t uSize, char *cResult)
+            {
+                assert(1 <= uSize && uSize <= uFullEncodedBlockSize);
+
+                int iResultSize = FDecodedBlockSizes::pInstance(uSize);
+                if (iResultSize <= 0) {
+                    return false; // uInvalid cBlock uSize
+                }
+
+                uint64_t uResNum = 0;
+                uint64_t uOrder = 1;
+                for (size_t i = uSize - 1; i < uSize; --i) {
+                    int iDigit = FReverseAlphabet::pInstance(cBlock[i]);
+                    if (iDigit < 0) {
+                        return false; // uInvalid symbol
+                    }
+
+                    uint64_t uProductHi;
+                    uint64_t uTmp = uResNum + mul128(uOrder, iDigit, &uProductHi);
+                    if (uTmp < uResNum || 0 != uProductHi) {
+                        return false; // overflow
+                    }
+
+                    uResNum = uTmp;
+                    uOrder *= uAlphabetSize; // never overflows, 58^10 < 2^64
+                }
+
+                if (static_cast<size_t>(iResultSize) < uFullBlockSize
+                    && (UINT64_C(1) << (8 * iResultSize)) <= uResNum) {
+                    return false; // overflow
+                }
+
+                uint64To8Be(uResNum, iResultSize, reinterpret_cast<uint8_t *>(cResult));
+
+                return true;
+            }
+
+        } // namespace
+
+        std::string encode (const std::string &cData)
+        {
+            if (cData.empty()) {
+                return std::string();
+            }
+
+            size_t uFullBlockCount = cData.size() / uFullBlockSize;
+            size_t uLastBlockSize = cData.size() % uFullBlockSize;
+            size_t uResultSize = uFullBlockCount *
+                                 uFullEncodedBlockSize + uEncodedBlockSizes[uLastBlockSize];
+
+            std::string cResult(uResultSize, cAlphabet[0]);
+            for (size_t i = 0; i < uFullBlockCount; ++i) {
+                encodeBlock(cData.data() + i *
+                                           uFullBlockSize,
+                            uFullBlockSize,
+                            &cResult[i * uFullEncodedBlockSize]);
+            }
+
+            if (0 < uLastBlockSize) {
+                encodeBlock(cData.data() + uFullBlockCount *
+                                           uFullBlockSize,
+                            uLastBlockSize,
+                            &cResult[uFullBlockCount * uFullEncodedBlockSize]);
+            }
+
+            return cResult;
         }
-    }
 
-    int operator()(char letter) const
-    {
-        size_t idx = static_cast<size_t>(letter - alphabet[0]);
+        bool decode (const std::string &cEncodedString, std::string &cData)
+        {
+            if (cEncodedString.empty()) {
+                cData.clear();
+                return true;
+            }
 
-        return idx < m_data.size() ? m_data[idx] : -1;
-    }
+            size_t uFullBlockCount = cEncodedString.size() / uFullEncodedBlockSize;
+            size_t uLastBlockSize = cEncodedString.size() % uFullEncodedBlockSize;
+            int iLastBlockDecodedSize = FDecodedBlockSizes::pInstance(uLastBlockSize);
+            if (iLastBlockDecodedSize < 0) {
+                return false; // uInvalid cEncodedString length
+            }
+            size_t uDataSize = uFullBlockCount * uFullBlockSize + iLastBlockDecodedSize;
 
-    static ReverseAlphabet instance;
+            cData.resize(uDataSize, 0);
+            for (size_t i = 0; i < uFullBlockCount; ++i) {
+                if (!decodeBlock(cEncodedString.data() + i * uFullEncodedBlockSize,
+                                 uFullEncodedBlockSize,
+                                 &cData[i * uFullBlockSize])) {
+                    return false;
+                }
+            }
 
-private:
-    std::vector<int8_t> m_data;
-};
+            if (0 < uLastBlockSize) {
+                if (!decodeBlock(cEncodedString.data() + uFullBlockCount * uFullEncodedBlockSize,
+                                 uLastBlockSize,
+                                 &cData[uFullBlockCount * uFullBlockSize])) {
+                    return false;
+                }
+            }
 
-ReverseAlphabet ReverseAlphabet::instance;
-
-struct DecodedBlockSizes {
-    DecodedBlockSizes()
-    {
-        m_data.resize(encodedBlockSizes[fullBlockSize] + 1, -1);
-        for (size_t i = 0; i <= fullBlockSize; ++i) {
-            m_data[encodedBlockSizes[i]] = static_cast<int>(i);
-        }
-    }
-
-    int operator()(size_t encodedBlockSize) const
-    {
-        assert(encodedBlockSize <= fullEncodedBlockSize);
-
-        return m_data[encodedBlockSize];
-    }
-
-    static DecodedBlockSizes instance;
-
-private:
-    std::vector<int> m_data;
-};
-
-DecodedBlockSizes DecodedBlockSizes::instance;
-
-uint64_t uint8BeTo64(const uint8_t *data, size_t size)
-{
-    assert(1 <= size && size <= sizeof(uint64_t));
-
-    uint64_t res = 0;
-    switch (9 - size) {
-    case 1:
-        res |= *data++;
-        /* FALLTHROUGH */
-    case 2:
-        res <<= 8;
-        res |= *data++;
-        /* FALLTHROUGH */
-    case 3:
-        res <<= 8;
-        res |= *data++;
-        /* FALLTHROUGH */
-    case 4:
-        res <<= 8;
-        res |= *data++;
-        /* FALLTHROUGH */
-    case 5:
-        res <<= 8;
-        res |= *data++;
-        /* FALLTHROUGH */
-    case 6:
-        res <<= 8;
-        res |= *data++;
-        /* FALLTHROUGH */
-    case 7:
-        res <<= 8;
-        res |= *data++;
-        /* FALLTHROUGH */
-    case 8:
-        res <<= 8;
-        res |= *data;
-        break;
-    default:
-        assert(false);
-    }
-
-    return res;
-}
-
-void uint64To8Be(uint64_t num, size_t size, uint8_t *data)
-{
-    assert(1 <= size && size <= sizeof(uint64_t));
-
-    uint64_t numBe = SWAP64BE(num);
-
-    memcpy(data, reinterpret_cast<uint8_t*>(&numBe) + sizeof(uint64_t) - size, size);
-}
-
-void encodeBlock(const char *block, size_t size, char *res)
-{
-    assert(1 <= size && size <= fullBlockSize);
-
-    uint64_t num = uint8BeTo64(reinterpret_cast<const uint8_t *>(block), size);
-    int i = static_cast<int>(encodedBlockSizes[size]) - 1;
-    while (0 < num) {
-        uint64_t remainder = num % alphabetSize;
-        num /= alphabetSize;
-        res[i] = alphabet[remainder];
-        --i;
-    }
-}
-
-bool decodeBlock(const char *block, size_t size, char *res)
-{
-    assert(1 <= size && size <= fullEncodedBlockSize);
-
-    int res_size = DecodedBlockSizes::instance(size);
-    if (res_size <= 0) {
-        return false; // invalid block size
-    }
-
-    uint64_t resNum = 0;
-    uint64_t order = 1;
-    for (size_t i = size - 1; i < size; --i) {
-        int digit = ReverseAlphabet::instance(block[i]);
-        if (digit < 0) {
-            return false; // invalid symbol
+            return true;
         }
 
-        uint64_t product_hi;
-        uint64_t tmp = resNum + mul128(order, digit, &product_hi);
-        if (tmp < resNum || 0 != product_hi) {
-            return false; // overflow
+        std::string encodeAddress (uint64_t uExtraTag, const std::string &cData)
+        {
+            std::string cBuffer = getVarintData(uExtraTag);
+            cBuffer += cData;
+
+            Crypto::FHash sHash = Crypto::cnFastHash(cBuffer.data(), cBuffer.size());
+
+            const char *cHashData = reinterpret_cast<const char *>(&sHash);
+            cBuffer.append(cHashData, uAddressChecksumSize);
+
+            return encode(cBuffer);
         }
 
-        resNum = tmp;
-        order *= alphabetSize; // never overflows, 58^10 < 2^64
-    }
+        bool decodeAddress (std::string cAddress, uint64_t &uExtraTag, std::string &sData)
+        {
+            std::string cAddrData;
+            bool r = decode(cAddress, cAddrData);
+            if (!r) {
+                return false;
+            }
+            if (cAddrData.size() <= uAddressChecksumSize) {
+                return false;
+            }
 
-    if (static_cast<size_t>(res_size) < fullBlockSize
-        && (UINT64_C(1) << (8 * res_size)) <= resNum) {
-        return false; // overflow
-    }
+            std::string cChecksum(uAddressChecksumSize, '\0');
+            cChecksum = cAddrData.substr(cAddrData.size() - uAddressChecksumSize);
 
-    uint64To8Be(resNum, res_size, reinterpret_cast<uint8_t *>(res));
+            cAddrData.resize(cAddrData.size() - uAddressChecksumSize);
+            Crypto::FHash sHash = Crypto::cnFastHash(cAddrData.data(), cAddrData.size());
+            std::string cExpectedChecksum(reinterpret_cast<const char *>(&sHash),
+                                          uAddressChecksumSize);
+            if (cExpectedChecksum != cChecksum) {
+                return false;
+            }
 
-    return true;
-}
+            int iRead = Tools::readVarint(cAddrData.begin(), cAddrData.end(), uExtraTag);
+            if (iRead <= 0) {
+                return false;
+            }
 
-} // namespace
+            sData = cAddrData.substr(iRead);
 
-std::string encode(const std::string &data)
-{
-    if (data.empty()) {
-        return std::string();
-    }
-
-    size_t fullBlockCount = data.size() / fullBlockSize;
-    size_t lastBlockSize = data.size() % fullBlockSize;
-    size_t resSize = fullBlockCount * fullEncodedBlockSize + encodedBlockSizes[lastBlockSize];
-
-    std::string res(resSize, alphabet[0]);
-    for (size_t i = 0; i < fullBlockCount; ++i) {
-        encodeBlock(data.data() + i * fullBlockSize, fullBlockSize, &res[i * fullEncodedBlockSize]);
-    }
-
-    if (0 < lastBlockSize) {
-        encodeBlock(data.data() + fullBlockCount * fullBlockSize, lastBlockSize,
-                    &res[fullBlockCount * fullEncodedBlockSize]);
-    }
-
-    return res;
-}
-
-bool decode(const std::string &enc, std::string &data)
-{
-    if (enc.empty()) {
-        data.clear();
-        return true;
-    }
-
-    size_t fullBlockCount = enc.size() / fullEncodedBlockSize;
-    size_t lastBlockSize = enc.size() % fullEncodedBlockSize;
-    int lastBlockDecodedSize = DecodedBlockSizes::instance(lastBlockSize);
-    if (lastBlockDecodedSize < 0) {
-        return false; // invalid enc length
-    }
-    size_t dataSize = fullBlockCount * fullBlockSize + lastBlockDecodedSize;
-
-    data.resize(dataSize, 0);
-    for (size_t i = 0; i < fullBlockCount; ++i) {
-        if (!decodeBlock(enc.data() + i * fullEncodedBlockSize, fullEncodedBlockSize,
-                         &data[i * fullBlockSize])) {
-            return false;
+            return true;
         }
-    }
 
-    if (0 < lastBlockSize) {
-        if (!decodeBlock(enc.data() + fullBlockCount * fullEncodedBlockSize, lastBlockSize,
-                         &data[fullBlockCount * fullBlockSize])) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-std::string encodeAddr(uint64_t tag, const std::string &data)
-{
-    std::string buf = getVarintData(tag);
-    buf += data;
-
-    Crypto::FHash hash = Crypto::cnFastHash(buf.data(), buf.size());
-
-    const char *hashData = reinterpret_cast<const char*>(&hash);
-    buf.append(hashData, addrChecksumSize);
-
-    return encode(buf);
-}
-
-bool decodeAddr(std::string addr, uint64_t &tag, std::string &data)
-{
-    std::string addrData;
-    bool r = decode(addr, addrData);
-    if (!r) {
-        return false;
-    }
-    if (addrData.size() <= addrChecksumSize) {
-        return false;
-    }
-
-    std::string checksum(addrChecksumSize, '\0');
-    checksum = addrData.substr(addrData.size() - addrChecksumSize);
-
-    addrData.resize(addrData.size() - addrChecksumSize);
-    Crypto::FHash hash = Crypto::cnFastHash(addrData.data(), addrData.size());
-    std::string expectedChecksum(reinterpret_cast<const char *>(&hash), addrChecksumSize);
-    if (expectedChecksum != checksum) {
-        return false;
-    }
-
-    int read = Tools::readVarint(addrData.begin(), addrData.end(), tag);
-    if (read <= 0) {
-        return false;
-    }
-
-    data = addrData.substr(read);
-
-    return true;
-}
-
-} // namespace Base58
+    } // namespace Base58
 
 } // namespace Tools

@@ -354,7 +354,7 @@ const T &SwappedVector<T>::operator[](uint64_t index)
     m_itemsFile.seekg(m_offsets[index]);
     T tempItem;
 
-    Common::StdInputStream stream(m_itemsFile);
+    Common::QStdInputStream stream(m_itemsFile);
     QwertyNote::BinaryInputStreamSerializer archive(stream);
     serialize(tempItem, archive);
 
@@ -433,7 +433,7 @@ void SwappedVector<T>::push_back(const T &item)
 
         m_itemsFile.seekp(m_itemsFileSize);
 
-        Common::StdOutputStream stream(m_itemsFile);
+        Common::QStdOutputStream stream(m_itemsFile);
         QwertyNote::BinaryOutputStreamSerializer archive(stream);
         serialize(const_cast<T &>(item), archive);
 

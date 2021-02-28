@@ -37,7 +37,7 @@ public:
     }
 
 protected:
-    Tools::ObserverManager<Observer> m_observerManager;
+    Tools::QObserverManager<Observer> m_observerManager;
 };
 
 } // namespace QwertyNote

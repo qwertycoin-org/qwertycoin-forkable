@@ -47,7 +47,7 @@ struct WalletTransactionDtoV2
 
     WalletTransactionDtoV2(const QwertyNote::WalletTransaction &wallet)
     {
-        state = wallet.state;
+        state = wallet.mState;
         timestamp = wallet.timestamp;
         blockHeight = wallet.blockHeight;
         hash = wallet.hash;
@@ -290,7 +290,7 @@ void WalletSerializerV2::loadTransactions(QwertyNote::ISerializer &serializer)
         serializer(dto, "transaction");
 
         WalletTransaction tx;
-        tx.state = dto.state;
+        tx.mState = dto.state;
         tx.timestamp = dto.timestamp;
         tx.blockHeight = dto.blockHeight;
         tx.hash = dto.hash;

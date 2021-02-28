@@ -112,7 +112,7 @@ void core::init_options(boost::program_options::options_description &desc) { }
 
 bool core::handle_command_line(const boost::program_options::variables_map &vm)
 {
-    m_config_folder = CommandLine::getArg(vm, CommandLine::argDataDir);
+    m_config_folder = CommandLine::getArg(vm, CommandLine::sArgDataDir);
     return true;
 }
 

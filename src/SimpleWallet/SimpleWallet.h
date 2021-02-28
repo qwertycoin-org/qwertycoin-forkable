@@ -229,7 +229,7 @@ private:
 
     std::unique_ptr<std::promise<std::error_code>> m_initResultPromise;
 
-    Common::ConsoleHandler m_consoleHandler;
+    Common::QConsoleHandler m_consoleHandler;
     const QwertyNote::Currency &m_currency;
     Logging::LoggerManager &m_logManager;
     System::Dispatcher &m_dispatcher;

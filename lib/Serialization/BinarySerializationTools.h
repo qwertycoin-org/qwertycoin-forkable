@@ -31,7 +31,7 @@ template <typename T>
 BinaryArray storeToBinary(const T &obj)
 {
     BinaryArray result;
-    Common::VectorOutputStream stream(result);
+    Common::QVectorOutputStream stream(result);
     BinaryOutputStreamSerializer ba(stream);
 
     serialize(const_cast<T &>(obj), ba);
@@ -42,7 +42,7 @@ BinaryArray storeToBinary(const T &obj)
 template <typename T>
 void loadFromBinary(T &obj, const BinaryArray &blob)
 {
-    Common::MemoryInputStream stream(blob.data(), blob.size());
+    Common::QMemoryInputStream stream(blob.data(), blob.size());
     BinaryInputStreamSerializer ba(stream);
     serialize(obj, ba);
 }
@@ -57,7 +57,7 @@ bool storeToBinaryFile(const T &obj, const std::string &filename)
             return false;
         }
 
-        Common::StdOutputStream stream(dataFile);
+        Common::QStdOutputStream stream(dataFile);
         BinaryOutputStreamSerializer out(stream);
         QwertyNote::serialize(const_cast<T &>(obj), out);
 
@@ -83,7 +83,7 @@ bool loadFromBinaryFile(T &obj, const std::string &filename)
             return false;
         }
 
-        Common::StdInputStream stream(dataFile);
+        Common::QStdInputStream stream(dataFile);
         BinaryInputStreamSerializer in(stream);
         serialize(obj, in);
 

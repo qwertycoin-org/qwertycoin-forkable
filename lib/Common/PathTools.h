@@ -21,17 +21,17 @@
 #include <string>
 
 namespace Common {
+    bool hasParentPath (const std::string &cPath);
 
-std::string nativePathToGeneric(const std::string &nativePath);
+    std::string nativePathToGeneric (const std::string &cNativePath);
 
-std::string getPathDirectory(const std::string &path);
-std::string getPathFilename(const std::string &path);
-void splitPath(const std::string &path, std::string &directory, std::string &filename);
+    std::string getPathDirectory (const std::string &cPath);
+    std::string getPathFilename (const std::string &cPath);
+    void splitPath (const std::string &cPath, std::string &cDirectory, std::string &cFilename);
 
-std::string combinePath(const std::string &path1, const std::string &path2);
-std::string getExtension(const std::string &path);
-std::string removeExtension(const std::string &path);
-std::string replaceExtenstion(const std::string &path, const std::string &extension);
-bool hasParentPath(const std::string &path);
+    std::string combinePath (const std::string &cPath1, const std::string &cPath2);
+    std::string getExtension (const std::string &cPath);
+    std::string removeExtension (const std::string &cPath);
+    std::string replaceExtension (const std::string &cPath, const std::string &cExtension);
 
 } // namespace Common

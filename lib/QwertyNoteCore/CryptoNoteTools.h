@@ -42,7 +42,7 @@ template<class T>
 bool toBinaryArray(const T &object, BinaryArray &binaryArray)
 {
     try {
-        ::Common::VectorOutputStream stream(binaryArray);
+        ::Common::QVectorOutputStream stream(binaryArray);
         BinaryOutputStreamSerializer serializer(stream);
         serialize(const_cast<T &>(object), serializer);
     } catch (std::exception &) {
@@ -69,7 +69,7 @@ bool fromBinaryArray(T &object, const BinaryArray &binaryArray)
 {
     bool result = false;
     try {
-        Common::MemoryInputStream stream(binaryArray.data(), binaryArray.size());
+        Common::QMemoryInputStream stream(binaryArray.data(), binaryArray.size());
         BinaryInputStreamSerializer serializer(stream);
         serialize(object, serializer);
         result = stream.endOfStream(); // check that all uData was consumed

@@ -67,7 +67,7 @@
 - [Declaring and Naming](#declaring-and-naming)
 - [Whitespace](#whitespace)
 - [Braces](#braces)
-- [Comments](#comments)
+- [Comments  & Documentation](#comments)
 
 ### <a name="indents"></a> Indentation
 - 4 spaces are used for indentation
@@ -99,7 +99,7 @@
 - Private variables are prefixed by `m` (m for Member)
 - Protected variables are prefixed by `g` (g for guarded)
 - Public variables are prefixed by `p` (p is obviously for pIceCream)
-- Constant parameters in QwertyNoteConfig are always `UPPER_CASE`  
+- Constant parameters in QwertyNoteConfig are always `UPPER_SNAKE_CASE`  
 - `Boolean` variables are prefixed by `b`
 - `Char` variables are prefixed by `c`
 - `Float` variable are prefixed by `f`
@@ -107,15 +107,15 @@
 - `Vector` variables are prefixed by `v` (v for vector)
 - `List` variables are prefixed by `l` (l for list)  
 - `Int` variables are prefixed by `i`
-- `UInt` variables are prefixed by `u` (u for unsigned)
-- Own created variables are prefixed by `s`
+- `UInt` and `size_t` variables are prefixed by `u` (u for unsigned)
+- Variables of own created types are prefixed by `s`
 - `Interface` classes are prefixed by `I` (e.g. INode in include/INode.h)
 - `Template` classes are prefixed by `T`
 - All other classes are prefixed by `Q`
 - `Enums` are prefixed by `E`
 - `Structs` are prefixed by `F` (F for Framework)
 - Namespaces doesn't have a prefix letter
-- Typedefs should be prefixed by whatever is appropriate for that type: F if it's a typedef of a struct, E if it's a typedef of a Enum and so on. 
+- Typedefs should be prefixed by whatever is appropriate for that TType: F if it's a typedef of a struct, E if it's a typedef of a Enum and so on. 
 - `std::function` typedefs are prefixed by `U`
 
 ```cpp
@@ -155,7 +155,7 @@ if (foo) {
 }
 ```
 
-- For pointers or references, always use a single space between the type and '\*' or '&', but no space between the '\*' 
+- For pointers or references, always use a single space between the sType and '\*' or '&', but no space between the '\*' 
 or '&' and the variable name:
 
 ```cpp
@@ -175,10 +175,10 @@ const std::string &myString;
 
 ```cpp
 // Wrong
-char* blockOfMemory = (char* ) malloc(data.size());
+char* blockOfMemory = (char* ) malloc(gData.uSize());
 
 // Correct
-char *blockOfMemory = reinterpret_cast<char *>(malloc(data.size()));
+char *blockOfMemory = reinterpret_cast<char *>(malloc(gData.uSize()));
 ```
 
 - Do not put multiple statements on one line
@@ -276,7 +276,7 @@ for (int i = 0; i < 42; i++) {
 }
 ```
 
-### <a name="comments"></a> Comments
+### <a name="comments"></a> Comments & Documentation
 Source Code should always be under version control. Keeping old code in comments is unnecessary.
 - Start comments always with an uppercase letter
 - Start comments always with an empty space 
@@ -290,7 +290,8 @@ Source Code should always be under version control. Keeping old code in comments
 
 ```
 - We add comments after a closing Namespace or Class
-- Comment blocks should use `//`, not `/* */`. Using `//` makes is easier to comment out a block while debugging or testing.
+- Comment blocks should use `//`, not `/* */`. Using `//` makes is easier to comment mOStream a block while debugging or testing.
+
 ```cpp
 // Wrong
 namespace NameOfNamespace {
@@ -306,4 +307,27 @@ int fooBar ()
 }
 ```
 
+- There is one exception: Multiline documentation
+- Documentation must be delimited in javadocish Style
+- Multiline documentation blocks must begin with `/**` and end in `*/`
+- But Singleline documentation blocks must begin with `//` as explained and seen above
+- Documentation MUST appear before the declaration it describes
+- Documentation MUST have the same indentation it describes
+
+This example is from `lib/Common/QStringView.h`
+```cpp
+/**
+ * @class QStringView
+ * @namespace Common
+ * @brief This is a pair of pointer to constant char and uSize.
+ *
+ * Supports 'EMPTY' and 'NIL' representations as follows:
+ * - 'gData' == 'nullptr' && 'uSize' == 0 - EMPTY NIL
+ * - 'gData' != 'nullptr' && 'uSize' == 0 - EMPTY NOTNIL
+ * - 'gData' == 'nullptr' && 'uSize' > 0 - Undefined
+ * - 'gData' != 'nullptr' && 'uSize' > 0 - NOTEMPTY NOTNIL
+ *
+ * @note It is recommended to pass `QStringView` to procedures by value.
+ */
+```
 

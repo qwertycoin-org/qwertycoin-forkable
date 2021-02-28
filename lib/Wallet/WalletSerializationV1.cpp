@@ -85,7 +85,7 @@ struct WalletTransactionDto
 
     WalletTransactionDto(const QwertyNote::WalletTransaction &wallet)
     {
-        state = wallet.state;
+        state = wallet.mState;
         timestamp = wallet.timestamp;
         blockHeight = wallet.blockHeight;
         hash = wallet.hash;
@@ -219,9 +219,9 @@ std::string decrypt(const std::string &cipher,
 template<typename Object>
 void deserialize(Object &obj, const std::string &name, const std::string &plain)
 {
-    MemoryInputStream stream(plain.data(), plain.size());
+    QMemoryInputStream stream(plain.data(), plain.size());
     QwertyNote::BinaryInputStreamSerializer s(stream);
-    s(obj, Common::StringView(name));
+    s(obj, Common::QStringView(name));
 }
 
 template<typename Object>
@@ -395,7 +395,7 @@ void WalletSerializerV1::loadWalletV1(Common::IInputStream &source, const Crypto
 
     std::string plain = decrypt(cipher, cryptoContext);
 
-    MemoryInputStream decryptedStream(plain.data(), plain.size());
+    QMemoryInputStream decryptedStream(plain.data(), plain.size());
     QwertyNote::BinaryInputStreamSerializer serializer(decryptedStream);
 
     loadWalletV1Keys(serializer);
@@ -721,7 +721,7 @@ void WalletSerializerV1::loadTransactions(Common::IInputStream &source,
         cryptoContext.incIv();
 
         WalletTransaction tx;
-        tx.state = dto.state;
+        tx.mState = dto.state;
         tx.timestamp = dto.timestamp;
         tx.blockHeight = dto.blockHeight;
         tx.hash = dto.hash;

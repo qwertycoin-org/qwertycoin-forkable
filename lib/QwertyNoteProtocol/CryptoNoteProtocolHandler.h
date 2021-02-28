@@ -136,7 +136,7 @@ private:
     uint32_t m_observedHeight;
 
     std::atomic<size_t> m_peersCount;
-    Tools::ObserverManager<IQwertyNoteProtocolObserver> m_observerManager;
+    Tools::QObserverManager<IQwertyNoteProtocolObserver> m_observerManager;
 };
 
 } // namespace QwertyNote

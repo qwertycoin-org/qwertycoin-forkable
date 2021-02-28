@@ -30,12 +30,12 @@ CoreConfig::CoreConfig()
 
 void CoreConfig::init(const boost::program_options::variables_map &options)
 {
-    if (options.count(CommandLine::argDataDir.name) != 0
-        && (!options[CommandLine::argDataDir.name].defaulted()
+    if (options.count(CommandLine::sArgDataDir.cName) != 0
+        && (!options[CommandLine::sArgDataDir.cName].defaulted()
             || configFolder == Tools::getDefaultDataDirectory())
         ) {
-        configFolder = CommandLine::getArg(options, CommandLine::argDataDir);
-        configFolderDefaulted = options[CommandLine::argDataDir.name].defaulted();
+        configFolder = CommandLine::getArg(options, CommandLine::sArgDataDir);
+        configFolderDefaulted = options[CommandLine::sArgDataDir.cName].defaulted();
     }
 }
 

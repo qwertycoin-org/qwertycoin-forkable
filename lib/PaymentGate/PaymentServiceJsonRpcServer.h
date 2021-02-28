@@ -32,8 +32,8 @@ class WalletService;
 
 class PaymentServiceJsonRpcServer : public QwertyNote::JsonRpcServer
 {
-    typedef std::function<void (const Common::JsonValue &jsonRpcParams,
-                                Common::JsonValue &jsonResponse)> HandlerFunction;
+    typedef std::function<void (const Common::QJsonValue &jsonRpcParams,
+                                Common::QJsonValue &jsonResponse)> HandlerFunction;
 
 public:
     PaymentServiceJsonRpcServer(System::Dispatcher &sys,
@@ -44,7 +44,7 @@ public:
     PaymentServiceJsonRpcServer(const PaymentServiceJsonRpcServer &) = delete;
 
 protected:
-    void processJsonRpcRequest(const Common::JsonValue &req, Common::JsonValue &resp) override;
+    void processJsonRpcRequest(const Common::QJsonValue &req, Common::QJsonValue &resp) override;
 
 private:
     WalletService &service;
@@ -52,14 +52,14 @@ private:
 
     template <typename RequestType, typename ResponseType, typename RequestHandler>
     HandlerFunction jsonHandler(RequestHandler handler) {
-        return [handler] (const Common::JsonValue &jsonRpcParams,
-                          Common::JsonValue &jsonResponse) mutable {
+        return [handler] (const Common::QJsonValue &jsonRpcParams,
+                          Common::QJsonValue &jsonResponse) mutable {
             RequestType request;
             ResponseType response;
 
             try {
                 QwertyNote::JsonInputValueSerializer inputSerializer(
-                    const_cast<Common::JsonValue &>(jsonRpcParams)
+                    const_cast<Common::QJsonValue &>(jsonRpcParams)
                 );
                 serialize(request, inputSerializer);
             } catch (std::exception &) {

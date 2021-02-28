@@ -56,13 +56,13 @@ uint64_t getPenalizedAmount(uint64_t amount, size_t medianSize, size_t currentBl
 
     uint64_t penalizedAmountHi;
     uint64_t penalizedAmountLo;
-    div128_32(
+    div128b32(
         productHi,
         productLo,
         static_cast<uint32_t>(medianSize),
         &penalizedAmountHi,
         &penalizedAmountLo);
-    div128_32(
+    div128b32(
         penalizedAmountHi,
         penalizedAmountLo,
         static_cast<uint32_t>(medianSize),
@@ -80,7 +80,7 @@ std::string getAccountAddressAsStr(uint64_t prefix, const FAccountPublicAddress 
     BinaryArray ba;
     bool r = toBinaryArray(adr, ba);
     assert(r);
-    return Tools::Base58::encodeAddr(prefix, Common::asString(ba));
+    return Tools::Base58::encodeAddress(prefix, Common::asString(ba));
 }
 
 bool is_coinbase(const FTransaction &tx)
@@ -100,7 +100,7 @@ bool parseAccountAddressString(uint64_t& prefix, FAccountPublicAddress& adr, con
 {
     std::string data;
 
-    return Tools::Base58::decodeAddr(str, prefix, data)
+    return Tools::Base58::decodeAddress(str, prefix, data)
            && fromBinaryArray(adr, asBinaryArray(data))
            && checkKey(adr.sSpendPublicKey)
            && checkKey(adr.sViewPublicKey);

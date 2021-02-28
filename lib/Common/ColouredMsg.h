@@ -1,8 +1,22 @@
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2018, The TurtleCoin Developers
 // Copyright (c) 2018-2019, The Karbo Developers
-// Copyright (c) 2019, The Qwertycoin Group.
+// Copyright (c) 2018-2021, The Qwertycoin Group.
 //
-// Please see the included LICENSE file for more information.
+// This file is part of Qwertycoin.
+//
+// Qwertycoin is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Qwertycoin is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -13,108 +27,129 @@
 
 #include <Common/ConsoleTools.h>
 
-class ColouredMsg
+class QColouredMsg
 {
 public:
-    ColouredMsg(std::string msg,
-                Common::Console::Color colour)
-        : msg(std::move(msg)),
-          colour(colour)
+    QColouredMsg (std::string cMessage,
+                  Common::Console::EColor sColour)
+        : gMessage(std::move(cMessage)),
+          gColour(sColour)
     {
     }
 
-    ColouredMsg(std::string msg,
-                int padding,
-                Common::Console::Color colour)
-        : msg(std::move(msg)),
-          colour(colour),
-          padding(padding),
-          pad(true)
+    QColouredMsg (std::string cMessage,
+                  int iPadding,
+                  Common::Console::EColor sColour)
+        : gMessage(std::move(cMessage)),
+          gColour(sColour),
+          gPadding(iPadding),
+          gPad(true)
     {
     }
 
-    /* Set the text colour, write the message, then reset. We use a class
-       as it seems the only way to have a valid << operator. We need this
-       so we can nicely do something like:
-
-       std::cout << "Hello " << GreenMsg("user") << std::endl;
-
-       Without having to write:
-
-       std::cout << "Hello ";
-       GreenMsg("user");
-       std::cout << std::endl; */
-
-    friend std::ostream &operator<<(std::ostream &os, const ColouredMsg &m)
+    /**
+     * Set the text gColour, write the message, then reset. We use a class
+     * as it seems the only way to have a valid << operator. We need this
+     * so we can nicely do something like:
+     *
+     * std::cout << "Hello " << GreenMsg("user") << std::endl;
+     *
+     * Without having to write:
+     *
+     * std::cout << "Hello ";
+     * GreenMsg("user");
+     * std::cout << std::endl;
+     *
+     * @param oStream
+     * @param sColouredMsg
+     * @return
+     */
+    friend std::ostream &operator<< (std::ostream &oStream, const QColouredMsg &sColouredMsg)
     {
-        Common::Console::setTextColor(m.colour);
+        Common::Console::setTextColor(sColouredMsg.gColour);
 
-        if (m.pad) {
-            os << std::left << std::setw(m.padding) << m.msg;
+        if (sColouredMsg.gPad) {
+            oStream << std::left << std::setw(sColouredMsg.gPadding) << sColouredMsg.gMessage;
         } else {
-            os << m.msg;
+            oStream << sColouredMsg.gMessage;
         }
 
-        Common::Console::setTextColor(Common::Console::Color::Default);
-        return os;
+        Common::Console::setTextColor(Common::Console::EColor::Default);
+
+        return oStream;
     }
 
 protected:
-    std::string msg;
-    const Common::Console::Color colour;
-    const int padding = 0;
-    const bool pad = false;
+    std::string gMessage;
+    const Common::Console::EColor gColour;
+    const int gPadding = 0;
+    const bool gPad = false;
 };
 
-class SuccessMsg : public ColouredMsg
+class QSuccessMsg : public QColouredMsg
 {
 public:
-    explicit SuccessMsg(std::string msg)
-        : ColouredMsg(msg, Common::Console::Color::Green)
+    explicit QSuccessMsg (std::string cMessage)
+        : QColouredMsg(cMessage,
+                       Common::Console::EColor::Green)
     {
     }
 
-    explicit SuccessMsg(std::string msg, int padding)
-        : ColouredMsg(msg, padding, Common::Console::Color::Green)
-    {
-    }
-};
-
-class InformationMsg : public ColouredMsg
-{
-public:
-    explicit InformationMsg(std::string msg)
-        : ColouredMsg(msg, Common::Console::Color::BrightYellow)
-    {
-    }
-
-    explicit InformationMsg(std::string msg, int padding)
-        : ColouredMsg(msg, padding, Common::Console::Color::BrightYellow)
+    explicit QSuccessMsg (std::string cMessage, int iPadding)
+        : QColouredMsg(cMessage,
+                       iPadding,
+                       Common::Console::EColor::Green)
     {
     }
 };
 
-class SuggestionMsg : public ColouredMsg
+class QInformationMsg : public QColouredMsg
 {
 public:
-    explicit SuggestionMsg(std::string msg) : ColouredMsg(msg, Common::Console::Color::BrightBlue)
+    explicit QInformationMsg (std::string cMessage)
+        : QColouredMsg(cMessage,
+                       Common::Console::EColor::BrightYellow)
     {
     }
 
-    explicit SuggestionMsg(std::string msg, int padding)
-        : ColouredMsg(msg, padding, Common::Console::Color::BrightBlue)
+    explicit QInformationMsg (std::string cMessage, int iPadding)
+        : QColouredMsg(cMessage,
+                       iPadding,
+                       Common::Console::EColor::BrightYellow)
     {
     }
 };
 
-class WarningMsg : public ColouredMsg
+class QSuggestionMsg : public QColouredMsg
 {
 public:
-    explicit WarningMsg(std::string msg)
-        : ColouredMsg(msg, Common::Console::Color::BrightRed) { }
+    explicit QSuggestionMsg (std::string cMessage)
+        : QColouredMsg(cMessage,
+                       Common::Console::EColor::BrightBlue)
+    {
+    }
 
-    explicit WarningMsg(std::string msg, int padding)
-        : ColouredMsg(msg, padding, Common::Console::Color::BrightRed)
+    explicit QSuggestionMsg (std::string cMessage, int iPadding)
+        : QColouredMsg(cMessage,
+                       iPadding,
+                       Common::Console::EColor::BrightBlue)
+    {
+    }
+};
+
+class QWarningMsg : public QColouredMsg
+{
+public:
+    explicit QWarningMsg (std::string cMessage)
+        : QColouredMsg(cMessage,
+                       Common::Console::EColor::BrightRed)
+    {
+    }
+
+    explicit QWarningMsg (std::string cMessage, int iPadding)
+        : QColouredMsg(cMessage,
+                       iPadding,
+                       Common::Console::EColor::BrightRed)
     {
     }
 };

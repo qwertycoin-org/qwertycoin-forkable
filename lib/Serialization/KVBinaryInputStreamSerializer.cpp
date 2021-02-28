@@ -30,16 +30,16 @@ T readPod(Common::IInputStream &s)
 }
 
 template <typename T, typename JsonT = T>
-JsonValue readPodJson(Common::IInputStream &s)
+QJsonValue readPodJson(Common::IInputStream &s)
 {
-    JsonValue jv;
+    QJsonValue jv;
     jv = static_cast<JsonT>(readPod<T>(s));
 
     return jv;
 }
 
 template <typename T>
-JsonValue readIntegerJson(Common::IInputStream &s)
+QJsonValue readIntegerJson(Common::IInputStream &s)
 {
     return readPodJson<T, int64_t>(s);
 }
@@ -93,9 +93,9 @@ std::string readString(Common::IInputStream &s)
     return str;
 }
 
-JsonValue readStringJson(Common::IInputStream &s)
+QJsonValue readStringJson(Common::IInputStream &s)
 {
-    return JsonValue(readString(s));
+    return QJsonValue(readString(s));
 }
 
 void readName(Common::IInputStream &s, std::string &name)
@@ -107,14 +107,14 @@ void readName(Common::IInputStream &s, std::string &name)
     }
 }
 
-JsonValue loadValue(Common::IInputStream &stream, uint8_t type);
-JsonValue loadSection(Common::IInputStream &stream);
-JsonValue loadEntry(Common::IInputStream &stream);
-JsonValue loadArray(Common::IInputStream &stream, uint8_t itemType);
+QJsonValue loadValue(Common::IInputStream &stream, uint8_t type);
+QJsonValue loadSection(Common::IInputStream &stream);
+QJsonValue loadEntry(Common::IInputStream &stream);
+QJsonValue loadArray(Common::IInputStream &stream, uint8_t itemType);
 
-JsonValue loadSection(Common::IInputStream &stream)
+QJsonValue loadSection(Common::IInputStream &stream)
 {
-    JsonValue sec(JsonValue::OBJECT);
+    QJsonValue sec(QJsonValue::OBJECT);
     size_t count = readVarint(stream);
     std::string name;
 
@@ -126,7 +126,7 @@ JsonValue loadSection(Common::IInputStream &stream)
     return sec;
 }
 
-JsonValue loadValue(Common::IInputStream &stream, uint8_t type)
+QJsonValue loadValue(Common::IInputStream &stream, uint8_t type)
 {
     switch (type) {
     case BIN_KV_SERIALIZE_TYPE_INT64:
@@ -148,7 +148,7 @@ JsonValue loadValue(Common::IInputStream &stream, uint8_t type)
     case BIN_KV_SERIALIZE_TYPE_DOUBLE:
         return readPodJson<double>(stream);
     case BIN_KV_SERIALIZE_TYPE_BOOL:
-        return JsonValue(read<uint8_t>(stream) != 0);
+        return QJsonValue(read<uint8_t>(stream) != 0);
     case BIN_KV_SERIALIZE_TYPE_STRING:
         return readStringJson(stream);
     case BIN_KV_SERIALIZE_TYPE_OBJECT:
@@ -160,7 +160,7 @@ JsonValue loadValue(Common::IInputStream &stream, uint8_t type)
     }
 }
 
-JsonValue loadEntry(Common::IInputStream &stream)
+QJsonValue loadEntry(Common::IInputStream &stream)
 {
     auto type = readPod<uint8_t>(stream);
 
@@ -172,9 +172,9 @@ JsonValue loadEntry(Common::IInputStream &stream)
     return loadValue(stream, type);
 }
 
-JsonValue loadArray(Common::IInputStream &stream, uint8_t itemType)
+QJsonValue loadArray(Common::IInputStream &stream, uint8_t itemType)
 {
-    JsonValue arr(JsonValue::ARRAY);
+    QJsonValue arr(QJsonValue::ARRAY);
     size_t count = readVarint(stream);
 
     while (count--) {
@@ -184,7 +184,7 @@ JsonValue loadArray(Common::IInputStream &stream, uint8_t itemType)
     return arr;
 }
 
-JsonValue parseBinary(Common::IInputStream &stream)
+QJsonValue parseBinary(Common::IInputStream &stream)
 {
     auto hdr = readPod<KVBinaryStorageBlockHeader>(stream);
 
@@ -207,7 +207,7 @@ KVBinaryInputStreamSerializer::KVBinaryInputStreamSerializer(Common::IInputStrea
 {
 }
 
-bool KVBinaryInputStreamSerializer::binary(void *value, size_t size, Common::StringView name)
+bool KVBinaryInputStreamSerializer::binary(void *value, size_t size, Common::QStringView name)
 {
     std::string str;
 
@@ -224,7 +224,7 @@ bool KVBinaryInputStreamSerializer::binary(void *value, size_t size, Common::Str
     return true;
 }
 
-bool KVBinaryInputStreamSerializer::binary(std::string &value, Common::StringView name)
+bool KVBinaryInputStreamSerializer::binary(std::string &value, Common::QStringView name)
 {
     return (*this)(value, name); // load as string
 }

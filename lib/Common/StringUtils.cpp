@@ -18,98 +18,111 @@
 #include <regex>
 #include <sstream>
 #include <unordered_map>
+
 #include <Common/StringUtils.h>
 #include <Common/VectorUtils.h>
 
 namespace Common {
 
-std::string StringUtils::join(const std::vector<std::string> &tokens,
-                              const std::string &delimiter)
-{
-    std::stringstream stream;
+    std::string StringUtils::join (const std::vector <std::string> &vTokens,
+                                   const std::string &cDelimiter)
+    {
+        std::stringstream stream;
 
-    stream << tokens.front();
+        stream << vTokens.front();
 
-    std::for_each(begin(tokens) + 1, end(tokens), [&](const std::string &elem) {
-        stream << delimiter << elem;
-    });
+        std::for_each(begin(vTokens) + 1, end(vTokens), [&] (const std::string &elem)
+        {
+            stream << cDelimiter << elem;
+        });
 
-    return stream.str();
-}
-
-std::vector<std::string> StringUtils::split(const std::string &str,
-                                            const std::vector<std::string> &delimiters)
-{
-    std::regex rgx(join(escapeStrings(delimiters), "|"));
-
-    std::sregex_token_iterator first{begin(str), end(str), rgx, -1};
-    std::sregex_token_iterator last;
-
-    return {first, last};
-}
-
-std::vector<std::string> StringUtils::split(const std::string &str,
-                                            const std::string &delimiter)
-{
-    std::vector<std::string> delimiters = {delimiter};
-
-    return split(str, delimiters);
-}
-
-std::string StringUtils::escapeChar(char character)
-{
-    const std::unordered_map<char, std::string> ScapedSpecialCharacters = {
-        {'.', "\\."}, {'|', "\\|"}, {'*', "\\*"}, {'?', "\\?"},
-        {'+', "\\+"}, {'(', "\\("}, {')', "\\)"}, {'{', "\\{"},
-        {'}', "\\}"}, {'[', "\\["}, {']', "\\]"}, {'^', "\\^"},
-        {'$', "\\$"}, {'\\', "\\\\"}
-    };
-
-    auto it = ScapedSpecialCharacters.find(character);
-
-    if (it == ScapedSpecialCharacters.end()) {
-        return std::string(1, character);
+        return stream.str();
     }
 
-    return it->second;
-}
+    std::vector <std::string> StringUtils::split (const std::string &cStr,
+                                                  const std::vector <std::string> &vDelimiters)
+    {
+        std::regex rgx(join(escapeStrings(vDelimiters), "|"));
 
-std::string StringUtils::escapeString(const std::string &str)
-{
-    std::stringstream stream;
+        std::sregex_token_iterator first {begin(cStr), end(cStr), rgx, -1};
+        std::sregex_token_iterator last;
 
-    std::for_each(begin(str), end(str), [&stream](const char character) {
-        stream << escapeChar(character);
-    });
+        return {first, last};
+    }
 
-    return stream.str();
-}
+    std::vector <std::string> StringUtils::split (const std::string &cStr,
+                                                  const std::string &cDelimiter)
+    {
+        std::vector <std::string> delimiters = {cDelimiter};
 
-std::vector<std::string> StringUtils::escapeStrings(const std::vector<std::string> &delimiters)
-{
-    return VectorUtils::map<std::string>(delimiters, escapeString);
-}
+        return split(cStr, delimiters);
+    }
 
-bool StringUtils::isAnInteger(const std::string &token)
-{
-    const std::regex e("\\s*[+-]?([1-9][0-9]*|0[0-7]*|0[xX][0-9a-fA-F]+)");
+    std::string StringUtils::escapeChar (char cCharacter)
+    {
+        const std::unordered_map <char, std::string> ScapedSpecialCharacters = {
+            {'.',  "\\."},
+            {'|',  "\\|"},
+            {'*',  "\\*"},
+            {'?',  "\\?"},
+            {'+',  "\\+"},
+            {'(',  "\\("},
+            {')',  "\\)"},
+            {'{',  "\\{"},
+            {'}',  "\\}"},
+            {'[',  "\\["},
+            {']',  "\\]"},
+            {'^',  "\\^"},
+            {'$',  "\\$"},
+            {'\\', "\\\\"}
+        };
 
-    return std::regex_match(token, e);
-}
+        auto it = ScapedSpecialCharacters.find(cCharacter);
 
-std::string StringUtils::extractRegion(const std::string &str, int from, int to)
-{
-    std::string region;
-    int regionSize = to - from;
+        if (it == ScapedSpecialCharacters.end()) {
+            return std::string(1, cCharacter);
+        }
 
-    return str.substr(from, regionSize);
-}
+        return it->second;
+    }
 
-int StringUtils::convertToInt(const std::string &str)
-{
-    std::string::size_type sz;
+    std::string StringUtils::escapeString (const std::string &cStr)
+    {
+        std::stringstream stream;
 
-    return std::stoi(str, &sz);
-}
+        std::for_each(begin(cStr), end(cStr), [&stream] (const char character)
+        {
+            stream << escapeChar(character);
+        });
+
+        return stream.str();
+    }
+
+    std::vector <std::string> StringUtils::escapeStrings (const std::vector <std::string> &cStrings)
+    {
+        return VectorUtils::map <std::string>(cStrings, escapeString);
+    }
+
+    bool StringUtils::isAnInteger (const std::string &cToken)
+    {
+        const std::regex e("\\s*[+-]?([1-9][0-9]*|0[0-7]*|0[xX][0-9a-fA-F]+)");
+
+        return std::regex_match(cToken, e);
+    }
+
+    std::string StringUtils::extractRegion (const std::string &cStr, int iFrom, int iTo)
+    {
+        std::string region;
+        int regionSize = iTo - iFrom;
+
+        return cStr.substr(iFrom, regionSize);
+    }
+
+    int StringUtils::convertToInt (const std::string &cStr)
+    {
+        std::string::size_type sz;
+
+        return std::stoi(cStr, &sz);
+    }
 
 } // namespace Common

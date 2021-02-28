@@ -24,16 +24,16 @@
 
 namespace Common {
 
-class StringInputStream : public IInputStream
-{
-public:
-    explicit StringInputStream(const std::string &in);
+    class QStringInputStream : public IInputStream
+    {
+    public:
+        explicit QStringInputStream (const std::string &cIn);
 
-    size_t readSome(void *data, size_t size) override;
+        size_t readSome (void *data, size_t uSize) override;
 
-private:
-    const std::string &in;
-    size_t offset;
-};
+    private:
+        const std::string &mIStream;
+        size_t mOffset;
+    };
 
 } // namespace Common

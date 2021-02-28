@@ -20,22 +20,22 @@
 
 namespace Tools {
 
-ScopeExit::ScopeExit(std::function<void()> &&handler)
-    : m_handler(std::move(handler)),
-      m_cancelled(false)
+QScopeExit::QScopeExit(std::function<void()> &&UHandler)
+    : mHandler(std::move(UHandler)),
+      mCancelled(false)
 {
 }
 
-ScopeExit::~ScopeExit()
+QScopeExit::~QScopeExit()
 {
-    if (!m_cancelled) {
-        m_handler();
+    if (!mCancelled) {
+        mHandler();
     }
 }
 
-void ScopeExit::cancel()
+void QScopeExit::cancel()
 {
-    m_cancelled = true;
+    mCancelled = true;
 }
 
 } // namespace Tools

@@ -230,7 +230,7 @@ PaymentService::TransactionRpcInfo convertTransactionWithTransfersToTransactionR
 {
     PaymentService::TransactionRpcInfo transactionInfo;
 
-    transactionInfo.state = static_cast<uint8_t>(transactionWithTransfers.transaction.state);
+    transactionInfo.state = static_cast<uint8_t>(transactionWithTransfers.transaction.mState);
     transactionInfo.transactionHash = Common::podToHex(transactionWithTransfers.transaction.hash);
     transactionInfo.blockIndex = transactionWithTransfers.transaction.blockHeight;
     transactionInfo.timestamp = transactionWithTransfers.transaction.timestamp;
@@ -1097,7 +1097,7 @@ std::error_code WalletService::getTransaction(const std::string &transactionHash
 
         auto transactionWithTransfers = wallet.getTransaction(hash);
 
-        if (transactionWithTransfers.transaction.state == WalletTransactionState::DELETED) {
+        if (transactionWithTransfers.transaction.mState == WalletTransactionState::DELETED) {
             logger(Logging::WARNING, Logging::BRIGHT_YELLOW)
                 << "Transaction "
                 << transactionHash

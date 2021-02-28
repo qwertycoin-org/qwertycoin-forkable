@@ -34,7 +34,7 @@
 
 namespace QwertyNote {
 
-inline bool serialize(uuid &v, const Common::StringView &name, ISerializer &s)
+inline bool serialize(uuid &v, const Common::QStringView &name, ISerializer &s)
 {
     return s.binary(&v, sizeof(v), name);
 }

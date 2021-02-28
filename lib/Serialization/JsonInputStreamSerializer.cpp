@@ -24,9 +24,9 @@ namespace QwertyNote {
 
 namespace {
 
-Common::JsonValue getJsonValueFromStreamHelper(std::istream &stream)
+Common::QJsonValue getJsonValueFromStreamHelper(std::istream &stream)
 {
-    Common::JsonValue value;
+    Common::QJsonValue value;
 
     stream >> value;
 

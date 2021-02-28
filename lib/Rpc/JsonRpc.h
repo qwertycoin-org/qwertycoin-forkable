@@ -65,19 +65,19 @@ public:
     std::string message;
 };
 
-typedef boost::optional<Common::JsonValue> OptionalId;
+typedef boost::optional<Common::QJsonValue> OptionalId;
 
 class JsonRpcRequest
 {
 public:
-    JsonRpcRequest() : psReq(Common::JsonValue::OBJECT)
+    JsonRpcRequest() : psReq(Common::QJsonValue::OBJECT)
     {
     }
 
     bool parseRequest(const std::string &requestBody)
     {
         try {
-            psReq = Common::JsonValue::fromString(requestBody);
+            psReq = Common::QJsonValue(requestBody);
         } catch (std::exception &) {
             throw JsonRpcError(errParseError);
         }
@@ -99,7 +99,7 @@ public:
     bool loadParams(T &v) const
     {
         loadFromJsonValue(v, psReq.contains("params") ? psReq("params")
-                                                      : Common::JsonValue(Common::JsonValue::NIL));
+                                                      : Common::QJsonValue(Common::QJsonValue::NIL));
         return true;
     }
 
@@ -135,7 +135,7 @@ public:
     }
 
 private:
-    Common::JsonValue psReq;
+    Common::QJsonValue psReq;
     OptionalId id;
     std::string method;
 };
@@ -143,14 +143,14 @@ private:
 class JsonRpcResponse
 {
 public:
-    JsonRpcResponse() : psResp(Common::JsonValue::OBJECT)
+    JsonRpcResponse() : psResp(Common::QJsonValue::OBJECT)
     {
     }
 
     void parse(const std::string &responseBody)
     {
         try {
-            psResp = Common::JsonValue::fromString(responseBody);
+            psResp = Common::QJsonValue(responseBody);
         } catch (std::exception &) {
             throw JsonRpcError(errParseError);
         }
@@ -206,7 +206,7 @@ public:
     }
 
 private:
-    Common::JsonValue psResp;
+    Common::QJsonValue psResp;
 };
 
 void invokeJsonRpcCommand(HttpClient &httpClient,

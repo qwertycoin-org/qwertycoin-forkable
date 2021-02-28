@@ -24,23 +24,23 @@ namespace QwertyNote {
 
 namespace {
 
-const CommandLine::ArgDescriptor<std::string> arg_extra_messages = {
+const CommandLine::FArgDescriptor<std::string> arg_extra_messages = {
     "extra-messages-file",
     "Specify file for extra messages to include into coinbase transactions",
     "",
     true
 };
 
-const CommandLine::ArgDescriptor<std::string> arg_start_mining = {
+const CommandLine::FArgDescriptor<std::string> arg_start_mining = {
     "start-mining",
     "Specify wallet address to mining for",
     "",
     true
 };
 
-const CommandLine::ArgDescriptor<uint32_t> arg_mining_threads = {
+const CommandLine::FArgDescriptor<uint32_t> arg_mining_threads = {
     "mining-threads",
-    "Specify mining threads count",
+    "Specify mining threads mCount",
     0,
     true
 };

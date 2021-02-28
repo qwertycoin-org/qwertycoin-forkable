@@ -32,28 +32,28 @@ public:
 
     ISerializer::SerializerType type() const override;
 
-    bool beginObject(Common::StringView name) override;
+    bool beginObject(Common::QStringView name) override;
     void endObject() override;
 
-    bool beginArray(size_t &size, Common::StringView name) override;
+    bool beginArray(size_t &size, Common::QStringView name) override;
     void endArray() override;
 
-    bool operator()(uint8_t &value, Common::StringView name) override;
-    bool operator()(int16_t &value, Common::StringView name) override;
-    bool operator()(uint16_t &value, Common::StringView name) override;
-    bool operator()(int32_t &value, Common::StringView name) override;
-    bool operator()(uint32_t &value, Common::StringView name) override;
-    bool operator()(int64_t &value, Common::StringView name) override;
-    bool operator()(uint64_t &value, Common::StringView name) override;
-    bool operator()(double &value, Common::StringView name) override;
-    bool operator()(bool &value, Common::StringView name) override;
-    bool operator()(std::string &value, Common::StringView name) override;
+    bool operator()(uint8_t &value, Common::QStringView name) override;
+    bool operator()(int16_t &value, Common::QStringView name) override;
+    bool operator()(uint16_t &value, Common::QStringView name) override;
+    bool operator()(int32_t &value, Common::QStringView name) override;
+    bool operator()(uint32_t &value, Common::QStringView name) override;
+    bool operator()(int64_t &value, Common::QStringView name) override;
+    bool operator()(uint64_t &value, Common::QStringView name) override;
+    bool operator()(double &value, Common::QStringView name) override;
+    bool operator()(bool &value, Common::QStringView name) override;
+    bool operator()(std::string &value, Common::QStringView name) override;
 
-    bool binary(void *value, size_t size, Common::StringView name) override;
-    bool binary(std::string &value, Common::StringView name) override;
+    bool binary(void *value, size_t size, Common::QStringView name) override;
+    bool binary(std::string &value, Common::QStringView name) override;
 
     template<typename T>
-    bool operator()(T &value, Common::StringView name)
+    bool operator()(T &value, Common::QStringView name)
     {
         return ISerializer::operator()(value, name);
     }

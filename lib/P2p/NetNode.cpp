@@ -121,49 +121,49 @@ namespace QwertyNote {
 
 namespace {
 
-const CommandLine::ArgDescriptor<std::string> arg_p2p_bind_ip = {
+const CommandLine::FArgDescriptor<std::string> arg_p2p_bind_ip = {
     "p2p-bind-ip",
     "Interface for p2p network protocol",
     "0.0.0.0"
 };
-const CommandLine::ArgDescriptor<std::string> arg_p2p_bind_port = {
+const CommandLine::FArgDescriptor<std::string> arg_p2p_bind_port = {
     "p2p-bind-port",
     "Port for p2p network protocol",
     std::to_string(QwertyNote::P2P_DEFAULT_PORT)
 };
-const CommandLine::ArgDescriptor<uint32_t> arg_p2p_external_port = {
+const CommandLine::FArgDescriptor<uint32_t> arg_p2p_external_port = {
     "p2p-external-port",
     "External port for p2p network protocol (if port forwarding used with NAT)",
     0
 };
-const CommandLine::ArgDescriptor<bool> arg_p2p_allow_local_ip = {
+const CommandLine::FArgDescriptor<bool> arg_p2p_allow_local_ip = {
     "allow-local-ip",
     "Allow local ip add to peer list, mostly in debug purposes"
 };
-const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_add_peer = {
+const CommandLine::FArgDescriptor<std::vector<std::string>> arg_p2p_add_peer = {
     "add-peer",
     "Manually add peer to local peerlist"
 };
-const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_add_priority_node = {
+const CommandLine::FArgDescriptor<std::vector<std::string>> arg_p2p_add_priority_node = {
     "add-priority-node",
     "Specify list of peers to connect to and attempt to keep the connection open"
 };
-const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_add_exclusive_node = {
+const CommandLine::FArgDescriptor<std::vector<std::string>> arg_p2p_add_exclusive_node = {
     "add-exclusive-node",
     "Specify list of peers to connect to only. "
     "If this option is given the options add-priority-node and seed-node are ignored. "
 };
-const CommandLine::ArgDescriptor<std::vector<std::string>> arg_p2p_seed_node = {
+const CommandLine::FArgDescriptor<std::vector<std::string>> arg_p2p_seed_node = {
     "seed-node",
     "Connect to a node to retrieve peer addresses, and disconnect"
 };
-const CommandLine::ArgDescriptor<bool> arg_p2p_hide_my_port = {
+const CommandLine::FArgDescriptor<bool> arg_p2p_hide_my_port = {
     "hide-my-port",
     "Do not announce yourself as peerlist candidate",
     false,
     true
 };
-const CommandLine::ArgDescriptor<std::string> arg_p2p_exclusive_version = {
+const CommandLine::FArgDescriptor<std::string> arg_p2p_exclusive_version = {
     "exclusive-version",
     "Refuse connections from nodes that are not running the specified version. (specify version in short format, i.e. 5.1.4)"
 };
@@ -377,7 +377,7 @@ bool NodeServer::init_config()
             p2p_data.open(state_file_path, std::ios_base::binary | std::ios_base::in);
 
             if (!p2p_data.fail()) {
-                StdInputStream inputStream(p2p_data);
+                QStdInputStream inputStream(p2p_data);
                 BinaryInputStreamSerializer a(inputStream);
                 QwertyNote::serialize(*this, a);
                 loaded = true;
@@ -730,7 +730,7 @@ bool NodeServer::store_config()
             return false;
         }
 
-        StdOutputStream stream(p2p_data);
+        QStdOutputStream stream(p2p_data);
         BinaryOutputStreamSerializer a(stream);
         QwertyNote::serialize(*this, a);
 
@@ -1671,7 +1671,7 @@ bool NodeServer::connect_to_peerlist(const std::vector<NetworkAddress> &peers)
 
 bool NodeServer::parse_peers_and_add_to_container(
     const boost::program_options::variables_map &vm,
-    const CommandLine::ArgDescriptor<std::vector<std::string>> &arg,
+    const CommandLine::FArgDescriptor<std::vector<std::string>> &arg,
     std::vector<NetworkAddress> &container)
 {
     std::vector<std::string> perrs = CommandLine::getArg(vm, arg);

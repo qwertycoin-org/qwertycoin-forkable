@@ -66,8 +66,8 @@ void JsonRpcServer::processRequest(const QwertyNote::HttpRequest &req,
 
         if (req.getUrl() == "/json_rpc") {
             std::istringstream jsonInputStream(req.getBody());
-            Common::JsonValue jsonRpcRequest;
-            Common::JsonValue jsonRpcResponse(Common::JsonValue::OBJECT);
+            Common::QJsonValue jsonRpcRequest;
+            Common::QJsonValue jsonRpcResponse(Common::QJsonValue::OBJECT);
 
             try {
                 jsonInputStream >> jsonRpcRequest;
@@ -97,9 +97,9 @@ void JsonRpcServer::processRequest(const QwertyNote::HttpRequest &req,
     }
 }
 
-void JsonRpcServer::prepareJsonResponse(const Common::JsonValue &req, Common::JsonValue &resp)
+void JsonRpcServer::prepareJsonResponse(const Common::QJsonValue &req, Common::QJsonValue &resp)
 {
-    using Common::JsonValue;
+    using Common::QJsonValue;
 
     if (req.contains("id")) {
         resp.insert("id", req("id"));
@@ -108,21 +108,21 @@ void JsonRpcServer::prepareJsonResponse(const Common::JsonValue &req, Common::Js
     resp.insert("jsonrpc", "2.0");
 }
 
-void JsonRpcServer::makeErrorResponse(const std::error_code &ec, Common::JsonValue &resp)
+void JsonRpcServer::makeErrorResponse(const std::error_code &ec, Common::QJsonValue &resp)
 {
-    using Common::JsonValue;
+    using Common::QJsonValue;
 
-    JsonValue error(JsonValue::OBJECT);
+    QJsonValue error(QJsonValue::OBJECT);
 
-    JsonValue code;
+    QJsonValue code;
     // application specific error code
     code = static_cast<int64_t>(QwertyNote::JsonRpc::errParseError);
 
-    JsonValue message;
+    QJsonValue message;
     message = ec.message();
 
-    JsonValue data(JsonValue::OBJECT);
-    JsonValue appCode;
+    QJsonValue data(QJsonValue::OBJECT);
+    QJsonValue appCode;
     appCode = static_cast<int64_t>(ec.value());
     data.insert("application_code", appCode);
 
@@ -133,13 +133,13 @@ void JsonRpcServer::makeErrorResponse(const std::error_code &ec, Common::JsonVal
     resp.insert("error", error);
 }
 
-void JsonRpcServer::makeGenericErrorReponse(Common::JsonValue &resp,const char *what,int errorCode)
+void JsonRpcServer::makeGenericErrorReponse(Common::QJsonValue &resp, const char *what, int errorCode)
 {
-    using Common::JsonValue;
+    using Common::QJsonValue;
 
-    JsonValue error(JsonValue::OBJECT);
+    QJsonValue error(QJsonValue::OBJECT);
 
-    JsonValue code;
+    QJsonValue code;
     code = static_cast<int64_t>(errorCode);
 
     std::string msg;
@@ -149,7 +149,7 @@ void JsonRpcServer::makeGenericErrorReponse(Common::JsonValue &resp,const char *
         msg = "Unknown application error";
     }
 
-    JsonValue message;
+    QJsonValue message;
     message = msg;
 
     error.insert("code", code);
@@ -159,17 +159,17 @@ void JsonRpcServer::makeGenericErrorReponse(Common::JsonValue &resp,const char *
 
 }
 
-void JsonRpcServer::makeMethodNotFoundResponse(Common::JsonValue &resp)
+void JsonRpcServer::makeMethodNotFoundResponse(Common::QJsonValue &resp)
 {
-    using Common::JsonValue;
+    using Common::QJsonValue;
 
-    JsonValue error(JsonValue::OBJECT);
+    QJsonValue error(QJsonValue::OBJECT);
 
-    JsonValue code;
-    // ambiguous declaration of JsonValue::operator= (between int and JsonValue)
+    QJsonValue code;
+    // ambiguous declaration of QJsonValue::operator= (between int and QJsonValue)
     code = static_cast<int64_t>(QwertyNote::JsonRpc::errMethodNotFound);
 
-    JsonValue message;
+    QJsonValue message;
     message = "Method not found";
 
     error.insert("code", code);
@@ -178,25 +178,25 @@ void JsonRpcServer::makeMethodNotFoundResponse(Common::JsonValue &resp)
     resp.insert("error", error);
 }
 
-void JsonRpcServer::fillJsonResponse(const Common::JsonValue &v, Common::JsonValue &resp)
+void JsonRpcServer::fillJsonResponse(const Common::QJsonValue &v, Common::QJsonValue &resp)
 {
     resp.insert("result", v);
 }
 
-void JsonRpcServer::makeJsonParsingErrorResponse(Common::JsonValue &resp)
+void JsonRpcServer::makeJsonParsingErrorResponse(Common::QJsonValue &resp)
 {
-    using Common::JsonValue;
+    using Common::QJsonValue;
 
-    resp = JsonValue(JsonValue::OBJECT);
+    resp = QJsonValue(QJsonValue::OBJECT);
     resp.insert("jsonrpc", "2.0");
     resp.insert("id", nullptr);
 
-    JsonValue error(JsonValue::OBJECT);
-    JsonValue code;
-    // ambiguous declaration of JsonValue::operator= (between int and JsonValue)
+    QJsonValue error(QJsonValue::OBJECT);
+    QJsonValue code;
+    // ambiguous declaration of QJsonValue::operator= (between int and QJsonValue)
     code = static_cast<int64_t>(QwertyNote::JsonRpc::errParseError);
 
-    JsonValue message = "Parse error";
+    QJsonValue message = "Parse error";
 
     error.insert("code", code);
     error.insert("message", message);

@@ -118,7 +118,7 @@
 using namespace QwertyNote;
 using namespace Logging;
 using namespace Qwertycoin;
-using Common::JsonValue;
+using Common::QJsonValue;
 
 namespace po = boost::program_options;
 
@@ -128,90 +128,90 @@ namespace po = boost::program_options;
 
 namespace {
 
-const CommandLine::ArgDescriptor<std::string> arg_config_file = {
+const CommandLine::FArgDescriptor<std::string> arg_config_file = {
     "config-file",
     "Specify configuration file",
     ""
 };
-const CommandLine::ArgDescriptor<std::string> arg_wallet_file = {
+const CommandLine::FArgDescriptor<std::string> arg_wallet_file = {
     "wallet-file",
     "Use wallet <arg>",
     ""
 };
-const CommandLine::ArgDescriptor<std::string> arg_generate_new_wallet = {
+const CommandLine::FArgDescriptor<std::string> arg_generate_new_wallet = {
     "generate-new-wallet",
     "Generate new wallet and save it to <arg>",
     ""
 };
-const CommandLine::ArgDescriptor<std::string> arg_daemon_address = {
+const CommandLine::FArgDescriptor<std::string> arg_daemon_address = {
     "daemon-address",
-    "Use daemon instance at <host>:<port>",
+    "Use daemon pInstance at <host>:<port>",
     ""
 };
-const CommandLine::ArgDescriptor<std::string> arg_daemon_host = {
+const CommandLine::FArgDescriptor<std::string> arg_daemon_host = {
     "daemon-host",
-    "Use daemon instance at host <arg> instead of localhost",
+    "Use daemon pInstance at host <arg> instead of localhost",
     ""
 };
-const CommandLine::ArgDescriptor<std::string> arg_password = {
+const CommandLine::FArgDescriptor<std::string> arg_password = {
     "password",
     "Wallet password",
     "",
     true
 };
-const CommandLine::ArgDescriptor<std::string> arg_change_password = {
+const CommandLine::FArgDescriptor<std::string> arg_change_password = {
     "change-password",
     "Change wallet password and exit",
     "",
     true
 };
-const CommandLine::ArgDescriptor<std::string> arg_mnemonic_seed = {
+const CommandLine::FArgDescriptor<std::string> arg_mnemonic_seed = {
     "mnemonic-seed",
     "Specify mnemonic seed for wallet recovery/creation",
     ""
 };
-const CommandLine::ArgDescriptor<bool> arg_restore_deterministic_wallet = {
+const CommandLine::FArgDescriptor<bool> arg_restore_deterministic_wallet = {
     "restore-deterministic-wallet",
     "Recover wallet using electrum-style mnemonic",
     false
 };
-const CommandLine::ArgDescriptor<bool> arg_non_deterministic = {
+const CommandLine::FArgDescriptor<bool> arg_non_deterministic = {
     "non-deterministic",
     "Creates non-deterministic (classic) view and spend keys",
     false
 };
-const CommandLine::ArgDescriptor<uint16_t> arg_daemon_port = {
+const CommandLine::FArgDescriptor<uint16_t> arg_daemon_port = {
     "daemon-port",
-    "Use daemon instance at port <arg> instead of 8197",
+    "Use daemon pInstance at port <arg> instead of 8197",
     0
 };
-const CommandLine::ArgDescriptor<std::string> arg_log_file = {
+const CommandLine::FArgDescriptor<std::string> arg_log_file = {
     "log-file",
     "Set the log file location",
     ""
 };
-const CommandLine::ArgDescriptor<uint32_t> arg_log_level = {
+const CommandLine::FArgDescriptor<uint32_t> arg_log_level = {
     "log-level",
     "Set the log verbosity level",
     INFO,
     true
 };
-const CommandLine::ArgDescriptor<bool> arg_testnet = {
+const CommandLine::FArgDescriptor<bool> arg_testnet = {
     "testnet",
     "Used to deploy test nets. The daemon must be launched with --testnet flag",
     false
 };
-const CommandLine::ArgDescriptor<bool> arg_rescan = {
+const CommandLine::FArgDescriptor<bool> arg_rescan = {
     "rescan",
     "Start synchronizing from scratch",
     false
 };
-const CommandLine::ArgDescriptor<bool> arg_purge = {
+const CommandLine::FArgDescriptor<bool> arg_purge = {
     "purge",
-    "Discard cache data and start synchronizing from scratch",
+    "Discard cache gData and start synchronizing from scratch",
     false
 };
-const CommandLine::ArgDescriptor< std::vector<std::string> > arg_command = {
+const CommandLine::FArgDescriptor< std::vector<std::string> > arg_command = {
     "command",
     ""
 };
@@ -630,19 +630,19 @@ struct TransferCommand
     }
 };
 
-JsonValue buildLoggerConfiguration(Level level, const std::string &logfile)
+QJsonValue buildLoggerConfiguration(Level level, const std::string &logfile)
 {
-    JsonValue loggerConfiguration(JsonValue::OBJECT);
+    QJsonValue loggerConfiguration(QJsonValue::OBJECT);
     loggerConfiguration.insert("globalLevel", static_cast<int64_t>(level));
 
-    JsonValue& cfgLoggers = loggerConfiguration.insert("loggers", JsonValue::ARRAY);
+    QJsonValue& cfgLoggers = loggerConfiguration.insert("loggers", QJsonValue::ARRAY);
 
-    JsonValue& consoleLogger = cfgLoggers.pushBack(JsonValue::OBJECT);
+    QJsonValue& consoleLogger = cfgLoggers.pushBack(QJsonValue::OBJECT);
     consoleLogger.insert("type", "console");
     consoleLogger.insert("level", static_cast<int64_t>(TRACE));
     consoleLogger.insert("pattern", "%D %T %L ");
 
-    JsonValue& fileLogger = cfgLoggers.pushBack(JsonValue::OBJECT);
+    QJsonValue& fileLogger = cfgLoggers.pushBack(QJsonValue::OBJECT);
     fileLogger.insert("type", "file");
     fileLogger.insert("filename", logfile);
     fileLogger.insert("level", static_cast<int64_t>(TRACE));
@@ -992,7 +992,7 @@ bool processServerFeeAddressResponse(const std::string &response, std::string &f
 {
     try {
         std::stringstream stream(response);
-        JsonValue json;
+        QJsonValue json;
         stream >> json;
 
         auto rootIt = json.getObject().find("fee_address");
@@ -1736,7 +1736,7 @@ bool simple_wallet::init(const boost::program_options::variables_map &vm)
             return false;
         }
 
-        if (Tools::Base58::decodeAddr(private_key_string, addressPrefix, data)
+        if (Tools::Base58::decodeAddress(private_key_string, addressPrefix, data)
             && addressPrefix == parameters::ADDRESS_BASE58_PREFIX && data.size() == sizeof(keys)) {
             std::memcpy(&keys, data.data(), sizeof(keys));
         }
@@ -2456,9 +2456,9 @@ bool simple_wallet::export_keys(const std::vector<std::string> &args)
     std::cout << "View secret key: " << Common::podToHex(keys.sViewSecretKey) << std::endl;
     std::cout
         << "Private keys: "
-        << Tools::Base58::encodeAddr(
-                         parameters::ADDRESS_BASE58_PREFIX,
-                         std::string(reinterpret_cast<char *>(&keys), sizeof(keys)))
+        << Tools::Base58::encodeAddress(
+            parameters::ADDRESS_BASE58_PREFIX,
+            std::string(reinterpret_cast<char *>(&keys), sizeof(keys)))
         << std::endl;
 
     return true;
@@ -3405,7 +3405,7 @@ bool simple_wallet::run()
     m_consoleHandler.start(
         false,
         "[wallet " + addr_start + "]: ",
-        Common::Console::Color::BrightYellow
+        Common::Console::EColor::BrightYellow
     );
 
     return true;
@@ -3504,8 +3504,8 @@ int main(int argc, char *argv[])
     setbuf(stdout, NULL);
 
     po::options_description desc_general("General options");
-    CommandLine::addArg(desc_general, CommandLine::argHelp);
-    CommandLine::addArg(desc_general, CommandLine::argVersion);
+    CommandLine::addArg(desc_general, CommandLine::sArgHelp);
+    CommandLine::addArg(desc_general, CommandLine::sArgVersion);
     CommandLine::addArg(desc_general, arg_config_file);
 
     po::options_description desc_params("Wallet options");
@@ -3528,7 +3528,7 @@ int main(int argc, char *argv[])
     Tools::wallet_rpc_server::init_options(desc_params);
 
     po::positional_options_description positional_options;
-    positional_options.add(arg_command.name, -1);
+    positional_options.add(arg_command.cName, -1);
 
     po::options_description desc_all;
     desc_all.add(desc_general).add(desc_params);
@@ -3542,7 +3542,7 @@ int main(int argc, char *argv[])
     bool r = CommandLine::handleErrorHelper(desc_all, [&]() {
         po::store(CommandLine::parseCommandLine(argc, argv, desc_general, true), vm);
 
-        if (CommandLine::getArg(vm, CommandLine::argHelp)) {
+        if (CommandLine::getArg(vm, CommandLine::sArgHelp)) {
             QwertyNote::Currency tmp_currency = QwertyNote::CurrencyBuilder(logManager).currency();
             QwertyNote::simple_wallet tmp_wallet(dispatcher, tmp_currency, logManager);
 
@@ -3551,7 +3551,7 @@ int main(int argc, char *argv[])
             std::cout << desc_all << '\n' << tmp_wallet.get_commands_str();
 
             return false;
-        } else if (CommandLine::getArg(vm, CommandLine::argVersion)) {
+        } else if (CommandLine::getArg(vm, CommandLine::sArgVersion)) {
             std::cout << CRYPTONOTE_NAME << " wallet v" << PROJECT_VERSION_LONG;
             return false;
         }
@@ -3589,7 +3589,7 @@ int main(int argc, char *argv[])
     auto modulePath = Common::nativePathToGeneric(argv[0]);
     auto cfgLogFile = Common::nativePathToGeneric(CommandLine::getArg(vm, arg_log_file));
     if (cfgLogFile.empty()) {
-        cfgLogFile = Common::replaceExtenstion(modulePath, ".log");
+        cfgLogFile = Common::replaceExtension(modulePath, ".log");
     } else {
         if (!Common::hasParentPath(cfgLogFile)) {
             cfgLogFile = Common::combinePath(Common::getPathDirectory(modulePath), cfgLogFile);
@@ -3692,7 +3692,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        Tools::SignalHandler::install([&wrpc, &wallet] {
+        Tools::QSignalHandler::install([&wrpc, &wallet] {
             wrpc.send_stop_signal();
         });
 
@@ -3722,7 +3722,7 @@ int main(int argc, char *argv[])
             wal.process_command(command);
         }
 
-        Tools::SignalHandler::install([&wal] {
+        Tools::QSignalHandler::install([&wal] {
             wal.stop();
         });
 

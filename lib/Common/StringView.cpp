@@ -22,135 +22,135 @@
 
 namespace Common {
 
-const StringView::Size StringView::INVALID = std::numeric_limits<StringView::Size>::max();
-const StringView StringView::EMPTY(reinterpret_cast<Object *>(1), 0);
-const StringView StringView::NIL(nullptr, 0);
+const QStringView::Size QStringView::INVALID = std::numeric_limits<QStringView::Size>::max();
+const QStringView QStringView::EMPTY(reinterpret_cast<Object *>(1), 0);
+const QStringView QStringView::NIL(nullptr, 0);
 
-StringView::StringView()
+QStringView::QStringView()
 #ifndef NDEBUG // In debug mode, fill in object with invalid state (undefined).
-    : data(nullptr),
-      size(INVALID)
+    : gData(nullptr),
+      gSize(INVALID)
 #endif
 {
 }
 
-StringView::StringView(const Object *stringData, Size stringSize)
-    : data(stringData),
-      size(stringSize)
+QStringView::QStringView(const Object *stringData, Size stringSize)
+    : gData(stringData),
+      gSize(stringSize)
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 }
 
-StringView::StringView(const std::string &string)
-    : data(string.data()),
-      size(string.size())
+QStringView::QStringView(const std::string &string)
+    : gData(string.data()),
+      gSize(string.size())
 {
 }
 
-StringView::StringView(const StringView &other)
-    : data(other.data),
-      size(other.size)
+QStringView::QStringView(const QStringView &other)
+    : gData(other.gData),
+      gSize(other.gSize)
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 }
 
-StringView &StringView::operator=(const StringView &other)
+QStringView &QStringView::operator=(const QStringView &other)
 {
-    assert(other.data != nullptr || other.size == 0);
+    assert(other.gData != nullptr || other.gSize == 0);
 
-    data = other.data;
-    size = other.size;
+    gData = other.gData;
+    gSize = other.gSize;
 
     return *this;
 }
 
-StringView::operator std::string() const
+QStringView::operator std::string() const
 {
-    return std::string(data, size);
+    return std::string(gData, gSize);
 }
 
-const StringView::Object *StringView::getData() const
+const QStringView::Object *QStringView::getData() const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    return data;
+    return gData;
 }
 
-StringView::Size StringView::getSize() const
+QStringView::Size QStringView::getSize() const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    return size;
+    return gSize;
 }
 
-bool StringView::isEmpty() const
+bool QStringView::isEmpty() const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    return size == 0;
+    return gSize == 0;
 }
 
-bool StringView::isNil() const
+bool QStringView::isNil() const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    return data == nullptr;
+    return gData == nullptr;
 }
 
-const StringView::Object &StringView::operator[](Size index) const
+const QStringView::Object &QStringView::operator[](Size index) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(index < size);
+    assert(index < gSize);
 
-    return *(data + index);
+    return *(gData + index);
 }
 
-const StringView::Object &StringView::first() const
+const QStringView::Object &QStringView::first() const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(size > 0);
+    assert(gSize > 0);
 
-    return *data;
+    return *gData;
 }
 
-const StringView::Object &StringView::last() const
+const QStringView::Object &QStringView::last() const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(size > 0);
+    assert(gSize > 0);
 
-    return *(data + (size - 1));
+    return *(gData + (gSize - 1));
 }
 
-const StringView::Object *StringView::begin() const
+const QStringView::Object *QStringView::begin() const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    return data;
+    return gData;
 }
 
-const StringView::Object *StringView::end() const
+const QStringView::Object *QStringView::end() const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    return data + size;
+    return gData + gSize;
 }
 
-bool StringView::operator==(StringView other) const
+bool QStringView::operator==(QStringView other) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(other.data != nullptr || other.size == 0);
+    assert(other.gData != nullptr || other.gSize == 0);
 
-    if (size == other.size) {
+    if (gSize == other.gSize) {
         for (Size i = 0;; ++i) {
-            if (i == size) {
+            if (i == gSize) {
                 return true;
             }
 
-            if (*(data + i) != *(other.data + i)) {
+            if (*(gData + i) != *(other.gData + i)) {
                 break;
             }
         }
@@ -159,21 +159,21 @@ bool StringView::operator==(StringView other) const
     return false;
 }
 
-bool StringView::operator!=(StringView other) const
+bool QStringView::operator!=(QStringView other) const
 {
     return !(*this == other);
 }
 
-bool StringView::operator<(StringView other) const
+bool QStringView::operator<(QStringView other) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(other.data != nullptr || other.size == 0);
+    assert(other.gData != nullptr || other.gSize == 0);
 
-    Size count = other.size < size ? other.size : size;
+    Size count = other.gSize < gSize ? other.gSize : gSize;
     for (Size i = 0; i < count; ++i) {
-        Object char1 = *(data + i);
-        Object char2 = *(other.data + i);
+        Object char1 = *(gData + i);
+        Object char2 = *(other.gData + i);
         if (char1 < char2) {
             return true;
         }
@@ -183,48 +183,48 @@ bool StringView::operator<(StringView other) const
         }
     }
 
-    return size < other.size;
+    return gSize < other.gSize;
 }
 
-bool StringView::operator<=(StringView other) const
+bool QStringView::operator<=(QStringView other) const
 {
     return !(other < *this);
 }
 
-bool StringView::operator>(StringView other) const
+bool QStringView::operator>(QStringView other) const
 {
     return other < *this;
 }
 
-bool StringView::operator>=(StringView other) const
+bool QStringView::operator>=(QStringView other) const
 {
     return !(*this < other);
 }
 
-bool StringView::beginsWith(const Object &object) const
+bool QStringView::beginsWith(const Object &object) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    if (size == 0) {
+    if (gSize == 0) {
         return false;
     }
 
-    return *data == object;
+    return *gData == object;
 }
 
-bool StringView::beginsWith(StringView other) const
+bool QStringView::beginsWith(QStringView other) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(other.data != nullptr || other.size == 0);
+    assert(other.gData != nullptr || other.gSize == 0);
 
-    if (size >= other.size) {
+    if (gSize >= other.gSize) {
         for (Size i = 0;; ++i) {
-            if (i == other.size) {
+            if (i == other.gSize) {
                 return true;
             }
 
-            if (*(data + i) != *(other.data + i)) {
+            if (*(gData + i) != *(other.gData + i)) {
                 break;
             }
         }
@@ -233,12 +233,12 @@ bool StringView::beginsWith(StringView other) const
     return false;
 }
 
-bool StringView::contains(const Object &object) const
+bool QStringView::contains(const Object &object) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    for (Size i = 0; i < size; ++i) {
-        if (*(data + i) == object) {
+    for (Size i = 0; i < gSize; ++i) {
+        if (*(gData + i) == object) {
             return true;
         }
     }
@@ -246,21 +246,21 @@ bool StringView::contains(const Object &object) const
     return false;
 }
 
-bool StringView::contains(StringView other) const
+bool QStringView::contains(QStringView other) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(other.data != nullptr || other.size == 0);
+    assert(other.gData != nullptr || other.gSize == 0);
 
-    if (size >= other.size) {
-    Size i = size - other.size;
+    if (gSize >= other.gSize) {
+    Size i = gSize - other.gSize;
         for (Size j = 0; i >= j; ++j) {
             for (Size k = 0;; ++k) {
-                if (k == other.size) {
+                if (k == other.gSize) {
                     return true;
                 }
 
-                if (*(data + j + k) != *(other.data + k)) {
+                if (*(gData + j + k) != *(other.gData + k)) {
                     break;
                 }
             }
@@ -270,31 +270,31 @@ bool StringView::contains(StringView other) const
     return false;
 }
 
-bool StringView::endsWith(const Object &object) const
+bool QStringView::endsWith(const Object &object) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    if (size == 0) {
+    if (gSize == 0) {
         return false;
     }
 
-    return *(data + (size - 1)) == object;
+    return *(gData + (gSize - 1)) == object;
 }
 
-bool StringView::endsWith(StringView other) const
+bool QStringView::endsWith(QStringView other) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(other.data != nullptr || other.size == 0);
+    assert(other.gData != nullptr || other.gSize == 0);
 
-    if (size >= other.size) {
-        Size i = size - other.size;
+    if (gSize >= other.gSize) {
+        Size i = gSize - other.gSize;
         for (Size j = 0;; ++j) {
-            if (j == other.size) {
+            if (j == other.gSize) {
                 return true;
             }
 
-            if (*(data + i + j) != *(other.data + j)) {
+            if (*(gData + i + j) != *(other.gData + j)) {
                 break;
             }
         }
@@ -303,12 +303,12 @@ bool StringView::endsWith(StringView other) const
     return false;
 }
 
-StringView::Size StringView::find(const Object &object) const
+QStringView::Size QStringView::find(const Object &object) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    for (Size i = 0; i < size; ++i) {
-        if (*(data + i) == object) {
+    for (Size i = 0; i < gSize; ++i) {
+        if (*(gData + i) == object) {
             return i;
         }
     }
@@ -316,21 +316,21 @@ StringView::Size StringView::find(const Object &object) const
     return INVALID;
 }
 
-StringView::Size StringView::find(StringView other) const
+QStringView::Size QStringView::find(QStringView other) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(other.data != nullptr || other.size == 0);
+    assert(other.gData != nullptr || other.gSize == 0);
 
-    if (size >= other.size) {
-        Size i = size - other.size;
+    if (gSize >= other.gSize) {
+        Size i = gSize - other.gSize;
         for (Size j = 0; i >= j; ++j) {
             for (Size k = 0;; ++k) {
-                if (k == other.size) {
+                if (k == other.gSize) {
                     return j;
                 }
 
-                if (*(data + j + k) != *(other.data + k)) {
+                if (*(gData + j + k) != *(other.gData + k)) {
                     break;
                 }
             }
@@ -340,34 +340,34 @@ StringView::Size StringView::find(StringView other) const
     return INVALID;
 }
 
-StringView::Size StringView::findLast(const Object &object) const
+QStringView::Size QStringView::findLast(const Object &object) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    for (Size i = 0; i < size; ++i) {
-        if (*(data + (size - 1 - i)) == object) {
-            return size - 1 - i;
+    for (Size i = 0; i < gSize; ++i) {
+        if (*(gData + (gSize - 1 - i)) == object) {
+            return gSize - 1 - i;
         }
     }
 
     return INVALID;
 }
 
-StringView::Size StringView::findLast(StringView other) const
+QStringView::Size QStringView::findLast(QStringView other) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(other.data != nullptr || other.size == 0);
+    assert(other.gData != nullptr || other.gSize == 0);
 
-    if (size >= other.size) {
-        Size i = size - other.size;
+    if (gSize >= other.gSize) {
+        Size i = gSize - other.gSize;
         for (Size j = 0; i >= j; ++j) {
             for (Size k = 0;; ++k) {
-                if (k == other.size) {
+                if (k == other.gSize) {
                     return i - j;
                 }
 
-                if (*(data + (i - j + k)) != *(other.data + k)) {
+                if (*(gData + (i - j + k)) != *(other.gData + k)) {
                     break;
                 }
             }
@@ -377,58 +377,58 @@ StringView::Size StringView::findLast(StringView other) const
     return INVALID;
 }
 
-StringView StringView::head(Size headSize) const
+QStringView QStringView::head(Size headSize) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(headSize <= size);
+    assert(headSize <= gSize);
 
-    return StringView(data, headSize);
+    return QStringView(gData, headSize);
 }
 
-StringView StringView::tail(Size tailSize) const
+QStringView QStringView::tail(Size tailSize) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(tailSize <= size);
+    assert(tailSize <= gSize);
 
-    return StringView(data + (size - tailSize), tailSize);
+    return QStringView(gData + (gSize - tailSize), tailSize);
 }
 
-StringView StringView::unhead(Size headSize) const
+QStringView QStringView::unhead(Size headSize) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(headSize <= size);
+    assert(headSize <= gSize);
 
-    return StringView(data + headSize, size - headSize);
+    return QStringView(gData + headSize, gSize - headSize);
 }
 
-StringView StringView::untail(Size tailSize) const
+QStringView QStringView::untail(Size tailSize) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(tailSize <= size);
+    assert(tailSize <= gSize);
 
-    return StringView(data, size - tailSize);
+    return QStringView(gData, gSize - tailSize);
 }
 
-StringView StringView::range(Size startIndex, Size endIndex) const
+QStringView QStringView::range(Size startIndex, Size endIndex) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(startIndex <= endIndex && endIndex <= size);
+    assert(startIndex <= endIndex && endIndex <= gSize);
 
-    return StringView(data + startIndex, endIndex - startIndex);
+    return QStringView(gData + startIndex, endIndex - startIndex);
 }
 
-StringView StringView::slice(Size startIndex, Size sliceSize) const
+QStringView QStringView::slice(Size startIndex, Size sliceSize) const
 {
-    assert(data != nullptr || size == 0);
+    assert(gData != nullptr || gSize == 0);
 
-    assert(startIndex <= size && startIndex + sliceSize <= size);
+    assert(startIndex <= gSize && startIndex + sliceSize <= gSize);
 
-    return StringView(data + startIndex, sliceSize);
+    return QStringView(gData + startIndex, sliceSize);
 }
 
 } // namespace Common

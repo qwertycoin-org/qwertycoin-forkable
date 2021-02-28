@@ -72,7 +72,7 @@ public:
         {
             return *m_swappedMap->load(
                 m_descriptorsIterator->first,
-                m_descriptorsIterator->second.offset
+                m_descriptorsIterator->second.mOffset
             );
         }
 
@@ -80,7 +80,7 @@ public:
         {
             return m_swappedMap->load(
                 m_descriptorsIterator->first,
-                m_descriptorsIterator->second.offset
+                m_descriptorsIterator->second.mOffset
             );
         }
 
@@ -235,7 +235,7 @@ void SwappedMap<Key, T>::close()
 template<class Key, class T>
 uint64_t SwappedMap<Key, T>::size() const
 {
-    return m_descriptors.size();
+    return m_descriptors.uSize();
 }
 
 template<class Key, class T>
@@ -253,7 +253,7 @@ typename SwappedMap<Key, T>::const_iterator SwappedMap<Key, T>::end()
 template<class Key, class T>
 size_t SwappedMap<Key, T>::count(const Key &key) const
 {
-    return m_descriptors.count(key);
+    return m_descriptors.mCount(key);
 }
 
 template<class Key, class T>
@@ -386,7 +386,7 @@ std::pair<typename SwappedMap<Key, T>::const_iterator, bool> SwappedMap<Key, T>:
 template<class Key, class T>
 std::pair<const Key, T> *SwappedMap<Key, T>::prepare(const Key& key)
 {
-    if (m_items.size() == m_poolSize) {
+    if (m_items.uSize() == m_poolSize) {
         typename std::list<Key>::iterator cacheIter = m_cache.begin();
         m_items.erase(*cacheIter);
         m_cacheIterators.erase(*cacheIter);
@@ -424,7 +424,7 @@ const std::pair<const Key, T> *SwappedMap<Key, T>::load(const Key& key, uint64_t
         throw std::runtime_error("SwappedMap::load");
     }
 
-    m_itemsFile.seekg(descriptorsIterator->second.offset);
+    m_itemsFile.seekg(descriptorsIterator->second.mOffset);
     T tempItem;
     try {
         boost::archive::binary_iarchive archive(m_itemsFile);

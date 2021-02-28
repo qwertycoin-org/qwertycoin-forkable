@@ -42,7 +42,7 @@ class TransfersSynchronizer : public ITransfersSynchronizer, public IBlockchainC
         std::unique_ptr<TransfersConsumer>
     > ConsumersContainer;
 
-    typedef Tools::ObserverManager<ITransfersSynchronizerObserver> SubscribersNotifier;
+    typedef Tools::QObserverManager<ITransfersSynchronizerObserver> SubscribersNotifier;
 
     typedef std::unordered_map<
         Crypto::FPublicKey,

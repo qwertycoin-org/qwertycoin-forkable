@@ -17,110 +17,110 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
+
 #include <Common/PathTools.h>
 
 namespace {
 
-const char GENERIC_PATH_SEPARATOR = '/';
+    const char GENERIC_PATH_SEPARATOR = '/';
 
 #ifdef _WIN32
-const char NATIVE_PATH_SEPARATOR = '\\';
+    const char NATIVE_PATH_SEPARATOR = '\\';
 #else
-const char NATIVE_PATH_SEPARATOR = '/';
+    const char NATIVE_PATH_SEPARATOR = '/';
 #endif
 
-std::string::size_type findExtensionPosition(const std::string &filename)
-{
-    auto pos = filename.rfind('.');
+    std::string::size_type findExtensionPosition (const std::string &cFilename)
+    {
+        auto pos = cFilename.rfind('.');
 
-    if (pos != std::string::npos) {
-        auto slashPos = filename.rfind(GENERIC_PATH_SEPARATOR);
-        if (slashPos != std::string::npos && slashPos > pos) {
-            return std::string::npos;
+        if (pos != std::string::npos) {
+            auto slashPos = cFilename.rfind(GENERIC_PATH_SEPARATOR);
+            if (slashPos != std::string::npos && slashPos > pos) {
+                return std::string::npos;
+            }
         }
-    }
 
-    return pos;
-}
+        return pos;
+    }
 
 } // namespace
 
 namespace Common {
-
-std::string nativePathToGeneric(const std::string &nativePath)
-{
-    if (GENERIC_PATH_SEPARATOR == NATIVE_PATH_SEPARATOR) {
-        return nativePath;
+    bool hasParentPath (const std::string &cPath)
+    {
+        return cPath.find(GENERIC_PATH_SEPARATOR) != std::string::npos;
     }
 
-    std::string genericPath(nativePath);
-    std::replace(genericPath.begin(),
-                 genericPath.end(),
-                 NATIVE_PATH_SEPARATOR,
-                 GENERIC_PATH_SEPARATOR);
+    std::string nativePathToGeneric (const std::string &cNativePath)
+    {
+        if (GENERIC_PATH_SEPARATOR == NATIVE_PATH_SEPARATOR) {
+            return cNativePath;
+        }
 
-    return genericPath;
-}
+        std::string genericPath(cNativePath);
+        std::replace(genericPath.begin(),
+                     genericPath.end(),
+                     NATIVE_PATH_SEPARATOR,
+                     GENERIC_PATH_SEPARATOR);
 
-std::string getPathDirectory(const std::string &path)
-{
-    auto slashPos = path.rfind(GENERIC_PATH_SEPARATOR);
-    if (slashPos == std::string::npos) {
+        return genericPath;
+    }
+
+    std::string getPathDirectory (const std::string &cPath)
+    {
+        auto slashPos = cPath.rfind(GENERIC_PATH_SEPARATOR);
+        if (slashPos == std::string::npos) {
+            return std::string();
+        }
+
+        return cPath.substr(0, slashPos);
+    }
+
+    std::string getPathFilename (const std::string &cPath)
+    {
+        auto slashPos = cPath.rfind(GENERIC_PATH_SEPARATOR);
+        if (slashPos == std::string::npos) {
+            return cPath;
+        }
+
+        return cPath.substr(slashPos + 1);
+    }
+
+    void splitPath (const std::string &cPath, std::string &cDirectory, std::string &cFilename)
+    {
+        cDirectory = getPathDirectory(cPath);
+        cFilename = getPathFilename(cPath);
+    }
+
+    std::string combinePath (const std::string &cPath1, const std::string &cPath2)
+    {
+        return cPath1.empty() ? cPath2 : cPath1 + GENERIC_PATH_SEPARATOR + cPath2;
+    }
+
+    std::string replaceExtension (const std::string &cPath, const std::string &cExtension)
+    {
+        return removeExtension(cPath) + cExtension;
+    }
+
+    std::string getExtension (const std::string &cPath)
+    {
+        auto pos = findExtensionPosition(cPath);
+        if (pos != std::string::npos) {
+            return cPath.substr(pos);
+        }
+
         return std::string();
     }
 
-    return path.substr(0, slashPos);
-}
+    std::string removeExtension (const std::string &cPath)
+    {
+        auto pos = findExtensionPosition(cPath);
+        if (pos == std::string::npos) {
+            return cPath;
+        }
 
-std::string getPathFilename(const std::string &path)
-{
-    auto slashPos = path.rfind(GENERIC_PATH_SEPARATOR);
-    if (slashPos == std::string::npos) {
-        return path;
+        return cPath.substr(0, pos);
     }
-
-    return path.substr(slashPos + 1);
-}
-
-void splitPath(const std::string &path, std::string &directory, std::string &filename)
-{
-    directory = getPathDirectory(path);
-    filename = getPathFilename(path);
-}
-
-std::string combinePath(const std::string &path1, const std::string &path2)
-{
-    return path1.empty() ? path2 : path1 + GENERIC_PATH_SEPARATOR + path2;
-}
-
-std::string replaceExtenstion(const std::string &path, const std::string &extension)
-{
-    return removeExtension(path) + extension;
-}
-
-std::string getExtension(const std::string &path)
-{
-    auto pos = findExtensionPosition(path);
-    if (pos != std::string::npos) {
-        return path.substr(pos);
-    }
-
-    return std::string();
-}
-
-std::string removeExtension(const std::string &filename)
-{
-    auto pos = findExtensionPosition(filename);
-    if (pos == std::string::npos) {
-        return filename;
-    }
-
-    return filename.substr(0, pos);
-}
-
-bool hasParentPath(const std::string &path)
-{
-    return path.find(GENERIC_PATH_SEPARATOR) != std::string::npos;
-}
 
 } // namespace Common

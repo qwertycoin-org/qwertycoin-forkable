@@ -21,10 +21,10 @@
 #include <Common/StringTools.h>
 #include <Serialization/JsonInputValueSerializer.h>
 
-using Common::JsonValue;
+using Common::QJsonValue;
 using namespace QwertyNote;
 
-JsonInputValueSerializer::JsonInputValueSerializer(const Common::JsonValue &value)
+JsonInputValueSerializer::JsonInputValueSerializer(const Common::QJsonValue &value)
 {
     if (!value.isObject()) {
         throw std::runtime_error(
@@ -35,7 +35,7 @@ JsonInputValueSerializer::JsonInputValueSerializer(const Common::JsonValue &valu
     m_chain.push_back(&value);
 }
 
-JsonInputValueSerializer::JsonInputValueSerializer(Common::JsonValue &&value)
+JsonInputValueSerializer::JsonInputValueSerializer(Common::QJsonValue &&value)
     : m_value(std::move(value))
 {
     if (!this->m_value.isObject()) {
@@ -52,19 +52,19 @@ ISerializer::SerializerType JsonInputValueSerializer::type() const
     return ISerializer::INPUT;
 }
 
-bool JsonInputValueSerializer::beginObject(Common::StringView name)
+bool JsonInputValueSerializer::beginObject(Common::QStringView name)
 {
-    const JsonValue *parent = m_chain.back();
+    const QJsonValue *parent = m_chain.back();
 
     if (parent->isArray()) {
-        const JsonValue &v = (*parent)[m_idxs.back()++];
+        const QJsonValue &v = (*parent)[m_idxs.back()++];
         m_chain.push_back(&v);
 
         return true;
     }
 
     if (parent->contains(std::string(name))) {
-        const JsonValue &v = (*parent)(std::string(name));
+        const QJsonValue &v = (*parent)(std::string(name));
         m_chain.push_back(&v);
 
         return true;
@@ -80,13 +80,13 @@ void JsonInputValueSerializer::endObject()
     m_chain.pop_back();
 }
 
-bool JsonInputValueSerializer::beginArray(size_t &size, Common::StringView name)
+bool JsonInputValueSerializer::beginArray(size_t &size, Common::QStringView name)
 {
-    const JsonValue *parent = m_chain.back();
+    const QJsonValue *parent = m_chain.back();
     std::string strName(name);
 
     if (parent->contains(strName)) {
-        const JsonValue &arr = (*parent)(strName);
+        const QJsonValue &arr = (*parent)(strName);
         size = arr.size();
 
         m_chain.push_back(&arr);
@@ -110,47 +110,47 @@ void JsonInputValueSerializer::endArray()
     m_idxs.pop_back();
 }
 
-bool JsonInputValueSerializer::operator()(uint16_t &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(uint16_t &value, Common::QStringView name)
 {
     return getNumber(name, value);
 }
 
-bool JsonInputValueSerializer::operator()(int16_t &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(int16_t &value, Common::QStringView name)
 {
     return getNumber(name, value);
 }
 
-bool JsonInputValueSerializer::operator()(uint32_t &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(uint32_t &value, Common::QStringView name)
 {
     return getNumber(name, value);
 }
 
-bool JsonInputValueSerializer::operator()(int32_t &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(int32_t &value, Common::QStringView name)
 {
     return getNumber(name, value);
 }
 
-bool JsonInputValueSerializer::operator()(int64_t &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(int64_t &value, Common::QStringView name)
 {
     return getNumber(name, value);
 }
 
-bool JsonInputValueSerializer::operator()(uint64_t &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(uint64_t &value, Common::QStringView name)
 {
     return getNumber(name, value);
 }
 
-bool JsonInputValueSerializer::operator()(double &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(double &value, Common::QStringView name)
 {
     return getNumber(name, value);
 }
 
-bool JsonInputValueSerializer::operator()(uint8_t &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(uint8_t &value, Common::QStringView name)
 {
     return getNumber(name, value);
 }
 
-bool JsonInputValueSerializer::operator()(std::string &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(std::string &value, Common::QStringView name)
 {
     auto ptr = getValue(name);
     if (ptr == nullptr) {
@@ -162,7 +162,7 @@ bool JsonInputValueSerializer::operator()(std::string &value, Common::StringView
     return true;
 }
 
-bool JsonInputValueSerializer::operator()(bool &value, Common::StringView name)
+bool JsonInputValueSerializer::operator()(bool &value, Common::QStringView name)
 {
     auto ptr = getValue(name);
     if (ptr == nullptr) {
@@ -174,7 +174,7 @@ bool JsonInputValueSerializer::operator()(bool &value, Common::StringView name)
     return true;
 }
 
-bool JsonInputValueSerializer::binary(void *value, size_t size, Common::StringView name)
+bool JsonInputValueSerializer::binary(void *value, size_t size, Common::QStringView name)
 {
     auto ptr = getValue(name);
     if (ptr == nullptr) {
@@ -186,7 +186,7 @@ bool JsonInputValueSerializer::binary(void *value, size_t size, Common::StringVi
     return true;
 }
 
-bool JsonInputValueSerializer::binary(std::string &value, Common::StringView name)
+bool JsonInputValueSerializer::binary(std::string &value, Common::QStringView name)
 {
     auto ptr = getValue(name);
     if (ptr == nullptr) {
@@ -199,9 +199,9 @@ bool JsonInputValueSerializer::binary(std::string &value, Common::StringView nam
     return true;
 }
 
-const JsonValue *JsonInputValueSerializer::getValue(Common::StringView name)
+const QJsonValue *JsonInputValueSerializer::getValue(Common::QStringView name)
 {
-    const JsonValue& val = *m_chain.back();
+    const QJsonValue& val = *m_chain.back();
     if (val.isArray()) {
         return &val[m_idxs.back()++];
     }

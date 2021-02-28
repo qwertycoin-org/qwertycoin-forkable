@@ -23,34 +23,40 @@
 
 namespace Common {
 
-namespace VectorUtils {
+    namespace VectorUtils {
 
-template<typename T, class UnaryPredicate>
-std::vector<T> filter(const std::vector<T> &original, UnaryPredicate pred)
-{
-    std::vector<T> filtered;
+        template <typename T, class QUnaryPredicate>
+        std::vector <T> filter (const std::vector <T> &vOriginal, QUnaryPredicate sPredicate)
+        {
+            std::vector <T> vFiltered;
 
-    std::copy_if(begin(original), end(original), std::back_inserter(filtered), pred);
+            std::copy_if(begin(vOriginal), end(vOriginal), std::back_inserter(vFiltered),
+                         sPredicate);
 
-    return filtered;
-}
+            return vFiltered;
+        }
 
-template<typename T2, typename T1, class UnaryOperation>
-std::vector<T2> map(const std::vector<T1> &original, UnaryOperation mappingFunction)
-{
-    std::vector<T2> mapped;
+        template <typename T2, typename T1, class QUnaryOperation>
+        std::vector <T2> map (const std::vector <T1> &vOriginal, QUnaryOperation sMappingFunction)
+        {
+            std::vector <T2> vMapped;
 
-    std::transform(begin(original), end(original), std::back_inserter(mapped), mappingFunction);
+            std::transform(begin(vOriginal),
+                           end(vOriginal),
+                           std::back_inserter(vMapped),
+                           sMappingFunction);
 
-    return mapped;
-}
+            return vMapped;
+        }
 
-template<typename T>
-void append(std::vector<T> &appendedTo, const std::vector<T> &appended)
-{
-    appendedTo.insert(end(appendedTo), begin(appended), end(appended));
-}
+        template <typename T>
+        void append (std::vector <T> &vAppendedTo, const std::vector <T> &vAppended)
+        {
+            vAppendedTo.insert(end(vAppendedTo),
+                               begin(vAppended),
+                               end(vAppended));
+        }
 
-} // namespace VectorUtils
+    } // namespace VectorUtils
 
 } // namespace Common

@@ -279,7 +279,7 @@ void WalletLegacy::initWithKeys(const FAccountKeys &accountKeys, const std::stri
         }
 
         m_account.setAccountKeys(accountKeys);
-        m_account.set_createtime(ACCOUNT_CREATE_TIME_ACCURACY);
+        m_account.setCreateTime(ACCOUNT_CREATE_TIME_ACCURACY);
         m_password = password;
 
         initSync();
@@ -846,7 +846,7 @@ std::list<FTransactionOutputInformation> WalletLegacy::selectFusionTransfersToSe
         return selectedOutputs;
     }
 
-    ShuffleGenerator<size_t> generator(selectedOuts.size());
+    QShuffleGenerator<size_t> generator(selectedOuts.size());
     std::vector<FTransactionOutputInformation> trimmedSelectedOuts;
     trimmedSelectedOuts.reserve(maxInputCount);
     for (size_t i = 0; i < maxInputCount; ++i) {

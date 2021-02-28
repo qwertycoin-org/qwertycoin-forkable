@@ -20,16 +20,16 @@
 
 namespace Common {
 
-StdInputStream::StdInputStream(std::istream &in)
-    : in(in)
-{
-}
+    QStdInputStream::QStdInputStream (std::istream &in)
+        : mIStream(in)
+    {
+    }
 
-size_t StdInputStream::readSome(void *data, size_t size)
-{
-    in.read(static_cast<char *>(data), size);
+    size_t QStdInputStream::readSome (void *data, size_t uSize)
+    {
+        mIStream.read(static_cast<char *>(data), uSize);
 
-    return in.gcount();
-}
+        return mIStream.gcount();
+    }
 
 } // namespace Common

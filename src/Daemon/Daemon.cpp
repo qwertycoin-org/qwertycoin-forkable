@@ -58,7 +58,7 @@
 #include <crtdbg.h>
 #endif
 
-using Common::JsonValue;
+using Common::QJsonValue;
 using namespace QwertyNote;
 using namespace Logging;
 using namespace Qwertycoin;
@@ -67,102 +67,102 @@ namespace po = boost::program_options;
 
 namespace {
 
-const CommandLine::ArgDescriptor<std::string> arg_config_file = {
+const CommandLine::FArgDescriptor<std::string> arg_config_file = {
     "config-file",
     "Specify configuration file",
     std::string(QwertyNote::CRYPTONOTE_NAME) + ".conf"
 };
 
-const CommandLine::ArgDescriptor<bool> arg_os_version = {
+const CommandLine::FArgDescriptor<bool> arg_os_version = {
     "os-version",
     ""
 };
 
-const CommandLine::ArgDescriptor<std::string> arg_log_file = {
+const CommandLine::FArgDescriptor<std::string> arg_log_file = {
     "log-file",
     "",
     ""
 };
 
-const CommandLine::ArgDescriptor<int> arg_log_level = {
+const CommandLine::FArgDescriptor<int> arg_log_level = {
     "log-level",
     "",
     2
 }; // info level
 
-const CommandLine::ArgDescriptor<bool> arg_console = {
+const CommandLine::FArgDescriptor<bool> arg_console = {
     "no-console",
     "Disable daemon console commands"
 };
 
-const CommandLine::ArgDescriptor<bool> arg_restricted_rpc = {
+const CommandLine::FArgDescriptor<bool> arg_restricted_rpc = {
     "restricted-rpc",
     "Restrict RPC to view only commands to prevent abuse"
 };
 
-const CommandLine::ArgDescriptor<bool> arg_enable_blockchain_indexes = {
+const CommandLine::FArgDescriptor<bool> arg_enable_blockchain_indexes = {
     "enable-blockchain-indexes",
     "Enable blockchain indexes",
     false
 };
 
-const CommandLine::ArgDescriptor<bool> arg_print_genesis_tx = {
+const CommandLine::FArgDescriptor<bool> arg_print_genesis_tx = {
     "print-genesis-tx",
     "Prints genesis' block tx hex to insert it to config and exits"
 };
 
-const CommandLine::ArgDescriptor<std::string> arg_enable_cors = {
+const CommandLine::FArgDescriptor<std::string> arg_enable_cors = {
     "enable-cors",
     "Adds header 'Access-Control-Allow-Origin' to the daemon's RPC responses. "
     "Uses the value as domain. Use * for all",
     ""
 };
 
-const CommandLine::ArgDescriptor<std::string> arg_set_fee_address = {
+const CommandLine::FArgDescriptor<std::string> arg_set_fee_address = {
     "fee-address",
     "Sets fee address for light wallets to the daemon's RPC responses.",
     ""
 };
 
-const CommandLine::ArgDescriptor<std::string> arg_set_contact = {
+const CommandLine::FArgDescriptor<std::string> arg_set_contact = {
     "contact",
     "Sets node admin contact",
     ""
 };
 
-const CommandLine::ArgDescriptor<std::string> arg_set_view_key = {
+const CommandLine::FArgDescriptor<std::string> arg_set_view_key = {
     "view-key",
     "Sets private view key to check for masternode's fee.",
     ""
 };
 
-const CommandLine::ArgDescriptor<bool> arg_testnet_on  = {
+const CommandLine::FArgDescriptor<bool> arg_testnet_on  = {
     "testnet",
     "Used to deploy test nets. Checkpoints and hardcoded seeds are ignored, "
-    "network id is changed. Use it with --data-dir flag. "
+    "network id is changed. Use it with --gData-dir flag. "
     "The wallet must be launched with --testnet flag.",
     false
 };
 
-const CommandLine::ArgDescriptor<bool> arg_fixed_difficulty  = {
+const CommandLine::FArgDescriptor<bool> arg_fixed_difficulty  = {
     "fixed-difficulty",
     "Fixed difficulty used for testing.",
     0
 };
 
 
-const CommandLine::ArgDescriptor<std::string> arg_load_checkpoints = {
+const CommandLine::FArgDescriptor<std::string> arg_load_checkpoints = {
     "load-checkpoints",
     "<filename> Load checkpoints from csv file.",
     ""
 };
 
-const CommandLine::ArgDescriptor<bool> arg_disable_checkpoints = {
+const CommandLine::FArgDescriptor<bool> arg_disable_checkpoints = {
     "without-checkpoints",
     "Synchronize without checkpoints"
 };
 
-const CommandLine::ArgDescriptor<std::string> arg_rollback = {
+const CommandLine::FArgDescriptor<std::string> arg_rollback = {
     "rollback",
     "Rollback blockchain to <height>"
 };
@@ -183,19 +183,19 @@ void print_genesis_tx_hex(const po::variables_map &vm, LoggerManager &logManager
         << "const char GENESIS_COINBASE_TX_HEX[] = \"" << tx_hex << "\";" << std::endl;
 }
 
-JsonValue buildLoggerConfiguration(Level level, const std::string &logfile)
+QJsonValue buildLoggerConfiguration(Level level, const std::string &logfile)
 {
-    JsonValue loggerConfiguration(JsonValue::OBJECT);
+    QJsonValue loggerConfiguration(QJsonValue::OBJECT);
     loggerConfiguration.insert("globalLevel", static_cast<int64_t>(level));
 
-    JsonValue& cfgLoggers = loggerConfiguration.insert("loggers", JsonValue::ARRAY);
+    QJsonValue& cfgLoggers = loggerConfiguration.insert("loggers", QJsonValue::ARRAY);
 
-    JsonValue& fileLogger = cfgLoggers.pushBack(JsonValue::OBJECT);
+    QJsonValue& fileLogger = cfgLoggers.pushBack(QJsonValue::OBJECT);
     fileLogger.insert("type", "file");
     fileLogger.insert("filename", logfile);
     fileLogger.insert("level", static_cast<int64_t>(TRACE));
 
-    JsonValue& consoleLogger = cfgLoggers.pushBack(JsonValue::OBJECT);
+    QJsonValue& consoleLogger = cfgLoggers.pushBack(QJsonValue::OBJECT);
     consoleLogger.insert("type", "console");
     consoleLogger.insert("level", static_cast<int64_t>(TRACE));
     consoleLogger.insert("pattern", "%D %T %L ");
@@ -207,7 +207,7 @@ bool command_line_preprocessor(const boost::program_options::variables_map &vm, 
 {
     bool exit = false;
 
-    if (CommandLine::getArg(vm, CommandLine::argVersion)) {
+    if (CommandLine::getArg(vm, CommandLine::sArgVersion)) {
         std::cout << QwertyNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL;
         exit = true;
     }
@@ -235,11 +235,11 @@ int main(int argc, char *argv[])
         po::options_description desc_cmd_only("Command line options");
         po::options_description desc_cmd_sett("Command line options and settings options");
 
-        CommandLine::addArg(desc_cmd_only, CommandLine::argHelp);
-        CommandLine::addArg(desc_cmd_only, CommandLine::argVersion);
+        CommandLine::addArg(desc_cmd_only, CommandLine::sArgHelp);
+        CommandLine::addArg(desc_cmd_only, CommandLine::sArgVersion);
         CommandLine::addArg(desc_cmd_only, arg_os_version);
         // tools::get_default_data_dir() can't be called during static initialization
-        CommandLine::addArg(desc_cmd_only, CommandLine::argDataDir,
+        CommandLine::addArg(desc_cmd_only, CommandLine::sArgDataDir,
                              Tools::getDefaultDataDirectory());
         CommandLine::addArg(desc_cmd_only, arg_config_file);
 
@@ -271,14 +271,14 @@ int main(int argc, char *argv[])
         bool r = CommandLine::handleErrorHelper(desc_options, [&]() {
             po::store(po::parse_command_line(argc, argv, desc_options), vm);
 
-            if (CommandLine::getArg(vm, CommandLine::argHelp)) {
+            if (CommandLine::getArg(vm, CommandLine::sArgHelp)) {
                 std::cout << QwertyNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL
                           << ENDL;
                 std::cout << desc_options << std::endl;
                 return false;
             }
 
-            std::string data_dir = CommandLine::getArg(vm, CommandLine::argDataDir);
+            std::string data_dir = CommandLine::getArg(vm, CommandLine::sArgDataDir);
             std::string config = CommandLine::getArg(vm, arg_config_file);
 
             boost::filesystem::path data_dir_path(data_dir);
@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
         auto cfgLogFile = Common::nativePathToGeneric(CommandLine::getArg(vm, arg_log_file));
 
         if (cfgLogFile.empty()) {
-            cfgLogFile = Common::replaceExtenstion(modulePath, ".log");
+            cfgLogFile = Common::replaceExtension(modulePath, ".log");
         } else {
             if (!Common::hasParentPath(cfgLogFile)) {
                 cfgLogFile = Common::combinePath(Common::getPathDirectory(modulePath), cfgLogFile);
@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
         } catch (std::exception &) {
             std::cout
                 << "GENESIS_COINBASE_TX_HEX constant has an incorrect value. Please launch: "
-                << QwertyNote::CRYPTONOTE_NAME << "d --" << arg_print_genesis_tx.name;
+                << QwertyNote::CRYPTONOTE_NAME << "d --" << arg_print_genesis_tx.cName;
             return 1;
         }
         QwertyNote::Currency currency = currencyBuilder.currency();
@@ -486,7 +486,7 @@ int main(int argc, char *argv[])
         }
         logger(INFO) << "Core rpc server started ok";
 
-        Tools::SignalHandler::install([&dch, &p2psrv]() {
+        Tools::QSignalHandler::install([&dch, &p2psrv]() {
             dch.stop_handling();
             p2psrv.sendStopSignal();
         });

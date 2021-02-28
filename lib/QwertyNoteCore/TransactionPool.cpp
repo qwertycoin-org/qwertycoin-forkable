@@ -810,7 +810,7 @@ bool tx_memory_pool::addTransactionInputs(
             auto ins_res = kei_image_set.insert(id);
             if (!(ins_res.second)) {
                 logger(ERROR, BRIGHT_RED)
-                    << "internal error: try to insert duplicate Iterator in key_image set";
+                    << "internal error: try to insert duplicate QIterator in key_image set";
                 return false;
             }
         } else if (in.type() == typeid(FMultiSignatureInput)) {

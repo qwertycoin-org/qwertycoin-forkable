@@ -24,15 +24,15 @@
 
 namespace Common {
 
-class StringOutputStream : public IOutputStream
-{
-public:
-    explicit StringOutputStream(std::string &out);
+    class QStringOutputStream : public IOutputStream
+    {
+    public:
+        explicit QStringOutputStream (std::string &cOut);
 
-    size_t writeSome(const void *data, size_t size) override;
+        size_t writeSome (const void *data, size_t uSize) override;
 
-private:
-    std::string &out;
-};
+    private:
+        std::string &mOStream;
+    };
 
 } // namespace Common

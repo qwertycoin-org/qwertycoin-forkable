@@ -42,10 +42,10 @@ public:
                       QwertyNote::Currency &currency,
 		const std::string &walletFilename);
 
-	static const CommandLine::ArgDescriptor<uint16_t> arg_rpc_bind_port;
-	static const CommandLine::ArgDescriptor<std::string> arg_rpc_bind_ip;
-	static const CommandLine::ArgDescriptor<std::string> arg_rpc_user;
-	static const CommandLine::ArgDescriptor<std::string> arg_rpc_password;
+	static const CommandLine::FArgDescriptor<uint16_t> arg_rpc_bind_port;
+	static const CommandLine::FArgDescriptor<std::string> arg_rpc_bind_ip;
+	static const CommandLine::FArgDescriptor<std::string> arg_rpc_user;
+	static const CommandLine::FArgDescriptor<std::string> arg_rpc_password;
 
 	static void init_options(boost::program_options::options_description &desc);
 	bool init(const boost::program_options::variables_map &vm);

@@ -50,14 +50,14 @@ using namespace Tools::CPU;
 
 static std::vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> cpuinfoBuffer()
 {
-    std::vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> buffer;
+    std::vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> mBuffer;
 
     DWORD byte_count = 0;
     GetLogicalProcessorInformation(nullptr, &byte_count);
-    buffer.resize(byte_count / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION));
-    GetLogicalProcessorInformation(buffer.data(), &byte_count);
+    mBuffer.resize(byte_count / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION));
+    GetLogicalProcessorInformation(mBuffer.data(), &byte_count);
 
-    return buffer;
+    return mBuffer;
 }
 
 #endif
@@ -106,45 +106,45 @@ std::string Tools::CPU::architecture() noexcept
 #endif
 }
 
-Tools::CPU::Quantities Tools::CPU::quantities()
+Tools::CPU::FQuantities Tools::CPU::quantities()
 {
-    Quantities ret {};
+    FQuantities sReturn {};
 
 #ifdef _WIN32
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
-    ret.logical = sysinfo.dwNumberOfProcessors;
-    ret.physical = ret.logical / 2;
+    sReturn.uLogical = sysinfo.dwNumberOfProcessors;
+    sReturn.uPhysical = sReturn.uLogical / 2;
 #elif __APPLE__
     int nm[2];
     size_t len = 4;
-    uint32_t count;
+    uint32_t mCount;
 
     nm[0] = CTL_HW;
     nm[1] = HW_AVAILCPU;
-    sysctl(nm, 2, &count, &len, NULL, 0);
+    sysctl(nm, 2, &mCount, &len, NULL, 0);
 
-    if (count < 1) {
+    if (mCount < 1) {
         nm[1] = HW_NCPU;
-        sysctl(nm, 2, &count, &len, NULL, 0);
-        if (count < 1) {
-            count = 1;
+        sysctl(nm, 2, &mCount, &len, NULL, 0);
+        if (mCount < 1) {
+            mCount = 1;
         }
     }
-    ret.logical = count;
-    ret.physical = ret.logical / 2;
+    sReturn.uLogical = mCount;
+    sReturn.uPhysical = sReturn.uLogical / 2;
 #else
-    ret.logical = sysconf(_SC_NPROCESSORS_ONLN);
+    sReturn.uLogical = sysconf(_SC_NPROCESSORS_ONLN);
 
     std::ifstream cpuinfo("/proc/cpuinfo");
 
     if (!cpuinfo.is_open() || !cpuinfo) {
-        return ret;
+        return sReturn;
     }
 
     std::vector<unsigned int> packageIds;
     for (std::string line; std::getline(cpuinfo, line);) {
-        if (line.find("physical id") == 0) {
+        if (line.find("uPhysical id") == 0) {
             const auto physicalId =
                     std::strtoul(line.c_str() + line.find_first_of("1234567890"), nullptr, 10);
             if (std::find(packageIds.begin(), packageIds.end(), physicalId) == packageIds.end()) {
@@ -153,8 +153,8 @@ Tools::CPU::Quantities Tools::CPU::quantities()
         }
     }
 
-    ret.packages = packageIds.size();
-    ret.physical = ret.logical / ret.packages;
+    sReturn.uPackages = packageIds.size();
+    sReturn.uPhysical = sReturn.uLogical / sReturn.uPackages;
 #endif
-    return ret;
+    return sReturn;
 }

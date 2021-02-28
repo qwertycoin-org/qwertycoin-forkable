@@ -20,8 +20,8 @@
 
 namespace CommandLine {
 
-const ArgDescriptor<bool> argHelp = { "help", "Produce help message" };
-const ArgDescriptor<bool> argVersion = { "version", "Output version information" };
-const ArgDescriptor<std::string> argDataDir = { "data-dir", "Specify data directory" };
+    const FArgDescriptor <bool> sArgHelp = {"help", "Produce help message"};
+    const FArgDescriptor <bool> sArgVersion = {"version", "Output version information"};
+    const FArgDescriptor <std::string> sArgDataDir = {"gData-dir", "Specify gData directory"};
 
 } // namespace CommandLine

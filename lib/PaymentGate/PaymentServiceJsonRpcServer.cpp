@@ -59,8 +59,8 @@ PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(System::Dispatcher &sys
     handlers.emplace("validateAddress", jsonHandler<ValidateAddress::Request, ValidateAddress::Response>(std::bind(&PaymentServiceJsonRpcServer::handleValidateAddress, this, std::placeholders::_1, std::placeholders::_2)));
 }
 
-void PaymentServiceJsonRpcServer::processJsonRpcRequest(const Common::JsonValue &req,
-                                                        Common::JsonValue &resp)
+void PaymentServiceJsonRpcServer::processJsonRpcRequest(const Common::QJsonValue &req,
+                                                        Common::QJsonValue &resp)
 {
     try {
         prepareJsonResponse(req, resp);
@@ -88,7 +88,7 @@ void PaymentServiceJsonRpcServer::processJsonRpcRequest(const Common::JsonValue 
 
         logger(Logging::DEBUGGING) << method << " request came";
 
-        Common::JsonValue params(Common::JsonValue::OBJECT);
+        Common::QJsonValue params(Common::QJsonValue::OBJECT);
         if (req.contains("params")) {
             params = req("params");
         }

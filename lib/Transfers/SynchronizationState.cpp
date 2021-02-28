@@ -122,14 +122,14 @@ const std::vector<Crypto::FHash> &SynchronizationState::getKnownBlockHashes() co
 
 void SynchronizationState::save(std::ostream &os)
 {
-    StdOutputStream stream(os);
+    QStdOutputStream stream(os);
     QwertyNote::BinaryOutputStreamSerializer s(stream);
     serialize(s, "state");
 }
 
 void SynchronizationState::load(std::istream &in)
 {
-    StdInputStream stream(in);
+    QStdInputStream stream(in);
     QwertyNote::BinaryInputStreamSerializer s(stream);
     serialize(s, "state");
 }

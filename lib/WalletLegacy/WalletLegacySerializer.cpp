@@ -60,7 +60,7 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
     QwertyNote::WALLET_LEGACY_SERIALIZATION_VERSION = walletSerializationVersion;
 
     std::stringstream plainArchive;
-    StdOutputStream plainStream(plainArchive);
+    QStdOutputStream plainStream(plainArchive);
     QwertyNote::BinaryOutputStreamSerializer serializer(plainStream);
     saveKeys(serializer);
 
@@ -93,7 +93,7 @@ void WalletLegacySerializer::serialize(std::ostream &stream,
     Crypto::Chacha8Iv iv = encrypt(plain, password, cipher);
 
     uint32_t version = walletSerializationVersion;
-    StdOutputStream output(stream);
+    QStdOutputStream output(stream);
     QwertyNote::BinaryOutputStreamSerializer s(output);
     s.beginObject("wallet");
     s(version, "version");
@@ -140,7 +140,7 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
     std::string &cache,
     std::vector<Crypto::FHash> &safeTxes)
 {
-    StdInputStream stdStream(stream);
+    QStdInputStream stdStream(stream);
     QwertyNote::BinaryInputStreamSerializer serializerEncrypted(stdStream);
 
     serializerEncrypted.beginObject("wallet");
@@ -161,7 +161,7 @@ void WalletLegacySerializer::deserialize(std::istream &stream,
     std::string plain;
     decrypt(cipher, plain, iv, password);
 
-    MemoryInputStream decryptedStream(plain.data(), plain.size());
+    QMemoryInputStream decryptedStream(plain.data(), plain.size());
     QwertyNote::BinaryInputStreamSerializer serializer(decryptedStream);
 
     loadKeys(serializer);
@@ -241,7 +241,7 @@ void WalletLegacySerializer::loadKeys(QwertyNote::ISerializer &serializer)
     acc.sViewSecretKey = keys.viewSecretKey;
 
     account.setAccountKeys(acc);
-    account.set_createtime(keys.creationTimestamp);
+    account.setCreateTime(keys.creationTimestamp);
 }
 
 } // namespace QwertyNote

@@ -34,14 +34,14 @@
 
 namespace Common {
 
-class AsyncConsoleReader
+class QAsyncConsoleReader
 {
 public:
-    AsyncConsoleReader();
-    ~AsyncConsoleReader();
+    QAsyncConsoleReader();
+    ~QAsyncConsoleReader();
 
     void start();
-    bool getLine(std::string& line);
+    bool getLine(std::string& cLine);
     void stop();
     bool stopped() const;
     void pause();
@@ -53,46 +53,46 @@ private:
     bool waitInput();
 
 private:
-    std::atomic<bool> m_stop;
-    std::thread m_thread;
-    BlockingQueue<std::string> m_queue;
+    std::atomic<bool> mStop;
+    std::thread mThread;
+    TBlockingQueue<std::string> mQueue;
 };
 
-class ConsoleHandler
+class QConsoleHandler
 {
     typedef std::function<bool(const std::vector<std::string> &)> ConsoleCommandHandler;
     typedef std::map<std::string,
                      std::pair<ConsoleCommandHandler,
                                std::string>> CommandHandlersMap;
 public:
-    ~ConsoleHandler();
+    ~QConsoleHandler();
 
     std::string getUsage() const;
-    void setHandler(const std::string &command,
-                    const ConsoleCommandHandler &handler,
-                    const std::string &usage = "");
+    void setHandler(const std::string &cCommand,
+                    const ConsoleCommandHandler &sHandler,
+                    const std::string &cUsage = "");
     void requestStop();
-    bool runCommand(const std::vector<std::string> &cmdAndArgs);
+    bool runCommand(const std::vector<std::string> &vCmdAndArgs);
 
-    void start(bool startThread = true,
-               const std::string &prompt = "",
-               Console::Color promptColor = Console::Color::Default);
+    void start(bool bStartThread = true,
+               const std::string &cPrompt = "",
+               Console::EColor sPromptColor = Console::EColor::Default);
     void stop();
     void wait();
     void pause();
     void unpause();
 
 private:
-    virtual void handleCommand(const std::string &cmd);
+    virtual void handleCommand(const std::string &cCmd);
 
     void handlerThread();
 
 private:
-    std::thread m_thread;
-    std::string m_prompt;
-    Console::Color m_promptColor = Console::Color::Default;
-    CommandHandlersMap m_handlers;
-    AsyncConsoleReader m_consoleReader;
+    std::thread mThread;
+    std::string mPrompt;
+    Console::EColor mPromptColor = Console::EColor::Default;
+    CommandHandlersMap mHandlers;
+    QAsyncConsoleReader mConsoleReader;
 };
 
 } // namespace Common

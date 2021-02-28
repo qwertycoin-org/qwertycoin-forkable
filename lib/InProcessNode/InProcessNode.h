@@ -245,7 +245,7 @@ private:
     State state;
     QwertyNote::ICore &core;
     QwertyNote::IQwertyNoteProtocolQuery &protocol;
-    Tools::ObserverManager<INodeObserver> observerManager;
+    Tools::QObserverManager<INodeObserver> observerManager;
     FBlockHeaderInfo lastLocalBlockHeaderInfo;
 
     boost::asio::io_service ioService;

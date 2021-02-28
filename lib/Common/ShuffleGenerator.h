@@ -22,47 +22,52 @@
 
 #include <Crypto/Random.h>
 
-template<typename T>
-class ShuffleGenerator
+template <typename T>
+class QShuffleGenerator
 {
 public:
-    explicit ShuffleGenerator(T n) : count(n), N(n)
+    explicit QShuffleGenerator (T n)
+        : mCount(n),
+          mN(n)
     {
     }
 
-    bool empty() const { return count == 0; }
-
-    void reset()
+    bool empty () const
     {
-        count = N;
-        selected.clear();
+        return mCount == 0;
     }
 
-    T operator()()
+    void reset ()
     {
-        if (count == 0) {
+        mCount = mN;
+        mSelected.clear();
+    }
+
+    T operator() ()
+    {
+        if (mCount == 0) {
             throw std::runtime_error("shuffle sequence ended");
         }
 
-        T value = Random::randomValue<T>(0, --count);
+        T value = Random::randomValue <T>(0, --mCount);
 
-        auto rValIt = selected.find(count);
-        auto rVal = rValIt != selected.end() ? rValIt->second : count;
+        auto rValIt = mSelected.find(mCount);
+        auto rVal = rValIt != mSelected.end() ? rValIt->second : mCount;
 
-        auto lValIt = selected.find(value);
+        auto lValIt = mSelected.find(value);
 
-        if (lValIt != selected.end()) {
+        if (lValIt != mSelected.end()) {
             value = lValIt->second;
             lValIt->second = rVal;
         } else {
-            selected[value] = rVal;
+            mSelected[value] = rVal;
         }
 
         return value;
     }
 
 private:
-    std::unordered_map<T, T> selected;
-    T count;
-    const T N;
+    std::unordered_map <T, T> mSelected;
+    T mCount;
+    const T mN;
 };

@@ -316,7 +316,7 @@ private:
     tx_memory_pool &m_tx_pool;
     std::recursive_mutex m_blockchain_lock; // TODO: add here reader/writer lock
     Crypto::CnContext m_cn_context;
-    Tools::ObserverManager<IBlockchainStorageObserver> m_observerManager;
+    Tools::QObserverManager<IBlockchainStorageObserver> m_observerManager;
 
     key_images_container m_spent_keys;
     size_t m_current_block_cumul_sz_limit;

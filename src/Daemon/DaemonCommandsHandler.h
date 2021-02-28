@@ -95,7 +95,7 @@ private:
     bool generate_blocks(const std::vector<std::string> &args);
 
 private:
-    Common::ConsoleHandler m_consoleHandler;
+    Common::QConsoleHandler m_consoleHandler;
     QwertyNote::core &m_core;
     QwertyNote::NodeServer &m_srv;
     Logging::LoggerRef logger;

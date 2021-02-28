@@ -194,8 +194,8 @@ private:
     std::thread m_workerThread;
     System::Dispatcher *m_dispatcher = nullptr;
     System::ContextGroup *m_context_group = nullptr;
-    Tools::ObserverManager<QwertyNote::INodeObserver> m_observerManager;
-    Tools::ObserverManager<QwertyNote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
+    Tools::QObserverManager<QwertyNote::INodeObserver> m_observerManager;
+    Tools::QObserverManager<QwertyNote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
 
     unsigned int m_rpcTimeout;
     HttpClient *m_httpClient = nullptr;

@@ -127,7 +127,7 @@ typedef boost::multi_index_container <
     >
 > WalletTransactions;
 
-typedef Common::FileMappedVector<EncryptedWalletRecord> ContainerStorage;
+typedef Common::QFileMappedVector<EncryptedWalletRecord> ContainerStorage;
 typedef std::pair<size_t, QwertyNote::WalletTransfer> TransactionTransferPair;
 typedef std::vector<TransactionTransferPair> WalletTransfers;
 typedef std::map<size_t, QwertyNote::FTransaction> UncommitedTransactions;

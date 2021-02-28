@@ -29,8 +29,8 @@ class KVBinaryInputStreamSerializer : public JsonInputValueSerializer
 public:
     explicit KVBinaryInputStreamSerializer(Common::IInputStream &strm);
 
-    bool binary(void *value, size_t size, Common::StringView name) override;
-    bool binary(std::string &value, Common::StringView name) override;
+    bool binary(void *value, size_t size, Common::QStringView name) override;
+    bool binary(std::string &value, Common::QStringView name) override;
 };
 
 } // namespace QwertyNote

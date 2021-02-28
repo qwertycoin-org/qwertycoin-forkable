@@ -20,18 +20,18 @@
 
 namespace Common {
 
-VectorOutputStream::VectorOutputStream(std::vector<uint8_t> &out)
-    : out(out)
-{
-}
+    QVectorOutputStream::QVectorOutputStream (std::vector <uint8_t> &vOut)
+        : mOutStream(vOut)
+    {
+    }
 
-size_t VectorOutputStream::writeSome(const void *data, size_t size)
-{
-    out.insert(out.end(),
-               static_cast<const uint8_t *>(data),
-               static_cast<const uint8_t *>(data) + size);
+    size_t QVectorOutputStream::writeSome (const void *data, size_t uSize)
+    {
+        mOutStream.insert(mOutStream.end(),
+                          static_cast<const uint8_t *>(data),
+                          static_cast<const uint8_t *>(data) + uSize);
 
-    return size;
-}
+        return uSize;
+    }
 
 } // namespace Common

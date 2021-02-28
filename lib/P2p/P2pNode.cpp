@@ -205,14 +205,14 @@ void P2pNode::serialize(ISerializer &s)
 
 void P2pNode::save(std::ostream &os)
 {
-    StdOutputStream stream(os);
+    QStdOutputStream stream(os);
     BinaryOutputStreamSerializer a(stream);
     QwertyNote::serialize(*this, a);
 }
 
 void P2pNode::load(std::istream &in)
 {
-    StdInputStream stream(in);
+    QStdInputStream stream(in);
     BinaryInputStreamSerializer a(stream);
     QwertyNote::serialize(*this, a);
 }

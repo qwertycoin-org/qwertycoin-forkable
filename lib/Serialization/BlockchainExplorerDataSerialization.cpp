@@ -106,7 +106,7 @@ void getVariantValue(
 }
 
 template <typename T>
-bool serializePod(T &v, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serializePod(T &v, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializer.binary(&v, sizeof(v), name);
 }

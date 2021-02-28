@@ -20,19 +20,19 @@
 
 namespace Common {
 
-StdOutputStream::StdOutputStream(std::ostream &out)
-    : out(out)
-{
-}
-
-size_t StdOutputStream::writeSome(const void *data, size_t size)
-{
-    out.write(static_cast<const char *>(data), size);
-    if (out.bad()) {
-        return 0;
+    QStdOutputStream::QStdOutputStream (std::ostream &out)
+        : mOStream(out)
+    {
     }
 
-    return size;
-}
+    size_t QStdOutputStream::writeSome (const void *data, size_t uSize)
+    {
+        mOStream.write(static_cast<const char *>(data), uSize);
+        if (mOStream.bad()) {
+            return 0;
+        }
+
+        return uSize;
+    }
 
 } // namespace Common

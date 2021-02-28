@@ -282,23 +282,24 @@ bool DaemonCommandsHandler::status(const std::vector<std::string> &args)
 
     std::cout
         << std::endl
-        << (synced ? ColouredMsg("Synced ", Common::Console::Color::BrightGreen) : ColouredMsg("Syncing ", Common::Console::Color::BrightYellow)) 
-        << ColouredMsg(std::to_string(height), Common::Console::Color::BrightWhite) << "/" << ColouredMsg(std::to_string(last_known_block_index), Common::Console::Color::BrightWhite)
-        << " (" << ColouredMsg(std::to_string(get_sync_percentage(height, last_known_block_index)).substr(0, 5) + "%", Common::Console::Color::BrightWhite) << ") "
-        << "on " << ColouredMsg((m_core.currency().isTestnet() ? "testnet" : "mainnet"), Common::Console::Color::BrightWhite) << ", "
-        << "block v. " << ColouredMsg(std::to_string((int)majorVersion), Common::Console::Color::BrightWhite) << ",\n"
-        << "last block hash: " << ColouredMsg(Common::podToHex(last_block_hash), Common::Console::Color::BrightWhite) << ",\n"
-        << "next difficulty: " << ColouredMsg(std::to_string(difficulty), Common::Console::Color::BrightWhite) << ", "
-        << "network hashrate: " << ColouredMsg(get_mining_speed(hashrate), Common::Console::Color::BrightWhite) << ", "
-        << "alt. blocks: " << ColouredMsg(std::to_string(alt_blocks_count), Common::Console::Color::BrightWhite) << ", \n"
-        << ColouredMsg(std::to_string(outgoing_connections_count), Common::Console::Color::BrightWhite) << " out. + " 
-        << ColouredMsg(std::to_string(incoming_connections_count), Common::Console::Color::BrightWhite) << " inc. connection(s), "
-        << ColouredMsg(std::to_string(rpc_conn), Common::Console::Color::BrightWhite) << " rpc connection(s), " 
-        << "peers: " << ColouredMsg(std::to_string(white_peerlist_size), Common::Console::Color::BrightWhite) << " white / " 
-        << ColouredMsg(std::to_string(grey_peerlist_size), Common::Console::Color::BrightWhite) << " grey, \n"
-        << ColouredMsg(std::to_string(tx_pool_size), Common::Console::Color::BrightWhite) << " transaction(s) in mempool, "
-        << "uptime: " << ColouredMsg(std::to_string((unsigned int)floor(uptime / 60.0 / 60.0 / 24.0)) + "d " + std::to_string((unsigned int)floor(fmod((uptime / 60.0 / 60.0), 24.0))) + "h "
-        + std::to_string((unsigned int)floor(fmod((uptime / 60.0), 60.0))) + "m " + std::to_string((unsigned int)fmod(uptime, 60.0)) + "s", Common::Console::Color::BrightWhite) << std::endl
+        << (synced ? QColouredMsg("Synced ", Common::Console::EColor::BrightGreen) : QColouredMsg("Syncing ", Common::Console::EColor::BrightYellow))
+        << QColouredMsg(std::to_string(height), Common::Console::EColor::BrightWhite) << "/" << QColouredMsg(std::to_string(last_known_block_index), Common::Console::EColor::BrightWhite)
+        << " (" << QColouredMsg(std::to_string(get_sync_percentage(height, last_known_block_index)).substr(0, 5) + "%", Common::Console::EColor::BrightWhite) << ") "
+        << "on " << QColouredMsg((m_core.currency().isTestnet() ? "testnet" : "mainnet"), Common::Console::EColor::BrightWhite) << ", "
+        << "block v. " << QColouredMsg(std::to_string((int)majorVersion), Common::Console::EColor::BrightWhite) << ",\n"
+        << "last block hash: " << QColouredMsg(Common::podToHex(last_block_hash), Common::Console::EColor::BrightWhite) << ",\n"
+        << "next difficulty: " << QColouredMsg(std::to_string(difficulty), Common::Console::EColor::BrightWhite) << ", "
+        << "network hashrate: " << QColouredMsg(get_mining_speed(hashrate), Common::Console::EColor::BrightWhite) << ", "
+        << "alt. blocks: " << QColouredMsg(std::to_string(alt_blocks_count), Common::Console::EColor::BrightWhite) << ", \n"
+        << QColouredMsg(std::to_string(outgoing_connections_count),
+                        Common::Console::EColor::BrightWhite) << " out. + "
+        << QColouredMsg(std::to_string(incoming_connections_count), Common::Console::EColor::BrightWhite) << " inc. connection(s), "
+        << QColouredMsg(std::to_string(rpc_conn), Common::Console::EColor::BrightWhite) << " rpc connection(s), "
+        << "peers: " << QColouredMsg(std::to_string(white_peerlist_size), Common::Console::EColor::BrightWhite) << " white / "
+        << QColouredMsg(std::to_string(grey_peerlist_size), Common::Console::EColor::BrightWhite) << " grey, \n"
+        << QColouredMsg(std::to_string(tx_pool_size), Common::Console::EColor::BrightWhite) << " transaction(s) in mempool, "
+        << "uptime: " << QColouredMsg(std::to_string((unsigned int)floor(uptime / 60.0 / 60.0 / 24.0)) + "d " + std::to_string((unsigned int)floor(fmod((uptime / 60.0 / 60.0), 24.0))) + "h "
+                                      + std::to_string((unsigned int)floor(fmod((uptime / 60.0), 60.0))) + "m " + std::to_string((unsigned int)fmod(uptime, 60.0)) + "s", Common::Console::EColor::BrightWhite) << std::endl
         << std::endl;
 
     return true;

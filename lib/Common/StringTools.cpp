@@ -17,6 +17,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <cstdio>
 #include <fstream>
 #include <iomanip>
 
@@ -24,428 +25,461 @@
 
 namespace Common {
 
-namespace {
+    namespace {
 
-const uint8_t characterValues[256] =
-{
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-};
+        const uint8_t uCharacterValues[256] = {
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff
+        };
 
-} // namespace
+    } // namespace
 
-std::string asString(const void *data, size_t size)
-{
-    return std::string(static_cast<const char *>(data), size);
-}
-
-std::string asString(const std::vector<uint8_t> &data)
-{
-    return std::string(reinterpret_cast<const char *>(data.data()), data.size());
-}
-
-std::vector<uint8_t> asBinaryArray(const std::string &data)
-{
-    auto dataPtr = reinterpret_cast<const uint8_t *>(data.data());
-
-    return std::vector<uint8_t>(dataPtr, dataPtr + data.size());
-}
-
-uint8_t fromHex(char character)
-{
-    uint8_t value = characterValues[static_cast<unsigned char>(character)];
-    if (value > 0x0f) {
-        throw std::runtime_error("fromHex: invalid character");
+    std::string asString (const void *data, size_t uSize)
+    {
+        return std::string(static_cast<const char *>(data), uSize);
     }
 
-    return value;
-}
-
-bool fromHex(char character, uint8_t &value)
-{
-    if (characterValues[static_cast<unsigned char>(character)] > 0x0f) {
-        return false;
+    std::string asString (const std::vector <uint8_t> &vData)
+    {
+        return std::string(reinterpret_cast<const char *>(vData.data()), vData.size());
     }
 
-    value = characterValues[static_cast<unsigned char>(character)];
+    std::vector <uint8_t> asBinaryArray (const std::string &cData)
+    {
+        auto dataPtr = reinterpret_cast<const uint8_t *>(cData.data());
 
-    return true;
-}
-
-size_t fromHex(const std::string &text, void *data, size_t bufferSize)
-{
-    if ((text.size() & 1) != 0) {
-        throw std::runtime_error("fromHex: invalid string size");
+        return std::vector <uint8_t>(dataPtr, dataPtr + cData.size());
     }
 
-    if (text.size() >> 1 > bufferSize) {
-        throw std::runtime_error("fromHex: invalid buffer size");
+    uint8_t fromHex (char cCharacter)
+    {
+        uint8_t value = uCharacterValues[static_cast<unsigned char>(cCharacter)];
+        if (value > 0x0f) {
+            throw std::runtime_error("fromHex: invalid character");
+        }
+
+        return value;
     }
 
-    for (size_t i = 0; i < text.size() >> 1; ++i) {
-        static_cast<uint8_t *>(data)[i] = fromHex(text[i << 1]) << 4 | fromHex(text[(i << 1) + 1]);
-    }
-
-    return text.size() >> 1;
-}
-
-bool fromHex(const std::string &text, void *data, size_t bufferSize, size_t &size)
-{
-    if ((text.size() & 1) != 0) {
-        return false;
-    }
-
-    if (text.size() >> 1 > bufferSize) {
-        return false;
-    }
-
-    for (size_t i = 0; i < text.size() >> 1; ++i) {
-        uint8_t value1;
-        if (!fromHex(text[i << 1], value1)) {
+    bool fromHex (char cCharacter, uint8_t &uValue)
+    {
+        if (uCharacterValues[static_cast<unsigned char>(cCharacter)] > 0x0f) {
             return false;
         }
 
-        uint8_t value2;
-        if (!fromHex(text[(i << 1) + 1], value2)) {
+        uValue = uCharacterValues[static_cast<unsigned char>(cCharacter)];
+
+        return true;
+    }
+
+    size_t fromHex (const std::string &cText, void *data, size_t uBufferSize)
+    {
+        if ((cText.size() & 1) != 0) {
+            throw std::runtime_error("fromHex: invalid string size");
+        }
+
+        if (cText.size() >> 1 > uBufferSize) {
+            throw std::runtime_error("fromHex: invalid buffer size");
+        }
+
+        for (size_t i = 0; i < cText.size() >> 1; ++i) {
+            static_cast<uint8_t *>(data)[i] =
+                fromHex(cText[i << 1]) << 4 | fromHex(cText[(i << 1) + 1]);
+        }
+
+        return cText.size() >> 1;
+    }
+
+    bool fromHex (const std::string &cText,
+                  void *data, size_t uBufferSize,
+                  size_t &uSize)
+    {
+        if ((cText.size() & 1) != 0) {
             return false;
         }
 
-        static_cast<uint8_t *>(data)[i] = value1 << 4 | value2;
-    }
-
-    size = text.size() >> 1;
-
-    return true;
-}
-
-std::vector<uint8_t> fromHex(const std::string &text)
-{
-    if ((text.size() & 1) != 0) {
-        throw std::runtime_error("fromHex: invalid string size");
-    }
-
-    std::vector<uint8_t> data(text.size() >> 1);
-    for (size_t i = 0; i < data.size(); ++i) {
-        data[i] = fromHex(text[i << 1]) << 4 | fromHex(text[(i << 1) + 1]);
-    }
-
-    return data;
-}
-
-bool fromHex(const std::string &text, std::vector<uint8_t> &data)
-{
-    if ((text.size() & 1) != 0) {
-        return false;
-    }
-
-    for (size_t i = 0; i < text.size() >> 1; ++i) {
-        uint8_t value1;
-        if (!fromHex(text[i << 1], value1)) {
+        if (cText.size() >> 1 > uBufferSize) {
             return false;
         }
 
-        uint8_t value2;
-        if (!fromHex(text[(i << 1) + 1], value2)) {
+        for (size_t i = 0; i < cText.size() >> 1; ++i) {
+            uint8_t value1;
+            if (!fromHex(cText[i << 1], value1)) {
+                return false;
+            }
+
+            uint8_t value2;
+            if (!fromHex(cText[(i << 1) + 1], value2)) {
+                return false;
+            }
+
+            static_cast<uint8_t *>(data)[i] = value1 << 4 | value2;
+        }
+
+        uSize = cText.size() >> 1;
+
+        return true;
+    }
+
+    std::vector <uint8_t> fromHex (const std::string &cText)
+    {
+        if ((cText.size() & 1) != 0) {
+            throw std::runtime_error("fromHex: invalid string size");
+        }
+
+        std::vector <uint8_t> data(cText.size() >> 1);
+        for (size_t i = 0; i < data.size(); ++i) {
+            data[i] = fromHex(cText[i << 1]) << 4 | fromHex(cText[(i << 1) + 1]);
+        }
+
+        return data;
+    }
+
+    bool fromHex (const std::string &cText, std::vector <uint8_t> &vData)
+    {
+        if ((cText.size() & 1) != 0) {
             return false;
         }
 
-        data.push_back(value1 << 4 | value2);
+        for (size_t i = 0; i < cText.size() >> 1; ++i) {
+            uint8_t value1;
+            if (!fromHex(cText[i << 1], value1)) {
+                return false;
+            }
+
+            uint8_t value2;
+            if (!fromHex(cText[(i << 1) + 1], value2)) {
+                return false;
+            }
+
+            vData.push_back(value1 << 4 | value2);
+        }
+
+        return true;
     }
 
-    return true;
-}
+    std::string toHex (const void *data, size_t uSize)
+    {
+        std::string cText;
+        for (size_t i = 0; i < uSize; ++i) {
+            cText += "0123456789abcdef"[static_cast<const uint8_t *>(data)[i] >> 4];
+            cText += "0123456789abcdef"[static_cast<const uint8_t *>(data)[i] & 15];
+        }
 
-std::string toHex(const void *data, size_t size)
-{
-    std::string text;
-    for (size_t i = 0; i < size; ++i) {
-        text += "0123456789abcdef"[static_cast<const uint8_t *>(data)[i] >> 4];
-        text += "0123456789abcdef"[static_cast<const uint8_t *>(data)[i] & 15];
+        return cText;
     }
 
-    return text;
-}
-
-void toHex(const void *data, size_t size, std::string &text)
-{
-    for (size_t i = 0; i < size; ++i) {
-        text += "0123456789abcdef"[static_cast<const uint8_t *>(data)[i] >> 4];
-        text += "0123456789abcdef"[static_cast<const uint8_t *>(data)[i] & 15];
-    }
-}
-
-std::string toHex(const std::vector<uint8_t> &data)
-{
-    std::string text;
-
-    for (size_t i = 0; i < data.size(); ++i) {
-        text += "0123456789abcdef"[data[i] >> 4];
-        text += "0123456789abcdef"[data[i] & 15];
+    void toHex (const void *data, size_t uSize, std::string &cText)
+    {
+        for (size_t i = 0; i < uSize; ++i) {
+            cText += "0123456789abcdef"[static_cast<const uint8_t *>(data)[i] >> 4];
+            cText += "0123456789abcdef"[static_cast<const uint8_t *>(data)[i] & 15];
+        }
     }
 
-    return text;
-}
+    std::string toHex (const std::vector <uint8_t> &vData)
+    {
+        std::string text;
 
-void toHex(const std::vector<uint8_t> &data, std::string &text)
-{
-    for (size_t i = 0; i < data.size(); ++i) {
-        text += "0123456789abcdef"[data[i] >> 4];
-        text += "0123456789abcdef"[data[i] & 15];
-    }
-}
+        for (unsigned char i : vData) {
+            text += "0123456789abcdef"[i >> 4];
+            text += "0123456789abcdef"[i & 15];
+        }
 
-std::string extract(std::string &text, char delimiter)
-{
-    size_t delimiterPosition = text.find(delimiter);
-    std::string subText;
-    if (delimiterPosition != std::string::npos) {
-        subText = text.substr(0, delimiterPosition);
-        text = text.substr(delimiterPosition + 1);
-    } else {
-        subText.swap(text);
+        return text;
     }
 
-    return subText;
-}
-
-std::string extract(const std::string &text, char delimiter, size_t &offset)
-{
-    size_t delimiterPosition = text.find(delimiter, offset);
-    if (delimiterPosition != std::string::npos) {
-        offset = delimiterPosition + 1;
-        return text.substr(offset, delimiterPosition);
-    } else {
-        offset = text.size();
-        return text.substr(offset);
+    void toHex (const std::vector <uint8_t> &vData, std::string &cText)
+    {
+        for (unsigned char i : vData) {
+            cText += "0123456789abcdef"[i >> 4];
+            cText += "0123456789abcdef"[i & 15];
+        }
     }
-}
 
-namespace {
+    std::string extract (std::string &cText, char cDelimiter)
+    {
+        size_t uDelimiterPosition = cText.find(cDelimiter);
+        std::string subText;
 
-static const std::string base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                       "abcdefghijklmnopqrstuvwxyz"
-                                       "0123456789+/";
+        if (uDelimiterPosition != std::string::npos) {
+            subText = cText.substr(0, uDelimiterPosition);
+            cText = cText.substr(uDelimiterPosition + 1);
+        } else {
+            subText.swap(cText);
+        }
 
-bool isBase64(unsigned char c)
-{
-    return (isalnum(c) || (c == '+') || (c == '/'));
-}
+        return subText;
+    }
 
-} // namespace
+    std::string extract (const std::string &cText,
+                         char cDelimiter,
+                         size_t &uOffset)
+    {
+        size_t uDelimiterPosition = cText.find(cDelimiter, uOffset);
+        if (uDelimiterPosition != std::string::npos) {
+            uOffset = uDelimiterPosition + 1;
+            return cText.substr(uOffset, uDelimiterPosition);
+        } else {
+            uOffset = cText.size();
+            return cText.substr(uOffset);
+        }
+    }
 
-std::string base64Encode(std::string const &encodableString)
-{
-    static const char* encodingTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    const size_t resultSize = 4 * ((encodableString.size() + 2) / 3);
-    std::string result;
-    result.reserve(resultSize);
+    namespace {
 
-    for (size_t i = 0; i < encodableString.size(); i += 3) {
-        size_t a = static_cast<size_t>(encodableString[i]);
-        size_t b = i + 1 < encodableString.size() ? static_cast<size_t>(encodableString[i + 1]) : 0;
-        size_t c = i + 2 < encodableString.size() ? static_cast<size_t>(encodableString[i + 2]) : 0;
+        static const std::string cBase64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                "abcdefghijklmnopqrstuvwxyz"
+                                                "0123456789+/";
 
-        result.push_back(encodingTable[a >> 2]);
-        result.push_back(encodingTable[((a & 0x3) << 4) | (b >> 4)]);
-        if (i + 1 < encodableString.size()) {
-            result.push_back(encodingTable[((b & 0xF) << 2) | (c >> 6)]);
-            if (i + 2 < encodableString.size()) {
-                result.push_back(encodingTable[c & 0x3F]);
+        bool isBase64 (unsigned char cChar)
+        {
+            return (isalnum(cChar) || (cChar == '+') || (cChar == '/'));
+        }
+
+    } // namespace
+
+    std::string base64Encode (std::string const &cEncodableString)
+    {
+        static const char *cEncodingTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                            "abcdefghijklmnopqrstuvwxyz"
+                                            "0123456789+/";
+
+        const size_t uResultSize = 4 * ((cEncodableString.size() + 2) / 3);
+        std::string result;
+        result.reserve(uResultSize);
+
+        for (size_t i = 0; i < cEncodableString.size(); i += 3) {
+            auto a = static_cast<size_t>(static_cast<unsigned char>(cEncodableString[i]));
+            size_t b =
+                i + 1 < cEncodableString.size() ? static_cast<size_t>(cEncodableString[i + 1]) : 0;
+            size_t c =
+                i + 2 < cEncodableString.size() ? static_cast<size_t>(cEncodableString[i + 2]) : 0;
+
+            result.push_back(cEncodingTable[a >> 2]);
+            result.push_back(cEncodingTable[((a & 0x3) << 4) | (b >> 4)]);
+            if (i + 1 < cEncodableString.size()) {
+                result.push_back(cEncodingTable[((b & 0xF) << 2) | (c >> 6)]);
+                if (i + 2 < cEncodableString.size()) {
+                    result.push_back(cEncodingTable[c & 0x3F]);
+                }
             }
         }
+
+        while (result.size() != uResultSize) {
+            result.push_back('=');
+        }
+
+        return result;
     }
 
-    while (result.size() != resultSize) {
-        result.push_back('=');
-    }
+    std::string base64Decode (const std::string &cEncodedString)
+    {
+        size_t inLen = cEncodedString.size();
+        size_t i = 0;
+        size_t j = 0;
+        size_t in_ = 0;
+        unsigned char char_array_4[4], char_array_3[3];
+        std::string result;
 
-    return result;
-}
+        while (inLen-- && (cEncodedString[in_] != '=') && isBase64(cEncodedString[in_])) {
+            char_array_4[i++] = cEncodedString[in_];
+            in_++;
+            if (i == 4) {
+                for (i = 0; i < 4; i++) {
+                    char_array_4[i] = (unsigned char) cBase64Chars.find(char_array_4[i]);
+                }
 
-std::string base64Decode(const std::string &encoded_string)
-{
-    size_t in_len = encoded_string.size();
-    size_t i = 0;
-    size_t j = 0;
-    size_t in_ = 0;
-    unsigned char char_array_4[4], char_array_3[3];
-    std::string ret;
+                char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+                char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+                char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-    while (in_len-- && (encoded_string[in_] != '=') && isBase64(encoded_string[in_])) {
-        char_array_4[i++] = encoded_string[in_]; in_++;
-        if (i == 4) {
-            for (i = 0; i <4; i++) {
-                char_array_4[i] = (unsigned char) base64chars.find(char_array_4[i]);
+                for (i = 0; (i < 3); i++) {
+                    result += char_array_3[i];
+                }
+
+                i = 0;
+            }
+        }
+
+        if (i) {
+            for (j = i; j < 4; j++) {
+                char_array_4[j] = 0;
+            }
+
+            for (j = 0; j < 4; j++) {
+                char_array_4[j] = (unsigned char) cBase64Chars.find(char_array_4[j]);
             }
 
             char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
             char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
             char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-            for (i = 0; (i < 3); i++) {
-                ret += char_array_3[i];
+            for (j = 0; (j < i - 1); j++) {
+                result += char_array_3[j];
             }
-
-            i = 0;
-        }
-    }
-
-    if (i) {
-        for (j = i; j <4; j++) {
-            char_array_4[j] = 0;
         }
 
-        for (j = 0; j <4; j++) {
-            char_array_4[j] = (unsigned char) base64chars.find(char_array_4[j]);
-        }
-
-        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-        for (j = 0; (j < i - 1); j++) {
-            ret += char_array_3[j];
-        }
+        return result;
     }
 
-    return ret;
-}
+    bool loadFileToString (const std::string &cFilepath, std::string &cBuf)
+    {
+        try {
+            std::ifstream fStream;
+            fStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+            fStream.open(cFilepath, std::ios_base::binary | std::ios_base::in | std::ios::ate);
 
-bool loadFileToString(const std::string &filepath, std::string &buf)
-{
-    try {
-        std::ifstream fstream;
-        fstream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        fstream.open(filepath, std::ios_base::binary | std::ios_base::in | std::ios::ate);
+            size_t fileSize = static_cast<size_t>(fStream.tellg());
+            cBuf.resize(fileSize);
 
-        size_t fileSize = static_cast<size_t>(fstream.tellg());
-        buf.resize(fileSize);
-
-        if (fileSize > 0)  {
-            fstream.seekg(0, std::ios::beg);
-            fstream.read(&buf[0], buf.size());
-        }
-    } catch (const std::exception &) {
-        return false;
-    }
-
-    return true;
-}
-
-bool saveStringToFile(const std::string &filepath, const std::string &buf)
-{
-    try {
-        std::ofstream fstream;
-        fstream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        fstream.open(filepath, std::ios_base::binary | std::ios_base::out | std::ios_base::trunc);
-        fstream << buf;
-    } catch (const std::exception &)  {
-        return false;
-    }
-
-    return true;
-}
-
-std::string ipAddressToString(uint32_t ip)
-{
-    uint8_t bytes[4];
-    bytes[0] = ip & 0xFF;
-    bytes[1] = (ip >> 8) & 0xFF;
-    bytes[2] = (ip >> 16) & 0xFF;
-    bytes[3] = (ip >> 24) & 0xFF;
-
-    char buf[16];
-    sprintf(buf, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);
-
-    return std::string(buf);
-}
-
-uint32_t stringToIpAddress(const std::string &addr)
-{
-    uint32_t v[4];
-
-    if (sscanf(addr.c_str(), "%d.%d.%d.%d", &v[0], &v[1], &v[2], &v[3]) != 4) {
-        return false;
-    }
-
-    for (int i = 0; i < 4; ++i) {
-        if (v[i] > 0xff) {
+            if (fileSize > 0) {
+                fStream.seekg(0, std::ios::beg);
+                fStream.read(&cBuf[0], cBuf.size());
+            }
+        } catch (const std::exception &) {
             return false;
         }
+
+        return true;
     }
 
-    return ((v[3] << 24) | (v[2] << 16) | (v[1] << 8) | v[0]);
-}
-
-bool parseIpAddressAndPort(uint32_t &ip, uint32_t &port, const std::string &addr)
-{
-    uint32_t v[4];
-    uint32_t localPort;
-
-    if (sscanf(addr.c_str(), "%d.%d.%d.%d:%d", &v[0], &v[1], &v[2], &v[3], &localPort) != 5) {
-        return false;
-    }
-
-    for (int i = 0; i < 4; ++i) {
-        if (v[i] > 0xff) {
+    bool saveStringToFile (const std::string &cFilepath, const std::string &cBuf)
+    {
+        try {
+            std::ofstream fStream;
+            fStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+            fStream
+                .open(cFilepath, std::ios_base::binary | std::ios_base::out | std::ios_base::trunc);
+            fStream << cBuf;
+        } catch (const std::exception &) {
             return false;
         }
+
+        return true;
     }
 
-    ip = (v[3] << 24) | (v[2] << 16) | (v[1] << 8) | v[0];
+    std::string ipAddressToString (uint32_t uIp)
+    {
+        uint8_t uBytes[4];
+        uBytes[0] = uIp & 0xFF;
+        uBytes[1] = (uIp >> 8) & 0xFF;
+        uBytes[2] = (uIp >> 16) & 0xFF;
+        uBytes[3] = (uIp >> 24) & 0xFF;
 
-    port = localPort;
+        char cBuf[16];
+        sprintf(cBuf, "%d.%d.%d.%d", uBytes[0], uBytes[1], uBytes[2], uBytes[3]);
 
-    return true;
-}
+        return std::string(cBuf);
+    }
 
-std::string timeIntervalToString(uint64_t intervalInSeconds)
-{
-    auto tail = intervalInSeconds;
+    uint32_t stringToIpAddress (const std::string &cAddress)
+    {
+        uint32_t v[4];
 
-    auto days = tail / (60 * 60 * 24);
-    tail = tail % (60 * 60 * 24);
-    auto hours = tail / (60 * 60);
-    tail = tail % (60 * 60);
-    auto  minutes = tail / (60);
-    tail = tail % (60);
-    auto seconds = tail;
+        if (sscanf(cAddress.c_str(), "%d.%d.%d.%d", &v[0], &v[1], &v[2], &v[3]) != 4) {
+            return false;
+        }
 
-    std::stringstream ss;
-    ss << "d" << days << std::setfill('0')
-       << ".h" << std::setw(2) << hours
-       << ".m" << std::setw(2) << minutes
-       << ".s" << std::setw(2) << seconds;
+        for (unsigned int i : v) {
+            if (i > 0xff) {
+                return false;
+            }
+        }
 
-    return ss.str();
-}
+        return ((v[3] << 24) | (v[2] << 16) | (v[1] << 8) | v[0]);
+    }
 
-bool startsWith(const std::string &str1, const std::string &str2)
-{
-    if (str1.length() < str2.length())
-        return false;
-    return str1.compare(0, str2.length(), str2) == 0;
-}
+    bool parseIpAddressAndPort (uint32_t &uIp, uint32_t &uPort, const std::string &cAddress)
+    {
+        uint32_t v[4];
+        uint32_t localPort;
 
-bool ends_with(const std::string &str1, const std::string &str2)
-{
-    if (str1.length() < str2.length())
-        return false;
-    return str1.compare(str1.length() - str2.length(), str2.length(), str2) == 0;
-}
+        if (sscanf(cAddress.c_str(), "%d.%d.%d.%d:%d", &v[0], &v[1], &v[2], &v[3], &localPort) !=
+            5) {
+            return false;
+        }
+
+        for (unsigned int i : v) {
+            if (i > 0xff) {
+                return false;
+            }
+        }
+
+        uIp = (v[3] << 24) | (v[2] << 16) | (v[1] << 8) | v[0];
+
+        uPort = localPort;
+
+        return true;
+    }
+
+    std::string timeIntervalToString (uint64_t uIntervalInSeconds)
+    {
+        auto tail = uIntervalInSeconds;
+
+        auto days = tail / (60 * 60 * 24);
+        tail = tail % (60 * 60 * 24);
+        auto hours = tail / (60 * 60);
+        tail = tail % (60 * 60);
+        auto minutes = tail / (60);
+        tail = tail % (60);
+        auto seconds = tail;
+
+        std::stringstream ss;
+        ss << "d" << days << std::setfill('0')
+           << ".h" << std::setw(2) << hours
+           << ".m" << std::setw(2) << minutes
+           << ".s" << std::setw(2) << seconds;
+
+        return ss.str();
+    }
+
+    bool startsWith (const std::string &cStr1, const std::string &cStr2)
+    {
+        if (cStr1.length() < cStr2.length()) {
+            return false;
+        }
+
+        return cStr1.compare(0, cStr2.length(), cStr2) == 0;
+    }
+
+    bool endsWith (const std::string &cStr1, const std::string &cStr2)
+    {
+        if (cStr1.length() < cStr2.length()) {
+            return false;
+        }
+
+        return cStr1.compare(cStr1.length() - cStr2.length(), cStr2.length(), cStr2) == 0;
+    }
 
 } // namespace Common

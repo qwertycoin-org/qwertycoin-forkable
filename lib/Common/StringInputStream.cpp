@@ -22,23 +22,23 @@
 
 namespace Common {
 
-StringInputStream::StringInputStream(const std::string &in)
-    : in(in),
-      offset(0)
-{
-}
-
-size_t StringInputStream::readSome(void *data, size_t size)
-{
-    if (size > in.size() - offset) {
-        size = in.size() - offset;
+    QStringInputStream::QStringInputStream (const std::string &cIn)
+        : mIStream(cIn),
+          mOffset(0)
+    {
     }
 
-    memcpy(data, in.data() + offset, size);
+    size_t QStringInputStream::readSome (void *data, size_t uSize)
+    {
+        if (uSize > mIStream.size() - mOffset) {
+            uSize = mIStream.size() - mOffset;
+        }
 
-    offset += size;
+        memcpy(data, mIStream.data() + mOffset, uSize);
 
-    return size;
-}
+        mOffset += uSize;
+
+        return uSize;
+    }
 
 } // namespace Common

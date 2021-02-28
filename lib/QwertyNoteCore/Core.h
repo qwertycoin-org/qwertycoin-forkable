@@ -363,7 +363,7 @@ private:
     std::string m_config_folder;
     cryptonote_protocol_stub m_protocol_stub;
     std::atomic<bool> m_starter_message_showed;
-    Tools::ObserverManager<ICoreObserver> m_observerManager;
+    Tools::QObserverManager<ICoreObserver> m_observerManager;
     time_t start_time;
 
     std::atomic<uint64_t> m_blocksFound;

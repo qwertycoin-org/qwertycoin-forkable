@@ -19,107 +19,109 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+
 #include <Windows.h>
+
 #else
 #include <cstdio>
 #include <unistd.h>
 #endif
 
-using Common::Console::Color;
+using Common::Console::EColor;
 
 namespace Common {
 
-AsyncConsoleReader::AsyncConsoleReader()
-    : m_stop(true)
-{
-}
-
-AsyncConsoleReader::~AsyncConsoleReader()
-{
-    stop();
-}
-
-void AsyncConsoleReader::start()
-{
-    m_stop = false;
-    m_thread = std::thread([this] { consoleThread(); });
-}
-
-bool AsyncConsoleReader::getLine(std::string &line)
-{
-    return m_queue.pop(line);
-}
-
-void AsyncConsoleReader::pause()
-{
-    if (m_stop) {
-        return;
+    QAsyncConsoleReader::QAsyncConsoleReader ()
+        : mStop(true)
+    {
     }
 
-    m_stop = true;
-
-    if (m_thread.joinable()) {
-        m_thread.join();
+    QAsyncConsoleReader::~QAsyncConsoleReader ()
+    {
+        stop();
     }
 
-    m_thread = std::thread();
-}
-
-void AsyncConsoleReader::unpause()
-{
-    start();
-}
-
-void AsyncConsoleReader::stop()
-{
-    if (m_stop) {
-        return; // already stopping/stopped
+    void QAsyncConsoleReader::start ()
+    {
+        mStop = false;
+        mThread = std::thread([this] { consoleThread(); });
     }
 
-    m_stop = true;
-    m_queue.close();
+    bool QAsyncConsoleReader::getLine (std::string &cLine)
+    {
+        return mQueue.pop(cLine);
+    }
+
+    void QAsyncConsoleReader::pause ()
+    {
+        if (mStop) {
+            return;
+        }
+
+        mStop = true;
+
+        if (mThread.joinable()) {
+            mThread.join();
+        }
+
+        mThread = std::thread();
+    }
+
+    void QAsyncConsoleReader::unpause ()
+    {
+        start();
+    }
+
+    void QAsyncConsoleReader::stop ()
+    {
+        if (mStop) {
+            return; // already stopping/stopped
+        }
+
+        mStop = true;
+        mQueue.close();
 
 #ifdef _WIN32
-    ::CloseHandle(::GetStdHandle(STD_INPUT_HANDLE));
+        ::CloseHandle(::GetStdHandle(STD_INPUT_HANDLE));
 #endif
 
-    if (m_thread.joinable()) {
-        m_thread.join();
-    }
-
-    m_thread = std::thread();
-}
-
-bool AsyncConsoleReader::stopped() const
-{
-    return m_stop;
-}
-
-void AsyncConsoleReader::consoleThread()
-{
-    while (waitInput()) {
-        std::string line;
-
-        if (!std::getline(std::cin, line)) {
-            break;
+        if (mThread.joinable()) {
+            mThread.join();
         }
 
-        if (!m_queue.push(line)) {
-            break;
+        mThread = std::thread();
+    }
+
+    bool QAsyncConsoleReader::stopped () const
+    {
+        return mStop;
+    }
+
+    void QAsyncConsoleReader::consoleThread ()
+    {
+        while (waitInput()) {
+            std::string line;
+
+            if (!std::getline(std::cin, line)) {
+                break;
+            }
+
+            if (!mQueue.push(line)) {
+                break;
+            }
         }
     }
-}
 
-bool AsyncConsoleReader::waitInput()
-{
+    bool QAsyncConsoleReader::waitInput ()
+    {
 #ifndef _WIN32
-    #if defined(__OpenBSD__) || defined(__ANDROID__)
+#if defined(__OpenBSD__) || defined(__ANDROID__)
         int stdinFileno = fileno(stdin);
-    #else
+#else
         int stdinFileno = ::fileno(stdin);
-    #endif
+#endif
 
-    while (!m_stop) {
+    while (!mStop) {
         fd_set readSet;
         FD_ZERO(&readSet);
         FD_SET(stdinFileno, &readSet);
@@ -143,189 +145,192 @@ bool AsyncConsoleReader::waitInput()
         }
     }
 #else
-    while (!m_stop.load(std::memory_order_relaxed)) {
-        int retval = ::WaitForSingleObject(::GetStdHandle(STD_INPUT_HANDLE), 100);
-        switch (retval) {
-        case WAIT_FAILED:
-            return false;
-        case WAIT_OBJECT_0:
-            return true;
-        default:
-            break;
+        while (!mStop.load(std::memory_order_relaxed)) {
+            int retval = ::WaitForSingleObject(::GetStdHandle(STD_INPUT_HANDLE), 100);
+            switch (retval) {
+                case WAIT_FAILED:
+                    return false;
+                case WAIT_OBJECT_0:
+                    return true;
+                default:
+                    break;
+            }
         }
-    }
 #endif
 
-    return !m_stop;
-}
-
-ConsoleHandler::~ConsoleHandler()
-{
-    stop();
-}
-
-void ConsoleHandler::start(bool startThread, const std::string &prompt, Console::Color promptColor)
-{
-    m_prompt = prompt;
-    m_promptColor = promptColor;
-    m_consoleReader.start();
-
-    if (startThread) {
-        m_thread = std::thread([this] { handlerThread(); });
-    } else {
-        handlerThread();
-    }
-}
-
-void ConsoleHandler::stop()
-{
-    requestStop();
-    wait();
-}
-
-void ConsoleHandler::pause()
-{
-    m_consoleReader.pause();
-}
-
-void ConsoleHandler::unpause()
-{
-    m_consoleReader.unpause();
-}
-
-void ConsoleHandler::wait()
-{
-    try {
-        if (m_thread.joinable()) {
-            m_thread.join();
-        }
-    } catch (std::exception &e) {
-        std::cerr << "Exception in ConsoleHandler::wait - " << e.what() << std::endl;
-    }
-}
-
-void ConsoleHandler::requestStop()
-{
-    m_consoleReader.stop();
-}
-
-std::string ConsoleHandler::getUsage() const
-{
-    if (m_handlers.empty()) {
-        return std::string();
+        return !mStop;
     }
 
-    std::stringstream ss;
-
-    size_t maxLength = std::max_element(
-        m_handlers.begin(), m_handlers.end(),
-        [](CommandHandlersMap::const_reference &a,
-           CommandHandlersMap::const_reference &b)
+    QConsoleHandler::~QConsoleHandler ()
     {
-        return a.first.size() < b.first.size();
-    })->first.size();
-
-    for (auto &x : m_handlers) {
-        ss << std::left << std::setw(maxLength + 3) << x.first << x.second.second << std::endl;
+        stop();
     }
 
-    return ss.str();
-}
+    void QConsoleHandler::start (bool bStartThread,
+                                 const std::string &cPrompt,
+                                 Console::EColor sPromptColor)
+    {
+        mPrompt = cPrompt;
+        mPromptColor = sPromptColor;
+        mConsoleReader.start();
 
-void ConsoleHandler::setHandler(const std::string &command,
-                                const ConsoleCommandHandler &handler,
-                                const std::string &usage)
-{
-    m_handlers[command] = std::make_pair(handler, usage);
-}
-
-bool ConsoleHandler::runCommand(const std::vector<std::string> &cmdAndArgs)
-{
-    if (cmdAndArgs.empty()) {
-        return false;
-    }
-
-    const auto &cmd = cmdAndArgs.front();
-    auto hIter = m_handlers.find(cmd);
-
-    if (hIter == m_handlers.end()) {
-        std::cout << "Unknown command: " << cmd << std::endl;
-        return false;
-    }
-
-    std::vector<std::string> args(cmdAndArgs.begin() + 1, cmdAndArgs.end());
-    hIter->second.first(args);
-
-    return true;
-}
-
-void ConsoleHandler::handleCommand(const std::string &cmd)
-{
-    bool parseString = false;
-    std::string arg;
-    std::vector<std::string> argList;
-
-    for (auto ch : cmd) {
-        switch (ch) {
-        case ' ':
-            if (parseString) {
-                arg += ch;
-            } else if (!arg.empty()) {
-                argList.emplace_back(std::move(arg));
-                arg.clear();
-            }
-            break;
-        case '"':
-            if (!arg.empty()) {
-                argList.emplace_back(std::move(arg));
-                arg.clear();
-            }
-            parseString = !parseString;
-            break;
-        default:
-            arg += ch;
+        if (bStartThread) {
+            mThread = std::thread([this] { handlerThread(); });
+        } else {
+            handlerThread();
         }
     }
 
-    if (!arg.empty()) {
-        argList.emplace_back(std::move(arg));
+    void QConsoleHandler::stop ()
+    {
+        requestStop();
+        wait();
     }
 
-    runCommand(argList);
-}
+    void QConsoleHandler::pause ()
+    {
+        mConsoleReader.pause();
+    }
 
-void ConsoleHandler::handlerThread()
-{
-    std::string line;
+    void QConsoleHandler::unpause ()
+    {
+        mConsoleReader.unpause();
+    }
 
-    while(!m_consoleReader.stopped()) {
+    void QConsoleHandler::wait ()
+    {
         try {
-            if (!m_prompt.empty()) {
-                if (m_promptColor != Color::Default) {
-                    Console::setTextColor(m_promptColor);
-                }
-
-                std::cout << m_prompt;
-                std::cout.flush();
-
-                if (m_promptColor != Color::Default) {
-                    Console::setTextColor(Color::Default);
-                }
+            if (mThread.joinable()) {
+                mThread.join();
             }
-
-            if (!m_consoleReader.getLine(line)) {
-                break;
-            }
-
-            boost::algorithm::trim(line);
-            if (!line.empty()) {
-                handleCommand(line);
-            }
-        } catch (std::exception &) {
-            // ignore errors, best comment EVER SEEN!
-            // i'll add Error logs later
+        } catch (std::exception &e) {
+            std::cerr << "Exception in QConsoleHandler::wait - " << e.what() << std::endl;
         }
     }
-}
+
+    void QConsoleHandler::requestStop ()
+    {
+        mConsoleReader.stop();
+    }
+
+    std::string QConsoleHandler::getUsage () const
+    {
+        if (mHandlers.empty()) {
+            return std::string();
+        }
+
+        std::stringstream ss;
+
+        size_t uMaxLength = std::max_element(
+            mHandlers.begin(),
+            mHandlers.end(),
+            [] (CommandHandlersMap::const_reference &a,
+                CommandHandlersMap::const_reference &b)
+            {
+                return a.first.size() < b.first.size();
+            })->first.size();
+
+        for (auto &x : mHandlers) {
+            ss << std::left << std::setw(uMaxLength + 3) << x.first << x.second.second << std::endl;
+        }
+
+        return ss.str();
+    }
+
+    void QConsoleHandler::setHandler (const std::string &cCommand,
+                                      const ConsoleCommandHandler &sHandler,
+                                      const std::string &cUsage)
+    {
+        mHandlers[cCommand] = std::make_pair(sHandler, cUsage);
+    }
+
+    bool QConsoleHandler::runCommand (const std::vector <std::string> &vCmdAndArgs)
+    {
+        if (vCmdAndArgs.empty()) {
+            return false;
+        }
+
+        const auto &cmd = vCmdAndArgs.front();
+        auto hIter = mHandlers.find(cmd);
+
+        if (hIter == mHandlers.end()) {
+            std::cout << "Unknown command: " << cmd << std::endl;
+            return false;
+        }
+
+        std::vector <std::string> vArgs(vCmdAndArgs.begin() + 1, vCmdAndArgs.end());
+        hIter->second.first(vArgs);
+
+        return true;
+    }
+
+    void QConsoleHandler::handleCommand (const std::string &cCmd)
+    {
+        bool bParseString = false;
+        std::string cArg;
+        std::vector <std::string> vArgList;
+
+        for (auto ch : cCmd) {
+            switch (ch) {
+                case ' ':
+                    if (bParseString) {
+                        cArg += ch;
+                    } else if (!cArg.empty()) {
+                        vArgList.emplace_back(std::move(cArg));
+                        cArg.clear();
+                    }
+                    break;
+                case '"':
+                    if (!cArg.empty()) {
+                        vArgList.emplace_back(std::move(cArg));
+                        cArg.clear();
+                    }
+                    bParseString = !bParseString;
+                    break;
+                default:
+                    cArg += ch;
+            }
+        }
+
+        if (!cArg.empty()) {
+            vArgList.emplace_back(std::move(cArg));
+        }
+
+        runCommand(vArgList);
+    }
+
+    void QConsoleHandler::handlerThread ()
+    {
+        std::string cLine;
+
+        while (!mConsoleReader.stopped()) {
+            try {
+                if (!mPrompt.empty()) {
+                    if (mPromptColor != EColor::Default) {
+                        Console::setTextColor(mPromptColor);
+                    }
+
+                    std::cout << mPrompt;
+                    std::cout.flush();
+
+                    if (mPromptColor != EColor::Default) {
+                        Console::setTextColor(EColor::Default);
+                    }
+                }
+
+                if (!mConsoleReader.getLine(cLine)) {
+                    break;
+                }
+
+                boost::algorithm::trim(cLine);
+                if (!cLine.empty()) {
+                    handleCommand(cLine);
+                }
+            } catch (std::exception &) {
+                // ignore errors, best comment EVER SEEN!
+                // i'll add Error logs later
+            }
+        }
+    }
 
 } // namespace Common

@@ -24,118 +24,119 @@
 #include <mutex>
 #include <thread>
 
-template <typename T, typename Container = std::deque<T>>
-class BlockingQueue
+template <typename T, typename Container = std::deque <T>>
+class TBlockingQueue
 {
 public:
-    explicit BlockingQueue(size_t maxSize = 1)
-        : m_maxSize(maxSize),
-          m_closed(false)
+    explicit TBlockingQueue (size_t uMaxSize = 1)
+        : mMaxSize(uMaxSize),
+          mClosed(false)
     {
     }
 
     template <typename TT>
-    bool push(TT &&v)
+    bool push (TT &&v)
     {
-        std::unique_lock<std::mutex> lk(m_mutex);
+        std::unique_lock <std::mutex> lk(mMutex);
 
-        while (!m_closed && m_queue.size() >= m_maxSize) {
-            m_haveSpace.wait(lk);
+        while (!mClosed && mQueue.size() >= mMaxSize) {
+            mHaveSpace.wait(lk);
         }
 
-        if (m_closed) {
+        if (mClosed) {
             return false;
         }
 
-        m_queue.push_back(std::forward<TT>(v));
-        m_haveData.notify_one();
+        mQueue.push_back(std::forward <TT>(v));
+        mHaveData.notify_one();
 
         return true;
     }
 
-    bool pop(T &v)
+    bool pop (T &v)
     {
-        std::unique_lock<std::mutex> lk(m_mutex);
+        std::unique_lock <std::mutex> lk(mMutex);
 
-        while (m_queue.empty()) {
-            if (m_closed) {
-                // all data has been processed, queue is closed
+        while (mQueue.empty()) {
+            if (mClosed) {
+                // all gData has been processed, queue is closed
                 return false;
             }
-            m_haveData.wait(lk);
+
+            mHaveData.wait(lk);
         }
 
-        v = std::move(m_queue.front());
-        m_queue.pop_front();
+        v = std::move(mQueue.front());
+        mQueue.pop_front();
 
         // we can have several waiting threads to unblock
-        if (m_closed && m_queue.empty()) {
-            m_haveSpace.notify_all();
-        }else {
-            m_haveSpace.notify_one();
+        if (mClosed && mQueue.empty()) {
+            mHaveSpace.notify_all();
+        } else {
+            mHaveSpace.notify_one();
         }
 
         return true;
     }
 
-    void close(bool wait = false)
+    void close (bool bWait = false)
     {
-        std::unique_lock<std::mutex> lk(m_mutex);
-        m_closed = true;
-        m_haveData.notify_all(); // wake up threads in pop()
-        m_haveSpace.notify_all();
+        std::unique_lock <std::mutex> lk(mMutex);
+        mClosed = true;
+        mHaveData.notify_all(); // wake up threads in pop()
+        mHaveSpace.notify_all();
 
-        if (wait) {
-            while (!m_queue.empty()) {
-                m_haveSpace.wait(lk);
+        if (bWait) {
+            while (!mQueue.empty()) {
+                mHaveSpace.wait(lk);
             }
         }
     }
 
-    size_t size()
+    size_t size ()
     {
-        std::unique_lock<std::mutex> lk(m_mutex);
+        std::unique_lock <std::mutex> lk(mMutex);
 
-        return m_queue.size();
+        return mQueue.uSize();
     }
 
-    size_t capacity() const
+    size_t capacity () const
     {
-        return m_maxSize;
+        return mMaxSize;
     }
 
 private:
-    const size_t m_maxSize;
-    Container m_queue;
-    bool m_closed;
+    const size_t mMaxSize;
+    Container mQueue;
+    bool mClosed;
 
-    std::mutex m_mutex;
-    std::condition_variable m_haveData;
-    std::condition_variable m_haveSpace;
+    std::mutex mMutex;
+    std::condition_variable mHaveData;
+    std::condition_variable mHaveSpace;
 };
 
 template <typename QueueT>
-class GroupClose
+class TGroupClose
 {
 public:
-    GroupClose(QueueT &queue, size_t groupSize)
-        : m_queue(queue),
-          m_count(groupSize)
+    TGroupClose (QueueT &sQueue, size_t uGroupSize)
+        : mQueue(sQueue),
+          mCount(uGroupSize)
     {
     }
 
-    void close()
+    void close ()
     {
-        if (m_count == 0) {
+        if (mCount == 0) {
             return;
         }
 
-        if (m_count.fetch_sub(1) == 1) {
-            m_queue.close();
+        if (mCount.fetch_sub(1) == 1) {
+            mQueue.close();
         }
     }
 
 private:
-    std::atomic<size_t> m_count;
-    QueueT &m_queue;
+    std::atomic <size_t> mCount;
+    QueueT &mQueue;
 };

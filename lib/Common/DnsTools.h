@@ -24,8 +24,8 @@
 namespace Common {
 
 #ifndef __ANDROID__
-bool fetchDnsTxt(const std::string &domain,
-                 std::vector<std::string> &records);
+bool fetchDnsTxt(const std::string &cDomain,
+                 std::vector<std::string> &vRecords);
 #endif
 
 } // namespace Common

@@ -31,7 +31,7 @@ class LoggerManager : public LoggerGroup
 public:
     LoggerManager() = default;
 
-    void configure(const Common::JsonValue &val);
+    void configure(const Common::QJsonValue &val);
 
     void operator()(const std::string &category,
                     Level level,

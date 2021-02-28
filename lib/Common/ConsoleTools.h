@@ -22,34 +22,34 @@
 
 namespace Common {
 
-namespace Console {
+    namespace Console {
 
-enum class Color : uint8_t
-{
-    // default
-    Default,
-    // main
-    Blue,
-    Green,
-    Red,
-    Yellow,
-    White,
-    Cyan,
-    Magenta,
-    // bright
-    BrightBlue,
-    BrightGreen,
-    BrightRed,
-    BrightYellow,
-    BrightWhite,
-    BrightCyan,
-    BrightMagenta
-};
+        enum class EColor : uint8_t
+        {
+            // default
+            Default,
+            // main
+            Blue,
+            Green,
+            Red,
+            Yellow,
+            White,
+            Cyan,
+            Magenta,
+            // bright
+            BrightBlue,
+            BrightGreen,
+            BrightRed,
+            BrightYellow,
+            BrightWhite,
+            BrightCyan,
+            BrightMagenta
+        };
 
-void setTextColor(Color color);
+        void setTextColor (EColor sColor);
 
-bool isConsoleTTY();
+        bool isConsoleTTY ();
 
-} // namespace Console
+    } // namespace Console
 
 } // namespace Common

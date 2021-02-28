@@ -49,7 +49,7 @@ bool parseTransactionExtra(
     }
 
     try {
-        MemoryInputStream iss(transactionExtra.data(), transactionExtra.size());
+        QMemoryInputStream iss(transactionExtra.data(), transactionExtra.size());
         BinaryInputStreamSerializer ar(iss);
 
         int c = 0;

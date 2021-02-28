@@ -994,7 +994,7 @@ std::vector<FTransactionSpentOutputInformation> TransfersContainer::getSpentOutp
 void TransfersContainer::save(std::ostream &os)
 {
     std::lock_guard<std::mutex> lk(m_mutex);
-    StdOutputStream stream(os);
+    QStdOutputStream stream(os);
     QwertyNote::BinaryOutputStreamSerializer s(stream);
 
     s(const_cast<uint32_t &>(TRANSFERS_CONTAINER_STORAGE_VERSION), "version");
@@ -1025,7 +1025,7 @@ void TransfersContainer::save(std::ostream &os)
 void TransfersContainer::load(std::istream &in)
 {
     std::lock_guard<std::mutex> lk(m_mutex);
-    StdInputStream stream(in);
+    QStdInputStream stream(in);
     QwertyNote::BinaryInputStreamSerializer s(stream);
 
     uint32_t version = 0;
@@ -1168,12 +1168,12 @@ void TransfersContainer::repair()
 
     if (deletedInputCount + deletedUnconfirmedOutputCount + deletedAvailableOutputCount > 0) {
         m_logger(WARNING, BRIGHT_YELLOW) << "Repair finished:\n"
-            << "    Deleted inputs " << deletedInputCount
-            << ", total inputs " << m_spentTransfers.size() << '\n'
-            << "    Deleted unconfirmed outputs " << deletedUnconfirmedOutputCount
-            << ", total unconfirmed outputs " << m_unconfirmedTransfers.size() << '\n'
-            << "    Deleted available outputs " << deletedAvailableOutputCount
-            << ", total available outputs " << m_availableTransfers.size();
+                                         << "    Deleted inputs " << deletedInputCount
+                                         << ", total inputs " << m_spentTransfers.size() << '\n'
+                                         << "    Deleted unconfirmed outputs " << deletedUnconfirmedOutputCount
+                                         << ", total unconfirmed outputs " << m_unconfirmedTransfers.size() << '\n'
+                                         << "    Deleted available outputs " << deletedAvailableOutputCount
+                                         << ", total available outputs " << m_availableTransfers.size();
     } else {
         m_logger(DEBUGGING) << "Repair finished";
     }

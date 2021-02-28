@@ -41,14 +41,14 @@ class KVBinaryOutputStreamSerializer : public ISerializer
         std::string name;
         size_t count;
 
-        explicit Level(Common::StringView nm)
+        explicit Level(Common::QStringView nm)
             : name(nm),
               state(State::Object),
               count(0)
         {
         }
 
-        Level(Common::StringView nm, size_t arraySize)
+        Level(Common::QStringView nm, size_t arraySize)
             : name(nm),
               state(State::ArrayPrefix),
               count(arraySize)
@@ -71,34 +71,34 @@ public:
 
     ISerializer::SerializerType type() const override;
 
-    bool beginObject(Common::StringView name) override;
+    bool beginObject(Common::QStringView name) override;
     void endObject() override;
 
-    bool beginArray(size_t &size, Common::StringView name) override;
+    bool beginArray(size_t &size, Common::QStringView name) override;
     void endArray() override;
 
-    bool operator()(uint8_t &value, Common::StringView name) override;
-    bool operator()(int16_t &value, Common::StringView name) override;
-    bool operator()(uint16_t &value, Common::StringView name) override;
-    bool operator()(int32_t &value, Common::StringView name) override;
-    bool operator()(uint32_t &value, Common::StringView name) override;
-    bool operator()(int64_t &value, Common::StringView name) override;
-    bool operator()(uint64_t &value, Common::StringView name) override;
-    bool operator()(double &value, Common::StringView name) override;
-    bool operator()(bool &value, Common::StringView name) override;
-    bool operator()(std::string &value, Common::StringView name) override;
+    bool operator()(uint8_t &value, Common::QStringView name) override;
+    bool operator()(int16_t &value, Common::QStringView name) override;
+    bool operator()(uint16_t &value, Common::QStringView name) override;
+    bool operator()(int32_t &value, Common::QStringView name) override;
+    bool operator()(uint32_t &value, Common::QStringView name) override;
+    bool operator()(int64_t &value, Common::QStringView name) override;
+    bool operator()(uint64_t &value, Common::QStringView name) override;
+    bool operator()(double &value, Common::QStringView name) override;
+    bool operator()(bool &value, Common::QStringView name) override;
+    bool operator()(std::string &value, Common::QStringView name) override;
 
-    bool binary(void *value, size_t size, Common::StringView name) override;
-    bool binary(std::string &value, Common::StringView name) override;
+    bool binary(void *value, size_t size, Common::QStringView name) override;
+    bool binary(std::string &value, Common::QStringView name) override;
 
     template<typename T>
-    bool operator()(T &value, Common::StringView name)
+    bool operator()(T &value, Common::QStringView name)
     {
         return ISerializer::operator()(value, name);
     }
 
 private:
-    void writeElementPrefix(uint8_t type, Common::StringView name);
+    void writeElementPrefix(uint8_t type, Common::QStringView name);
     void checkArrayPreamble(uint8_t type);
     MemoryStream &stream();
 

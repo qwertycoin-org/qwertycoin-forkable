@@ -22,21 +22,21 @@
 
 namespace Common {
 
-class MemoryInputStream : public IInputStream
-{
-public:
-    MemoryInputStream(const void *buffer, size_t bufferSize);
+    class QMemoryInputStream : public IInputStream
+    {
+    public:
+        QMemoryInputStream (const void *buffer, size_t uBufferSize);
 
-    size_t getPosition() const;
+        size_t getPosition () const;
 
-    bool endOfStream() const;
+        bool endOfStream () const;
 
-    size_t readSome(void* data, size_t size) override;
+        size_t readSome (void *data, size_t uSize) override;
 
-private:
-    const char *buffer;
-    size_t bufferSize;
-    size_t position;
-};
+    private:
+        const char *mBuffer;
+        size_t mBufferSize;
+        size_t mPosition;
+    };
 
 } // namespace Common

@@ -29,7 +29,7 @@
 
 namespace Common {
 
-class JsonValue;
+class QJsonValue;
 
 } // namespace Common
 
@@ -56,16 +56,16 @@ public:
                const std::string &m_rpcPassword);
 
 protected:
-    static void makeErrorResponse(const std::error_code &ec, Common::JsonValue &resp);
-    static void makeMethodNotFoundResponse(Common::JsonValue &resp);
-    static void makeGenericErrorReponse(Common::JsonValue &resp,
+    static void makeErrorResponse(const std::error_code &ec, Common::QJsonValue &resp);
+    static void makeMethodNotFoundResponse(Common::QJsonValue &resp);
+    static void makeGenericErrorReponse(Common::QJsonValue &resp,
                                         const char *what,
                                         int errorCode = -32001);
-    static void fillJsonResponse(const Common::JsonValue &v, Common::JsonValue &resp);
-    static void prepareJsonResponse(const Common::JsonValue &req, Common::JsonValue &resp);
-    static void makeJsonParsingErrorResponse(Common::JsonValue &resp);
+    static void fillJsonResponse(const Common::QJsonValue &v, Common::QJsonValue &resp);
+    static void prepareJsonResponse(const Common::QJsonValue &req, Common::QJsonValue &resp);
+    static void makeJsonParsingErrorResponse(Common::QJsonValue &resp);
 
-    virtual void processJsonRpcRequest(const Common::JsonValue &req, Common::JsonValue &resp) = 0;
+    virtual void processJsonRpcRequest(const Common::QJsonValue &req, Common::QJsonValue &resp) = 0;
 
 private:
     void processRequest(const QwertyNote::HttpRequest &request,

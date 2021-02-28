@@ -23,10 +23,14 @@
 
 namespace Tools {
 
-std::string getDefaultDataDirectory();
-std::string getOsVersionString();
-bool createDirectoriesIfNecessary(const std::string &path);
-std::error_code replaceFile(const std::string &replacement_name, const std::string &replaced_name);
-bool directoryExists(const std::string &path);
+    std::string getDefaultDataDirectory ();
+    std::string getOsVersionString ();
+
+    bool createDirectoriesIfNecessary (const std::string &cPath);
+
+    std::error_code replaceFile (const std::string &cReplacementName,
+                                 const std::string &cReplacedName);
+
+    bool directoryExists (const std::string &cPath);
 
 } // namespace Tools

@@ -23,14 +23,16 @@
 
 namespace Tools {
 
-namespace Base58 {
+    namespace Base58 {
 
-std::string encode(const std::string &data);
-bool decode(const std::string &enc, std::string &data);
+        std::string encode (const std::string &cData);
 
-std::string encodeAddr(uint64_t tag, const std::string &data);
-bool decodeAddr(std::string addr, uint64_t &tag, std::string &data);
+        bool decode (const std::string &cEncodedString, std::string &cData);
 
-} // namespace Base58
+        std::string encodeAddress (uint64_t uExtraTag, const std::string &cData);
+
+        bool decodeAddress (std::string cAddress, uint64_t &uExtraTag, std::string &sData);
+
+    } // namespace Base58
 
 } // namespace Tools

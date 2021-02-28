@@ -25,201 +25,230 @@
 
 namespace Common {
 
-/*!
-    \class ArrayView
-    \inmodule Common
-    \brief This is a pair of pointer to constant object of parametrized type and size.
-
-    Supports 'EMPTY' and 'NIL' representations as follows:
-    - 'data' == 'nullptr' && 'size' == 0 - EMPTY NIL
-    - 'data' != 'nullptr' && 'size' == 0 - EMPTY NOTNIL
-    - 'data' == 'nullptr' && 'size' > 0 - Undefined
-    - 'data' != 'nullptr' && 'size' > 0 - NOTEMPTY NOTNIL
-    For signed integer 'Size', 'ArrayView' with 'size' < 0 is undefined.
-
-    \note It is recommended to pass 'ArrayView' to procedures by value.
-*/
-template<class ObjectType = uint8_t, class SizeType = size_t>
-class ArrayView
+/**
+ * @class TArrayView
+ * @namespace Common
+ * @brief This is a pair of pointer to constant object of parametrized sType and uSize.
+ *
+ * Supports 'EMPTY' and 'NIL' representations as follows:
+ * - 'uData' == 'nullptr' && 'uSize' == 0 - EMPTY NIL
+ * - 'uData' != 'nullptr' && 'uSize' == 0 - EMPTY NOTNIL
+ * - 'uData' == 'nullptr' && 'uSize' > 0 - Undefined
+ * - 'uData' != 'nullptr' && 'uSize' > 0 - NOTEMPTY NOTNIL
+ * For signed integer 'uSize', 'TArrayView' with 'uSize' < 0 is undefined.
+ *
+ * @note It is recommended to pass 'TArrayView' to procedures by value.
+ *
+ * @tparam QObjectType
+ * @tparam QSizeType
+ */
+template<class QObjectType = uint8_t, class QSizeType = size_t>
+class TArrayView
 {
 public:
-    typedef ObjectType Object;
-    typedef SizeType Size;
+    typedef QObjectType uObject;
+    typedef QSizeType uSize;
 
-    const static Size INVALID;
-    const static ArrayView EMPTY;
-    const static ArrayView NIL;
+    const static uSize INVALID;
+    const static TArrayView EMPTY;
+    const static TArrayView NIL;
 
-    /*!
-        Default constructor.
-        Leaves object uninitialized. Any usage before initializing it is undefined.
-    */
-    ArrayView()
-#ifndef NDEBUG // In debug mode, fill in object with invalid state (undefined).
-        : m_data(nullptr),
-          m_size(INVALID)
+    /**
+     * Default constructor.
+     * Leaves object uninitialized. Any usage before initializing it is undefined.
+     */
+    TArrayView()
+#ifndef NDEBUG // In debug mode, fill in object with uInvalid mState (undefined).
+        : gData(nullptr),
+          gSize(INVALID)
 #endif
     {
     }
 
-    /*!
-        Direct constructor.
-        The behavior is undefined unless 'arrayData' != 'nullptr' || 'arraySize' == 0
-    */
-    ArrayView(const Object *arrayData, Size arraySize)
-        : m_data(arrayData),
-          m_size(arraySize)
+    /**
+     * Direct constructor.
+     * The behavior is undefined unless 'sArrayData' != 'nullptr' || 'sArraySize' == 0
+     *
+     * @param sArrayData
+     * @param sArraySize
+     */
+    TArrayView(const uObject *sArrayData, uSize sArraySize)
+        : gData(sArrayData),
+          gSize(sArraySize)
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
     }
 
-    /*!
-        Constructor from C array.
-        The behavior is undefined unless 'arrayData' != 'nullptr' || 'arraySize' == 0.
-        Input state can be malformed using pointer conversions.
-    */
-    template<Size arraySize>
-    explicit ArrayView(const Object(&arrayData)[arraySize])
-        : m_data(arrayData),
-          m_size(arraySize)
+    /**
+     * Constructor from C array.
+     * The behavior is undefined unless 'arrayData' != 'nullptr' || 'sArraySize' == 0.
+     * Input mState can be malformed using pointer conversions.
+     *
+     * @tparam sArraySize
+     * @param arrayData
+     */
+    template<uSize sArraySize>
+    explicit TArrayView(const uObject(&arrayData)[sArraySize])
+        : gData(arrayData),
+          gSize(sArraySize)
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
     }
 
-    /*!
-        Copy constructor.
-        Performs default action - bitwise copying of source object.
-        The behavior is undefined unless 'other' 'ArrayView' is in defined state,
-        that is 'data' != 'nullptr' || 'size' == 0
-    */
-    ArrayView(const ArrayView &other)
-        : m_data(other.m_data),
-          m_size(other.m_size)
+    /**
+     * Copy constructor.
+     * Performs default action - bitwise copying of source object.
+     * The behavior is undefined unless 'other' 'TArrayView' is in defined mState,
+     * that is 'uData' != 'nullptr' || 'uSize' == 0
+     *
+     * @param other
+     */
+    TArrayView(const TArrayView &other)
+        : gData(other.gData),
+          gSize(other.gSize)
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
     }
 
-    /*!
-        Destructor.
-        Does nothing.
-    */
-    ~ArrayView() = default;
+    /**
+     * Destructor.
+     * Does nothing.
+     */
+    ~TArrayView() = default;
 
-    const Object *getData() const
+    const uObject *getData() const
     {
-        assert(m_data != nullptr || m_size == 0);
-        return m_data;
+        assert(gData != nullptr || gSize == 0);
+        return gData;
     }
 
-    Size getSize() const
+    uSize getSize() const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        return m_size;
+        return gSize;
     }
 
-    /*!
-        Return false if 'ArrayView' is not EMPTY.
-        The behavior is undefined unless 'ArrayView' was initialized.
-    */
+    /**
+     * Return false if 'TArrayView' is not EMPTY.
+     * The behavior is undefined unless 'TArrayView' was initialized.
+     *
+     * @return
+     */
     bool isEmpty() const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        return m_size == 0;
+        return gSize == 0;
     }
 
-    /*!
-        Return false if 'ArrayView' is not NIL.
-        The behavior is undefined unless 'ArrayView' was initialized.
-    */
+    /**
+     * Return false if 'TArrayView' is not NIL.
+     * The behavior is undefined unless 'TArrayView' was initialized.
+     *
+     * @return
+     */
     bool isNil() const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        return m_data == nullptr;
+        return gData == nullptr;
     }
 
-    /*!
-        Get first element.
-        The behavior is undefined unless 'ArrayView' was initialized and 'size' > 0
-    */
-    const Object &first() const
+    /**
+     * Get first element.
+     * The behavior is undefined unless 'TArrayView' was initialized and 'uSize' > 0
+     *
+     * @return
+     */
+    const uObject &first() const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(m_size > 0);
+        assert(gSize > 0);
 
-        return *m_data;
+        return *gData;
     }
 
-    /*!
-        Get last element.
-        The behavior is undefined unless 'ArrayView' was initialized and 'size' > 0
-    */
-    const Object &last() const
+    /**
+     * Get last element.
+     * The behavior is undefined unless 'TArrayView' was initialized and 'uSize' > 0
+     *
+     * @return
+     */
+    const uObject &last() const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(m_size > 0);
+        assert(gSize > 0);
 
-        return *(m_data + (m_size - 1));
+        return *(gData + (gSize - 1));
     }
 
-    /*!
-        Return a pointer to the first element.
-        The behavior is undefined unless 'ArrayView' was initialized.
-    */
-    const Object *begin() const
+    /**
+     * Return a pointer to the first element.
+     * The behavior is undefined unless 'TArrayView' was initialized.
+     *
+     * @return
+     */
+    const uObject *begin() const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        return m_data;
+        return gData;
     }
 
-    /*!
-        Return a pointer after the last element.
-        The behavior is undefined unless 'ArrayView' was initialized.
-    */
-    const Object *end() const
+    /**
+     * Return a pointer after the last element.
+     * The behavior is undefined unless 'TArrayView' was initialized.
+     *
+     * @return
+     */
+    const uObject *end() const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        return m_data + m_size;
+        return gData + gSize;
     }
 
-    /*!
-        Return false if 'ArrayView' does not contain 'object' at the beginning.
-        The behavior is undefined unless 'ArrayView' was initialized.
-    */
-    bool beginsWith(const Object &object) const
+    /**
+     * Return false if 'TArrayView' does not contain 'sObject' at the beginning.
+     * The behavior is undefined unless 'TArrayView' was initialized.
+     *
+     * @param sObject
+     * @return
+     */
+    bool beginsWith(const uObject &sObject) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        if (m_size == 0) {
+        if (gSize == 0) {
             return false;
         }
 
-        return *m_data == object;
+        return *gData == sObject;
     }
 
-    /*!
-        Return false if 'ArrayView' does not contain 'other' at the beginning.
-        The behavior is undefined unless both arrays were initialized.
-    */
-    bool beginsWith(ArrayView other) const
+    /**
+     * Return false if 'TArrayView' does not contain 'sOther' at the beginning.
+     * The behavior is undefined unless both arrays were initialized.
+     *
+     * @param sOther
+     * @return
+     */
+    bool beginsWith(TArrayView sOther) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(other.m_data != nullptr || other.m_size == 0);
+        assert(sOther.gData != nullptr || sOther.gSize == 0);
 
-        if (m_size >= other.m_size) {
-            for (Size i = 0;; ++i) {
-                if (i == other.m_size) {
+        if (gSize >= sOther.gSize) {
+            for (uSize i = 0;; ++i) {
+                if (i == sOther.gSize) {
                     return true;
                 }
 
-                if (!(*(m_data + i) == *(other.m_data + i))) {
+                if (!(*(gData + i) == *(sOther.gData + i))) {
                     break;
                 }
             }
@@ -228,16 +257,19 @@ public:
         return false;
     }
 
-    /*!
-        Return false if 'ArrayView' does not contain 'object'.
-        The behavior is undefined unless 'ArrayView' was initialized.
-    */
-    bool contains(const Object &object) const
+    /**
+     * Return false if 'TArrayView' does not contain 'sObject'.
+     * The behavior is undefined unless 'TArrayView' was initialized.
+     *
+     * @param sObject
+     * @return
+     */
+    bool contains(const uObject &sObject) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        for (Size i = 0; i < m_size; ++i) {
-            if (*(m_data + i) == object) {
+        for (uSize i = 0; i < gSize; ++i) {
+            if (*(gData + i) == sObject) {
                 return true;
             }
         }
@@ -245,25 +277,28 @@ public:
         return false;
     }
 
-    /*!
-        Return false if 'ArrayView' does not contain 'other'.
-        The behavior is undefined unless both arrays were initialized.
-    */
-    bool contains(ArrayView other) const
+    /**
+     * Return false if 'TArrayView' does not contain 'sOther'.
+     * The behavior is undefined unless both arrays were initialized.
+     *
+     * @param sOther
+     * @return
+     */
+    bool contains(TArrayView sOther) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(other.m_data != nullptr || other.m_size == 0);
+        assert(sOther.gData != nullptr || sOther.gSize == 0);
 
-        if (m_size >= other.m_size) {
-            Size i = m_size - other.m_size;
-            for (Size j = 0; !(i < j); ++j) {
-                for (Size k = 0;; ++k) {
-                    if (k == other.m_size) {
+        if (gSize >= sOther.gSize) {
+            uSize i = gSize - sOther.gSize;
+            for (uSize j = 0; !(i < j); ++j) {
+                for (uSize k = 0;; ++k) {
+                    if (k == sOther.gSize) {
                         return true;
                     }
 
-                    if (!(*(m_data + j + k) == *(other.m_data + k))) {
+                    if (!(*(gData + j + k) == *(sOther.gData + k))) {
                         break;
                     }
                 }
@@ -273,39 +308,45 @@ public:
         return false;
     }
 
-    /*!
-        Return false if 'ArrayView' does not contain 'object' at the end.
-        The behavior is undefined unless 'ArrayView' was initialized.
-    */
-    bool endsWith(const Object &object) const
+    /**
+     * Return false if 'TArrayView' does not contain 'sObject' at the end.
+     * The behavior is undefined unless 'TArrayView' was initialized.
+     *
+     * @param sObject
+     * @return
+     */
+    bool endsWith(const uObject &sObject) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        if (m_size == 0) {
+        if (gSize == 0) {
             return false;
         }
 
-        return *(m_data + (m_size - 1)) == object;
+        return *(gData + (gSize - 1)) == sObject;
     }
 
-    /*!
-    Return false if 'ArrayView' does not contain 'other' at the end.
-    The behavior is undefined unless both arrays were initialized.
-    */
-    bool endsWith(ArrayView other) const
+    /**
+     * Return false if 'TArrayView' does not contain 'sOther' at the end.
+     * The behavior is undefined unless both arrays were initialized.
+     *
+     * @param sOther
+     * @return
+     */
+    bool endsWith(TArrayView sOther) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(other.m_data != nullptr || other.m_size == 0);
+        assert(sOther.gData != nullptr || sOther.gSize == 0);
 
-        if (m_size >= other.m_size) {
-            Size i = m_size - other.m_size;
-            for (Size j = 0;; ++j) {
-                if (j == other.m_size) {
+        if (gSize >= sOther.gSize) {
+            uSize i = gSize - sOther.gSize;
+            for (uSize j = 0;; ++j) {
+                if (j == sOther.gSize) {
                     return true;
                 }
 
-                if (!(*(m_data + i + j) == *(other.m_data + j))) {
+                if (!(*(gData + i + j) == *(sOther.gData + j))) {
                     break;
                 }
             }
@@ -314,17 +355,20 @@ public:
         return false;
     }
 
-    /*!
-        Looks for the first occurence of 'object' in 'ArrayView',
-        returns index or INVALID if there are no occurences.
-        The behavior is undefined unless 'ArrayView' was initialized.
-    */
-    Size find(const Object &object) const
+    /**
+     * Looks for the first occurrence of 'sObject' in 'TArrayView',
+     * returns index or uInvalid if there are no occurrences.
+     * The behavior is undefined unless 'TArrayView' was initialized.
+     *
+     * @param sObject
+     * @return
+     */
+    uSize find(const uObject &sObject) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        for (Size i = 0; i < m_size; ++i) {
-            if (*(m_data + i) == object) {
+        for (uSize i = 0; i < gSize; ++i) {
+            if (*(gData + i) == sObject) {
                 return i;
             }
         }
@@ -332,26 +376,29 @@ public:
         return INVALID;
     }
 
-    /*!
-        Looks for the first occurence of 'other' in 'ArrayView',
-        returns index or INVALID if there are no occurences.
-        The behavior is undefined unless both arrays were initialized.
-    */
-    Size find(ArrayView other) const
+    /**
+     * Looks for the first occurrence of 'sOther' in 'TArrayView',
+     * returns index or uInvalid if there are no occurrences.
+     * The behavior is undefined unless both arrays were initialized.
+     *
+     * @param sOther
+     * @return
+     */
+    uSize find(TArrayView sOther) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(other.m_data != nullptr || other.m_size == 0);
+        assert(sOther.gData != nullptr || sOther.gSize == 0);
 
-        if (m_size >= other.m_size) {
-            Size i = m_size - other.m_size;
-            for (Size j = 0; !(i < j); ++j) {
-                for (Size k = 0;; ++k) {
-                    if (k == other.m_size) {
+        if (gSize >= sOther.gSize) {
+            uSize i = gSize - sOther.gSize;
+            for (uSize j = 0; !(i < j); ++j) {
+                for (uSize k = 0;; ++k) {
+                    if (k == sOther.gSize) {
                         return j;
                     }
 
-                    if (!(*(m_data + j + k) == *(other.m_data + k))) {
+                    if (!(*(gData + j + k) == *(sOther.gData + k))) {
                         break;
                     }
                 }
@@ -362,43 +409,46 @@ public:
     }
 
     /*!
-        Looks for the last occurence of 'object' in 'ArrayView',
-        returns index or INVALID if there are no occurences.
-        The behavior is undefined unless 'ArrayView' was initialized.
+        Looks for the last occurence of 'object' in 'TArrayView',
+        returns index or uInvalid if there are no occurences.
+        The behavior is undefined unless 'TArrayView' was initialized.
     */
-    Size findLast(const Object &object) const
+    uSize findLast(const uObject &object) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        for (Size i = 0; i < m_size; ++i) {
-            if (*(m_data + (m_size - 1 - i)) == object) {
-                return m_size - 1 - i;
+        for (uSize i = 0; i < gSize; ++i) {
+            if (*(gData + (gSize - 1 - i)) == object) {
+                return gSize - 1 - i;
             }
         }
 
         return INVALID;
     }
 
-    /*!
-        Looks for the first occurence of 'other' in 'ArrayView',
-        returns index or INVALID if there are no occurences.
-        The behavior is undefined unless both arrays were initialized.
-    */
-    Size findLast(ArrayView other) const
+    /**
+     * Looks for the first occurrence of 'sOther' in 'TArrayView',
+     * returns index or uInvalid if there are no occurrences.
+     * The behavior is undefined unless both arrays were initialized.
+     *
+     * @param sOther
+     * @return
+     */
+    uSize findLast(TArrayView sOther) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(other.m_data != nullptr || other.m_size == 0);
+        assert(sOther.gData != nullptr || sOther.gSize == 0);
 
-        if (m_size >= other.m_size) {
-            Size i = m_size - other.m_size;
-            for (Size j = 0; !(i < j); ++j) {
-                for (Size k = 0;; ++k) {
-                    if (k == other.m_size) {
+        if (gSize >= sOther.gSize) {
+            uSize i = gSize - sOther.gSize;
+            for (uSize j = 0; !(i < j); ++j) {
+                for (uSize k = 0;; ++k) {
+                    if (k == sOther.gSize) {
                         return i - j;
                     }
 
-                    if (!(*(m_data + (i - j + k)) == *(other.m_data + k))) {
+                    if (!(*(gData + (i - j + k)) == *(sOther.gData + k))) {
                         break;
                     }
                 }
@@ -408,119 +458,145 @@ public:
         return INVALID;
     }
 
-    /*!
-        Returns subarray of 'headSize' first elements.
-        The behavior is undefined unless 'ArrayView' was initialized and 'headSize' <= 'size'.
-    */
-    ArrayView head(Size headSize) const
+    /**
+     * Returns subarray of 'sHeadSize' first elements.
+     * The behavior is undefined unless 'TArrayView' was initialized and 'sHeadSize' <= 'uSize'.
+     *
+     * @param sHeadSize
+     * @return
+     */
+    TArrayView head(uSize sHeadSize) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(headSize <= m_size);
+        assert(sHeadSize <= gSize);
 
-        return ArrayView(m_data, headSize);
+        return TArrayView(gData, sHeadSize);
     }
 
-    /*!
-        Returns subarray of 'tailSize' last elements.
-        The behavior is undefined unless 'ArrayView' was initialized and 'tailSize' <= 'size'.
-    */
-    ArrayView tail(Size tailSize) const
+    /**
+     * Returns subarray of 'sTailSize' last elements.
+     * The behavior is undefined unless 'TArrayView' was initialized and 'sTailSize' <= 'uSize'.
+     *
+     * @param sTailSize
+     * @return
+     */
+    TArrayView tail(uSize sTailSize) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(tailSize <= m_size);
+        assert(sTailSize <= gSize);
 
-        return ArrayView(m_data + (m_size - tailSize), tailSize);
+        return TArrayView(gData + (gSize - sTailSize), sTailSize);
     }
 
-    /*!
-        Returns 'ArrayView' without 'headSize' first elements.
-        The behavior is undefined unless 'ArrayView' was initialized and 'headSize' <= 'size'.
-    */
-    ArrayView unhead(Size headSize) const
+    /**
+     * Returns 'TArrayView' without 'sHeadSize' first elements.
+     * The behavior is undefined unless 'TArrayView' was initialized and 'sHeadSize' <= 'uSize'.
+     *
+     * @param sHeadSize
+     * @return
+     */
+    TArrayView unHead(uSize sHeadSize) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(headSize <= m_size);
+        assert(sHeadSize <= gSize);
 
-        return ArrayView(m_data + headSize, m_size - headSize);
+        return TArrayView(gData + sHeadSize, gSize - sHeadSize);
     }
 
-    /*!
-        Returns 'ArrayView' without 'tailSize' last elements.
-        The behavior is undefined unless 'ArrayView' was initialized and 'tailSize' <= 'size'.
-    */
-    ArrayView untail(Size tailSize) const
+    /**
+     * Returns 'TArrayView' without 'sTailSize' last elements.
+     * The behavior is undefined unless 'TArrayView' was initialized and 'sTailSize' <= 'uSize'.
+     *
+     * @param sTailSize
+     * @return
+     */
+    TArrayView unTail(uSize sTailSize) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(tailSize <= m_size);
+        assert(sTailSize <= gSize);
 
-        return ArrayView(m_data, m_size - tailSize);
+        return TArrayView(gData, gSize - sTailSize);
     }
 
-    /*!
-        Returns subarray starting at 'startIndex' and contaning 'endIndex' - 'startIndex' elements.
-        The behavior is undefined unless 'ArrayView' was initialized and 'startIndex' <= 'endIndex'
-        and 'endIndex' <= 'size'.
-    */
-    ArrayView range(Size startIndex, Size endIndex) const
+    /**
+     * Returns subarray starting at 'sStartIndex' and contaning 'sEndIndex' - 'sStartIndex' elements.
+     * The behavior is undefined unless 'TArrayView' was initialized and 'sStartIndex' <= 'sEndIndex'
+     * and 'sEndIndex' <= 'uSize'.
+     *
+     * @param sStartIndex
+     * @param sEndIndex
+     * @return
+     */
+    TArrayView range(uSize sStartIndex, uSize sEndIndex) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(startIndex <= endIndex && endIndex <= m_size);
+        assert(sStartIndex <= sEndIndex && sEndIndex <= gSize);
 
-        return ArrayView(m_data + startIndex, endIndex - startIndex);
+        return TArrayView(gData + sStartIndex, sEndIndex - sStartIndex);
     }
 
-    /*!
-        Returns subarray starting at 'startIndex' and contaning 'sliceSize' elements.
-        The behavior is undefined unless 'ArrayView' was initialized and 'startIndex' <= 'size'
-        and 'startIndex' + 'sliceSize' <= 'size'.
-    */
-    ArrayView slice(Size startIndex, Size sliceSize) const
+    /**
+     * Returns subarray starting at 'sStartIndex' and containing 'sSliceSize' elements.
+     * The behavior is undefined unless 'TArrayView' was initialized and 'sStartIndex' <= 'uSize'
+     * and 'sStartIndex' + 'sSliceSize' <= 'uSize'.
+     *
+     * @param sStartIndex
+     * @param sSliceSize
+     * @return
+     */
+    TArrayView slice(uSize sStartIndex, uSize sSliceSize) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(startIndex <= m_size && startIndex + sliceSize <= m_size);
+        assert(sStartIndex <= gSize && sStartIndex + sSliceSize <= gSize);
 
-        return ArrayView(m_data + startIndex, sliceSize);
+        return TArrayView(gData + sStartIndex, sSliceSize);
     }
 
-    /*!
-        Copy assignment operator.
-        The behavior is undefined unless 'other' 'ArrayView' is in defined state,
-        that is 'data' != 'nullptr' || 'size' == 0
-    */
-    ArrayView &operator=(const ArrayView &other)
+    /**
+     * Copy assignment operator.
+     * The behavior is undefined unless 'sOther' 'TArrayView' is in defined mState,
+     * that is 'uData' != 'nullptr' || 'uSize' == 0
+     *
+     * @param sOther
+     * @return
+     */
+    TArrayView &operator=(const TArrayView &sOther)
     {
-        assert(other.m_data != nullptr || other.m_size == 0);
+        assert(sOther.gData != nullptr || sOther.gSize == 0);
 
-        m_data = other.m_data;
-        m_size = other.m_size;
+        gData = sOther.gData;
+        gSize = sOther.gSize;
 
         return *this;
     }
 
-    /*!
-        Compare elements of two arrays, return false if there is a difference.
-        EMPTY and NIL arrays are considered equal.
-        The behavior is undefined unless both arrays were initialized.
-    */
-    bool operator==(ArrayView other) const
+    /**
+     * Compare elements of two arrays, return false if there is a difference.
+     * EMPTY and NIL arrays are considered equal.
+     * The behavior is undefined unless both arrays were initialized.
+     *
+     * @param sOther
+     * @return
+     */
+    bool operator==(TArrayView sOther) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(other.m_data != nullptr || other.m_size == 0);
+        assert(sOther.gData != nullptr || sOther.gSize == 0);
 
-        if (m_size == other.m_size) {
-            for (Size i = 0;; ++i) {
-                if (i == m_size) {
+        if (gSize == sOther.gSize) {
+            for (uSize i = 0;; ++i) {
+                if (i == gSize) {
                     return true;
                 }
 
-                if (!(*(m_data + i) == *(other.m_data + i))) {
+                if (!(*(gData + i) == *(sOther.gData + i))) {
                     break;
                 }
             }
@@ -529,24 +605,27 @@ public:
         return false;
     }
 
-    /*!
-        Compare elements two arrays, return false if there is no difference.
-        EMPTY and NIL arrays are considered equal.
-        The behavior is undefined unless both arrays were initialized.
-    */
-    bool operator!=(ArrayView other) const
+    /**
+     * Compare elements two arrays, return false if there is no difference.
+     * EMPTY and NIL arrays are considered equal.
+     * The behavior is undefined unless both arrays were initialized.
+     *
+     * @param other
+     * @return
+     */
+    bool operator!=(TArrayView other) const
     {
-        assert(m_data != nullptr || m_size == 0);
+        assert(gData != nullptr || gSize == 0);
 
-        assert(other.m_data != nullptr || other.m_size == 0);
+        assert(other.gData != nullptr || other.gSize == 0);
 
-        if (m_size == other.m_size) {
-            for (Size i = 0;; ++i) {
-                if (i == m_size) {
+        if (gSize == other.gSize) {
+            for (uSize i = 0;; ++i) {
+                if (i == gSize) {
                     return false;
                 }
 
-                if (*(m_data + i) != *(other.m_data + i)) {
+                if (*(gData + i) != *(other.gData + i)) {
                     break;
                 }
             }
@@ -555,29 +634,32 @@ public:
         return true;
     }
 
-    /*!
-        Get 'ArrayView' element by index.
-        The behavior is undefined unless 'ArrayView' was initialized and 'index' < 'size'.
-    */
-    const Object &operator[](Size index) const
+    /**
+     * Get 'TArrayView' element by sIndex.
+     * The behavior is undefined unless 'TArrayView' was initialized and 'sIndex' < 'uSize'.
+     *
+     * @param sIndex
+     * @return
+     */
+    const uObject &operator[](uSize sIndex) const
     {
-        assert(m_data != nullptr || m_size == 0);
-        assert(index < m_size);
-        return *(m_data + index);
+        assert(gData != nullptr || gSize == 0);
+        assert(sIndex < gSize);
+        return *(gData + sIndex);
     }
 
 protected:
-    const Object *m_data;
-    Size m_size;
+    const uObject *gData;
+    uSize gSize;
 };
 
-template<class Object, class Size>
-const Size ArrayView<Object, Size>::INVALID = std::numeric_limits<Size>::max();
+template<class QObject, class QSize>
+const QSize TArrayView<QObject, QSize>::INVALID = std::numeric_limits<uSize>::max();
 
-template<class Object, class Size>
-const ArrayView<Object, Size> ArrayView<Object, Size>::EMPTY(reinterpret_cast<Object *>(1), 0);
+template<class QObject, class QSize>
+const TArrayView<QObject, QSize> TArrayView<QObject, QSize>::EMPTY(reinterpret_cast<uObject *>(1), 0);
 
-template<class Object, class Size>
-const ArrayView<Object, Size> ArrayView<Object, Size>::NIL(nullptr, 0);
+template<class QObject, class QSize>
+const TArrayView<QObject, QSize> TArrayView<QObject, QSize>::NIL(nullptr, 0);
 
 } // namespace Common

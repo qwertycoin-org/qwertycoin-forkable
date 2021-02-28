@@ -86,7 +86,7 @@ struct WalletEvent
 
 struct WalletTransaction
 {
-    WalletTransactionState state;
+    WalletTransactionState mState;
     uint64_t timestamp;
     uint32_t blockHeight;
     Crypto::FHash hash;

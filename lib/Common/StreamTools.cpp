@@ -17,263 +17,264 @@
 // along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdexcept>
+
 #include <Common/IInputStream.h>
 #include <Common/IOutputStream.h>
 #include <Common/StreamTools.h>
 
 namespace Common {
 
-void read(IInputStream &in, void *data, size_t size)
-{
-    while (size > 0) {
-        size_t readSize = in.readSome(data, size);
-        if (readSize == 0) {
-            throw std::runtime_error("Failed to read from IInputStream");
-        }
-
-        data = static_cast<uint8_t*>(data) + readSize;
-        size -= readSize;
-    }
-}
-
-void read(IInputStream &in, int8_t &value)
-{
-    read(in, &value, sizeof(value));
-}
-
-void read(IInputStream &in, int16_t &value)
-{
-    // TODO: Convert from little endian on big endian platforms
-    read(in, &value, sizeof(value));
-}
-
-void read(IInputStream &in, int32_t &value)
-{
-    // TODO: Convert from little endian on big endian platforms
-    read(in, &value, sizeof(value));
-}
-
-void read(IInputStream &in, int64_t &value)
-{
-    // TODO: Convert from little endian on big endian platforms
-    read(in, &value, sizeof(value));
-}
-
-void read(IInputStream &in, uint8_t &value)
-{
-    read(in, &value, sizeof(value));
-}
-
-void read(IInputStream &in, uint16_t &value)
-{
-    // TODO: Convert from little endian on big endian platforms
-    read(in, &value, sizeof(value));
-}
-
-void read(IInputStream &in, uint32_t &value)
-{
-    // TODO: Convert from little endian on big endian platforms
-    read(in, &value, sizeof(value));
-}
-
-void read(IInputStream &in, uint64_t &value)
-{
-    // TODO: Convert from little endian on big endian platforms
-    read(in, &value, sizeof(value));
-}
-
-void read(IInputStream &in, std::vector<uint8_t> &data, size_t size)
-{
-    data.resize(size);
-    read(in, data.data(), size);
-}
-
-void read(IInputStream &in, std::string &data, size_t size)
-{
-    std::vector<char> temp(size);
-    read(in, temp.data(), size);
-    data.assign(temp.data(), size);
-}
-
-void readVarint(IInputStream &in, uint8_t &value)
-{
-    uint8_t temp = 0;
-    for (uint8_t shift = 0;; shift += 7) {
-        uint8_t piece;
-        read(in, piece);
-        if (shift >= sizeof(temp) * 8 - 7 && piece >= 1 << (sizeof(temp) * 8 - shift)) {
-            throw std::runtime_error("readVarint, value overflow");
-        }
-
-        temp |= static_cast<size_t>(piece & 0x7f) << shift;
-        if ((piece & 0x80) == 0) {
-            if (piece == 0 && shift != 0) {
-                throw std::runtime_error("readVarint, invalid value representation");
+    void read (IInputStream &in, void *data, size_t uSize)
+    {
+        while (uSize > 0) {
+            size_t readSize = in.readSome(data, uSize);
+            if (readSize == 0) {
+                throw std::runtime_error("Failed to read from IInputStream");
             }
 
-            break;
+            data = static_cast<uint8_t *>(data) + readSize;
+            uSize -= readSize;
         }
     }
 
-    value = temp;
-}
+    void read (IInputStream &in, int8_t &iValue)
+    {
+        read(in, &iValue, sizeof(iValue));
+    }
 
-void readVarint(IInputStream &in, uint16_t &value)
-{
-    uint16_t temp = 0;
-    for (uint8_t shift = 0;; shift += 7) {
-        uint8_t piece;
-        read(in, piece);
-        if (shift >= sizeof(temp) * 8 - 7 && piece >= 1 << (sizeof(temp) * 8 - shift)) {
-            throw std::runtime_error("readVarint, value overflow");
-        }
+    void read (IInputStream &in, int16_t &iValue)
+    {
+        // TODO: Convert from little endian on big endian platforms
+        read(in, &iValue, sizeof(iValue));
+    }
 
-        temp |= static_cast<size_t>(piece & 0x7f) << shift;
-        if ((piece & 0x80) == 0) {
-            if (piece == 0 && shift != 0) {
-                throw std::runtime_error("readVarint, invalid value representation");
+    void read (IInputStream &in, int32_t &iValue)
+    {
+        // TODO: Convert from little endian on big endian platforms
+        read(in, &iValue, sizeof(iValue));
+    }
+
+    void read (IInputStream &in, int64_t &iValue)
+    {
+        // TODO: Convert from little endian on big endian platforms
+        read(in, &iValue, sizeof(iValue));
+    }
+
+    void read (IInputStream &in, uint8_t &uValue)
+    {
+        read(in, &uValue, sizeof(uValue));
+    }
+
+    void read (IInputStream &in, uint16_t &uValue)
+    {
+        // TODO: Convert from little endian on big endian platforms
+        read(in, &uValue, sizeof(uValue));
+    }
+
+    void read (IInputStream &in, uint32_t &uValue)
+    {
+        // TODO: Convert from little endian on big endian platforms
+        read(in, &uValue, sizeof(uValue));
+    }
+
+    void read (IInputStream &in, uint64_t &uValue)
+    {
+        // TODO: Convert from little endian on big endian platforms
+        read(in, &uValue, sizeof(uValue));
+    }
+
+    void read (IInputStream &in, std::vector <uint8_t> &vData, size_t uSize)
+    {
+        vData.resize(uSize);
+        read(in, vData.data(), uSize);
+    }
+
+    void read (IInputStream &in, std::string &cData, size_t uSize)
+    {
+        std::vector <char> temp(uSize);
+        read(in, temp.data(), uSize);
+        cData.assign(temp.data(), uSize);
+    }
+
+    void readVarint (IInputStream &in, uint8_t &uValue)
+    {
+        uint8_t temp = 0;
+        for (uint8_t shift = 0;; shift += 7) {
+            uint8_t piece;
+            read(in, piece);
+            if (shift >= sizeof(temp) * 8 - 7 && piece >= 1 << (sizeof(temp) * 8 - shift)) {
+                throw std::runtime_error("readVarint, uValue overflow");
             }
 
-            break;
+            temp |= static_cast<size_t>(piece & 0x7f) << shift;
+            if ((piece & 0x80) == 0) {
+                if (piece == 0 && shift != 0) {
+                    throw std::runtime_error("readVarint, uInvalid uValue representation");
+                }
+
+                break;
+            }
         }
+
+        uValue = temp;
     }
 
-    value = temp;
-}
-
-void readVarint(IInputStream &in, uint32_t &value)
-{
-    uint32_t temp = 0;
-    for (uint8_t shift = 0;; shift += 7) {
-        uint8_t piece;
-        read(in, piece);
-        if (shift >= sizeof(temp) * 8 - 7 && piece >= 1 << (sizeof(temp) * 8 - shift)) {
-            throw std::runtime_error("readVarint, value overflow");
-        }
-
-        temp |= static_cast<size_t>(piece & 0x7f) << shift;
-        if ((piece & 0x80) == 0) {
-            if (piece == 0 && shift != 0) {
-                throw std::runtime_error("readVarint, invalid value representation");
+    void readVarint (IInputStream &in, uint16_t &uValue)
+    {
+        uint16_t temp = 0;
+        for (uint8_t shift = 0;; shift += 7) {
+            uint8_t piece;
+            read(in, piece);
+            if (shift >= sizeof(temp) * 8 - 7 && piece >= 1 << (sizeof(temp) * 8 - shift)) {
+                throw std::runtime_error("readVarint, uValue overflow");
             }
 
-            break;
+            temp |= static_cast<size_t>(piece & 0x7f) << shift;
+            if ((piece & 0x80) == 0) {
+                if (piece == 0 && shift != 0) {
+                    throw std::runtime_error("readVarint, uInvalid uValue representation");
+                }
+
+                break;
+            }
         }
+
+        uValue = temp;
     }
 
-    value = temp;
-}
-
-void readVarint(IInputStream &in, uint64_t &value)
-{
-    uint64_t temp = 0;
-    for (uint8_t shift = 0;; shift += 7) {
-        uint8_t piece;
-        read(in, piece);
-        if (shift >= sizeof(temp) * 8 - 7 && piece >= 1 << (sizeof(temp) * 8 - shift)) {
-            throw std::runtime_error("readVarint, value overflow");
-        }
-
-        temp |= static_cast<uint64_t>(piece & 0x7f) << shift;
-        if ((piece & 0x80) == 0) {
-            if (piece == 0 && shift != 0) {
-                throw std::runtime_error("readVarint, invalid value representation");
+    void readVarint (IInputStream &in, uint32_t &uValue)
+    {
+        uint32_t temp = 0;
+        for (uint8_t shift = 0;; shift += 7) {
+            uint8_t piece;
+            read(in, piece);
+            if (shift >= sizeof(temp) * 8 - 7 && piece >= 1 << (sizeof(temp) * 8 - shift)) {
+                throw std::runtime_error("readVarint, uValue overflow");
             }
 
-            break;
+            temp |= static_cast<size_t>(piece & 0x7f) << shift;
+            if ((piece & 0x80) == 0) {
+                if (piece == 0 && shift != 0) {
+                    throw std::runtime_error("readVarint, uInvalid uValue representation");
+                }
+
+                break;
+            }
+        }
+
+        uValue = temp;
+    }
+
+    void readVarint (IInputStream &in, uint64_t &uValue)
+    {
+        uint64_t temp = 0;
+        for (uint8_t shift = 0;; shift += 7) {
+            uint8_t piece;
+            read(in, piece);
+            if (shift >= sizeof(temp) * 8 - 7 && piece >= 1 << (sizeof(temp) * 8 - shift)) {
+                throw std::runtime_error("readVarint, uValue overflow");
+            }
+
+            temp |= static_cast<uint64_t>(piece & 0x7f) << shift;
+            if ((piece & 0x80) == 0) {
+                if (piece == 0 && shift != 0) {
+                    throw std::runtime_error("readVarint, uInvalid uValue representation");
+                }
+
+                break;
+            }
+        }
+
+        uValue = temp;
+    }
+
+    void write (IOutputStream &out, const void *data, size_t uSize)
+    {
+        while (uSize > 0) {
+            size_t writtenSize = out.writeSome(data, uSize);
+            if (writtenSize == 0) {
+                throw std::runtime_error("Failed to write to IOutputStream");
+            }
+
+            data = static_cast<const uint8_t *>(data) + writtenSize;
+            uSize -= writtenSize;
         }
     }
 
-    value = temp;
-}
+    void write (IOutputStream &out, int8_t iValue)
+    {
+        write(out, &iValue, sizeof(iValue));
+    }
 
-void write(IOutputStream &out, const void *data, size_t size)
-{
-    while (size > 0) {
-        size_t writtenSize = out.writeSome(data, size);
-        if (writtenSize == 0) {
-            throw std::runtime_error("Failed to write to IOutputStream");
+    void write (IOutputStream &out, int16_t iValue)
+    {
+        // TODO: Convert to little endian on big endian platforms
+        write(out, &iValue, sizeof(iValue));
+    }
+
+    void write (IOutputStream &out, int32_t iValue)
+    {
+        // TODO: Convert to little endian on big endian platforms
+        write(out, &iValue, sizeof(iValue));
+    }
+
+    void write (IOutputStream &out, int64_t iValue)
+    {
+        // TODO: Convert to little endian on big endian platforms
+        write(out, &iValue, sizeof(iValue));
+    }
+
+    void write (IOutputStream &out, uint8_t uValue)
+    {
+        write(out, &uValue, sizeof(uValue));
+    }
+
+    void write (IOutputStream &out, uint16_t uValue)
+    {
+        // TODO: Convert to little endian on big endian platforms
+        write(out, &uValue, sizeof(uValue));
+    }
+
+    void write (IOutputStream &out, uint32_t uValue)
+    {
+        // TODO: Convert to little endian on big endian platforms
+        write(out, &uValue, sizeof(uValue));
+    }
+
+    void write (IOutputStream &out, uint64_t uValue)
+    {
+        // TODO: Convert to little endian on big endian platforms
+        write(out, &uValue, sizeof(uValue));
+    }
+
+    void write (IOutputStream &out, const std::vector <uint8_t> &vData)
+    {
+        write(out, vData.data(), vData.size());
+    }
+
+    void write (IOutputStream &out, const std::string &cData)
+    {
+        write(out, cData.data(), cData.size());
+    }
+
+    void writeVarint (IOutputStream &out, uint32_t uValue)
+    {
+        while (uValue >= 0x80) {
+            write(out, static_cast<uint8_t>(uValue | 0x80));
+            uValue >>= 7;
         }
 
-        data = static_cast<const uint8_t *>(data) + writtenSize;
-        size -= writtenSize;
-    }
-}
-
-void write(IOutputStream &out, int8_t value)
-{
-    write(out, &value, sizeof(value));
-}
-
-void write(IOutputStream &out, int16_t value)
-{
-    // TODO: Convert to little endian on big endian platforms
-    write(out, &value, sizeof(value));
-}
-
-void write(IOutputStream &out, int32_t value)
-{
-    // TODO: Convert to little endian on big endian platforms
-    write(out, &value, sizeof(value));
-}
-
-void write(IOutputStream &out, int64_t value)
-{
-    // TODO: Convert to little endian on big endian platforms
-    write(out, &value, sizeof(value));
-}
-
-void write(IOutputStream &out, uint8_t value)
-{
-    write(out, &value, sizeof(value));
-}
-
-void write(IOutputStream &out, uint16_t value)
-{
-    // TODO: Convert to little endian on big endian platforms
-    write(out, &value, sizeof(value));
-}
-
-void write(IOutputStream &out, uint32_t value)
-{
-    // TODO: Convert to little endian on big endian platforms
-    write(out, &value, sizeof(value));
-}
-
-void write(IOutputStream &out, uint64_t value)
-{
-    // TODO: Convert to little endian on big endian platforms
-    write(out, &value, sizeof(value));
-}
-
-void write(IOutputStream &out, const std::vector<uint8_t> &data)
-{
-    write(out, data.data(), data.size());
-}
-
-void write(IOutputStream &out, const std::string &data)
-{
-    write(out, data.data(), data.size());
-}
-
-void writeVarint(IOutputStream &out, uint32_t value)
-{
-    while (value >= 0x80) {
-        write(out, static_cast<uint8_t>(value | 0x80));
-        value >>= 7;
+        write(out, static_cast<uint8_t>(uValue));
     }
 
-    write(out, static_cast<uint8_t>(value));
-}
+    void writeVarint (IOutputStream &out, uint64_t uValue)
+    {
+        while (uValue >= 0x80) {
+            write(out, static_cast<uint8_t>(uValue | 0x80));
+            uValue >>= 7;
+        }
 
-void writeVarint(IOutputStream &out, uint64_t value)
-{
-    while (value >= 0x80) {
-        write(out, static_cast<uint8_t>(value | 0x80));
-        value >>= 7;
+        write(out, static_cast<uint8_t>(uValue));
     }
-
-    write(out, static_cast<uint8_t>(value));
-}
 
 } // namespace Common

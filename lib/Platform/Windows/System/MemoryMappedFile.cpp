@@ -79,7 +79,7 @@ void MemoryMappedFile::create(const std::string &path,
         }
     }
 
-    Tools::ScopeExit failExitHandler([this, &ec] {
+    Tools::QScopeExit failExitHandler([this, &ec] {
         ec = std::error_code(::GetLastError(), std::system_category());
         std::error_code ignore;
         close(ignore);
@@ -146,7 +146,7 @@ void MemoryMappedFile::open(const std::string &path, std::error_code &ec)
         }
     }
 
-    Tools::ScopeExit failExitHandler([this, &ec] {
+    Tools::QScopeExit failExitHandler([this, &ec] {
         ec = std::error_code(::GetLastError(), std::system_category());
         std::error_code ignore;
         close(ignore);

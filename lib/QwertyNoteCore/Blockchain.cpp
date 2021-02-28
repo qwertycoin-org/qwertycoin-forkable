@@ -87,14 +87,14 @@ class BlockCacheSerializer;
 class BlockchainIndicesSerializer;
 
 template<typename K, typename V, typename Hash>
-bool serialize(google::sparse_hash_map<K, V, Hash> &value, Common::StringView name,
+bool serialize(google::sparse_hash_map<K, V, Hash> &value, Common::QStringView name,
                ISerializer &serializer)
 {
     return serializeMap(value, name, serializer, [&value](size_t size) { value.resize(size); });
 }
 
 template<typename K, typename Hash>
-bool serialize(google::sparse_hash_set<K, Hash> &value, Common::StringView name,
+bool serialize(google::sparse_hash_set<K, Hash> &value, Common::QStringView name,
                ISerializer &serializer)
 {
     size_t size = value.size();
@@ -122,7 +122,7 @@ bool serialize(google::sparse_hash_set<K, Hash> &value, Common::StringView name,
 
 // custom serialization to speedup cache loading
 bool serialize(std::vector<std::pair<Blockchain::TransactionIndex, uint16_t>> &value,
-               Common::StringView name, QwertyNote::ISerializer &s)
+               Common::QStringView name, QwertyNote::ISerializer &s)
 {
     const size_t elementSize = sizeof(std::pair<Blockchain::TransactionIndex, uint16_t>);
     size_t size = value.size() * elementSize;
@@ -172,7 +172,7 @@ public:
                 return;
             }
 
-            StdInputStream stream(stdStream);
+            QStdInputStream stream(stdStream);
             BinaryInputStreamSerializer s(stream);
             QwertyNote::serialize(*this, s);
         } catch (std::exception &e) {
@@ -188,7 +188,7 @@ public:
                 return false;
             }
 
-            StdOutputStream stream(file);
+            QStdOutputStream stream(file);
             BinaryOutputStreamSerializer s(stream);
             QwertyNote::serialize(*this, s);
         } catch (std::exception &) {

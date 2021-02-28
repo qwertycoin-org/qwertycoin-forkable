@@ -38,7 +38,7 @@
 #include <mach/mach.h>
 
 #elif (defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)            \
-       || defined(_WIN64))
+ || defined(_WIN64))
 #define SYS_MEMINFO_WIN
 
 #include <windows.h>
@@ -74,356 +74,368 @@
 #endif
 
 namespace Tools {
-namespace CPU {
-enum class Architecture {
-    x64,
-    arm,
-    itanium,
-    x86,
-    unknown,
-};
+    namespace CPU {
+        enum class EArchitecture
+        {
+            x64,
+            arm,
+            itanium,
+            x86,
+            unknown,
+        };
 
-enum class ByteOrder {
-    little,
-    big,
-};
+        enum class EByteOrder
+        {
+            little,
+            big,
+        };
 
-enum class InstructionSet {
-    s3d_now,
-    s3d_now_extended,
-    mmx,
-    mmx_extended,
-    sse,
-    sse2,
-    sse3,
-    ssse3,
-    sse4a,
-    sse41,
-    sse42,
-    aes,
+        enum class EInstructionSet
+        {
+            s3d_now,
+            s3d_now_extended,
+            mmx,
+            mmx_extended,
+            sse,
+            sse2,
+            sse3,
+            ssse3,
+            sse4a,
+            sse41,
+            sse42,
+            aes,
 
-    avx,
-    avx2,
+            avx,
+            avx2,
 
-    avx_512,
-    avx_512_f,
-    avx_512_cd,
-    avx_512_pf,
-    avx_512_er,
-    avx_512_vl,
-    avx_512_bw,
-    avx_512_bq,
-    avx_512_dq,
-    avx_512_ifma,
-    avx_512_vbmi,
+            avx_512,
+            avx_512_f,
+            avx_512_cd,
+            avx_512_pf,
+            avx_512_er,
+            avx_512_vl,
+            avx_512_bw,
+            avx_512_bq,
+            avx_512_dq,
+            avx_512_ifma,
+            avx_512_vbmi,
 
-    hle,
+            hle,
 
-    bmi1,
-    bmi2,
-    adx,
-    mpx,
-    sha,
-    prefetch_wt1,
+            bmi1,
+            bmi2,
+            adx,
+            mpx,
+            sha,
+            prefetch_wt1,
 
-    fma3,
-    fma4,
+            fma3,
+            fma4,
 
-    xop,
+            xop,
 
-    rd_rand,
+            rd_rand,
 
-    x64,
-    x87_fpu,
-};
+            x64,
+            x87_fpu,
+        };
 
-enum class CacheType {
-    unified,
-    instruction,
-    data,
-    trace,
-};
+        enum class ECacheType
+        {
+            unified,
+            instruction,
+            data,
+            trace,
+        };
 
-struct Quantities {
-    // Hyperthreads.
-    uint32_t logical;
-    // Physical "cores".
-    uint32_t physical;
-    // Physical CPU units/packages/sockets.
-    uint32_t packages;
-};
+        struct FQuantities
+        {
+            // Hyperthreads.
+            uint32_t uLogical;
+            // Physical "cores".
+            uint32_t uPhysical;
+            // Physical CPU units/packages/sockets.
+            uint32_t uPackages;
+        };
 
-struct Cache {
-    std::size_t size;
-    std::size_t lineSize;
-    std::uint8_t associativity;
-    CacheType type;
-};
+        struct FCache
+        {
+            std::size_t uSize;
+            std::size_t uLineSize;
+            std::uint8_t uAssociativity;
+            ECacheType sType;
+        };
 
 // Returns the quantity of CPU at various gradation.
-HARDWARE_INFO_LINKAGE Quantities quantities();
+        HARDWARE_INFO_LINKAGE FQuantities quantities ();
 
 // Get CPU cache properties
-HARDWARE_INFO_LINKAGE Cache cache(unsigned int level);
+        HARDWARE_INFO_LINKAGE FCache cache (unsigned int level);
 
 // Returns the architecture of the current CPU.
-HARDWARE_INFO_LINKAGE std::string architecture() noexcept;
+        HARDWARE_INFO_LINKAGE std::string architecture () noexcept;
 
 // Returns the current frequency of the current CPU in Hz.
-HARDWARE_INFO_LINKAGE uint64_t frequency() noexcept;
+        HARDWARE_INFO_LINKAGE uint64_t frequency () noexcept;
 
 // Returns the current byte order of the current CPU.
-HARDWARE_INFO_LINKAGE ByteOrder byteOrder() noexcept;
+        HARDWARE_INFO_LINKAGE EByteOrder byteOrder () noexcept;
 
 // Returns the CPU's vendor.
-HARDWARE_INFO_LINKAGE std::string vendor();
+        HARDWARE_INFO_LINKAGE std::string vendor ();
 
 // Returns the CPU's vendor according to the CPUID instruction
-HARDWARE_INFO_LINKAGE std::string vendorId();
+        HARDWARE_INFO_LINKAGE std::string vendorId ();
 
 // Returns the CPU's model name.
-HARDWARE_INFO_LINKAGE std::string modelName();
+        HARDWARE_INFO_LINKAGE std::string modelName ();
 
-// Returns whether an instruction set is supported by the current CPU.
+// Returns whether an instruction sSet is supported by the current CPU.
 // `noexcept` on Windows
-HARDWARE_INFO_LINKAGE bool instructionSetSupported(InstructionSet set);
+        HARDWARE_INFO_LINKAGE bool instructionSetSupported (EInstructionSet sSet);
 
 // Retrieve all of the instruction sets this hardware supports
-HARDWARE_INFO_LINKAGE std::vector<InstructionSet> supportedInstructionSets();
-}
-
-namespace Memory {
-class MemInfo
-{
-public:
-    inline static double usedVirtMem();
-
-    inline static double usedPhysMem();
-
-    inline static double usedVirtMemMax();
-
-    inline static double usedPhysMemMax();
-
-    inline static double usedSysMem();
-
-    inline static double freeSysMem();
-
-    inline static double sysMem();
-
-private:
-    inline static int parseLine(char *line)
-    {
-        int i = strlen(line);
-        while (*line < '0' || *line > '9')
-            line++;
-        line[i - 3] = '\0';
-        i = atoi(line);
-        return i;
+        HARDWARE_INFO_LINKAGE std::vector <EInstructionSet> supportedInstructionSets ();
     }
-};
 
-double MemInfo::usedVirtMem()
-{
+    namespace Memory {
+        class QMemoryInfo
+        {
+        public:
+            inline static double usedVirtMem ();
+
+            inline static double usedPhysMem ();
+
+            inline static double usedVirtMemMax ();
+
+            inline static double usedPhysMemMax ();
+
+            inline static double usedSysMem ();
+
+            inline static double freeSysMem ();
+
+            inline static double sysMem ();
+
+        private:
+            inline static int parseLine (char *cLine)
+            {
+                int i = strlen(cLine);
+                while (*cLine < '0' || *cLine > '9')
+                    cLine++;
+                cLine[i - 3] = '\0';
+                i = atoi(cLine);
+                return i;
+            }
+        };
+
+        double QMemoryInfo::usedVirtMem ()
+        {
 #ifdef SYS_MEMINFO_NIX
-    FILE *file = fopen("/proc/self/status", "r");
-    int result = -1;
-    char line[128];
-    while (fgets(line, 128, file) != nullptr) {
-        if (strncmp(line, "VmSize:", 7) == 0) {
-            result = parseLine(line);
-            break;
+            FILE *file = fopen("/proc/self/status", "r");
+            int result = -1;
+            char line[128];
+            while (fgets(line, 128, file) != nullptr) {
+                if (strncmp(line, "VmSize:", 7) == 0) {
+                    result = parseLine(line);
+                    break;
+                }
+            }
+            fclose(file);
+
+            return static_cast<double>(result);
+#elif defined(SYS_MEMINFO_WIN)
+            PROCESS_MEMORY_COUNTERS_EX pmc;
+            GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *) &pmc,
+                                 sizeof(pmc));
+            return static_cast<double>(pmc.WorkingSetSize) / 1024.0;
+#elif defined(SYS_MEMINFO_MAC)
+            struct mach_task_basic_info info;
+            mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
+            if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&info, &infoCount)
+                != KERN_SUCCESS) {
+                return std::numeric_limits<double>::quiet_NaN();
+            } else {
+                return static_cast<double>(info.virtual_size) / 1024.0;
+            }
+#else
+            return std::numeric_limits<double>::quiet_NaN();
+#endif
+        }
+
+        double QMemoryInfo::usedPhysMem ()
+        {
+#ifdef SYS_MEMINFO_NIX
+            FILE *file = fopen("/proc/self/status", "r");
+            int result = -1;
+            char line[128];
+            while (fgets(line, 128, file) != nullptr) {
+                if (strncmp(line, "VmRSS:", 6) == 0) {
+                    result = parseLine(line);
+                    break;
+                }
+            }
+            fclose(file);
+
+            return static_cast<double>(result);
+#elif defined(SYS_MEMINFO_WIN)
+            PROCESS_MEMORY_COUNTERS_EX pmc;
+            GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *) &pmc,
+                                 sizeof(pmc));
+            return static_cast<double>(pmc.WorkingSetSize) / 1024.0;
+#elif defined(SYS_MEMINFO_MAC)
+            struct mach_task_basic_info info;
+            mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
+            if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&info, &infoCount)
+                != KERN_SUCCESS) {
+                return std::numeric_limits<double>::quiet_NaN();
+            } else {
+                return static_cast<double>(info.resident_size) / 1024.0;
+            }
+#else
+            return std::numeric_limits<double>::quiet_NaN();
+#endif
+        }
+
+        double QMemoryInfo::usedVirtMemMax ()
+        {
+#ifdef SYS_MEMINFO_NIX
+            FILE *file = fopen("/proc/self/status", "r");
+            int result = -1;
+            char line[128];
+            while (fgets(line, 128, file) != nullptr) {
+                if (strncmp(line, "VmPeak:", 7) == 0) {
+                    result = parseLine(line);
+                    break;
+                }
+            }
+            fclose(file);
+
+            return static_cast<double>(result);
+#elif defined(SYS_MEMINFO_WIN)
+            PROCESS_MEMORY_COUNTERS_EX pmc;
+            GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *) &pmc,
+                                 sizeof(pmc));
+            return static_cast<double>(pmc.PeakPagefileUsage) / 1024.0;
+#elif defined(SYS_MEMINFO_MAC)
+            return std::numeric_limits<double>::quiet_NaN();
+#else
+            return std::numeric_limits<double>::quiet_NaN();
+#endif
+        }
+
+        double QMemoryInfo::usedPhysMemMax ()
+        {
+#ifdef SYS_MEMINFO_NIX
+            FILE *file = fopen("/proc/self/status", "r");
+            int result = -1;
+            char line[128];
+            while (fgets(line, 128, file) != nullptr) {
+                if (strncmp(line, "VmHWM:", 6) == 0) {
+                    result = parseLine(line);
+                    break;
+                }
+            }
+            fclose(file);
+
+            return static_cast<double>(result);
+#elif defined(SYS_MEMINFO_WIN)
+            PROCESS_MEMORY_COUNTERS_EX pmc;
+            GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *) &pmc,
+                                 sizeof(pmc));
+            return static_cast<double>(pmc.PeakWorkingSetSize) / 1024.0;
+#elif defined(SYS_MEMINFO_MAC)
+            struct rusage rusage;
+            getrusage(RUSAGE_SELF, &rusage);
+            return static_cast<double>(rusage.ru_maxrss) / 1024;
+#else
+            return std::numeric_limits<double>::quiet_NaN();
+#endif
+        }
+
+        double QMemoryInfo::usedSysMem ()
+        {
+#ifdef SYS_MEMINFO_NIX
+            struct sysinfo memInfo {
+            };
+            sysinfo(&memInfo);
+
+            return static_cast<double>(memInfo.totalram - memInfo.freeram) * memInfo.mem_unit / 1024.0;
+#elif defined(SYS_MEMINFO_WIN)
+            MEMORYSTATUSEX memInfo;
+            memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+            GlobalMemoryStatusEx(&memInfo);
+            return static_cast<double>(memInfo.ullTotalPhys - memInfo.ullAvailPhys) / 1024.0;
+#elif defined(SYS_MEMINFO_MAC)
+            return std::numeric_limits<double>::quiet_NaN();
+#else
+            return std::numeric_limits<double>::quiet_NaN();
+#endif
+        }
+
+        double QMemoryInfo::freeSysMem ()
+        {
+#ifdef SYS_MEMINFO_NIX
+            struct sysinfo memInfo {
+            };
+            sysinfo(&memInfo);
+            return static_cast<double>(memInfo.freeram) * memInfo.mem_unit / 1024.0;
+#elif defined(SYS_MEMINFO_WIN)
+            MEMORYSTATUSEX memInfo;
+            memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+            GlobalMemoryStatusEx(&memInfo);
+            return static_cast<double>(memInfo.ullAvailPhys) / 1024.0;
+#elif defined(SYS_MEMINFO_MAC)
+            return std::numeric_limits<double>::quiet_NaN();
+#else
+            return std::numeric_limits<double>::quiet_NaN();
+#endif
+        }
+
+        double QMemoryInfo::sysMem ()
+        {
+#ifdef SYS_MEMINFO_NIX
+            struct sysinfo memInfo {
+            };
+            sysinfo(&memInfo);
+
+            return static_cast<double>(memInfo.totalram) * memInfo.mem_unit / 1024.0;
+#elif defined(SYS_MEMINFO_WIN)
+            MEMORYSTATUSEX memInfo;
+            memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+            GlobalMemoryStatusEx(&memInfo);
+            return static_cast<double>(memInfo.ullTotalPhys) / 1024.0;
+#elif defined(SYS_MEMINFO_MAC)
+            return std::numeric_limits<double>::quiet_NaN();
+#else
+            return std::numeric_limits<double>::quiet_NaN();
+#endif
         }
     }
-    fclose(file);
 
-    return static_cast<double>(result);
-#elif defined(SYS_MEMINFO_WIN)
-    PROCESS_MEMORY_COUNTERS_EX pmc;
-    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc));
-    return static_cast<double>(pmc.WorkingSetSize) / 1024.0;
-#elif defined(SYS_MEMINFO_MAC)
-    struct mach_task_basic_info info;
-    mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
-    if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&info, &infoCount)
-        != KERN_SUCCESS) {
-        return std::numeric_limits<double>::quiet_NaN();
-    } else {
-        return static_cast<double>(info.virtual_size) / 1024.0;
-    }
-#else
-    return std::numeric_limits<double>::quiet_NaN();
-#endif
-}
+    namespace Storage {
+        class QSpaceInfo
+        {
+        public:
+            inline static uintmax_t freeSpace (const boost::filesystem::path &path);
 
-double MemInfo::usedPhysMem()
-{
-#ifdef SYS_MEMINFO_NIX
-    FILE *file = fopen("/proc/self/status", "r");
-    int result = -1;
-    char line[128];
-    while (fgets(line, 128, file) != nullptr) {
-        if (strncmp(line, "VmRSS:", 6) == 0) {
-            result = parseLine(line);
-            break;
+            inline static uintmax_t availableSpace (const boost::filesystem::path &path);
+
+            inline static uintmax_t capacitySpace (const boost::filesystem::path &path);
+        };
+
+        uintmax_t QSpaceInfo::freeSpace (const boost::filesystem::path &path)
+        {
+            return boost::filesystem::space(path).free;
+        }
+
+        uintmax_t QSpaceInfo::availableSpace (const boost::filesystem::path &path)
+        {
+            return boost::filesystem::space(path).available;
+        }
+
+        uintmax_t QSpaceInfo::capacitySpace (const boost::filesystem::path &path)
+        {
+            return boost::filesystem::space(path).capacity;
         }
     }
-    fclose(file);
-
-    return static_cast<double>(result);
-#elif defined(SYS_MEMINFO_WIN)
-    PROCESS_MEMORY_COUNTERS_EX pmc;
-    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc));
-    return static_cast<double>(pmc.WorkingSetSize) / 1024.0;
-#elif defined(SYS_MEMINFO_MAC)
-    struct mach_task_basic_info info;
-    mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
-    if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&info, &infoCount)
-        != KERN_SUCCESS) {
-        return std::numeric_limits<double>::quiet_NaN();
-    } else {
-        return static_cast<double>(info.resident_size) / 1024.0;
-    }
-#else
-    return std::numeric_limits<double>::quiet_NaN();
-#endif
-}
-
-double MemInfo::usedVirtMemMax()
-{
-#ifdef SYS_MEMINFO_NIX
-    FILE *file = fopen("/proc/self/status", "r");
-    int result = -1;
-    char line[128];
-    while (fgets(line, 128, file) != nullptr) {
-        if (strncmp(line, "VmPeak:", 7) == 0) {
-            result = parseLine(line);
-            break;
-        }
-    }
-    fclose(file);
-
-    return static_cast<double>(result);
-#elif defined(SYS_MEMINFO_WIN)
-    PROCESS_MEMORY_COUNTERS_EX pmc;
-    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc));
-    return static_cast<double>(pmc.PeakPagefileUsage) / 1024.0;
-#elif defined(SYS_MEMINFO_MAC)
-    return std::numeric_limits<double>::quiet_NaN();
-#else
-    return std::numeric_limits<double>::quiet_NaN();
-#endif
-}
-
-double MemInfo::usedPhysMemMax()
-{
-#ifdef SYS_MEMINFO_NIX
-    FILE *file = fopen("/proc/self/status", "r");
-    int result = -1;
-    char line[128];
-    while (fgets(line, 128, file) != nullptr) {
-        if (strncmp(line, "VmHWM:", 6) == 0) {
-            result = parseLine(line);
-            break;
-        }
-    }
-    fclose(file);
-
-    return static_cast<double>(result);
-#elif defined(SYS_MEMINFO_WIN)
-    PROCESS_MEMORY_COUNTERS_EX pmc;
-    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc));
-    return static_cast<double>(pmc.PeakWorkingSetSize) / 1024.0;
-#elif defined(SYS_MEMINFO_MAC)
-    struct rusage rusage;
-    getrusage(RUSAGE_SELF, &rusage);
-    return static_cast<double>(rusage.ru_maxrss) / 1024;
-#else
-    return std::numeric_limits<double>::quiet_NaN();
-#endif
-}
-
-double MemInfo::usedSysMem()
-{
-#ifdef SYS_MEMINFO_NIX
-    struct sysinfo memInfo {
-    };
-    sysinfo(&memInfo);
-
-    return static_cast<double>(memInfo.totalram - memInfo.freeram) * memInfo.mem_unit / 1024.0;
-#elif defined(SYS_MEMINFO_WIN)
-    MEMORYSTATUSEX memInfo;
-    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-    GlobalMemoryStatusEx(&memInfo);
-    return static_cast<double>(memInfo.ullTotalPhys - memInfo.ullAvailPhys) / 1024.0;
-#elif defined(SYS_MEMINFO_MAC)
-    return std::numeric_limits<double>::quiet_NaN();
-#else
-    return std::numeric_limits<double>::quiet_NaN();
-#endif
-}
-
-double MemInfo::freeSysMem()
-{
-#ifdef SYS_MEMINFO_NIX
-    struct sysinfo memInfo {
-    };
-    sysinfo(&memInfo);
-    return static_cast<double>(memInfo.freeram) * memInfo.mem_unit / 1024.0;
-#elif defined(SYS_MEMINFO_WIN)
-    MEMORYSTATUSEX memInfo;
-    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-    GlobalMemoryStatusEx(&memInfo);
-    return static_cast<double>(memInfo.ullAvailPhys) / 1024.0;
-#elif defined(SYS_MEMINFO_MAC)
-    return std::numeric_limits<double>::quiet_NaN();
-#else
-    return std::numeric_limits<double>::quiet_NaN();
-#endif
-}
-
-double MemInfo::sysMem()
-{
-#ifdef SYS_MEMINFO_NIX
-    struct sysinfo memInfo {
-    };
-    sysinfo(&memInfo);
-
-    return static_cast<double>(memInfo.totalram) * memInfo.mem_unit / 1024.0;
-#elif defined(SYS_MEMINFO_WIN)
-    MEMORYSTATUSEX memInfo;
-    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-    GlobalMemoryStatusEx(&memInfo);
-    return static_cast<double>(memInfo.ullTotalPhys) / 1024.0;
-#elif defined(SYS_MEMINFO_MAC)
-    return std::numeric_limits<double>::quiet_NaN();
-#else
-    return std::numeric_limits<double>::quiet_NaN();
-#endif
-}
-}
-
-namespace Storage {
-class SpaceInfo
-{
-public:
-    inline static uintmax_t freeSpace(const boost::filesystem::path &path);
-    inline static uintmax_t availableSpace(const boost::filesystem::path &path);
-    inline static uintmax_t capacitySpace(const boost::filesystem::path &path);
-};
-
-uintmax_t SpaceInfo::freeSpace(const boost::filesystem::path &path)
-{
-    return boost::filesystem::space(path).free;
-}
-
-uintmax_t SpaceInfo::availableSpace(const boost::filesystem::path &path)
-{
-    return boost::filesystem::space(path).available;
-}
-
-uintmax_t SpaceInfo::capacitySpace(const boost::filesystem::path &path)
-{
-    return boost::filesystem::space(path).capacity;
-}
-}
 }

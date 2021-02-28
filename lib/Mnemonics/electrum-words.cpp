@@ -83,21 +83,21 @@ const std::string Japanese  ::c_name = "日本語";
 const std::string ChineseSim::c_name = "简体中文 (中国)";
 const std::string Russian   ::c_name = "русский язык";
 
-typedef std::unordered_map<std::string, Lazy<std::shared_ptr<Base>>> LanguageMap;
+typedef std::unordered_map<std::string, FLazy<std::shared_ptr<Base>>> LanguageMap;
 
 const static LanguageMap c_languageMap = {
-    { English   ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<English>();    }) },
-    { Ukrainian ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<Ukrainian>();  }) },
-    { Polish    ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<Polish>();     }) },
-    { German    ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<German>();     }) },
-    { French    ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<French>();     }) },
-    { Spanish   ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<Spanish>();    }) },
-    { Italian   ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<Italian>();    }) },
-    { Portuguese::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<Portuguese>(); }) },
-    { Dutch     ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<Dutch>();      }) },
-    { Japanese  ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<Japanese>();   }) },
-    { ChineseSim::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<ChineseSim>(); }) },
-    { Russian   ::c_name, Lazy<std::shared_ptr<Base>>([](){ return std::make_shared<Russian>();    }) },
+    { English   ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<English>();    }) },
+    { Ukrainian ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<Ukrainian>();  }) },
+    { Polish    ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<Polish>();     }) },
+    { German    ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<German>();     }) },
+    { French    ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<French>();     }) },
+    { Spanish   ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<Spanish>();    }) },
+    { Italian   ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<Italian>();    }) },
+    { Portuguese::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<Portuguese>(); }) },
+    { Dutch     ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<Dutch>();      }) },
+    { Japanese  ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<Japanese>();   }) },
+    { ChineseSim::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<ChineseSim>(); }) },
+    { Russian   ::c_name, FLazy<std::shared_ptr<Base>>([](){ return std::make_shared<Russian>();    }) },
 };
 
 } // namespace Language

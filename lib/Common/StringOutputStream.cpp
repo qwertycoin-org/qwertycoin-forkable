@@ -20,16 +20,16 @@
 
 namespace Common {
 
-StringOutputStream::StringOutputStream(std::string &out)
-    : out(out)
-{
-}
+    QStringOutputStream::QStringOutputStream (std::string &cOut)
+        : mOStream(cOut)
+    {
+    }
 
-size_t StringOutputStream::writeSome(const void *data, size_t size)
-{
-    out.append(static_cast<const char *>(data), size);
+    size_t QStringOutputStream::writeSome (const void *data, size_t uSize)
+    {
+        mOStream.append(static_cast<const char *>(data), uSize);
 
-    return size;
-}
+        return uSize;
+    }
 
 } // namespace Common

@@ -28,12 +28,12 @@ namespace {
 const std::string DEFAULT_RPC_IP = "127.0.0.1";
 const uint16_t DEFAULT_RPC_PORT = RPC_DEFAULT_PORT;
 
-const CommandLine::ArgDescriptor<std::string> arg_rpc_bind_ip = {
+const CommandLine::FArgDescriptor<std::string> arg_rpc_bind_ip = {
     "rpc-bind-ip",
     "",
     DEFAULT_RPC_IP
 };
-const CommandLine::ArgDescriptor<uint16_t> arg_rpc_bind_port = {
+const CommandLine::FArgDescriptor<uint16_t> arg_rpc_bind_port = {
     "rpc-bind-port",
     "",
     DEFAULT_RPC_PORT

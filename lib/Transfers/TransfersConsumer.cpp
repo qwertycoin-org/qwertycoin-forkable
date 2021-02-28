@@ -250,7 +250,7 @@ bool TransfersConsumer::onNewBlocks(const CompleteBlock *blocks,uint32_t startHe
         workers = 2;
     }
 
-    BlockingQueue<Tx> inputQueue(workers * 2);
+    TBlockingQueue<Tx> inputQueue(workers * 2);
 
     std::atomic<bool> stopProcessing(false);
 

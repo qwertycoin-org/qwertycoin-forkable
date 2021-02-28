@@ -30,11 +30,13 @@
 #include <Common/DnsTools.h>
 
 #ifdef _WIN32
+
 #include <Windows.h>
 #include <io.h>
 #include <windns.h>
 #include <Rpc.h>
 #include <sstream>
+
 #else
 #include <arpa/nameser.h>
 #include <resolv.h>
@@ -43,90 +45,92 @@
 namespace Common {
 
 #ifndef __ANDROID__
-bool fetchDnsTxt(const std::string &domain,
-                 std::vector<std::string> &records)
-{
+
+    bool fetchDnsTxt (const std::string &cDomain,
+                      std::vector <std::string> &vRecords)
+    {
 #ifdef _WIN32
-    using namespace std;
+        using namespace std;
 
-    #pragma comment(lib, "Ws2_32.lib")
-    #pragma comment(lib, "Dnsapi.lib")
+#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Dnsapi.lib")
 
-    PDNS_RECORD pDnsRecord; // pointer to DNS_RECORD structure.
+        PDNS_RECORD pDnsRecord; // pointer to DNS_RECORD structure.
 
-    {
-        WORD type = DNS_TYPE_TEXT;
-
-        if (0 != DnsQuery_A(domain.c_str(), type, DNS_QUERY_BYPASS_CACHE, NULL, &pDnsRecord, NULL))
         {
-            cerr << "Error querying: '" << domain << "'" << endl;
-            return false;
+            WORD type = DNS_TYPE_TEXT;
+
+            if (0 != DnsQuery_A(cDomain.c_str(), type, DNS_QUERY_BYPASS_CACHE, NULL, &pDnsRecord,
+                                NULL)) {
+                cerr << "Error querying: '" << cDomain << "'" << endl;
+                return false;
+            }
         }
-    }
 
-    PDNS_RECORD it;
-    map<WORD, function<void(void)>> callbacks;
+        PDNS_RECORD it;
+        map <WORD, function <void (void)>> callbacks;
 
-    callbacks[DNS_TYPE_TEXT] = [&it, &records](void) -> void {
-        std::stringstream stream;
-        for (DWORD i = 0; i < it->Data.TXT.dwStringCount; i++) {
-            stream << RPC_CSTR(it->Data.TXT.pStringArray[i]) << endl;;
+        callbacks[DNS_TYPE_TEXT] = [&it, &vRecords] (void) -> void
+        {
+            std::stringstream stream;
+            for (DWORD i = 0; i < it->Data.TXT.dwStringCount; i++) {
+                stream << RPC_CSTR(it->Data.TXT.pStringArray[i]) << endl;;
+            }
+            vRecords.push_back(stream.str());
+        };
+
+        for (it = pDnsRecord; it != NULL; it = it->pNext) {
+            if (callbacks.count(it->wType)) {
+                callbacks[it->wType]();
+            }
         }
-        records.push_back(stream.str());
-    };
 
-    for (it = pDnsRecord; it != NULL; it = it->pNext) {
-        if (callbacks.count(it->wType)) {
-            callbacks[it->wType]();
-        }
-    }
-
-    DnsRecordListFree(pDnsRecord, DnsFreeRecordListDeep);
+        DnsRecordListFree(pDnsRecord, DnsFreeRecordListDeep);
 #else
-    using namespace std;
+        using namespace std;
 
-    res_init();
+        res_init();
 
-    ns_msg nsMsg;
-    int response;
-    unsigned char queryBuffer[4096];
+        ns_msg nsMsg;
+        int response;
+        unsigned char queryBuffer[4096];
 
-    {
-        ns_type type = ns_t_txt;
+        {
+            ns_type sType = ns_t_txt;
 
-        const char *cDomain = (domain).c_str();
-        response = res_query(cDomain, 1, type, queryBuffer, sizeof(queryBuffer));
+            const char *domain = (cDomain).c_str();
+            response = res_query(domain, 1, sType, queryBuffer, sizeof(queryBuffer));
 
-        if (response < 0) {
-            return false;
+            if (response < 0) {
+                return false;
+            }
         }
-    }
 
-    ns_initparse(queryBuffer, response, &nsMsg);
+        ns_initparse(queryBuffer, response, &nsMsg);
 
-    map<ns_type, function<void(const ns_rr &rr)>> callbacks;
+        map<ns_type, function<void(const ns_rr &rr)>> callbacks;
 
-    callbacks[ns_t_txt] = [&nsMsg, &records](const ns_rr &rr) -> void {
-        int txt_len = *(unsigned char *) ns_rr_rdata(rr);
-        char txt[256];
-        memset(txt, 0, 256);
-        if (txt_len <= 255) {
-            memcpy(txt, ns_rr_rdata(rr) + 1, txt_len);
-            records.emplace_back(txt);
+        callbacks[ns_t_txt] = [&nsMsg, &vRecords](const ns_rr &rr) -> void {
+            int txt_len = *(unsigned char *) ns_rr_rdata(rr);
+            char txt[256];
+            memset(txt, 0, 256);
+            if (txt_len <= 255) {
+                memcpy(txt, ns_rr_rdata(rr) + 1, txt_len);
+                vRecords.emplace_back(txt);
+            }
+        };
+
+        for (int x = 0; x < ns_msg_count(nsMsg, ns_s_an); x++) {
+            ns_rr rr;
+            ns_parserr(&nsMsg, ns_s_an, x, &rr);
+            ns_type sType = ns_rr_type(rr);
+            if (callbacks.count(sType)) {
+                callbacks[sType](rr);
+            }
         }
-    };
-
-    for (int x = 0; x < ns_msg_count(nsMsg, ns_s_an); x++) {
-        ns_rr rr;
-        ns_parserr(&nsMsg, ns_s_an, x, &rr);
-        ns_type type = ns_rr_type(rr);
-        if (callbacks.count(type)) {
-            callbacks[type](rr);
-        }
-    }
 #endif
-    return !records.empty();
-}
+        return !vRecords.empty();
+    }
 
 #endif
 

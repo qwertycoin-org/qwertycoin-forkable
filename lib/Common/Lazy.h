@@ -34,201 +34,189 @@
 
 namespace {
 
-/*!
-    Exception thrown on attempt to access an uninitialized Lazy
-*/
-struct uninitialized_lazy_exception : public std::runtime_error
-{
-    uninitialized_lazy_exception()
-        : std::runtime_error("Uninitialized lazy value.")
-    {
-    }
-};
 
-template<typename T>
-struct Lazy
-{
-    /*!
-        Default constructor
-    */
-    Lazy()
-        : m_bInitialized(false),
-          m_initializer(DefaultInitializer),
-          m_deinitializer(DefaultDeinitializer)
+    // Exception thrown on attempt to access an uninitialized FLazy
+    struct FUninitializedLazyException : public std::runtime_error
     {
-    }
-
-    /*!
-        Construct with initializer and optional deinitializer functor
-    */
-    Lazy(std::function<T(void)> initializer,
-         std::function<void(T &)> deinitializer = DefaultDeinitializer)
-        : m_bInitialized(false),
-          m_initializer(initializer),
-          m_deinitializer(deinitializer)
-    {
-    }
-
-    /*!
-        Copy constructor.
-    */
-    explicit Lazy(const Lazy &o)
-        : m_bInitialized(false),
-          m_initializer(o.m_initializer),
-          m_deinitializer(o.m_deinitializer)
-    {
-        if (o.m_bInitialized) {
-            construct(*o.valuePtr());
+        FUninitializedLazyException ()
+            : std::runtime_error("Uninitialized lazy value.")
+        {
         }
-    }
+    };
 
-    /*!
-        Assign from Lazy<T>
-    */
-    Lazy &operator=(const Lazy<T> &o)
+    template <typename T>
+    struct FLazy
     {
-        destroy();
 
-        m_initializer   = o.m_initializer;
-        m_deinitializer = o.m_deinitializer;
-
-        if (o.m_bInitialized) {
-            construct(*o.valuePtr());
+        // Default constructor
+        FLazy ()
+            : mInitialized(false),
+              mInitializer(defaultInitializer),
+              mDeinitializer(defaultDeinitializer)
+        {
         }
 
-        return *this;
-    }
-
-    /*!
-        Construct from T
-    */
-    Lazy(const T &v)
-        : m_bInitialized(false),
-          m_initializer(DefaultInitializer),
-          m_deinitializer(DefaultDeinitializer)
-    {
-        construct(v);
-    }
-
-    /*!
-        Assign from T
-    */
-    T &operator=(const T &value)
-    {
-        construct(value);
-        return *valuePtr();
-    }
-
-    /*!
-        Destruct and deinitialize
-    */
-    ~Lazy()
-    {
-        destroy();
-    }
-
-    /*!
-        Answer true if initialized, either implicitly via function or explicitly via assignment
-    */
-    bool isInitialized() const
-    {
-        return m_bInitialized;
-    }
-
-    /*!
-        Force initialization, if not already done, and answer with the value.
-        Throws exception if not implicitly or explicitly initialized.
-    */
-    T &force() const
-    {
-        if (!m_bInitialized)
-            construct(m_initializer());
-        return *valuePtr();
-    }
-
-    /*!
-        Implicitly force initialization and answer with value
-    */
-    operator T &() const // FIXME: This overload is dangerous!
-    {
-        return force();
-    }
-
-    /*!
-        Get pointer to storage of T, regardless of initialized state
-    */
-    T *operator &() const // FIXME: This overload is dangerous!
-    {
-        return valuePtr();
-    }
-
-    /*!
-        Force initialization state to true, e.g. if value initialized directly via pointer
-    */
-    void forceInitialized()
-    {
-        m_bInitialized = true;
-    }
-
-private:
-    /*!
-        Get pointer to storage of T
-    */
-    T *valuePtr() const
-    {
-        return static_cast<T *>(static_cast<void *>(&m_value));
-    }
-
-    /*!
-        Call copy constructor for T.
-        Deinitialize self first, if necessary.
-    */
-    void construct(const T &value) const
-    {
-        destroy();
-        new (valuePtr()) T(value);
-        m_bInitialized = true;
-    }
-
-    void construct(T &&value) const
-    {
-        destroy();
-        new (valuePtr()) T(std::move(value));
-        m_bInitialized = true;
-    }
-
-    /*!
-        If initialized, call deinitializer and then destructor for T
-    */
-    void destroy() const
-    {
-        if (m_bInitialized) {
-            m_deinitializer(*valuePtr());
-            valuePtr()->~T();
-            m_bInitialized = false;
+        // Construct with UInitializer and optional UDeinitializer functor
+        FLazy (std::function <T (void)> UInitializer,
+               std::function <void (T &)> UDeinitializer = defaultDeinitializer)
+            : mInitialized(false),
+              mInitializer(UInitializer),
+              mDeinitializer(UDeinitializer)
+        {
         }
-    }
 
-    /*!
-        Inititializer if none specified; throw exception on attempt to access uninitialized lazy
-    */
-    static T DefaultInitializer()
-    {
-        throw uninitialized_lazy_exception();
-    }
+        // Copy constructor.
+        explicit FLazy (const FLazy &o)
+            : mInitialized(false),
+              mInitializer(o.mInitializer),
+              mDeinitializer(o.mDeinitializer)
+        {
+            if (o.mInitialized) {
+                construct(*o.valuePtr());
+            }
+        }
 
-    /*!
-        Deinitialize if none specified; does nothing
-    */
-    static void DefaultDeinitializer(T &)
-    {
-    }
+        // Assign from FLazy<T>
+        FLazy &operator= (const FLazy <T> &sOperator)
+        {
+            destroy();
 
-private:
-    mutable char m_value[sizeof(T)];
-    mutable bool m_bInitialized;
-    std::function<T(void)> m_initializer;
-    std::function<void(T &)> m_deinitializer;
-};
+            mInitializer = sOperator.mInitializer;
+            mDeinitializer = sOperator.mDeinitializer;
+
+            if (sOperator.mInitialized) {
+                construct(*sOperator.valuePtr());
+            }
+
+            return *this;
+        }
+
+        // Construct from T
+        FLazy (const T &sValue)
+            : mInitialized(false),
+              mInitializer(defaultInitializer),
+              mDeinitializer(defaultDeinitializer)
+        {
+            construct(sValue);
+        }
+
+        // Assign from T
+        T &operator= (const T &sValue)
+        {
+            construct(sValue);
+
+            return *valuePtr();
+        }
+
+        // Destruct and deinitialize
+        ~FLazy ()
+        {
+            destroy();
+        }
+
+        // Answer true if initialized, either implicitly via function or explicitly via assignment
+        bool isInitialized () const
+        {
+            return mInitialized;
+        }
+
+        /**
+         * Force initialization, if not already done, and answer with the value.
+         * Throws exception if not implicitly or explicitly initialized.
+         *
+         * @return valuePtr()
+         */
+        T &force () const
+        {
+            if (!mInitialized) {
+                construct(mInitializer());
+            }
+
+            return *valuePtr();
+        }
+
+        /**
+         * Implicitly force initialization and answer with value
+         *
+         * @todo This overload is dangerous!
+         *
+         * @return force()
+         */
+        operator T & () const
+        {
+            return force();
+        }
+
+        /**
+         * Get pointer to storage of T, regardless of initialized state
+         *
+         * @todo This overload is dangerous!
+         *
+         * @return valuePtr()
+         */
+        T *operator& () const
+        {
+            return valuePtr();
+        }
+
+        // Force initialization state to true, e.g. if value initialized directly via pointer
+        void forceInitialized ()
+        {
+            mInitialized = true;
+        }
+
+    private:
+        // Get pointer to storage of T
+        T *valuePtr () const
+        {
+            return static_cast<T *>(static_cast<void *>(&mValue));
+        }
+
+        /**
+         * Call copy constructor for T.
+         * Deinitialize self first, if necessary.
+         *
+         * @param value
+         */
+        void construct (const T &value) const
+        {
+            destroy();
+            new(valuePtr()) T(value);
+            mInitialized = true;
+        }
+
+        void construct (T &&value) const
+        {
+            destroy();
+            new(valuePtr()) T(std::move(value));
+            mInitialized = true;
+        }
+
+        // If initialized, call deinitializer and then destructor for T
+        void destroy () const
+        {
+            if (mInitialized) {
+                mDeinitializer(*valuePtr());
+                valuePtr()->~T();
+                mInitialized = false;
+            }
+        }
+
+        // Initializer if none specified; throw exception on attempt to access uninitialized lazy
+        static T defaultInitializer ()
+        {
+            throw FUninitializedLazyException();
+        }
+
+        // Deinitialize if none specified; does nothing
+        static void defaultDeinitializer (T &)
+        {
+        }
+
+        mutable char mValue[sizeof(T)];
+        mutable bool mInitialized;
+        std::function <T (void)> mInitializer;
+        std::function <void (T &)> mDeinitializer;
+    };
 
 } // namespace

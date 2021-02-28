@@ -133,14 +133,14 @@ void getVariantValue(QwertyNote::ISerializer &serializer,
 }
 
 template <typename T>
-bool serializePod(T &v, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serializePod(T &v, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializer.binary(&v, sizeof(v), name);
 }
 
 bool serializeVarintVector(
     std::vector<uint32_t> &vector, QwertyNote::ISerializer &serializer,
-    Common::StringView name)
+    Common::QStringView name)
 {
     size_t size = vector.size();
 
@@ -164,39 +164,39 @@ bool serializeVarintVector(
 
 namespace Crypto {
 
-bool serialize(FPublicKey &pubKey, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serialize(FPublicKey &pubKey, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializePod(pubKey, name, serializer);
 }
 
-bool serialize(FSecretKey &secKey, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serialize(FSecretKey &secKey, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializePod(secKey, name, serializer);
 }
 
-bool serialize(FHash &h, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serialize(FHash &h, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializePod(h, name, serializer);
 }
 
-bool serialize(FKeyImage &keyImage, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serialize(FKeyImage &keyImage, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializePod(keyImage, name, serializer);
 }
 
-bool serialize(Chacha8Iv &chacha, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serialize(Chacha8Iv &chacha, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializePod(chacha, name, serializer);
 }
 
-bool serialize(FSignature &sig, Common::StringView name, QwertyNote::ISerializer &serializer)
+bool serialize(FSignature &sig, Common::QStringView name, QwertyNote::ISerializer &serializer)
 {
     return serializePod(sig, name, serializer);
 }
 
 bool serialize(
 		FEllipticCurveScalar &ecScalar,
-		Common::StringView name,
+		Common::QStringView name,
 		QwertyNote::ISerializer &serializer)
 {
     return serializePod(ecScalar, name, serializer);
@@ -204,7 +204,7 @@ bool serialize(
 
 bool serialize(
 		FEllipticCurvePoint &ecPoint,
-		Common::StringView name,
+		Common::QStringView name,
 		QwertyNote::ISerializer &serializer)
 {
     return serializePod(ecPoint, name, serializer);
@@ -402,14 +402,14 @@ void serialize(TransactionExtraMergeMiningTag &tag, ISerializer &serializer)
 {
     if (serializer.type() == ISerializer::OUTPUT) {
         std::string field;
-        StringOutputStream os(field);
+        QStringOutputStream os(field);
         BinaryOutputStreamSerializer output(os);
         doSerialize(tag, output);
         serializer(field, "");
     } else {
         std::string field;
         serializer(field, "");
-        MemoryInputStream stream(field.data(), field.size());
+        QMemoryInputStream stream(field.data(), field.size());
         BinaryInputStreamSerializer input(stream);
         doSerialize(tag, input);
     }

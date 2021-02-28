@@ -37,39 +37,39 @@ public:
 
     virtual SerializerType type() const = 0;
 
-    virtual bool beginObject(Common::StringView name) = 0;
+    virtual bool beginObject(Common::QStringView name) = 0;
     virtual void endObject() = 0;
 
-    virtual bool beginArray(size_t &size, Common::StringView name) = 0;
+    virtual bool beginArray(size_t &size, Common::QStringView name) = 0;
     virtual void endArray() = 0;
 
-    virtual bool operator()(uint8_t &value, Common::StringView name) = 0;
-    virtual bool operator()(int16_t &value, Common::StringView name) = 0;
-    virtual bool operator()(uint16_t &value, Common::StringView name) = 0;
-    virtual bool operator()(int32_t &value, Common::StringView name) = 0;
-    virtual bool operator()(uint32_t &value, Common::StringView name) = 0;
-    virtual bool operator()(int64_t &value, Common::StringView name) = 0;
-    virtual bool operator()(uint64_t &value, Common::StringView name) = 0;
-    virtual bool operator()(double &value, Common::StringView name) = 0;
-    virtual bool operator()(bool &value, Common::StringView name) = 0;
-    virtual bool operator()(std::string &value, Common::StringView name) = 0;
+    virtual bool operator()(uint8_t &value, Common::QStringView name) = 0;
+    virtual bool operator()(int16_t &value, Common::QStringView name) = 0;
+    virtual bool operator()(uint16_t &value, Common::QStringView name) = 0;
+    virtual bool operator()(int32_t &value, Common::QStringView name) = 0;
+    virtual bool operator()(uint32_t &value, Common::QStringView name) = 0;
+    virtual bool operator()(int64_t &value, Common::QStringView name) = 0;
+    virtual bool operator()(uint64_t &value, Common::QStringView name) = 0;
+    virtual bool operator()(double &value, Common::QStringView name) = 0;
+    virtual bool operator()(bool &value, Common::QStringView name) = 0;
+    virtual bool operator()(std::string &value, Common::QStringView name) = 0;
 
     // read/write binary block
-    virtual bool binary(void *value, size_t size, Common::StringView name) = 0;
-    virtual bool binary(std::string &value, Common::StringView name) = 0;
+    virtual bool binary(void *value, size_t size, Common::QStringView name) = 0;
+    virtual bool binary(std::string &value, Common::QStringView name) = 0;
 
     template<typename T>
-    bool operator()(T &value, Common::StringView name);
+    bool operator()(T &value, Common::QStringView name);
 };
 
 template<typename T>
-bool ISerializer::operator()(T &value, Common::StringView name)
+bool ISerializer::operator()(T &value, Common::QStringView name)
 {
     return serialize(value, name, *this);
 }
 
 template<typename T>
-bool serialize(T &value, Common::StringView name, ISerializer &serializer)
+bool serialize(T &value, Common::QStringView name, ISerializer &serializer)
 {
     if (!serializer.beginObject(name)) {
         return false;
@@ -89,7 +89,7 @@ void serialize(T &value, ISerializer &serializer)
 
 #ifdef __clang__
 template<> inline
-bool ISerializer::operator()(size_t &value, Common::StringView name)
+bool ISerializer::operator()(size_t &value, Common::QStringView name)
 {
     return operator()(*reinterpret_cast<uint64_t *>(&value), name);
 }

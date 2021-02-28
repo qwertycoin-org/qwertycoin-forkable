@@ -22,26 +22,31 @@
 
 namespace Common {
 
-namespace StringUtils {
+    namespace StringUtils {
 
-std::vector<std::string> split(const std::string &str, const std::vector<std::string> &delimiters);
+        std::vector <std::string> split (const std::string &cStr,
+                                         const std::vector <std::string> &vDelimiters);
 
-std::vector<std::string> split(const std::string &str, const std::string &delimiter);
+        std::vector <std::string> split (const std::string &cStr,
+                                         const std::string &cDelimiter);
 
-std::string join(const std::vector<std::string> &tokens, const std::string &delimiter);
+        std::string join (const std::vector <std::string> &vTokens,
+                          const std::string &cDelimiter);
 
-std::string escapeChar(char character);
+        std::string escapeChar (char cCharacter);
 
-std::string escapeString(const std::string &str);
+        std::string escapeString (const std::string &cStr);
 
-std::vector<std::string> escapeStrings(const std::vector<std::string> &strs);
+        std::vector <std::string> escapeStrings (const std::vector <std::string> &cStrings);
 
-bool isAnInteger(const std::string &token);
+        bool isAnInteger (const std::string &cToken);
 
-std::string extractRegion(const std::string &str, int from, int to);
+        std::string extractRegion (const std::string &cStr,
+                                   int iFrom,
+                                   int iTo);
 
-int convertToInt(const std::string &str);
+        int convertToInt (const std::string &cStr);
 
-} // namespace StringUtils
+    } // namespace StringUtils
 
 } // namespace Common
