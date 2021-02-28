@@ -1676,7 +1676,7 @@ size_t WalletGreen::transfer(const TransactionParameters &transactionParameters,
             m_logger(INFO, BRIGHT_WHITE) <<
             "Transaction created and send, ID " << id <<
             ", hash " << m_transactions[id].hash <<
-            ", state " << tx.state <<
+            ", state " << tx.mState <<
             ", totalAmount " << m_currency.formatAmount(tx.totalAmount) <<
             ", fee " << m_currency.formatAmount(tx.fee) <<
             ", transfers: " << TransferListFormatter(m_currency, getTransactionTransfersRange(id));
@@ -2086,7 +2086,7 @@ size_t WalletGreen::makeTransaction(const TransactionParameters &sendingTransact
             m_logger(INFO, BRIGHT_WHITE)
             << "Delayed transaction created, ID " << id
             << ", hash " << m_transactions[id].hash
-            << ", state " << tx.state
+            << ", state " << tx.mState
             << ", totalAmount " << m_currency.formatAmount(tx.totalAmount)
             << ", fee " << m_currency.formatAmount(tx.fee)
             << ", transfers: " <<TransferListFormatter(m_currency,getTransactionTransfersRange(id));
@@ -2293,7 +2293,7 @@ void WalletGreen::updateTransactionStateAndPushEvent(size_t transactionId,
         m_logger(DEBUGGING)
             << "Transaction state changed, ID " << transactionId
             << ", hash " << it->hash
-            << ", new state " << it->state;
+            << ", new state " << it->mState;
     }
 }
 
@@ -2356,7 +2356,7 @@ bool WalletGreen::updateWalletTransactionInfo(size_t transactionId,
             << "Transaction updated, ID " << transactionId
             << ", hash " << it->hash
             << ", block " << it->blockHeight
-            << ", state " << it->state;
+            << ", state " << it->mState;
     }
 
     return updated;
@@ -2391,7 +2391,7 @@ size_t WalletGreen::insertBlockchainTransaction(const FTransactionInformation &i
         << "Transaction added, ID " << txId
         << ", hash " << tx.hash
         << ", block " << tx.blockHeight
-        << ", state " << tx.state;
+        << ", state " << tx.mState;
 
     return txId;
 }
@@ -2816,7 +2816,7 @@ size_t WalletGreen::validateSaveAndSendTransaction(
         << "Transaction added to container, ID " << transactionId
         << ", hash " << transaction.getTransactionHash()
         << ", block " << m_transactions[transactionId].blockHeight
-        << ", state " << m_transactions[transactionId].state;
+        << ", state " << m_transactions[transactionId].mState;
     Tools::QScopeExit rollbackTransactionInsertion([this, transactionId] {
         updateTransactionStateAndPushEvent(transactionId, WalletTransactionState::FAILED);
     });
@@ -3558,7 +3558,7 @@ void WalletGreen::transactionUpdated(
         m_logger(INFO, BRIGHT_WHITE)
             << "New transaction received, ID " << transactionId
             << ", hash " << tx.hash
-            << ", state " << tx.state
+            << ", state " << tx.mState
             << ", totalAmount " << m_currency.formatAmount(tx.totalAmount)
             << ", fee " << m_currency.formatAmount(tx.fee)
             << ", transfers: "
@@ -3631,9 +3631,9 @@ void WalletGreen::transactionDeleted(ITransfersSubscription *object, const FHash
     m_transactions.get<TransactionIndex>().modify(
         it,
         [this, &transactionHash, &updated](QwertyNote::WalletTransaction &tx) {
-        if (tx.state == WalletTransactionState::CREATED
-            || tx.state == WalletTransactionState::SUCCEEDED) {
-            tx.state = WalletTransactionState::CANCELLED;
+        if (tx.mState == WalletTransactionState::CREATED
+            || tx.mState == WalletTransactionState::SUCCEEDED) {
+            tx.mState = WalletTransactionState::CANCELLED;
             updated = true;
         }
 
@@ -3649,7 +3649,7 @@ void WalletGreen::transactionDeleted(ITransfersSubscription *object, const FHash
         m_logger(INFO, BRIGHT_WHITE)
             << "Transaction deleted, ID " << transactionId
             << ", hash " << transactionHash
-            << ", state " << tx.state
+            << ", state " << tx.mState
             << ", block " << tx.blockHeight
             << ", totalAmount " << m_currency.formatAmount(tx.totalAmount)
             << ", fee " << m_currency.formatAmount(tx.fee);
@@ -3845,7 +3845,7 @@ size_t WalletGreen::createFusionTransaction(
     const std::string &destinationAddress)
 {
     size_t id = WALLET_INVALID_TRANSACTION_ID;
-    Tools::ScopeExit releaseContext([this, &id] {
+    Tools::QScopeExit releaseContext([this, &id] {
         m_dispatcher.yield();
 
         if (id != WALLET_INVALID_TRANSACTION_ID) {
@@ -3853,7 +3853,7 @@ size_t WalletGreen::createFusionTransaction(
             m_logger(INFO, BRIGHT_WHITE)
                 << "Fusion transaction created and sent, ID " << id
                 << ", hash " << m_transactions[id].hash
-                << ", state " << tx.state
+                << ", state " << tx.mState
                 << ", transfers: "
                 << TransferListFormatter(m_currency, getTransactionTransfersRange(id));
         }
@@ -4185,7 +4185,7 @@ std::vector<WalletGreen::OutputToTransfer> WalletGreen::pickRandomFusionInputs(
         return selectedOuts;
     }
 
-    ShuffleGenerator<size_t> generator(selectedOuts.size());
+    QShuffleGenerator<size_t> generator(selectedOuts.size());
     std::vector<WalletGreen::OutputToTransfer> trimmedSelectedOuts;
     trimmedSelectedOuts.reserve(maxInputCount);
     for (size_t i = 0; i < maxInputCount; ++i) {
@@ -4225,7 +4225,7 @@ std::vector<TransactionsInBlockInfo> WalletGreen::getTransactionsInBlocks(
         auto lowerBound = blockHeightIndex.lower_bound(height);
         auto upperBound = blockHeightIndex.upper_bound(height);
         for (auto it = lowerBound; it != upperBound; ++it) {
-            if (it->state != WalletTransactionState::SUCCEEDED) {
+            if (it->mState != WalletTransactionState::SUCCEEDED) {
                 continue;
             }
 
@@ -4422,7 +4422,7 @@ std::vector<size_t> WalletGreen::deleteTransfersForAddress(
                     m_logger(DEBUGGING)
                         << "Transaction state changed, ID " << transactionId
                         << ", hash " << transaction.hash
-                        << ", new state " << transaction.state;
+                        << ", new state " << transaction.mState;
                 }
             });
 
