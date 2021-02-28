@@ -15,12 +15,12 @@ namespace Qwertycoin {
 
     namespace Breakpad {
 
-        class QExceptionHandler
+        class ExceptionHandler
         {
         public:
-            explicit QExceptionHandler (const std::string &sDumpPath = std::string());
+            explicit ExceptionHandler (const std::string &sDumpPath = std::string());
 
-            virtual ~QExceptionHandler ();
+            virtual ~ExceptionHandler ();
 
             static void dummyCrash ();
 

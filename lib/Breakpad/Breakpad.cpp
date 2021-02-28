@@ -59,7 +59,7 @@ static bool exceptionHandlerCallback (
 
 #endif
 
-Qwertycoin::Breakpad::QExceptionHandler::QExceptionHandler (const std::string &sDumpPath)
+Qwertycoin::Breakpad::ExceptionHandler::ExceptionHandler (const std::string &sDumpPath)
 {
 #if defined(_WIN32) || defined(WIN32) // Windows
     const std::string sDefaultDumpPath = std::string("C:\\Windows\\Temp");
@@ -102,7 +102,7 @@ Qwertycoin::Breakpad::QExceptionHandler::QExceptionHandler (const std::string &s
 #endif
 }
 
-Qwertycoin::Breakpad::ExceptionHandler::~ExceptionHandler()
+Qwertycoin::Breakpad::ExceptionHandler::~ExceptionHandler ()
 {
     if (mExceptionHandler) {
         delete mExceptionHandler;
@@ -113,7 +113,7 @@ Qwertycoin::Breakpad::ExceptionHandler::~ExceptionHandler()
 /*!
     WARNING: This function will crash running process! Use only for testing purposes.
 */
-void Qwertycoin::Breakpad::ExceptionHandler::dummyCrash()
+void Qwertycoin::Breakpad::ExceptionHandler::dummyCrash ()
 {
     int *a = (int *) 0x42;
     fprintf(stdout, "Going to crash...\n");
